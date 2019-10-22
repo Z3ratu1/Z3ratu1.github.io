@@ -468,8 +468,24 @@
 <h2 id="phar反序列化漏洞"><a href="#phar反序列化漏洞" class="headerlink" title="phar反序列化漏洞"></a>phar反序列化漏洞</h2><p>发生在php中存在的文件操作函数参数可控，将打包的phar包改为任意后缀上传并以phar协议读取即可<br>phar被正则开头匹配禁止的场合可以使用<code>php://filter/resource=phar://</code>进行绕过<br><code>finfo_file/finfo_buffer/mime_content_type</code>这些函数均可通过phar协议触发反序列化，因此看到这些函数的时候就可以考虑这个方法了</p>
 <p>这里注意构造数据时数据类型要与原来的数据类型完全一致，不能说名字相同反序列化就能成功。public和private反序列化后private多一个不可见字符。并且原来的array之类的变量都要进行初始化，做好代码审计工作</p>
 <p>例题有bytectf的ezcms<br>贴一个Zedd师傅的文章<a href="https://xz.aliyun.com/t/6057" target="_blank" rel="noopener">https://xz.aliyun.com/t/6057</a></p>
-<h3 id="phar反序列化影响的函数"><a href="#phar反序列化影响的函数" class="headerlink" title="phar反序列化影响的函数"></a>phar反序列化影响的函数</h3><p><code>fileatime / filectime / filemtime</code>stat / fileinode / fileowner / filegroup / fileperms<br><code>file / file_get_contents / readfile / fopen</code><br><code>file_exists / is_dir / is_executable / is_file / is_link / is_readable / is_writeable / is_writable</code>parse_ini_file<br><code>unlink</code>copy`<br>有关文件的操作基本都被涉及，在这些函数下使用phar://协议对文件进行访问均可触发我们先前构造好的数据进行巧妙的攻击</p>
-<h3 id="phar反序列化数据的构造"><a href="#phar反序列化数据的构造" class="headerlink" title="phar反序列化数据的构造"></a>phar反序列化数据的构造</h3><p><code>$a = new File(&#39;123&#39;,&#39;456&#39;); //构建一个设计好数据的变量</code><br><code>//echo unserialize($a);</code><br><code>$phar = new Phar(&quot;1.phar&quot;); //后缀名必须为phar</code><br><code>$phar-&gt;startBuffering();</code><br><code>$phar-&gt;setStub(&quot;&lt;?php __HALT_COMPILER(); ?&gt;&quot;); //设置stub，需要绕过图片检测时可在前面加GIF23a</code><br><code>$phar-&gt;setMetadata($a); //将自定义的meta-data存入manifest</code><br><code>$phar-&gt;addFromString(&quot;1.txt&quot;, &quot;test&quot;); //添加要压缩的文件,内容无意义</code><br><code>//签名自动计算</code><br><code>$phar-&gt;stopBuffering();</code><br>例题为bytectf的ezcms</p>
+<h3 id="phar反序列化影响的函数"><a href="#phar反序列化影响的函数" class="headerlink" title="phar反序列化影响的函数"></a>phar反序列化影响的函数</h3><pre class=" language-php"><code class="language-php">fileatime <span class="token operator">/</span> filectime <span class="token operator">/</span> filemtime
+stat <span class="token operator">/</span> fileinode <span class="token operator">/</span> fileowner <span class="token operator">/</span> filegroup <span class="token operator">/</span> fileperms
+file <span class="token operator">/</span> file_get_contents <span class="token operator">/</span> readfile <span class="token operator">/</span> fopen`
+file_exists <span class="token operator">/</span> is_dir <span class="token operator">/</span> is_executable <span class="token operator">/</span> is_file <span class="token operator">/</span> is_link <span class="token operator">/</span> is_readable <span class="token operator">/</span> is_writeable <span class="token operator">/</span> is_writable
+parse_ini_file
+unlink
+copy</code></pre>
+<p>有关文件的操作基本都被涉及，在这些函数下使用phar://协议对文件进行访问均可触发我们先前构造好的数据进行巧妙的攻击</p>
+<h3 id="phar反序列化数据的构造"><a href="#phar反序列化数据的构造" class="headerlink" title="phar反序列化数据的构造"></a>phar反序列化数据的构造</h3><pre class=" language-php"><code class="language-php"><span class="token variable">$a</span> <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">File</span><span class="token punctuation">(</span><span class="token string">'123'</span><span class="token punctuation">,</span><span class="token string">'456'</span><span class="token punctuation">)</span><span class="token punctuation">;</span> <span class="token comment" spellcheck="true">//构建一个设计好数据的变量 </span>
+<span class="token comment" spellcheck="true">//echo unserialize($a);</span>
+<span class="token variable">$phar</span> <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">Phar</span><span class="token punctuation">(</span><span class="token string">"1.phar"</span><span class="token punctuation">)</span><span class="token punctuation">;</span> <span class="token comment" spellcheck="true">//后缀名必须为phar</span>
+<span class="token variable">$phar</span><span class="token operator">-</span><span class="token operator">></span><span class="token function">startBuffering</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token variable">$phar</span><span class="token operator">-</span><span class="token operator">></span><span class="token function">setStub</span><span class="token punctuation">(</span><span class="token string">"&lt;?php __HALT_COMPILER(); ?>"</span><span class="token punctuation">)</span><span class="token punctuation">;</span> <span class="token comment" spellcheck="true">//设置stub，需要绕过图片检测时可在前面加GIF23a</span>
+<span class="token variable">$phar</span><span class="token operator">-</span><span class="token operator">></span><span class="token function">setMetadata</span><span class="token punctuation">(</span><span class="token variable">$a</span><span class="token punctuation">)</span><span class="token punctuation">;</span> <span class="token comment" spellcheck="true">//将自定义的meta-data存入manifest</span>
+<span class="token variable">$phar</span><span class="token operator">-</span><span class="token operator">></span><span class="token function">addFromString</span><span class="token punctuation">(</span><span class="token string">"1.txt"</span><span class="token punctuation">,</span> <span class="token string">"test"</span><span class="token punctuation">)</span><span class="token punctuation">;</span> <span class="token comment" spellcheck="true">//添加要压缩的文件,内容无意义</span>
+<span class="token comment" spellcheck="true">//签名自动计算</span>
+<span class="token variable">$phar</span><span class="token operator">-</span><span class="token operator">></span><span class="token function">stopBuffering</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span></code></pre>
+<p>例题为bytectf的ezcms</p>
 
             </div>
             <hr/>
@@ -568,7 +584,7 @@
 </style>
 
 <div id="reward">
-    <a href="#rewardModal" class="reward-link modal-trigger btn-floating btn-large waves-effect waves-light red">赏</a>
+<!--    <a href="#rewardModal" class="reward-link modal-trigger btn-floating btn-large waves-effect waves-light red">赏</a>-->
 
     <!-- Modal Structure -->
     <div id="rewardModal" class="modal">

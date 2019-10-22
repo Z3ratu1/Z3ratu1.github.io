@@ -6,7 +6,10 @@
     <meta charset="utf-8">
     <meta name="keywords" content="LCTF bestphp&#39;s revenge, Z3ratu1&#39;s blog">
     <meta name="description" content="LCTF bestphp’s revenge记录一个获得了马师傅肯定的题目
-题目源码index.php&amp;lt;?phphighlight_file(FILE);$b = &amp;#39;implode&amp;#39;;call_user_func($_">
+题目源码index.php&amp;lt;?php
+highlight_file(__FILE__);
+$b = &#39;implode&#39;;
+call_user_func($_G">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     <meta name="renderer" content="webkit|ie-stand|ie-comp">
@@ -446,7 +449,7 @@
                     
                     <div class="info-break-policy">
                         <i class="fa fa-file-word-o fa-fw"></i>Word Count:&nbsp;&nbsp;
-                        871
+                        865
                     </div>
                     
 
@@ -470,8 +473,24 @@
         <div class="card-content article-card-content">
             <div id="articleContent">
                 <h1 id="LCTF-bestphp’s-revenge"><a href="#LCTF-bestphp’s-revenge" class="headerlink" title="LCTF bestphp’s revenge"></a>LCTF bestphp’s revenge</h1><p>记录一个获得了马师傅肯定的题目</p>
-<h2 id="题目源码"><a href="#题目源码" class="headerlink" title="题目源码"></a>题目源码</h2><h3 id="index-php"><a href="#index-php" class="headerlink" title="index.php"></a>index.php</h3><p><code>&lt;?php</code>highlight_file(<strong>FILE</strong>);<br><code>$b = &#39;implode&#39;;</code>call_user_func($_GET[‘f’], $_POST);<br><code>session_start();</code>if (isset($_GET[‘name’])) {<br>    $_SESSION[‘name’] = $_GET[‘name’];<br><code>}</code>var_dump($_SESSION);<br><code>$a = array(reset($_SESSION), &#39;welcome_to_the_lctf2018&#39;);</code>call_user_func($b, $a);<br><code>?&gt;</code></p>
-<h3 id="flag-php"><a href="#flag-php" class="headerlink" title="flag.php"></a>flag.php</h3><p><code>$flag = &#39;LCTF{*************************}&#39;;</code>if($_SERVER[“REMOTE_ADDR”]===”127.0.0.1”){<br>       $_SESSION[‘flag’] = $flag;<br><code>}</code>only localhost can get flag!`</p>
+<h2 id="题目源码"><a href="#题目源码" class="headerlink" title="题目源码"></a>题目源码</h2><h3 id="index-php"><a href="#index-php" class="headerlink" title="index.php"></a>index.php</h3><pre class=" language-php"><code class="language-php"><span class="token delimiter">&lt;?php</span>
+<span class="token function">highlight_file</span><span class="token punctuation">(</span><span class="token constant">__FILE__</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token variable">$b</span> <span class="token operator">=</span> <span class="token string">'implode'</span><span class="token punctuation">;</span>
+<span class="token function">call_user_func</span><span class="token punctuation">(</span><span class="token variable">$_GET</span><span class="token punctuation">[</span><span class="token string">'f'</span><span class="token punctuation">]</span><span class="token punctuation">,</span> <span class="token variable">$_POST</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token function">session_start</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token function">isset</span><span class="token punctuation">(</span><span class="token variable">$_GET</span><span class="token punctuation">[</span><span class="token string">'name'</span><span class="token punctuation">]</span><span class="token punctuation">)</span><span class="token punctuation">)</span> 
+<span class="token punctuation">{</span>
+    <span class="token variable">$_SESSION</span><span class="token punctuation">[</span><span class="token string">'name'</span><span class="token punctuation">]</span> <span class="token operator">=</span> <span class="token variable">$_GET</span><span class="token punctuation">[</span><span class="token string">'name'</span><span class="token punctuation">]</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
+<span class="token function">var_dump</span><span class="token punctuation">(</span><span class="token variable">$_SESSION</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token variable">$a</span> <span class="token operator">=</span> <span class="token keyword">array</span><span class="token punctuation">(</span><span class="token function">reset</span><span class="token punctuation">(</span><span class="token variable">$_SESSION</span><span class="token punctuation">)</span><span class="token punctuation">,</span> <span class="token string">'welcome_to_the_lctf2018'</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token function">call_user_func</span><span class="token punctuation">(</span><span class="token variable">$b</span><span class="token punctuation">,</span> <span class="token variable">$a</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token delimiter">?></span></code></pre>
+<h3 id="flag-php"><a href="#flag-php" class="headerlink" title="flag.php"></a>flag.php</h3><pre class=" language-php"><code class="language-php"><span class="token variable">$flag</span> <span class="token operator">=</span> <span class="token string">'LCTF{*************************}'</span><span class="token punctuation">;</span>
+<span class="token keyword">if</span><span class="token punctuation">(</span><span class="token variable">$_SERVER</span><span class="token punctuation">[</span><span class="token string">"REMOTE_ADDR"</span><span class="token punctuation">]</span><span class="token operator">===</span><span class="token string">"127.0.0.1"</span><span class="token punctuation">)</span><span class="token punctuation">{</span>
+       <span class="token variable">$_SESSION</span><span class="token punctuation">[</span><span class="token string">'flag'</span><span class="token punctuation">]</span> <span class="token operator">=</span> <span class="token variable">$flag</span><span class="token punctuation">;</span>
+   <span class="token punctuation">}</span>
+only localhost can get flag<span class="token operator">!</span></code></pre>
 <h2 id="SESSION反序列化"><a href="#SESSION反序列化" class="headerlink" title="SESSION反序列化"></a>SESSION反序列化</h2><p>首先需要知道，php中的session中的内容并不是放在内存中的，而是以文件的方式来存储的，PHP的session在存入时会进过序列化，再使用时在通过反序列化，存储方式就是由配置项的session.save_handler来进行确定的，不同的save_hanld存在着不同的序列化反序列化操作，从而引起反序列化漏洞。</p>
 <blockquote>
 <p>php_binary 键名的长度对应的ascii字符+键名+经过serialize()函数序列化后的值<br>php 键名+竖线（|）+经过serialize()函数处理过的值<br>php_serialize 经过serialize()函数处理过的值，会将键名和值当作一个数组序列化</p>
@@ -580,7 +599,7 @@
 </style>
 
 <div id="reward">
-    <a href="#rewardModal" class="reward-link modal-trigger btn-floating btn-large waves-effect waves-light red">赏</a>
+<!--    <a href="#rewardModal" class="reward-link modal-trigger btn-floating btn-large waves-effect waves-light red">赏</a>-->
 
     <!-- Modal Structure -->
     <div id="rewardModal" class="modal">
@@ -699,7 +718,10 @@
                     <div class="summary block-with-text">
                         
                             LCTF bestphp’s revenge记录一个获得了马师傅肯定的题目
-题目源码index.php&lt;?phphighlight_file(FILE);$b = &#39;implode&#39;;call_user_func($_
+题目源码index.php&lt;?php
+highlight_file(__FILE__);
+$b = 'implode';
+call_user_func($_G
                         
                     </div>
                     <div class="publish-info">
