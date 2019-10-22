@@ -1,0 +1,1063 @@
+<!DOCTYPE HTML>
+<html lang="">
+
+
+<head>
+    <meta charset="utf-8">
+    <meta name="keywords" content="文件上传, Z3ratu1&#39;s blog">
+    <meta name="description" content="文件上传全文以upload-lab为例展开
+
+关于上传的具体步骤首先在本地前端可能会经过一次js代码的检验，上传到服务器之后会先存在一个后缀为.tmp的临时文件，之后服务器会对上传的文件进行判断，最终使用move_uploaded_file">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <meta name="renderer" content="webkit|ie-stand|ie-comp">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="format-detection" content="telephone=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <title>文件上传 | Z3ratu1&#39;s blog</title>
+    <link rel="icon" type="image/png" href="/favicon.png">
+
+    <link rel="stylesheet" type="text/css" href="/libs/awesome/css/font-awesome.min.css">
+    <link rel="stylesheet" type="text/css" href="/libs/materialize/materialize.min.css">
+    <link rel="stylesheet" type="text/css" href="/libs/aos/aos.css">
+    <link rel="stylesheet" type="text/css" href="/libs/animate/animate.min.css">
+    <link rel="stylesheet" type="text/css" href="/libs/lightGallery/css/lightgallery.min.css">
+    <link rel="stylesheet" type="text/css" href="/css/matery.css">
+    <link rel="stylesheet" type="text/css" href="/css/my.css">
+    <style type="text/css">
+        
+    </style>
+
+    <script src="/libs/jquery/jquery-2.2.0.min.js"></script>
+<link rel="stylesheet" href="/css/prism-tomorrow.css" type="text/css"></head>
+
+
+<body>
+
+<header class="navbar-fixed">
+    <nav id="headNav" class="bg-color nav-transparent">
+        <div id="navContainer" class="nav-wrapper container">
+            <div class="brand-logo">
+                <a href="/" class="waves-effect waves-light">
+                    
+                    <img src="/medias/logo.png" class="logo-img" alt="LOGO">
+                    
+                    <span class="logo-span">Z3ratu1's blog</span>
+                </a>
+            </div>
+            
+
+<a href="#" data-target="mobile-nav" class="sidenav-trigger button-collapse"><i class="fa fa-navicon"></i></a>
+<ul class="right nav-menu">
+    
+	<li class="hide-on-med-and-down nav-item" >
+		
+					  <a href="/" class="waves-effect waves-light">
+						
+						<i class="fa fa-home"></i>
+						
+						<span>Index</span>
+					</a>
+          
+        </li>
+    
+	<li class="hide-on-med-and-down nav-item" >
+		
+					  <a href="/tags" class="waves-effect waves-light">
+						
+						<i class="fa fa-tags"></i>
+						
+						<span>Tags</span>
+					</a>
+          
+        </li>
+    
+	<li class="hide-on-med-and-down nav-item" >
+		
+					  <a href="/categories" class="waves-effect waves-light">
+						
+						<i class="fa fa-bookmark"></i>
+						
+						<span>Categories</span>
+					</a>
+          
+        </li>
+    
+	<li class="hide-on-med-and-down nav-item" >
+		
+					  <a href="/archives" class="waves-effect waves-light">
+						
+						<i class="fa fa-archive"></i>
+						
+						<span>Archives</span>
+					</a>
+          
+        </li>
+    
+	<li class="hide-on-med-and-down nav-item" >
+		
+					  <a href="/about" class="waves-effect waves-light">
+						
+						<i class="fa fa-user-circle-o"></i>
+						
+						<span>About</span>
+					</a>
+          
+        </li>
+    
+	<li class="hide-on-med-and-down nav-item" >
+		
+					  <a href="/friends" class="waves-effect waves-light">
+						
+						<i class="fa fa-address-book"></i>
+						
+						<span>Friends</span>
+					</a>
+          
+        </li>
+    
+    <li>
+        <a href="#searchModal" class="modal-trigger waves-effect waves-light">
+            <i id="searchIcon" class="fa fa-search" title="Search"></i>
+        </a>
+    </li>
+</ul>
+
+<div id="mobile-nav" class="side-nav sidenav">
+
+    <div class="mobile-head bg-color">
+        
+        <img src="/medias/logo.png" class="logo-img circle responsive-img">
+        
+        <div class="logo-name">Z3ratu1's blog</div>
+        <div class="logo-desc">
+            
+            与其感慨路难行，不如现在出发
+            
+        </div>
+    </div>
+
+    
+
+    <ul class="menu-list mobile-menu-list">
+        
+        <li class="m-nav-item">
+	  
+		<a href="/" class="waves-effect waves-light">
+			
+			    <i class="fa fa-fw fa-home"></i>
+			
+			Index
+		</a>
+          
+        </li>
+        
+        <li class="m-nav-item">
+	  
+		<a href="/tags" class="waves-effect waves-light">
+			
+			    <i class="fa fa-fw fa-tags"></i>
+			
+			Tags
+		</a>
+          
+        </li>
+        
+        <li class="m-nav-item">
+	  
+		<a href="/categories" class="waves-effect waves-light">
+			
+			    <i class="fa fa-fw fa-bookmark"></i>
+			
+			Categories
+		</a>
+          
+        </li>
+        
+        <li class="m-nav-item">
+	  
+		<a href="/archives" class="waves-effect waves-light">
+			
+			    <i class="fa fa-fw fa-archive"></i>
+			
+			Archives
+		</a>
+          
+        </li>
+        
+        <li class="m-nav-item">
+	  
+		<a href="/about" class="waves-effect waves-light">
+			
+			    <i class="fa fa-fw fa-user-circle-o"></i>
+			
+			About
+		</a>
+          
+        </li>
+        
+        <li class="m-nav-item">
+	  
+		<a href="/friends" class="waves-effect waves-light">
+			
+			    <i class="fa fa-fw fa-address-book"></i>
+			
+			Friends
+		</a>
+          
+        </li>
+        
+        
+        <li><div class="divider"></div></li>
+        <li>
+            <a href="https://github.com/blinkfox/hexo-theme-matery" class="waves-effect waves-light" target="_blank">
+                <i class="fa fa-github-square fa-fw"></i>Fork Me
+            </a>
+        </li>
+        
+    </ul>
+</div>
+
+
+        </div>
+
+        
+            <style>
+    .nav-transparent .github-corner {
+        display: none !important;
+    }
+
+    .github-corner {
+        position: absolute;
+        z-index: 10;
+        top: 0;
+        right: 0;
+        border: 0;
+        transform: scale(1.1);
+    }
+
+    .github-corner svg {
+        color: #0f9d58;
+        fill: #fff;
+        height: 64px;
+        width: 64px;
+    }
+
+    .github-corner:hover .octo-arm {
+        animation: a 0.56s ease-in-out;
+    }
+
+    .github-corner .octo-arm {
+        animation: none;
+    }
+
+    @keyframes a {
+        0%,
+        to {
+            transform: rotate(0);
+        }
+        20%,
+        60% {
+            transform: rotate(-25deg);
+        }
+        40%,
+        80% {
+            transform: rotate(10deg);
+        }
+    }
+</style>
+
+<a href="https://github.com/Z3ratu1" class="github-corner tooltipped hide-on-med-and-down" target="_blank"
+   data-tooltip="Fork Me" data-position="left" data-delay="50">
+    <svg viewBox="0 0 250 250" aria-hidden="true">
+        <path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path>
+        <path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2"
+              fill=red style="transform-origin: 130px 106px;" class="octo-arm"></path>
+        <path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z"
+              fill=black class="octo-body"></path>
+    </svg>
+</a>
+        
+    </nav>
+
+</header>
+
+
+
+
+
+<div class="bg-cover pd-header post-cover" style="background-image: url('/img/note.jpg')">
+    <div class="container">
+        <div class="row">
+            <div class="col s12 m12 l12">
+                <div class="brand">
+                    <div class="description center-align post-title">
+                        文件上传
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+<main class="post-container content">
+
+    
+    <link rel="stylesheet" href="/libs/tocbot/tocbot.css">
+<style>
+    #articleContent h1::before,
+    #articleContent h2::before,
+    #articleContent h3::before,
+    #articleContent h4::before,
+    #articleContent h5::before,
+    #articleContent h6::before {
+        display: block;
+        content: " ";
+        height: 100px;
+        margin-top: -100px;
+        visibility: hidden;
+    }
+
+    #articleContent :focus {
+        outline: none;
+    }
+
+    .toc-fixed {
+        position: fixed;
+        top: 64px;
+    }
+
+    .toc-widget {
+        padding-left: 20px;
+    }
+
+    .toc-widget .toc-title {
+        margin: 35px 0 15px 0;
+        padding-left: 17px;
+        font-size: 1.5rem;
+        font-weight: bold;
+        line-height: 1.5rem;
+    }
+
+    .toc-widget ol {
+        padding: 0;
+        list-style: none;
+    }
+
+    #toc-content ol {
+        padding-left: 10px;
+    }
+
+    #toc-content ol li {
+        padding-left: 10px;
+    }
+
+    #toc-content .toc-link:hover {
+        color: #42b983;
+        font-weight: 700;
+        text-decoration: underline;
+    }
+
+    #toc-content .toc-link::before {
+        background-color: transparent;
+        max-height: 25px;
+    }
+
+    #toc-content .is-active-link {
+        color: #42b983;
+    }
+
+    #toc-content .is-active-link::before {
+        background-color: #42b983;
+    }
+
+    #floating-toc-btn {
+        position: fixed;
+        right: 20px;
+        bottom: 76px;
+        padding-top: 15px;
+        margin-bottom: 0;
+        z-index: 998;
+    }
+
+    #floating-toc-btn .btn-floating {
+        width: 48px;
+        height: 48px;
+    }
+
+    #floating-toc-btn .btn-floating i {
+        line-height: 48px;
+        font-size: 1.4rem;
+    }
+</style>
+<div class="row">
+    <div id="main-content" class="col s12 m12 l9">
+        <!-- 文章内容详情 -->
+<div id="artDetail">
+    <div class="card">
+        <div class="card-content article-info">
+            <div class="row tag-cate">
+                <div class="col s7">
+                    
+                    <div class="article-tag">
+                        
+                            <a href="/tags/php/" target="_blank">
+                                <span class="chip bg-color">php</span>
+                            </a>
+                        
+                            <a href="/tags/%E6%96%87%E4%BB%B6%E4%B8%8A%E4%BC%A0/" target="_blank">
+                                <span class="chip bg-color">文件上传</span>
+                            </a>
+                        
+                    </div>
+                    
+                </div>
+                <div class="col s5 right-align">
+                    
+                    <div class="post-cate">
+                        <i class="fa fa-bookmark fa-fw icon-category"></i>
+                        
+                            <a href="/categories/%E7%AC%94%E8%AE%B0/" class="post-category" target="_blank">
+                                笔记
+                            </a>
+                        
+                    </div>
+                    
+                </div>
+            </div>
+
+            <div class="post-info">
+                <div class="post-date info-break-policy">
+                    <i class="fa fa-calendar-minus-o fa-fw"></i>Publish Date:&nbsp;&nbsp;
+                    2019-09-27
+                </div>
+
+                
+                    
+                    <div class="info-break-policy">
+                        <i class="fa fa-file-word-o fa-fw"></i>Word Count:&nbsp;&nbsp;
+                        2.8k
+                    </div>
+                    
+
+                    
+                    <div class="info-break-policy">
+                        <i class="fa fa-clock-o fa-fw"></i>Read Times:&nbsp;&nbsp;
+                        10 Min
+                    </div>
+                    
+                
+				
+				
+                    <div id="busuanzi_container_page_pv" class="info-break-policy">
+                        <i class="fa fa-eye fa-fw"></i>Read Count:&nbsp;&nbsp;
+                        <span id="busuanzi_value_page_pv"></span>
+                    </div>
+				
+            </div>
+        </div>
+        <hr class="clearfix">
+        <div class="card-content article-card-content">
+            <div id="articleContent">
+                <h1 id="文件上传"><a href="#文件上传" class="headerlink" title="文件上传"></a>文件上传</h1><p>全文以upload-lab为例展开</p>
+<p><img src="https://xzfile.aliyuncs.com/media/upload/picture/20180712092548-81b98800-8572-1.png" alt="upload-lab导图"></p>
+<h2 id="关于上传的具体步骤"><a href="#关于上传的具体步骤" class="headerlink" title="关于上传的具体步骤"></a>关于上传的具体步骤</h2><p>首先在本地前端可能会经过一次js代码的检验，上传到服务器之后会先存在一个后缀为<code>.tmp</code>的临时文件，之后服务器会对上传的文件进行判断，最终使用<code>move_uploaded_file</code>函数将文件移动至标准路径，要注意使用该函数时路径由后台代码控制，最终储存的文件名不一定等于原文件名</p>
+<h2 id="客户端的检验"><a href="#客户端的检验" class="headerlink" title="客户端的检验"></a>客户端的检验</h2><p>使用本地js代码进行判断，是非常弱的检验手段。<br>不仅可以在本地看见源码，还可以手动把源码直接修改掉，也可通过抓包修改的形式避开判断。</p>
+<h3 id="客户端的捣乱"><a href="#客户端的捣乱" class="headerlink" title="客户端的捣乱"></a>客户端的捣乱</h3><p>有的时候上传的那个按钮属性会被设置为disable，查下代码手动改一改才能开始上传</p>
+<h2 id="服务器端的检验"><a href="#服务器端的检验" class="headerlink" title="服务器端的检验"></a>服务器端的检验</h2><p>在服务器端进行检验，该过程发生在数据包发送以后</p>
+<h3 id="黑名单"><a href="#黑名单" class="headerlink" title="黑名单"></a>黑名单</h3><p>禁止带有特定后缀名的文件上传，如.php，.asp等等</p>
+<p>这里需要注意的是我们如果要直接访问我们上传的后门，其后缀必须得是php及其衍生格式才能被解析。<br>upload-labs中的后缀处理步骤为：</p>
+<ol>
+<li>去除文件名两端的空格</li>
+<li>去除后缀最后的.</li>
+<li>以最后一个点为标志位截取文件后缀</li>
+<li>转为小写</li>
+<li>去除后缀最后的::$DATA</li>
+<li>修剪两端空格</li>
+<li>将修剪后的文件名与黑名单进行对比 </li>
+</ol>
+<h4 id="常见的PHP衍生格式"><a href="#常见的PHP衍生格式" class="headerlink" title="常见的PHP衍生格式"></a>常见的PHP衍生格式</h4><p>以upload-labs的第三关为例，这里过滤了.asp .aspx .php .jsp文件，我们可以使用PHP的衍生格式文件进行上传绕过。</p>
+<ul>
+<li>.php2</li>
+<li>.php3</li>
+<li>.php4</li>
+<li>.php5</li>
+<li>.php7</li>
+<li>.phtml</li>
+</ul>
+<h4 id="大小写后缀绕过"><a href="#大小写后缀绕过" class="headerlink" title="大小写后缀绕过"></a>大小写后缀绕过</h4><p>有的题目检测的不是很上心，大小写混搭即可绕过</p>
+<h4 id="增加空格绕过"><a href="#增加空格绕过" class="headerlink" title="增加空格绕过"></a>增加空格绕过</h4><p>有的检测是通过in_array函数实现的，并且是检测我们的后缀是否处于禁用列表之中，这时如果没有去除文件名后缀的空格，就可以完成绕过，如<code>.php</code><br>注：upload-labs的第六关的显示源码和真正的源码不符，显示的源码中仍有trim函数，坑死我了</p>
+<h4 id="Windows特性绕过"><a href="#Windows特性绕过" class="headerlink" title="Windows特性绕过"></a>Windows特性绕过</h4><p>只有在服务器是Windows系统下才有用的操作</p>
+<h5 id="加-进行绕过"><a href="#加-进行绕过" class="headerlink" title="加.进行绕过"></a>加.进行绕过</h5><p>发生在没有对文件删除.的检测中，由于Windows的特性，会自动去除文件后缀名中最后的点，这样我们的加点后缀在检测中就是以<code>.php.</code>的形式进行检测，但上传之后.会被去除又变回<code>.php</code></p>
+<h5 id="加-DATA绕过检测"><a href="#加-DATA绕过检测" class="headerlink" title="加::$DATA绕过检测"></a>加::$DATA绕过检测</h5><p>php在window的时候如果文件名+”::$DATA”会把::$DATA之后的数据当成文件流处理,不会检测后缀名.且保持”::$DATA”之前的文件名，完成绕过</p>
+<h5 id="使用原文件名作为新文件名"><a href="#使用原文件名作为新文件名" class="headerlink" title="使用原文件名作为新文件名"></a>使用原文件名作为新文件名</h5><p>以upload-labs第九题为例<br>一般来说服务器会将检测后的文件名作为上传文件的文件名进行保存，但是某些情况下会将原文件名进行保存，这时我们就可以利用这点构造进行绕过<br>例:<code>webshell.php. .</code>，通过Windows服务器特性即可绕过检测并可被解析，但如果储存的是处理过的文件名，此处被截取到的文件后缀将为空。</p>
+<h4 id="被禁用后缀名替换为空"><a href="#被禁用后缀名替换为空" class="headerlink" title="被禁用后缀名替换为空"></a>被禁用后缀名替换为空</h4><p>同样的套路常见于SQL注入，双写绕过即可<br>例：<code>.phphpp</code></p>
+<h4 id="禁止-lt"><a href="#禁止-lt" class="headerlink" title="禁止&lt;?"></a>禁止&lt;?</h4><p>可以使用<script language=php>  xxxxx  </script>这样的标签来进行定义，等价于<?php xxxx ?><br>该标准已在php7中禁用</p>
+<h3 id="白名单"><a href="#白名单" class="headerlink" title="白名单"></a>白名单</h3><p>只允许上传某些文件，如.jpg，.png等等，这时如何使我们上传的后门被解析是一个重点问题</p>
+<h4 id="htaccess重定向"><a href="#htaccess重定向" class="headerlink" title=".htaccess重定向"></a>.htaccess重定向</h4><p>是Apache的配置文件，.htaccess文件规定了当前目录的应用规则，不同的目录下可以拥有不同的.htaccess文件规定不同的规则<br>这里用它将所有文件都解析为php文件就可以用上传后缀为.jpg的shell了<br>将所有文件解析为php的代码如下<br><code>SetHandler application/x-httpd-php</code><br>可后接文件后缀名使特定文件被解析为php<br>上传该内容的.htaccess文件即可以上传.jpg后缀的文件作为后门了<br>启用.htaccess文件需要在Apache配置中修改允许重写<br>.htaccess构成的后门：<a href="http://www.dengb.com/aqgjrj/961456.html" target="_blank" rel="noopener">http://www.dengb.com/aqgjrj/961456.html</a></p>
+<p>几个常见语句</p>
+<ul>
+<li>设置php变量 <code>php_value &lt;key&gt; &lt;val&gt;</code>  例如<code>php_value auto_append_file xxx.php</code> 该语句等价于在当前页面底端增加一句require(xxx.php)</li>
+<li>更改解析方式 <code>SetHandler application/x-httpd-php .ext</code>，AddType语句和SetHandler一个效果，该语句规定将后缀为.ext的文件解析为php文件</li>
+<li><code>php_flag engine off</code>，该语句命令当前目录下的所有文件都不可作为PHP脚本解析，当服务器存在该设置时可以考虑控制文件上传路径，使我们的shell放置在无.htaccess文件的地方</li>
+<li><code>php_flag display_errors on</code>字面意思，显示错误</li>
+<li><code>php_value zend.script_encoding “UTF-7″</code> 修改编码方式，要是我就用base64了</li>
+</ul>
+<h4 id="user-ini包含后门"><a href="#user-ini包含后门" class="headerlink" title=".user.ini包含后门"></a>.user.ini包含后门</h4><p>.user.ini文件中也有和htaccess一样的auto_append_file，并且相较于.htaccess，.user.ini存在于各种服务器之中，使用文件包含时，被包含的任何文件都会被解析为php文件，所以我们可以通过上传.user.ini文件再上传一个图片马，进行访问就可以进入后门了（当然需要一个正常的可访问php文件才能）<br>贴一个文章：<a href="https://wooyun.js.org/drops/user.ini%E6%96%87%E4%BB%B6%E6%9E%84%E6%88%90%E7%9A%84PHP%E5%90%8E%E9%97%A8.html" target="_blank" rel="noopener">https://wooyun.js.org/drops/user.ini%E6%96%87%E4%BB%B6%E6%9E%84%E6%88%90%E7%9A%84PHP%E5%90%8E%E9%97%A8.html</a></p>
+<h4 id="00截断"><a href="#00截断" class="headerlink" title="00截断"></a>00截断</h4><blockquote>
+<p>适用情形：截断条件：php版本小于5.3.4，php的magic_quotes_gpc为OFF状态<br>因为对PHP版本要求过老，基本没用</p>
+</blockquote>
+<p>在上传的时候，当文件系统读到【0x00】时，会认为文件已经结束。利用00截断就是利用程序员在写程序时对文件的上传路径过滤不严格，产生0x00上传截断漏洞。<br>出现在上传路径可控的情况下，以get方式传递时可直接使用%00进行绕过，会自动进行url解码，以post方式执行时，需要在十六进制中对数据进行修改为00</p>
+<h4 id="图片马绕过"><a href="#图片马绕过" class="headerlink" title="图片马绕过"></a>图片马绕过</h4><p>PHP存在一些判断文件类型的函数，通常就是看看文件头尾是不是符合图片的类型，这个时候我们可以把木马拼接在图片中，即可制造出一个图片马进行上传。<br>图片马是以.jpg形式上传的，使用就需要有文件包含，或是.htaccess，或者其他的解析漏洞。<br>图片马制作<code>copy 1.jpg /b + shell.php /a shell.jpg</code>，感觉直接在010editor里面拼也差不多<br>该方法可以绕过<code>getReailFileType</code>，<code>getimagesize</code>，<code>exif_imagetype</code>等函数检验</p>
+<h5 id="exif-imagetype-绕过"><a href="#exif-imagetype-绕过" class="headerlink" title="exif_imagetype()绕过"></a>exif_imagetype()绕过</h5><p>可以在文件开头增加<code>GIF89a</code>来绕过<br><code>#define width 20</code><br><code>#define height 10</code><br>如上两行是xbm格式图片的开头，在上传.htaccess或是php脚本文件时将这两行添加进去可绕过exif_imagetype，并在解析时被作为注释，不影响脚本正常解析</p>
+<h5 id="二次渲染绕过"><a href="#二次渲染绕过" class="headerlink" title="二次渲染绕过"></a>二次渲染绕过</h5><p>图片进行二次渲染之后可能会剔除我们之前拼接在图片中的脚本，并且对于.jpg，.png和.gif图片而言，处理二次渲染的方式并不一致</p>
+<ul>
+<li>.gif文件：.gif图片在进行二次渲染时存在二进制文件完全不变的部分，将代码插入该部分即可。</li>
+<li>.png文件：很复杂，要分析数据块，将代码写入PLTE数据块并重新计算crc值修改，也可使用大佬的脚本</li>
+<li>.jpg文件：使用大佬脚本进行填充，但部分jpg文件不存在可填充空间，所以需要多拿几张图片进行尝试<br>一篇写的很好的文章：<a href="https://xz.aliyun.com/t/2657" target="_blank" rel="noopener">https://xz.aliyun.com/t/2657</a> 脚本也贴在里面了</li>
+</ul>
+<h4 id="条件竞争"><a href="#条件竞争" class="headerlink" title="条件竞争"></a>条件竞争</h4><p>发生在逻辑漏洞中，有的系统先将上传的文件进行保存再进行安全性检验，对于不通过的再予以删除，如果我们高频率对上传的文件进行访问，就有可能在其被删除之前访问到它，以此完成条件竞争<br>重复发包我们可以使用bp的intruder模块，随便自己加一个参数发起进攻即可，同时在浏览器反复尝试对上传的文件进行访问即可（需要知道上传的文件储存路径，并且文件名不要有变化）</p>
+<h5 id="阻止文件改名"><a href="#阻止文件改名" class="headerlink" title="阻止文件改名"></a>阻止文件改名</h5><p>系统存在将上传的文件进行改名的操作，进行随机改名之后我们不知道被修改的文件名是什么，自然无法进行进一步的访问。如果也同条件竞争一样一直对服务器进行文件上传，就有机会访问到尚未未改名的文件（实测时发现最后竟然保留了一个未被改名的文件，不知道为什么）</p>
+<h4 id="检测文件属性"><a href="#检测文件属性" class="headerlink" title="检测文件属性"></a>检测文件属性</h4><p>检测内容为文件的content-type，即文件属性。注意此处的content-type位于数据包中post的数据部分，不属于包的头部参数。<br>可以将文件名直接修改为<code>.jpg</code>然后抓包修改后缀为<code>.php</code>，或将<code>.php</code>文件的content-type修改为图片的<code>image/jpeg</code>即可绕过检测</p>
+<h4 id="本地包含的文件上传"><a href="#本地包含的文件上传" class="headerlink" title="本地包含的文件上传"></a>本地包含的文件上传</h4><p>存在include等函数时，会将包含的文件当做PHP代码执行，所以如果有该函数，我们以此方式对上传的.jpg后缀文件进行访问也可正确解析。</p>
+<h5 id="被限定后缀的本地包含"><a href="#被限定后缀的本地包含" class="headerlink" title="被限定后缀的本地包含"></a>被限定后缀的本地包含</h5><p>后台向文件包含位置增加一个.php后缀<br>这时可以使用php的phar伪协议，phar伪协议可以读取压缩包里的内容，我们可以将shell.php压缩为shell.zip，修改后缀为shell.jpg上传之后以phar伪协议进行读取，<code>?file=phar://upload/shell.jpg/shell</code>，这里最后一个shell会因为被添加一个.php被读取出来</p>
+<h4 id="phar反序列化"><a href="#phar反序列化" class="headerlink" title="phar反序列化"></a>phar反序列化</h4><p>PHP新爆出的重大安全隐患，许多文件相关操作函数不经意间存在对phar文件的反序列化操作，使得我们精心设计的恶意数据将会得以导入</p>
+<p>这种类型的漏洞需要源码进行代码审计，对__call,__construct等魔法方法着重关注，并且注意齐是否存在对文件操作函数的调用<br>zsx巨佬的博客<a href="https://blog.zsxsoft.com/post/38" target="_blank" rel="noopener">https://blog.zsxsoft.com/post/38</a></p>
+<h5 id="能够触发phar反序列化的函数"><a href="#能够触发phar反序列化的函数" class="headerlink" title="能够触发phar反序列化的函数"></a>能够触发phar反序列化的函数</h5><p><code>fileatime / filectime / filemtime</code>stat / fileinode / fileowner / filegroup / fileperms<br><code>file / file_get_contents / readfile / fopen</code><br><code>file_exists / is_dir / is_executable / is_file / is_link / is_readable / is_writeable / is_writable</code>parse_ini_file<br><code>unlink</code>copy`<br>这么多的函数都可以在传入参数为phar://协议时对包含的数据进行反序列化，再通过一系列魔法方法形成pop链，完成入侵<br>在构造数据时也要注意自己的数据是什么时候被构造或析构，数据的显示应该通过什么方法进行等等。</p>
+
+            </div>
+            <hr/>
+
+            
+            <style>
+    #reward {
+        margin: 40px 0;
+        text-align: center;
+    }
+
+    #reward .reward-link {
+        font-size: 1.88rem;
+    }
+
+    #reward .btn-floating:hover {
+        box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2), 0 5px 15px rgba(0, 0, 0, 0.2);
+    }
+
+    #rewardModal {
+        width: 320px;
+        height: 350px;
+    }
+
+    #rewardModal .reward-title {
+        margin: 15px auto;
+        padding-bottom: 5px;
+    }
+
+    #rewardModal .modal-content {
+        padding: 10px;
+    }
+
+    #rewardModal .close {
+        position: absolute;
+        right: 15px;
+        top: 15px;
+        color: rgba(0, 0, 0, 0.5);
+        font-size: 1.3rem;
+        line-height: 20px;
+        cursor: pointer;
+    }
+
+    #rewardModal .close:hover {
+        color: #ef5350;
+        transform: scale(1.3);
+        -moz-transform:scale(1.3);
+        -webkit-transform:scale(1.3);
+        -o-transform:scale(1.3);
+    }
+
+    #rewardModal .reward-tabs {
+        margin: 0 auto;
+        width: 210px;
+    }
+
+    .reward-tabs .tabs {
+        height: 38px;
+        margin: 10px auto;
+        padding-left: 0;
+    }
+
+    .reward-content ul {
+        padding-left: 0 !important;
+    }
+
+    .reward-tabs .tabs .tab {
+        height: 38px;
+        line-height: 38px;
+    }
+
+    .reward-tabs .tab a {
+        color: #fff;
+        background-color: #ccc;
+    }
+
+    .reward-tabs .tab a:hover {
+        background-color: #ccc;
+        color: #fff;
+    }
+
+    .reward-tabs .wechat-tab .active {
+        color: #fff !important;
+        background-color: #22AB38 !important;
+    }
+
+    .reward-tabs .alipay-tab .active {
+        color: #fff !important;
+        background-color: #019FE8 !important;
+    }
+
+    .reward-tabs .reward-img {
+        width: 210px;
+        height: 210px;
+    }
+</style>
+
+<div id="reward">
+    <a href="#rewardModal" class="reward-link modal-trigger btn-floating btn-large waves-effect waves-light red">赏</a>
+
+    <!-- Modal Structure -->
+    <div id="rewardModal" class="modal">
+        <div class="modal-content">
+            <a class="close modal-close"><i class="fa fa-close"></i></a>
+            <h4 class="reward-title">你的赏识是我前进的动力</h4>
+            <div class="reward-content">
+                <div class="reward-tabs">
+                    <ul class="tabs row">
+                        <li class="tab col s6 alipay-tab waves-effect waves-light"><a href="#alipay">支付宝</a></li>
+                        <li class="tab col s6 wechat-tab waves-effect waves-light"><a href="#wechat">微 信</a></li>
+                    </ul>
+                    <div id="alipay">
+                        <img src="/medias/reward/alipay.jpg" class="reward-img" alt="支付宝打赏二维码">
+                    </div>
+                    <div id="wechat">
+                        <img src="/medias/reward/wechat.png" class="reward-img" alt="微信打赏二维码">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    $(function () {
+        $('.tabs').tabs();
+    });
+</script>
+            
+
+            <link rel="stylesheet" type="text/css" href="/libs/share/css/share.min.css">
+
+<div id="article-share">
+    
+    <div class="social-share" data-disabled="qzone, qq, weibo, douban"></div>
+    
+</div>
+
+<script src="/libs/share/js/social-share.min.js"></script>
+
+            
+
+    <div class="reprint" id="reprint-statement">
+        <p class="reprint-tip">
+            <i class="fa fa-exclamation-triangle"></i>&nbsp;&nbsp;
+            <span>Reprint policy</span>
+        </p>
+        
+            <div class="center-align">
+                <a rel="license noopener" href="https://creativecommons.org/licenses/by/4.0/" target="_blank">
+                    <img alt=""
+                         style="border-width:0"
+                         src="https://i.creativecommons.org/l/by/4.0/88x31.png"/>
+                </a>
+            </div>
+            <br/>
+            <span xmlns:dct="http://purl.org/dc/terms/" href="http://purl.org/dc/dcmitype/Text"
+                  property="dct:title" rel="dct:type">
+                    《文件上传》
+                </span> by
+            <a xmlns:cc="http://creativecommons.org/ns#" href="/2019/09/27/%E6%96%87%E4%BB%B6%E4%B8%8A%E4%BC%A0/" property="cc:attributionName"
+               rel="cc:attributionURL">
+                Z3ratu1
+            </a> is licensed under a
+            <a rel="license noopener" href="https://creativecommons.org/licenses/by/4.0/" target="_blank">
+                Creative Commons Attribution 4.0 International License
+            </a> 
+        
+    </div>
+
+    <script async defer>
+      document.addEventListener("copy", function (e) {
+        let toastHTML = '<span>Copied successfully, please follow the reprint policy of this article</span><button class="btn-flat toast-action" onclick="navToReprintStatement()" style="font-size: smaller">more</a>';
+        M.toast({html: toastHTML})
+      });
+
+      function navToReprintStatement() {
+        $("html, body").animate({scrollTop: $("#reprint-statement").offset().top - 80}, 800);
+      }
+    </script>
+
+
+        </div>
+    </div>
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+<article id="prenext-posts" class="prev-next articles">
+    <div class="row article-row">
+        
+        <div class="article col s12 m6" data-aos="fade-up">
+            <div class="article-badge left-badge text-color">
+                <i class="fa fa-chevron-left"></i>&nbsp;Previous</div>
+            <div class="card">
+                <a href="/2019/10/09/bestphp's%20revenge/">
+                    <div class="card-image">
+                        
+                        <img src="/img/ctf.jpg" class="responsive-img" alt="LCTF bestphp's revenge">
+                        
+                        <span class="card-title">LCTF bestphp's revenge</span>
+                    </div>
+                </a>
+                <div class="card-content article-content">
+                    <div class="summary block-with-text">
+                        
+                            LCTF bestphp’s revenge记录一个获得了马师傅肯定的题目
+题目源码index.php&lt;?phphighlight_file(FILE);$b = &#39;implode&#39;;call_user_func($_
+                        
+                    </div>
+                    <div class="publish-info">
+                        <span class="publish-date">
+                            <i class="fa fa-clock-o fa-fw icon-date"></i>2019-10-09
+                        </span>
+                        <span class="publish-author">
+                            
+                            <i class="fa fa-bookmark fa-fw icon-category"></i>
+                            
+                            <a href="/categories/%E5%88%B7%E9%A2%98%E8%AE%B0%E5%BD%95/" class="post-category" target="_blank">
+                                    刷题记录
+                                </a>
+                            
+                            
+                        </span>
+                    </div>
+                </div>
+                
+                <div class="card-action article-tags">
+                    
+                    <a href="/tags/php/" target="_blank">
+                        <span class="chip bg-color">php</span>
+                    </a>
+                    
+                    <a href="/tags/SoapClient/" target="_blank">
+                        <span class="chip bg-color">SoapClient</span>
+                    </a>
+                    
+                    <a href="/tags/%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96/" target="_blank">
+                        <span class="chip bg-color">反序列化</span>
+                    </a>
+                    
+                    <a href="/tags/SSRF/" target="_blank">
+                        <span class="chip bg-color">SSRF</span>
+                    </a>
+                    
+                </div>
+                
+            </div>
+        </div>
+        
+        
+        <div class="article col s12 m6" data-aos="fade-up">
+            <div class="article-badge right-badge text-color">
+                Next&nbsp;<i class="fa fa-chevron-right"></i>
+            </div>
+            <div class="card">
+                <a href="/2019/09/27/%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96%E6%BC%8F%E6%B4%9E/">
+                    <div class="card-image">
+                        
+                        <img src="/img/note.jpg" class="responsive-img" alt="PHP中的反序列化漏洞">
+                        
+                        <span class="card-title">PHP中的反序列化漏洞</span>
+                    </div>
+                </a>
+                <div class="card-content article-content">
+                    <div class="summary block-with-text">
+                        
+                            PHP中的反序列化漏洞可能利用反序列化的提示代码中出现file_get_content等文件操作相关函数unserialze，serialze等危险函数类中存在__wakeup，__toString，__call，__sleep等魔法方法这
+                        
+                    </div>
+                    <div class="publish-info">
+                            <span class="publish-date">
+                                <i class="fa fa-clock-o fa-fw icon-date"></i>2019-09-27
+                            </span>
+                        <span class="publish-author">
+                            
+                            <i class="fa fa-bookmark fa-fw icon-category"></i>
+                            
+                            <a href="/categories/%E7%AC%94%E8%AE%B0/" class="post-category" target="_blank">
+                                    笔记
+                                </a>
+                            
+                            
+                        </span>
+                    </div>
+                </div>
+                
+                <div class="card-action article-tags">
+                    
+                    <a href="/tags/php/" target="_blank">
+                        <span class="chip bg-color">php</span>
+                    </a>
+                    
+                    <a href="/tags/%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96/" target="_blank">
+                        <span class="chip bg-color">反序列化</span>
+                    </a>
+                    
+                </div>
+                
+            </div>
+        </div>
+        
+    </div>
+</article>
+</div>
+
+
+
+    </div>
+    <div id="toc-aside" class="expanded col l3 hide-on-med-and-down">
+        <div class="toc-widget">
+            <div class="toc-title"><i class="fa fa-list-alt"></i>&nbsp;&nbsp;TOC</div>
+            <div id="toc-content"></div>
+        </div>
+    </div>
+</div>
+
+<!-- TOC 悬浮按钮. -->
+
+<div id="floating-toc-btn" class="hide-on-med-and-down">
+    <a class="btn-floating btn-large bg-color">
+        <i class="fa fa-list"></i>
+    </a>
+</div>
+
+
+<script src="/libs/tocbot/tocbot.min.js"></script>
+<script>
+    $(function () {
+        tocbot.init({
+            tocSelector: '#toc-content',
+            contentSelector: '#articleContent',
+            headingsOffset: -($(window).height() * 0.4 - 45),
+            // headingsOffset: -205,
+            headingSelector: 'h2, h3, h4'
+        });
+
+        // modify the toc link href to support Chinese.
+        let i = 0;
+        let tocHeading = 'toc-heading-';
+        $('#toc-content a').each(function () {
+            $(this).attr('href', '#' + tocHeading + (++i));
+        });
+
+        // modify the heading title id to support Chinese.
+        i = 0;
+        $('#articleContent').children('h2, h3, h4').each(function () {
+            $(this).attr('id', tocHeading + (++i));
+        });
+
+        // Set scroll toc fixed.
+        let tocHeight = parseInt($(window).height() * 0.4 - 64);
+        let $tocWidget = $('.toc-widget');
+        $(window).scroll(function () {
+            let scroll = $(window).scrollTop();
+            /* add post toc fixed. */
+            if (scroll > tocHeight) {
+                $tocWidget.addClass('toc-fixed');
+            } else {
+                $tocWidget.removeClass('toc-fixed');
+            }
+        });
+
+        
+        /* 修复文章卡片 div 的宽度. */
+        let fixPostCardWidth = function (srcId, targetId) {
+            let srcDiv = $('#' + srcId);
+            if (srcDiv.length === 0) {
+                return;
+            }
+
+            let w = srcDiv.width();
+            if (w >= 450) {
+                w = w + 21;
+            } else if (w >= 350 && w < 450) {
+                w = w + 18;
+            } else if (w >= 300 && w < 350) {
+                w = w + 16;
+            } else {
+                w = w + 14;
+            }
+            $('#' + targetId).width(w);
+        };
+
+        // 切换TOC目录展开收缩的相关操作.
+        const expandedClass = 'expanded';
+        let $tocAside = $('#toc-aside');
+        let $mainContent = $('#main-content');
+        $('#floating-toc-btn .btn-floating').click(function () {
+            if ($tocAside.hasClass(expandedClass)) {
+                $tocAside.removeClass(expandedClass).slideUp(500);
+                $mainContent.removeClass('l9');
+            } else {
+                $tocAside.addClass(expandedClass).slideDown(500);
+                $mainContent.addClass('l9');
+            }
+            fixPostCardWidth('artDetail', 'prenext-posts');
+        });
+        
+    });
+</script>
+    
+
+</main>
+
+
+<footer class="page-footer bg-color">
+    <div class="container row center-align">
+        <div class="col s12 m8 l8 copy-right">
+            
+            &nbsp;<i class="fa fa-area-chart"></i>&nbsp;站点总字数:&nbsp;<span
+                class="white-color">11.9k</span>&nbsp;字
+            
+            
+            
+            
+            
+            <span id="busuanzi_container_site_pv">
+                |&nbsp;<i class="fa fa-eye"></i>&nbsp;总访问量:&nbsp;<span id="busuanzi_value_site_pv"
+                    class="white-color"></span>&nbsp;次
+            </span>
+            
+            
+            <span id="busuanzi_container_site_uv">
+                |&nbsp;<i class="fa fa-users"></i>&nbsp;总访问人数:&nbsp;<span id="busuanzi_value_site_uv"
+                    class="white-color"></span>&nbsp;人
+            </span>
+            <br>
+            <span id="timeDate">载入天数...</span><span id="times">载入时分秒...</span>
+            <script>
+                var now = new Date();
+
+                function createtime() {
+                    var grt = new Date("06/28/2019 00:00:00");
+                    now.setTime(now.getTime() + 250);
+                    days = (now - grt) / 1000 / 60 / 60 / 24;
+                    dnum = Math.floor(days);
+                    hours = (now - grt) / 1000 / 60 / 60 - (24 * dnum);
+                    hnum = Math.floor(hours);
+                    if (String(hnum).length == 1) {
+                        hnum = "0" + hnum;
+                    }
+                    minutes = (now - grt) / 1000 / 60 - (24 * 60 * dnum) - (60 * hnum);
+                    mnum = Math.floor(minutes);
+                    if (String(mnum).length == 1) {
+                        mnum = "0" + mnum;
+                    }
+                    seconds = (now - grt) / 1000 - (24 * 60 * 60 * dnum) - (60 * 60 * hnum) - (60 * mnum);
+                    snum = Math.round(seconds);
+                    if (String(snum).length == 1) {
+                        snum = "0" + snum;
+                    }
+                    document.getElementById("timeDate").innerHTML = "本站已安全运行 " + dnum + " 天 ";
+                    document.getElementById("times").innerHTML = hnum + " 小时 " + mnum + " 分 " + snum + " 秒";
+                }
+                setInterval("createtime()", 250);
+            </script>
+            
+            
+        </div>
+        <div class="col s12 m4 l4 social-link social-statis">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</div>
+    </div>
+</footer>
+
+<div class="progress-bar"></div>
+
+
+<!-- 搜索遮罩框 -->
+<div id="searchModal" class="modal">
+    <div class="modal-content">
+        <div class="search-header">
+            <span class="title"><i class="fa fa-search"></i>&nbsp;&nbsp;Search</span>
+            <input type="search" id="searchInput" name="s" placeholder="Please enter a search keyword"
+                   class="search-input">
+        </div>
+        <div id="searchResult"></div>
+    </div>
+</div>
+
+<script src="/js/search.js"></script>
+<script type="text/javascript">
+$(function () {
+    searchFunc("/" + "search.xml", 'searchInput', 'searchResult');
+});
+</script>
+<!-- 回到顶部按钮 -->
+<div id="backTop" class="top-scroll">
+    <a class="btn-floating btn-large waves-effect waves-light" href="#!">
+        <i class="fa fa-angle-up"></i>
+    </a>
+</div>
+
+
+<script src="/libs/materialize/materialize.min.js"></script>
+<script src="/libs/masonry/masonry.pkgd.min.js"></script>
+<script src="/libs/aos/aos.js"></script>
+<script src="/libs/scrollprogress/scrollProgress.min.js"></script>
+<script src="/libs/lightGallery/js/lightgallery-all.min.js"></script>
+<script src="/js/matery.js"></script>
+
+<!-- Global site tag (gtag.js) - Google Analytics -->
+
+
+
+
+    <script async src="/libs/others/busuanzi.pure.mini.js"></script>
+
+
+</body>
+</html>
