@@ -4,6 +4,31 @@
   
     
     <entry>
+      <title>decade wp</title>
+      <link href="/2019/11/10/decade%20wp/"/>
+      <url>/2019/11/10/decade%20wp/</url>
+      
+        <content type="html"><![CDATA[<h1 id="decade-wp"><a href="#decade-wp" class="headerlink" title="decade wp"></a>decade wp</h1><p>复现复现，是一道bytectf修改了的题，加了几个过滤</p><h2 id="无参数函数的命令执行"><a href="#无参数函数的命令执行" class="headerlink" title="无参数函数的命令执行"></a>无参数函数的命令执行</h2><pre class=" language-php"><code class="language-php"><span class="token delimiter">&lt;?php</span><span class="token function">highlight_file</span><span class="token punctuation">(</span><span class="token constant">__FILE__</span><span class="token punctuation">)</span><span class="token punctuation">;</span><span class="token variable">$code</span> <span class="token operator">=</span> <span class="token variable">$_GET</span><span class="token punctuation">[</span><span class="token string">'code'</span><span class="token punctuation">]</span><span class="token punctuation">;</span><span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token operator">!</span><span class="token function">empty</span><span class="token punctuation">(</span><span class="token variable">$code</span><span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>        <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token string">';'</span> <span class="token operator">===</span> <span class="token function">preg_replace</span><span class="token punctuation">(</span><span class="token string">'/[a-z]+\((?R)?\)/'</span><span class="token punctuation">,</span> <span class="token keyword">NULL</span><span class="token punctuation">,</span> <span class="token variable">$code</span><span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>            <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token function">preg_match</span><span class="token punctuation">(</span><span class="token string">'/readfile|if|time|local|sqrt|et|na|nt|strlen|info|path|rand|dec|bin|hex|oct|pi|exp|log/i'</span><span class="token punctuation">,</span> <span class="token variable">$code</span><span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>                    <span class="token keyword">echo</span> <span class="token string">'bye~'</span><span class="token punctuation">;</span>                <span class="token punctuation">}</span> <span class="token keyword">else</span> <span class="token punctuation">{</span>                    <span class="token function">eval</span><span class="token punctuation">(</span><span class="token variable">$code</span><span class="token punctuation">)</span><span class="token punctuation">;</span>                <span class="token punctuation">}</span>            <span class="token punctuation">}</span>        <span class="token keyword">else</span> <span class="token punctuation">{</span>            <span class="token keyword">echo</span> <span class="token string">"No way!!!"</span><span class="token punctuation">;</span>        <span class="token punctuation">}</span><span class="token punctuation">}</span><span class="token keyword">else</span> <span class="token punctuation">{</span>        <span class="token keyword">echo</span> <span class="token string">"No way!!!"</span><span class="token punctuation">;</span>    <span class="token punctuation">}</span></code></pre><p>贴一下源码</p><p>这个正则大概意思就是只允许无参数的函数调用，并且函数还得是全英文的，不能有下划线数字之类的，(?R)表示引用当前正则表达式，?匹配一次或零次，也就是可以<code>func1(func2(func3(())))</code>这样子，后来看了师傅们的payload发现还可以<code>func1(func2())func3()</code>这个样子</p><h2 id="无中生有的用函数返回值获取字符串"><a href="#无中生有的用函数返回值获取字符串" class="headerlink" title="无中生有的用函数返回值获取字符串"></a>无中生有的用函数返回值获取字符串</h2><p>各种各样的神仙技巧，要求对各个函数的功能足够熟练才能做出来了，fuzz跑出内置函数然后做数学题或者各种各样的变换，我只能列一下学到的知识了</p><h3 id="获取’-’"><a href="#获取’-’" class="headerlink" title="获取’.’"></a>获取’.’</h3><h4 id="思路一"><a href="#思路一" class="headerlink" title="思路一"></a>思路一</h4><p>第一步，用chr(47)获取<code>.</code>，第二步，想办法无中生有一个数字出来，大佬的fuzz跑出来了一个phpversion函数，返回一个当前版本号，7.xxx，然后开始做数学题（我不太清楚这个数学题怎么做的）<br><code>ceil(sinh(cosh(tan(floor(sqrt(floor(phpversion())))))))</code>=47<br>这样子我们就可以访问当前目录了</p><h4 id="思路二"><a href="#思路二" class="headerlink" title="思路二"></a>思路二</h4><p>fuzz测试出localeconv()函数返回数组的第一位是<code>.</code>，就能直接current(localeconv())拿到</p><h4 id="思路三"><a href="#思路三" class="headerlink" title="思路三"></a>思路三</h4><p>用crypt函数对字符串进行加密，有概率在最后一位出现一个<code>.</code>，然后strrev翻转字符串，chr(ord())取得第一位，概率获得一个<code>.</code><br><code>chr(ord(strrev(crypt(($arg)))))</code>这里的arg好像是啥都行，数字，bool值都可以<br>所以用phpversion()也好，接着chdir()也好，都能用，就是概率性问题<br>还有见到用<code>serialize(array())</code>来获取字符串的</p><h3 id="获取’-’穿越目录"><a href="#获取’-’穿越目录" class="headerlink" title="获取’..’穿越目录"></a>获取’..’穿越目录</h3><p>flag在上级目录，所以我们还得拿一个<code>..</code>进行目录穿越，在执行ls -a的时候，列出来的目录的第二位是一个<code>..</code>，所以我们next(scandir())就能获得<code>..</code></p><h3 id="跳完目录还得再获取一个’-’"><a href="#跳完目录还得再获取一个’-’" class="headerlink" title="跳完目录还得再获取一个’.’"></a>跳完目录还得再获取一个’.’</h3><p>需要chdir穿越目录之后再来一个<code>.</code>，chdir的返回值是一个布尔值true，大佬说用localtime(time(true))可以构造一个47出来，因为时间不同会随之变化，但是实际上我试的时候怎么试都是0，该方案只得作罢<br>否则如果成功穿越目录并scandir的话，可以继续使用next(),current(),end()等函数读取处于特定位置的文件<br>样例payload:<code>echo(readfile(end(scandir(chr(pos(localtime(time(chdir(next(scandir(chr(ceil(sinh(cosh(tan(floor(sqrt(floor(phpversion())))))))))))))))))));</code><br>又：本地测试时显示pos函数的返回值为空，查一下发现可以用current函数代替，不知道大佬是怎么做出来的</p><h3 id="跳目录与读文件分开的奇妙操作"><a href="#跳目录与读文件分开的奇妙操作" class="headerlink" title="跳目录与读文件分开的奇妙操作"></a>跳目录与读文件分开的奇妙操作</h3><p>可以用if()func()这样的语法执行跳目录，在if里面跳目录，然后chdir返回一个true，if语句就通过了，再在后面执行读文件，不得不说是非常高级的思路了（然而我读的时候没意识到正则还能这么匹配过去）<br>所以我们<code>if(chdir(..))readfile(scandir(.))</code>，根据scandir的情况选择用哪个函数读取处于哪个位置的文件</p><h2 id="本题payload"><a href="#本题payload" class="headerlink" title="本题payload"></a>本题payload</h2><p>以上部分均为bytectf的boring_code，这之前还有一层跳转的绕过，本题去掉了之前的一层又多加了几个过滤，把我们做数学题时用到的sqrt，获取第二个<code>.</code>的time，local，还有读文件的readfile和分开跳目录读文件的if给禁止了，可以用一些相关函数代替<br>if只是为了分开执行一下语句，我们用一个while也可以达到同样的效果，数学方法没得了就可以用之前提到的加密方法去做，不过存在了一定的随机性<br>readfile被禁止了可以用file函数代替，不同的是file函数会把文件分行读进一个数组里，print_r，var_dump带下划线不能用了，echo会输出Array，又是current，next，end几个函数读特定行<br>payload:<code>while(chdir(next(scandir(chr(ord(strrev(crypt(serialize(array())))))))))echo(next(file(end(scandir(chr(ord(strrev(crypt(serialize(array()))))))))));</code></p><h2 id="思考"><a href="#思考" class="headerlink" title="思考"></a>思考</h2><p>其实看看禁用的列表也能得到部分出题人对这种绕过的思路<br>strlen就是一个获得数字的方法，info估计就能获得各种各样的字符了，rand生成随机数，bin，hex二进制十六进制应该也能整出数字来</p><h2 id="参考链接"><a href="#参考链接" class="headerlink" title="参考链接"></a>参考链接</h2><p><a href="http://zeroyu.xyz/2019/09/14/2019-bytectf-writeup/" target="_blank" rel="noopener">http://zeroyu.xyz/2019/09/14/2019-bytectf-writeup/</a></p>]]></content>
+      
+      
+      <categories>
+          
+          <category> 刷题记录 </category>
+          
+      </categories>
+      
+      
+        <tags>
+            
+            <tag> php </tag>
+            
+        </tags>
+      
+    </entry>
+    
+    
+    
+    <entry>
       <title>babyt5</title>
       <link href="/2019/11/03/babyt5/"/>
       <url>/2019/11/03/babyt5/</url>
@@ -55,11 +80,11 @@
             
             <tag> SSRF </tag>
             
+            <tag> 反序列化 </tag>
+            
             <tag> wp </tag>
             
             <tag> SoapClient </tag>
-            
-            <tag> 反序列化 </tag>
             
         </tags>
       
