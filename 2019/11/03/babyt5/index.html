@@ -448,14 +448,14 @@ $">
                     
                     <div class="info-break-policy">
                         <i class="fa fa-file-word-o fa-fw"></i>Word Count:&nbsp;&nbsp;
-                        1.6k
+                        1.8k
                     </div>
                     
 
                     
                     <div class="info-break-policy">
                         <i class="fa fa-clock-o fa-fw"></i>Read Times:&nbsp;&nbsp;
-                        5 Min
+                        6 Min
                     </div>
                     
                 
@@ -486,10 +486,10 @@ $">
 <span class="token keyword">echo</span> <span class="token variable">$result</span><span class="token punctuation">;</span></code></pre>
 <p>首先得想办法对strpos进行绕过，按常理来说我们如果把php放在最前面就可以绕过个strpos函数，但是curl不支持PHP伪协议(可用curl –version查看支持的协议)，于是出现了这个二次编码绕过<br>用%2570代替p即可绕过对于strpos的检验，详见<a href="https://bugs.php.net/bug.php?id=76671&amp;edit=1" target="_blank" rel="noopener">https://bugs.php.net/bug.php?id=76671&amp;edit=1</a><br>事实上个人感觉是数据发送到服务器端进行第一次解码，而curl发起第二次请求时进行了第二次的解码，也就意味着这并不是strpos的问题，而是一个来自二次编码绕过的问题</p>
 <h2 id="file-读文件"><a href="#file-读文件" class="headerlink" title="file://读文件"></a>file://读文件</h2><p>有了curl，可以用file://协议申请本地文件，读了index.php之后试着读了一下flag.php，结果flag.php里面只有一个提示说要读/etc/hosts<br>说实话一开始不知道这个是个什么文件，但是里面有一个很明显的ip地址172.18.0.3，马师傅说是内网地址QWQ<br>菜了，这样子curl肯定就是以SSRF的形式去打内网了</p>
-<h2 id="SSRF攻击内网服务器"><a href="#SSRF攻击内网服务器" class="headerlink" title="SSRF攻击内网服务器"></a>SSRF攻击内网服务器</h2><p>首先是扫网段，发现172.18.0.1|2都是可以访问的，172.18.0.3就是本机，并且在访问172.18.0.2发现在注释中出现了一个<code>include $\_GET[&#39;a&#39;]</code>，进入文件包含阶段<br>包含的时候一开始我智障操作了一波&amp;a=xxxx，这里我们是以curl的get请求请求到内网服务器上去的，使用我们的a应该是跟在对内网的请求url上的一个参数，即以?a=xxxx的形式进行请求，实在是太菜了才会犯的低级错误，记下来</p>
+<h2 id="SSRF攻击内网服务器"><a href="#SSRF攻击内网服务器" class="headerlink" title="SSRF攻击内网服务器"></a>SSRF攻击内网服务器</h2><p>首先是扫网段，发现172.18.0.1|2都是可以访问的，172.18.0.3就是本机，并且在访问172.18.0.2发现在注释中出现了一个<code>include $_GET[&#39;a&#39;]</code>，进入文件包含阶段<br>包含的时候一开始我智障操作了一波&amp;a=xxxx，这里我们是以curl的get请求请求到内网服务器上去的，使用我们的a应该是跟在对内网的请求url上的一个参数，即以?a=xxxx的形式进行请求，实在是太菜了才会犯的低级错误，记下来</p>
 <h2 id="gopher伪协议"><a href="#gopher伪协议" class="headerlink" title="gopher伪协议"></a>gopher伪协议</h2><p>本来按道理来说绕来绕去该直接拿flag了，我们完全有理由认为flag就位于内网ip为127.18.0.3的这台服务器上，然而这个服务器上没得flag.php，不会做了</p>
-<p>注意一点，这个时候我们这里curl只能进行一个get请求，无法进行更多的操作<br>因此这个时候就需要用gopher伪协议，gopher伪协议就是可以让我们把伪协议输入的内容作为一个完整的包，自由控制包的内容进而getshell，在对内网只能进行简单访问的时候通过这个伪协议就可以对内网进行任意的请求，自由翱翔于内网<br>接下来是马师傅的想法：比如这里我们对x使用gopher伪协议，发一个post的包。<br>在这个post的包中我们的参数x就是对内网中172.18.0.2服务器的访问，而a则是php://input伪协议，这样子文件包含就会包含我们post的内容，我们用input写一个一句话，然后紧接着把后门密码补上访问一波就可以了。<br>注意包构造时换号要以%0d%0a代替，然后空格什么的也要url编码一下<br>样例包如下</p>
-<pre><code>GET /?x=gopher://POST%20/?x%3dhttp://172.18.0.2:80?a%3dph%2570://input%26b=ls%20HTTP/1.1%0d%0aHost:%2047.104.170.59:7302%0d%0aContent-Length:%2030%0d%0a%0d%0a&lt;?ph%2570%20system($_GET[&#39;b&#39;]);%20?&gt; HTTP/1.1
+<p>注意一点，这个时候我们这里curl只能进行一个get请求，无法进行更多的操作<br>因此这个时候就需要用gopher伪协议，gopher伪协议就是可以让我们把伪协议输入的内容作为一个完整的包，自由控制包的内容进而getshell，在对内网只能进行简单访问的时候通过这个伪协议就可以对内网进行任意的请求，自由翱翔于内网<br>接下来是马师傅的想法：比如这里我们对x使用gopher伪协议，发一个post的包。<br>在这个post的包中我们的参数x就是对内网中172.18.0.2服务器的访问，而a则是php://input伪协议，这样子文件包含就会包含我们post的内容，我们用input写一个一句话，然后紧接着把后门密码补上访问一波就可以了。<br>注意包构造时换号要以%0d%0a代替，然后空格什么的也要url编码一下<br>样例包如下<br>注意gopher使用格式为<code>gopher:/ip:port/_ + payload</code>第一次用没加ip和端口我是真的傻</p>
+<pre><code>GET /?x=gopher://172.18.0.2:80/_POST%20/?x%3dhttp://172.18.0.2:80?a%3dph%2570://input%26b=ls%20HTTP/1.1%0d%0aHost:%2047.104.170.59:7302%0d%0aContent-Length:%2030%0d%0a%0d%0a&lt;?ph%2570%20system($_GET[&#39;b&#39;]);%20?&gt; HTTP/1.1
 Host: 47.104.170.59:7302
 User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:70.0) Gecko/20100101 Firefox/70.0
 Accept: text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8
@@ -500,8 +500,11 @@ Cache-Control: max-age=0
 
 </code></pre><p>打过去一开始400，后来改了改没有400了，但是也没有回显，可能是b那里不知道url编码把&amp;改成%26之后包发过去还解不解析，不改的话这个包就会认为b是另一个参数，更加没戏</p>
 <h2 id="gopher攻击stmp邮件服务"><a href="#gopher攻击stmp邮件服务" class="headerlink" title="gopher攻击stmp邮件服务"></a>gopher攻击stmp邮件服务</h2><p>wp的思路，除了扫网段还扫了端口，发现25端口还开了一个邮件服务，所以就得那gopher对stmp服务配合文件包含发起攻击了<br>有现成的工具:<a href="https://github.com/tarunkant/Gopherus" target="_blank" rel="noopener">https://github.com/tarunkant/Gopherus</a> 自动生成包，里面用法也都写下来了，思路就是对其发送一个内容带有shell的包，然后包乱写肯定会有问题，就会进入到其日志中去，然后我们通过猜测默认日志路径找到日志文件，进行对目录文件进行包含，被包含的文件会作为php代码执行，这样子日志中的那一句shell就可以用了，但是这道题题目感觉是有问题的，日志里面已经可以读到shell了，但是执行还是不给执行，我看的wp里也说环境出了问题，最后权且是对着wp里的flag路径读了一波读出来的，有点无奈。</p>
-<h2 id="后记"><a href="#后记" class="headerlink" title="后记"></a>后记</h2><p>对于什么时候用什么协议感觉我有时候人还是傻傻的，注意curl支持的协议有http(s),gopher,file等，file只能读本地文件，但是不能使用PHP伪协议，就不能使用php://filter进行编码读取，这样子读取php文件时&lt;&gt;会被浏览器认为是注释，需要查看源码才能看见。<br>而使用文件包含时则可以使用input,filter等php伪协议，进行写入文件包含、源码读取等操作，如果是其他类型的文件好像直接填写路径就包含进来可以直接看了(其实也不是太懂，昨天读日志的时候不能要先编码再读，不然读不到，今天本地测试的时候又直接读出来了？)总之实在不行全都编码解码问题不大</p>
+<h2 id="后记1"><a href="#后记1" class="headerlink" title="后记1"></a>后记1</h2><p>对于什么时候用什么协议感觉我有时候人还是傻傻的，注意curl支持的协议有http(s),gopher,file等，file只能读本地文件，但是不能使用PHP伪协议，就不能使用php://filter进行编码读取，这样子读取php文件时&lt;&gt;会被浏览器认为是注释，需要查看源码才能看见。<br>而使用文件包含时则可以使用input,filter等php伪协议，进行写入文件包含、源码读取等操作，如果是其他类型的文件好像直接填写路径就包含进来可以直接看了(其实也不是太懂，昨天读日志的时候不能要先编码再读，不然读不到，今天本地测试的时候又直接读出来了？)总之实在不行全都编码解码问题不大</p>
 <h2 id="参考的wp"><a href="#参考的wp" class="headerlink" title="参考的wp"></a>参考的wp</h2><p><a href="https://www.jianshu.com/p/804d95f6d6fb" target="_blank" rel="noopener">https://www.jianshu.com/p/804d95f6d6fb</a></p>
+<h2 id="后记2"><a href="#后记2" class="headerlink" title="后记2"></a>后记2</h2><p>重新学习了一遍gopher，解决一些问题<br>首先gopher使用方式要记牢，不要漏了<br><code>gopher://ip:port/_内容</code>要加ip和端口，并且内容前面要加一个下划线</p>
+<h3 id="二次编码"><a href="#二次编码" class="headerlink" title="二次编码"></a>二次编码</h3><p>gopher发包内容是需要二次编码的，一次编码在发过去的时候会在服务器进行解码，但是gopher还会再进行一次请求，这次请求会在服务器再进行一次解码，不编码可能导致请求中一些特殊字符影响执行，因此需要二次编码<br>但是需要注意，平常需要编码的数据进行二次编码，比如空格<br>而本身具有特殊意义的字符如&amp;=?等则只需一次编码即可</p>
+<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><p><a href="https://blog.csdn.net/qq_44632668/article/details/102631585" target="_blank" rel="noopener">https://blog.csdn.net/qq_44632668/article/details/102631585</a></p>
 
             </div>
             <hr/>
@@ -799,12 +802,12 @@ call_user_func($_G
                         <span class="chip bg-color">php</span>
                     </a>
                     
-                    <a href="/tags/SSRF/" target="_blank">
-                        <span class="chip bg-color">SSRF</span>
-                    </a>
-                    
                     <a href="/tags/%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96/" target="_blank">
                         <span class="chip bg-color">反序列化</span>
+                    </a>
+                    
+                    <a href="/tags/SSRF/" target="_blank">
+                        <span class="chip bg-color">SSRF</span>
                     </a>
                     
                     <a href="/tags/wp/" target="_blank">
@@ -929,7 +932,7 @@ call_user_func($_G
         <div class="col s12 m8 l8 copy-right">
             
             &nbsp;<i class="fa fa-area-chart"></i>&nbsp;站点总字数:&nbsp;<span
-                class="white-color">14.7k</span>&nbsp;字
+                class="white-color">17.1k</span>&nbsp;字
             
             
             
