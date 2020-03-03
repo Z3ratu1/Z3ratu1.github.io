@@ -4,10 +4,10 @@
 
 <head>
     <meta charset="utf-8">
-    <meta name="keywords" content="三叶草招新赛部分wp, Z3ratu1&#39;s blog">
-    <meta name="description" content="三叶草招新赛部分wp最近是三叶草招新，不愧是强队，招新赛都这么难，学习了QWQ
-性感黄阿姨在线聊天打开是一个对话框，输入表情包可以获得三叶草师傅们的表情包（没有什么实际意义）题目分两层，一层PHP弱类型一层XXE（xml实体注入）
-弱类型比">
+    <meta name="keywords" content="BJDCTF2020 部分wp, Z3ratu1&#39;s blog">
+    <meta name="description" content="BJDCTF2020 部分wpbuu平台上的一些bjdctf的题，记录一下
+Mark loves cat被戏耍了，完全是一个动脑题，输在愚钝上
+.git源码泄露最近做的几个题都是这种类型，总是要我扫一下目录，扫出来有一个/.git文件夹。想">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     <meta name="renderer" content="webkit|ie-stand|ie-comp">
@@ -15,7 +15,7 @@
     <meta name="format-detection" content="telephone=no">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <title>三叶草招新赛部分wp | Z3ratu1&#39;s blog</title>
+    <title>BJDCTF2020 部分wp | Z3ratu1&#39;s blog</title>
     <link rel="icon" type="image/png" href="/favicon.png">
 
     <link rel="stylesheet" type="text/css" href="/libs/awesome/css/font-awesome.min.css">
@@ -293,7 +293,7 @@
             <div class="col s12 m12 l12">
                 <div class="brand">
                     <div class="description center-align post-title">
-                        三叶草招新赛部分wp
+                        BJDCTF2020 部分wp
                     </div>
                 </div>
             </div>
@@ -404,8 +404,8 @@
                     
                     <div class="article-tag">
                         
-                            <a href="/tags/xxe/" target="_blank">
-                                <span class="chip bg-color">xxe</span>
+                            <a href="/tags/wp/" target="_blank">
+                                <span class="chip bg-color">wp</span>
                             </a>
                         
                     </div>
@@ -428,14 +428,14 @@
             <div class="post-info">
                 <div class="post-date info-break-policy">
                     <i class="fa fa-calendar-minus-o fa-fw"></i>Publish Date:&nbsp;&nbsp;
-                    2019-12-10
+                    2020-02-21
                 </div>
 
                 
                     
                     <div class="info-break-policy">
                         <i class="fa fa-file-word-o fa-fw"></i>Word Count:&nbsp;&nbsp;
-                        1.6k
+                        1.7k
                     </div>
                     
 
@@ -458,83 +458,113 @@
         <hr class="clearfix">
         <div class="card-content article-card-content">
             <div id="articleContent">
-                <h1 id="三叶草招新赛部分wp"><a href="#三叶草招新赛部分wp" class="headerlink" title="三叶草招新赛部分wp"></a>三叶草招新赛部分wp</h1><p>最近是三叶草招新，不愧是强队，招新赛都这么难，学习了QWQ</p>
-<h2 id="性感黄阿姨在线聊天"><a href="#性感黄阿姨在线聊天" class="headerlink" title="性感黄阿姨在线聊天"></a>性感黄阿姨在线聊天</h2><p>打开是一个对话框，输入表情包可以获得三叶草师傅们的表情包（没有什么实际意义）<br>题目分两层，一层PHP弱类型一层XXE（xml实体注入）</p>
-<h3 id="弱类型比较字符串"><a href="#弱类型比较字符串" class="headerlink" title="弱类型比较字符串"></a>弱类型比较字符串</h3><p>首先抓包发现数据以json的格式传递，<code>{&quot;root&quot;:{&quot;name&quot;:&quot;guest&quot;,&quot;request&quot;:&quot;flag&quot;}}</code><br>按照要求将guest改为admin之后出现一个判断<br><code>admin也不行! //if($name==md5($flag)){flag in ...}</code><br>这里只有name可控，在等号两边都可控时可以输入两个数组，通过md5函数无法处理数组返回null的性质绕过对md5的检验，这里显然不行，但这里数据是以json格式传递，我们可以控制数据类型（GET，POST方法默认传递过去的值为字符串），使用弱类型比较的转换</p>
-<h4 id="PHP字符与数字比较"><a href="#PHP字符与数字比较" class="headerlink" title="PHP字符与数字比较"></a>PHP字符与数字比较</h4><p>若字符串与数字比较，则认为0与其相等，若字符串以数字开头，则将其转化为开头的连续数字进行比较</p>
+                <h1 id="BJDCTF2020-部分wp"><a href="#BJDCTF2020-部分wp" class="headerlink" title="BJDCTF2020 部分wp"></a>BJDCTF2020 部分wp</h1><p>buu平台上的一些bjdctf的题，记录一下</p>
+<h2 id="Mark-loves-cat"><a href="#Mark-loves-cat" class="headerlink" title="Mark loves cat"></a>Mark loves cat</h2><p>被戏耍了，完全是一个动脑题，输在愚钝上</p>
+<h3 id="git源码泄露"><a href="#git源码泄露" class="headerlink" title=".git源码泄露"></a>.git源码泄露</h3><p>最近做的几个题都是这种类型，总是要我扫一下目录，扫出来有一个/.git文件夹。想获取.git下的源码我们需要使用Githack这个工具，就能把源码扒下来了，一开始看到一个花里胡哨的cms，最下面还有一个发送邮件，我还以为是那种cms的神仙漏洞或者是xss盗号之类的神仙操作，结果.git拿到这么个和原文无关的代码，着实有点过分</p>
 <pre class=" language-php"><code class="language-php"><span class="token delimiter">&lt;?php</span>
-<span class="token keyword">if</span><span class="token punctuation">(</span><span class="token number">0</span> <span class="token operator">==</span> <span class="token string">'flag'</span><span class="token punctuation">)</span>
-    <span class="token keyword">echo</span> <span class="token string">'pass'</span><span class="token punctuation">;</span>
-<span class="token keyword">if</span><span class="token punctuation">(</span><span class="token number">132</span> <span class="token operator">==</span> <span class="token string">'132flag'</span><span class="token punctuation">)</span>
-    <span class="token keyword">echo</span> <span class="token string">'pass'</span><span class="token punctuation">;</span>
-<span class="token delimiter">?></span></code></pre>
-<p>输出结果均为pass<br>用0实验不成，猜测可能flag的md5开头为数字，用burp的intruder模块爆破，得到name=357时通过验证，回显flag在<code>./_f14g_Is_Here_.php</code>，位于当前目录下，但是我们没有读的办法</p>
-<h3 id="XXE"><a href="#XXE" class="headerlink" title="XXE"></a>XXE</h3><p>现在还不会XML注入，据说payload不用记，临时要用的时候网上搜一把就有了<br>在上传xml的时候要把Content-Type改为application/xml<br>大概原理应该是xml被包含之后可执行吧？<br>张师傅的样例报文</p>
-<pre><code>POST /message.php HTTP/1.1
-Host: 148.70.59.198:41257
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:70.0) Gecko/20100101 Firefox/70.0
-Accept: */*
-Accept-Language: zh-CN,zh;q=0.8,zh-TW;q=0.7,zh-HK;q=0.5,en-US;q=0.3,en;q=0.2
-Content-Type: application/xml
-Content-Length: 188
-Origin: http://148.70.59.198:41257
-Connection: close
-Referer: http://148.70.59.198:41257/
 
-&lt;?xml version=&quot;1.0&quot;?&gt;
-&lt;!DOCTYPE GVI [&lt;!ENTITY xxe SYSTEM &quot;php://filter/convert.base64-encode/resource=_f14g_Is_Here_.php&quot; &gt;]&gt;
-&lt;root&gt;
-&lt;name&gt;&amp;xxe;&lt;/name&gt;
-&lt;request&gt;flag&lt;/request&gt;
-&lt;/root&gt;</code></pre><p>xml的格式于json保持一致，定义了一个xml实体并在name处引用<br>不是很懂XML是情况，为什么还能适用PHP伪协议的<br>在xml实体注入读取flag的时候，由于flag藏在php文件中，文件中的&lt;?php中的尖括号会让xml解析错误，无法直接读取，故可以使用filter伪协议以编码方式读出</p>
-<p>最后拿到了三叶草的wp，师傅的说法是既然发现他能够解析json格式，就可以猜测其能够解析xml文档，又此处如果判断不过在<code>name</code>处存在对输入名称的回显，将此处替换为xml实体，就可以尝试读取文件了</p>
-<p>参考XXE资料: <a href="https://www.freebuf.com/articles/web/177979.html" target="_blank" rel="noopener">https://www.freebuf.com/articles/web/177979.html</a></p>
-<h2 id="又来一只猫"><a href="#又来一只猫" class="headerlink" title="又来一只猫"></a>又来一只猫</h2><p>很简单的一个反序列化。。。简单的不能再简单，但是还是卡了我十分钟，就是因为那个很坑的私有成员变量<br>比如一个名为Stu的类有一个name的私有成员(private)，那么他在反序列化之后的名字会变为<code>\00Stu\00name</code>，但是本地跑出来的时候那个\00只是一个空格，打过去就不能正常反序列化覆盖默认值，把空格改为\00即可解决，protected的变量反序列化之后应为<code>\00*\00name</code></p>
-<h2 id="反引号调用shell-exce函数"><a href="#反引号调用shell-exce函数" class="headerlink" title="反引号调用shell_exce函数"></a>反引号调用shell_exce函数</h2><p>学到的一个新的知识点，PHP中被反引号会调用shell_exce函数达到命令执行的效果，在disable_function中如果禁用了shell_exce函数则反引号同时失效</p>
-<h2 id="代码审计一"><a href="#代码审计一" class="headerlink" title="代码审计一"></a>代码审计一</h2><p>贴一下重要部分源码，删去无关部分，能看懂就行</p>
-<pre class=" language-php"><code class="language-php"><span class="token delimiter">&lt;?php</span>
-    <span class="token function">empty</span><span class="token punctuation">(</span><span class="token variable">$_GET</span><span class="token punctuation">[</span><span class="token string">"url"</span><span class="token punctuation">]</span><span class="token punctuation">)</span> <span class="token operator">&amp;&amp;</span> <span class="token keyword">die</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-    <span class="token variable">$password</span> <span class="token operator">=</span> <span class="token string">"If I knew where I would die, I would never go there."</span><span class="token punctuation">;</span>
-    <span class="token variable">$arr</span> <span class="token operator">=</span> <span class="token function">explode</span><span class="token punctuation">(</span><span class="token string">' '</span><span class="token punctuation">,</span> <span class="token variable">$password</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token keyword">include</span> <span class="token string">'flag.php'</span><span class="token punctuation">;</span>
 
-    <span class="token variable">$url</span> <span class="token operator">=</span> <span class="token variable">$_GET</span><span class="token punctuation">[</span><span class="token string">"url"</span><span class="token punctuation">]</span><span class="token punctuation">;</span>
+<span class="token variable">$yds</span> <span class="token operator">=</span> <span class="token string">"dog"</span><span class="token punctuation">;</span>
+<span class="token variable">$is</span> <span class="token operator">=</span> <span class="token string">"cat"</span><span class="token punctuation">;</span>
+<span class="token variable">$handsome</span> <span class="token operator">=</span> <span class="token string">'yds'</span><span class="token punctuation">;</span>
 
-    <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token operator">!</span><span class="token function">startsWith</span><span class="token punctuation">(</span><span class="token variable">$url</span><span class="token punctuation">,</span>"http<span class="token punctuation">:</span><span class="token comment" spellcheck="true">//"))</span>
-    <span class="token punctuation">{</span>
-        <span class="token keyword">die</span><span class="token punctuation">(</span><span class="token string">"Not allow !"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-    <span class="token punctuation">}</span>
-
-    <span class="token keyword">for</span><span class="token punctuation">(</span><span class="token variable">$i</span><span class="token operator">=</span><span class="token number">0</span><span class="token punctuation">;</span> <span class="token variable">$i</span><span class="token operator">&lt;</span><span class="token function">count</span><span class="token punctuation">(</span><span class="token variable">$arr</span><span class="token punctuation">)</span><span class="token punctuation">;</span> <span class="token variable">$i</span><span class="token operator">++</span><span class="token punctuation">)</span>
-    <span class="token punctuation">{</span>
-        <span class="token variable">$ch</span> <span class="token operator">=</span> <span class="token function">curl_init</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-        <span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span>curl配置项
-        <span class="token variable">$output</span> <span class="token operator">=</span> <span class="token function">curl_exec</span><span class="token punctuation">(</span><span class="token variable">$ch</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-        <span class="token function">curl_close</span><span class="token punctuation">(</span><span class="token variable">$ch</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-
-        <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token variable">$output</span> <span class="token operator">===</span> <span class="token variable">$arr</span><span class="token punctuation">[</span><span class="token variable">$i</span><span class="token punctuation">]</span><span class="token punctuation">)</span>
-        <span class="token punctuation">{</span>
-            <span class="token keyword">if</span><span class="token punctuation">(</span><span class="token variable">$i</span> <span class="token operator">==</span> <span class="token function">sizeof</span><span class="token punctuation">(</span><span class="token variable">$arr</span><span class="token punctuation">)</span><span class="token operator">-</span><span class="token number">1</span><span class="token punctuation">)</span>
-            <span class="token punctuation">{</span>
-                <span class="token keyword">echo</span> <span class="token string">"Congratulations. Flag is  SYC{********************************}"</span><span class="token punctuation">;</span>
-            <span class="token punctuation">}</span>
-
-<span class="token delimiter">?></span></code></pre>
-<p>难度也不大，不过感觉有点意思，显然是将url导入到自己的服务器上，可以自己进行控制，从而满足要求，应该也算是ctf中的一个常用套路，不过我第一次见罢了（菜），做了就顺手记录一下</p>
-<h2 id="乱七八糟的思路"><a href="#乱七八糟的思路" class="headerlink" title="乱七八糟的思路"></a>乱七八糟的思路</h2><p>首先想着是不是能控制自己服务器的回复请求，这样子一个个改包回复就可以完成（太菜了不会实现）<br>然后就是waf师傅说的，把一个文件当数据库，每次访问就pop出第一位出来，这样子完成整个遍历<br>比较菜，写的脚本异常丑陋</p>
-<pre class=" language-php"><code class="language-php"><span class="token delimiter">&lt;?php</span>
-<span class="token variable">$file</span> <span class="token operator">=</span> <span class="token function">file_get_contents</span><span class="token punctuation">(</span><span class="token string">'1.txt'</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-<span class="token variable">$arr</span> <span class="token operator">=</span> <span class="token function">explode</span><span class="token punctuation">(</span><span class="token string">' '</span><span class="token punctuation">,</span> <span class="token variable">$file</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-<span class="token keyword">echo</span> <span class="token variable">$arr</span><span class="token punctuation">[</span><span class="token number">0</span><span class="token punctuation">]</span><span class="token punctuation">;</span>
-<span class="token variable">$file</span> <span class="token operator">=</span> <span class="token function">fopen</span><span class="token punctuation">(</span><span class="token string">'1.txt'</span><span class="token punctuation">,</span><span class="token string">'w'</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-<span class="token keyword">for</span><span class="token punctuation">(</span><span class="token variable">$i</span><span class="token operator">=</span><span class="token number">1</span><span class="token punctuation">;</span><span class="token variable">$i</span><span class="token operator">&lt;</span><span class="token function">count</span><span class="token punctuation">(</span><span class="token variable">$arr</span><span class="token punctuation">)</span><span class="token punctuation">;</span><span class="token variable">$i</span><span class="token operator">++</span><span class="token punctuation">)</span>
-<span class="token punctuation">{</span>
-    <span class="token function">file_put_contents</span><span class="token punctuation">(</span><span class="token string">"1.txt"</span><span class="token punctuation">,</span> <span class="token variable">$arr</span><span class="token punctuation">[</span><span class="token variable">$i</span><span class="token punctuation">]</span><span class="token punctuation">.</span><span class="token string">' '</span><span class="token punctuation">,</span> <span class="token constant">FILE_APPEND</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token keyword">foreach</span><span class="token punctuation">(</span><span class="token variable">$_POST</span> <span class="token keyword">as</span> <span class="token variable">$x</span> <span class="token operator">=</span><span class="token operator">></span> <span class="token variable">$y</span><span class="token punctuation">)</span><span class="token punctuation">{</span>
+    $<span class="token variable">$x</span> <span class="token operator">=</span> <span class="token variable">$y</span><span class="token punctuation">;</span>
 <span class="token punctuation">}</span>
-<span class="token function">fclose</span><span class="token punctuation">(</span><span class="token variable">$file</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-</code></pre>
-<p>又踩了一个坑，在服务器上的一个文件权限是需要修改的，不然PHP不能修改文件，用chmod临时改一下，应该有长久之计吧，但是还是菜</p>
-<h2 id="SQL注入系列"><a href="#SQL注入系列" class="headerlink" title="SQL注入系列"></a>SQL注入系列</h2><p>都不难，从万能密码到查数据库到替换为空到过滤，算是一次复习，就是最后那个过滤空格的地方让我重新调了一会payload，现在这个无需空格和逗号的payload放一下<br><code>select(ascii(substr((select(group_concat(table_name))from(information_schema.tables)where(table_schema)=database())from(1))));</code><br>当然这里只有一个列，如果有多列要那种1,1,group_concat()的情况的话，考虑一下用join函数继续调整payload</p>
-<h2 id="后记"><a href="#后记" class="headerlink" title="后记"></a>后记</h2><p>大队不愧是大队，后来在上海线下的时候面对面的遇上了三叶草的师傅，其中有一个就是大二的师傅，可以说水平以及远超我一大截了，招新赛虽然很简单的题也多，但是像我记录的这些题还有几个难题实在是做不出来，强校的基础还是比我们好啊，起步晚了，还需努力。</p>
+
+<span class="token keyword">foreach</span><span class="token punctuation">(</span><span class="token variable">$_GET</span> <span class="token keyword">as</span> <span class="token variable">$x</span> <span class="token operator">=</span><span class="token operator">></span> <span class="token variable">$y</span><span class="token punctuation">)</span><span class="token punctuation">{</span>
+    $<span class="token variable">$x</span> <span class="token operator">=</span> $<span class="token variable">$y</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
+
+<span class="token keyword">foreach</span><span class="token punctuation">(</span><span class="token variable">$_GET</span> <span class="token keyword">as</span> <span class="token variable">$x</span> <span class="token operator">=</span><span class="token operator">></span> <span class="token variable">$y</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token keyword">if</span><span class="token punctuation">(</span><span class="token variable">$_GET</span><span class="token punctuation">[</span><span class="token string">'flag'</span><span class="token punctuation">]</span> <span class="token operator">===</span> <span class="token variable">$x</span> <span class="token operator">&amp;&amp;</span> <span class="token variable">$x</span> <span class="token operator">!==</span> <span class="token string">'flag'</span><span class="token punctuation">)</span><span class="token punctuation">{</span>
+        <span class="token function">exit</span><span class="token punctuation">(</span><span class="token variable">$handsome</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+<span class="token punctuation">}</span>
+
+<span class="token keyword">if</span><span class="token punctuation">(</span><span class="token operator">!</span><span class="token function">isset</span><span class="token punctuation">(</span><span class="token variable">$_GET</span><span class="token punctuation">[</span><span class="token string">'flag'</span><span class="token punctuation">]</span><span class="token punctuation">)</span> <span class="token operator">&amp;&amp;</span> <span class="token operator">!</span><span class="token function">isset</span><span class="token punctuation">(</span><span class="token variable">$_POST</span><span class="token punctuation">[</span><span class="token string">'flag'</span><span class="token punctuation">]</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">{</span>
+    <span class="token function">exit</span><span class="token punctuation">(</span><span class="token variable">$yds</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
+
+<span class="token keyword">if</span><span class="token punctuation">(</span><span class="token variable">$_POST</span><span class="token punctuation">[</span><span class="token string">'flag'</span><span class="token punctuation">]</span> <span class="token operator">===</span> <span class="token string">'flag'</span>  <span class="token operator">||</span> <span class="token variable">$_GET</span><span class="token punctuation">[</span><span class="token string">'flag'</span><span class="token punctuation">]</span> <span class="token operator">===</span> <span class="token string">'flag'</span><span class="token punctuation">)</span><span class="token punctuation">{</span>
+    <span class="token function">exit</span><span class="token punctuation">(</span><span class="token variable">$is</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
+
+
+
+<span class="token keyword">echo</span> <span class="token string">"the flag is: "</span><span class="token punctuation">.</span><span class="token variable">$flag</span><span class="token punctuation">;</span></code></pre>
+<h3 id="变量覆盖"><a href="#变量覆盖" class="headerlink" title="变量覆盖"></a>变量覆盖</h3><p>先理清楚这里的思路，$$x两个美元符号，代表一个以$x的值为变量名的变量。<br>$$x=$y意为将POST方式传递过来的参数直接创建对应变量进行赋值<br>而$$x=$$y则是将变量名为$x的变量的值变为变量名为$y的变量的值，要想完成变量覆盖，就得在这一层把flag的值给拿过来<br>第一层判断要求若是要GET传flag，必须是flag=flag<br>第二层判断要求GET和POST至少有传一个flag<br>第三层判断要求不能出现flag=flag</p>
+<p>若要在最后的echo语句中获取flag，则至少得提交一个flag上去，而POST中提交flag必定使得flag的值被覆盖，get中提交flag则出现了第一层和第三层的矛盾，不去修改flag则会导致在第二层退出。即想要通过正统道路获得flag是不可能的(但是他那个echo $flag真的太诱人了，我在那看了好久)</p>
+<p>正确的思路在于exit也能输出变量，我们只要把exit中退出的变量覆盖成flag然后创造退出的条件就可以了（总觉得这个题有点高中考试的味道，为了出题而出题？）</p>
+<h2 id="The-mystery-of-ip"><a href="#The-mystery-of-ip" class="headerlink" title="The mystery of ip"></a>The mystery of ip</h2><p>很直接的一个题，就是我没想到，菜</p>
+<p>题目flag.php界面显示了当前ip，测试之后发现可以使用xff头对显示ip进行控制，问题在于这是什么类型的攻击</p>
+<p>百度得知基于xff头的攻击一般是注入或者xss，注入各种fuzz无果，xss不会，最后是师傅提示是模板注入，就直接出了，直接一步system(‘cat /flag’)</p>
+<h3 id="教训"><a href="#教训" class="headerlink" title="教训"></a>教训</h3><p>页面能够显示的内容，可选择的攻击方式有xss和ssti，xxe攻击一般得要有json格式的数据包发过去，并其中一项在页面中显示才有效</p>
+<h2 id="Cookie-is-so-stable"><a href="#Cookie-is-so-stable" class="headerlink" title="Cookie is so stable"></a>Cookie is so stable</h2><p>和上个IP这个题一样的界面，简单测试<code>64</code>之后发现仍存在SSTI，通过如图方法测试获知使用引擎为twig<br><img src="https://pic3.zhimg.com/v2-3321f46859c0be9e93f9ad79f3dd1cd3_1200x500.jpg" alt=""><br>php下的一个模板，可以根据这篇文章对ssti及相关攻击方式有一个基础了解</p>
+<p>一开始以为有过滤的，打了半天打不动，结果应该是需要用专业的payload打，为此专门去GitHub看了他们的源码，是在执行出现问题的时候返回了一句’what do you want to do’，而不是在查黑名单</p>
+<p><a href="https://zhuanlan.zhihu.com/p/28823933" target="_blank" rel="noopener">https://zhuanlan.zhihu.com/p/28823933</a></p>
+<h2 id="ZJCTF，不过如此"><a href="#ZJCTF，不过如此" class="headerlink" title="ZJCTF，不过如此"></a>ZJCTF，不过如此</h2><p>第一层很简单，用PHP伪协议就能过，第二步进入next.php，比较复杂的一个preg_replace的漏洞<br>上源码</p>
+<pre class=" language-php"><code class="language-php"><span class="token delimiter">&lt;?php</span>
+<span class="token variable">$id</span> <span class="token operator">=</span> <span class="token variable">$_GET</span><span class="token punctuation">[</span><span class="token string">'id'</span><span class="token punctuation">]</span><span class="token punctuation">;</span>
+<span class="token variable">$_SESSION</span><span class="token punctuation">[</span><span class="token string">'id'</span><span class="token punctuation">]</span> <span class="token operator">=</span> <span class="token variable">$id</span><span class="token punctuation">;</span>
+<span class="token keyword">function</span> <span class="token function">complex</span><span class="token punctuation">(</span><span class="token variable">$re</span><span class="token punctuation">,</span> <span class="token variable">$str</span><span class="token punctuation">)</span>
+<span class="token punctuation">{</span>
+    <span class="token keyword">return</span> <span class="token function">preg_replace</span><span class="token punctuation">(</span><span class="token string">'/('</span><span class="token punctuation">.</span><span class="token variable">$re</span><span class="token punctuation">.</span><span class="token string">')/ei'</span><span class="token punctuation">,</span> <span class="token string">'strtolower("\\1")'</span><span class="token punctuation">,</span> <span class="token variable">$str</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
+
+<span class="token keyword">foreach</span><span class="token punctuation">(</span><span class="token variable">$_GET</span> <span class="token keyword">as</span> <span class="token variable">$re</span> <span class="token operator">=</span><span class="token operator">></span> <span class="token variable">$str</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token keyword">echo</span> <span class="token function">complex</span><span class="token punctuation">(</span><span class="token variable">$re</span><span class="token punctuation">,</span> <span class="token variable">$str</span><span class="token punctuation">)</span><span class="token punctuation">.</span> <span class="token string">"\n"</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
+
+<span class="token keyword">function</span> <span class="token function">getFlag</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">{</span>
+    @<span class="token function">eval</span><span class="token punctuation">(</span><span class="token variable">$_GET</span><span class="token punctuation">[</span><span class="token string">'cmd'</span><span class="token punctuation">]</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span></code></pre>
+<p>一开始还担心这个函数定义的位置会不会影响调用，后来试了一下发现这个和python C++不一样，定义在后面的函数前面也可以调用</p>
+<p>preg_replace中的e参数通常造成安全隐患，他会将替代的部分作为PHP代码执行并将执行结果作为真正的替换字符串，但是这里替换字符串被写死了，而另外两个参数可控，但是在正则匹配中，允许以\n(n为数字)的形式对匹配到的组进行访问，而这里\1即为对正则匹配到的第一个组进行访问，即($re)匹配的部分，故形如.*=${phpinfo()}的payload就可以顺利执行</p>
+<p>而PHP会把一些不合法字符通过下划线代替，比如这里的. 还有[ 等符号，所以需要一个新的通配符进行匹配，<code>\S</code>即为匹配除空白字符的一切字符，<code>\s</code>则为匹配所有空白字符。通过\S*即可实现任意字符的匹配。</p>
+<h3 id="坑点"><a href="#坑点" class="headerlink" title="坑点"></a>坑点</h3><p>命令执行的时候要用${phpinfo()}这种动态变量的形式才能执行，直接写phpinfo()的话结果就是phpinfo()这个字符串，使用${phpinfo()}这么写时，PHP会认为大括号里面的东西是个变量先执行，再以其返回值为名创建一个变量，这样子才能进行命令执行</p>
+<h3 id="参考链接"><a href="#参考链接" class="headerlink" title="参考链接"></a>参考链接</h3><p><a href="https://xz.aliyun.com/t/2557" target="_blank" rel="noopener">https://xz.aliyun.com/t/2557</a></p>
+<h2 id="EasySearch"><a href="#EasySearch" class="headerlink" title="EasySearch"></a>EasySearch</h2><p>又是一个藏比题，要审源码就直接审嘛，每次整个备份文件的问题来找源码，上次.git这次.swp备份源码泄露，还有一个在html里面藏了个base32，我一开始base64没解出来，佛了。</p>
+<pre class=" language-php"><code class="language-php"><span class="token delimiter">&lt;?php</span>
+    <span class="token function">ob_start</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token keyword">function</span> <span class="token function">get_hash</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">{</span>
+        <span class="token variable">$chars</span> <span class="token operator">=</span> <span class="token string">'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&amp;*()+-'</span><span class="token punctuation">;</span>
+        <span class="token variable">$random</span> <span class="token operator">=</span> <span class="token variable">$chars</span><span class="token punctuation">[</span><span class="token function">mt_rand</span><span class="token punctuation">(</span><span class="token number">0</span><span class="token punctuation">,</span><span class="token number">73</span><span class="token punctuation">)</span><span class="token punctuation">]</span><span class="token punctuation">.</span><span class="token variable">$chars</span><span class="token punctuation">[</span><span class="token function">mt_rand</span><span class="token punctuation">(</span><span class="token number">0</span><span class="token punctuation">,</span><span class="token number">73</span><span class="token punctuation">)</span><span class="token punctuation">]</span><span class="token punctuation">.</span><span class="token variable">$chars</span><span class="token punctuation">[</span><span class="token function">mt_rand</span><span class="token punctuation">(</span><span class="token number">0</span><span class="token punctuation">,</span><span class="token number">73</span><span class="token punctuation">)</span><span class="token punctuation">]</span><span class="token punctuation">.</span><span class="token variable">$chars</span><span class="token punctuation">[</span><span class="token function">mt_rand</span><span class="token punctuation">(</span><span class="token number">0</span><span class="token punctuation">,</span><span class="token number">73</span><span class="token punctuation">)</span><span class="token punctuation">]</span><span class="token punctuation">.</span><span class="token variable">$chars</span><span class="token punctuation">[</span><span class="token function">mt_rand</span><span class="token punctuation">(</span><span class="token number">0</span><span class="token punctuation">,</span><span class="token number">73</span><span class="token punctuation">)</span><span class="token punctuation">]</span><span class="token punctuation">;</span><span class="token comment" spellcheck="true">//Random 5 times</span>
+        <span class="token variable">$content</span> <span class="token operator">=</span> <span class="token function">uniqid</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token variable">$random</span><span class="token punctuation">;</span>
+        <span class="token keyword">return</span> <span class="token function">sha1</span><span class="token punctuation">(</span><span class="token variable">$content</span><span class="token punctuation">)</span><span class="token punctuation">;</span> 
+    <span class="token punctuation">}</span>
+    <span class="token function">header</span><span class="token punctuation">(</span><span class="token string">"Content-Type: text/html;charset=utf-8"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token operator">*</span><span class="token operator">*</span><span class="token operator">*</span>
+    <span class="token keyword">if</span><span class="token punctuation">(</span><span class="token function">isset</span><span class="token punctuation">(</span><span class="token variable">$_POST</span><span class="token punctuation">[</span><span class="token string">'username'</span><span class="token punctuation">]</span><span class="token punctuation">)</span> <span class="token keyword">and</span> <span class="token variable">$_POST</span><span class="token punctuation">[</span><span class="token string">'username'</span><span class="token punctuation">]</span> <span class="token operator">!=</span> <span class="token string">''</span> <span class="token punctuation">)</span>
+    <span class="token punctuation">{</span>
+        <span class="token variable">$admin</span> <span class="token operator">=</span> <span class="token string">'6d0bc1'</span><span class="token punctuation">;</span>
+        <span class="token keyword">if</span> <span class="token punctuation">(</span> <span class="token variable">$admin</span> <span class="token operator">==</span> <span class="token function">substr</span><span class="token punctuation">(</span><span class="token function">md5</span><span class="token punctuation">(</span><span class="token variable">$_POST</span><span class="token punctuation">[</span><span class="token string">'password'</span><span class="token punctuation">]</span><span class="token punctuation">)</span><span class="token punctuation">,</span><span class="token number">0</span><span class="token punctuation">,</span><span class="token number">6</span><span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+            <span class="token keyword">echo</span> <span class="token string">"&lt;script>alert('[+] Welcome to manage system')&lt;/script>"</span><span class="token punctuation">;</span>
+            <span class="token variable">$file_shtml</span> <span class="token operator">=</span> <span class="token string">"public/"</span><span class="token punctuation">.</span><span class="token function">get_hash</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token string">".shtml"</span><span class="token punctuation">;</span>
+            <span class="token variable">$shtml</span> <span class="token operator">=</span> <span class="token function">fopen</span><span class="token punctuation">(</span><span class="token variable">$file_shtml</span><span class="token punctuation">,</span> <span class="token string">"w"</span><span class="token punctuation">)</span> <span class="token keyword">or</span> <span class="token keyword">die</span><span class="token punctuation">(</span><span class="token string">"Unable to open file!"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+            <span class="token variable">$text</span> <span class="token operator">=</span> '
+            <span class="token operator">*</span><span class="token operator">*</span><span class="token operator">*</span>
+            <span class="token operator">*</span><span class="token operator">*</span><span class="token operator">*</span>
+            <span class="token markup"><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>h1</span><span class="token punctuation">></span></span></span>Hello<span class="token punctuation">,</span><span class="token string">'.$_POST['</span>username<span class="token string">'].'</span><span class="token markup"><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>h1</span><span class="token punctuation">></span></span></span>
+            <span class="token operator">*</span><span class="token operator">*</span><span class="token operator">*</span>
+            <span class="token operator">*</span><span class="token operator">*</span><span class="token operator">*</span>'<span class="token punctuation">;</span>
+            <span class="token function">fwrite</span><span class="token punctuation">(</span><span class="token variable">$shtml</span><span class="token punctuation">,</span><span class="token variable">$text</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+            <span class="token function">fclose</span><span class="token punctuation">(</span><span class="token variable">$shtml</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+            <span class="token operator">*</span><span class="token operator">*</span><span class="token operator">*</span>
+            <span class="token keyword">echo</span> <span class="token string">"[!] Header  error ..."</span><span class="token punctuation">;</span>
+        <span class="token punctuation">}</span> <span class="token keyword">else</span> <span class="token punctuation">{</span>
+            <span class="token keyword">echo</span> <span class="token string">"&lt;script>alert('[!] Failed')&lt;/script>"</span><span class="token punctuation">;</span>
+
+    <span class="token punctuation">}</span><span class="token keyword">else</span>
+    <span class="token punctuation">{</span>
+    <span class="token operator">*</span><span class="token operator">*</span><span class="token operator">*</span>
+    <span class="token punctuation">}</span>
+    <span class="token operator">*</span><span class="token operator">*</span><span class="token operator">*</span>
+<span class="token delimiter">?></span></code></pre>
+<p>给了部分源码，第一层一个简单的md5碰撞，用个随机生成字符串脚本跑一下就出了一个能用的<code>FaRmZGN2nK</code><br>第二层是可以把我们post的username写到一个后缀为.shtml的文件里面，是一个没有见过的其妙类型，前面那个生成hash的函数纯粹唬人，就是各种散列计算取得一个文件名罢了，毫无作用<br>查了一下.shtml这种文件类型，对应了Apache一个SSI的文件包含和命令执行漏洞，按照样例payload打过去就可以了<br><code>&lt;!--#exec cmd=ls&quot;--&gt;</code></p>
+<p>SSI也需要用户输入内容可以显示在界面上，这种类型的漏洞目前有xss，ssti和ssi三种可能了，不过ssi只能在.shtml这种后缀的文件上使用，算是一个特色</p>
+<h3 id="查到payload的链接"><a href="#查到payload的链接" class="headerlink" title="查到payload的链接"></a>查到payload的链接</h3><p><a href="https://www.cnblogs.com/endust/p/11826210.html" target="_blank" rel="noopener">https://www.cnblogs.com/endust/p/11826210.html</a></p>
 
             </div>
             <hr/>
@@ -693,9 +723,9 @@ Referer: http://148.70.59.198:41257/
             <br/>
             <span xmlns:dct="http://purl.org/dc/terms/" href="http://purl.org/dc/dcmitype/Text"
                   property="dct:title" rel="dct:type">
-                    《三叶草招新赛部分wp》
+                    《BJDCTF2020 部分wp》
                 </span> by
-            <a xmlns:cc="http://creativecommons.org/ns#" href="/2019/12/10/%E4%B8%89%E5%8F%B6%E8%8D%89%E6%8B%9B%E6%96%B0%E8%B5%9B/" property="cc:attributionName"
+            <a xmlns:cc="http://creativecommons.org/ns#" href="/2020/02/21/BJDCTF2020%20%E9%83%A8%E5%88%86wp/" property="cc:attributionName"
                rel="cc:attributionURL">
                 Z3ratu1
             </a> is licensed under a
@@ -739,28 +769,25 @@ Referer: http://148.70.59.198:41257/
             <div class="article-badge left-badge text-color">
                 <i class="fa fa-chevron-left"></i>&nbsp;Previous</div>
             <div class="card">
-                <a href="/2020/02/12/SUCTF2019%20ezphp/">
+                <a href="/2020/02/26/%E6%9E%81%E5%AE%A2%E5%A4%A7%E6%8C%91%E6%88%98%20RCE%20ME/">
                     <div class="card-image">
                         
-                        <img src="/img/ctf1.jpg" class="responsive-img" alt="SUCTF2019 ezweb">
+                        <img src="/img/ctf.jpg" class="responsive-img" alt="极客大挑战 RCE ME">
                         
-                        <span class="card-title">SUCTF2019 ezweb</span>
+                        <span class="card-title">极客大挑战 RCE ME</span>
                     </div>
                 </a>
                 <div class="card-content article-content">
                     <div class="summary block-with-text">
                         
-                            SUCTF2019 ezwebBUU平台上复现题目，主要学习了一下异或绕过的操作还踩了一些奇奇怪怪的坑，题目共三层，层层绕过搞了我好几天，还是太菜了
-第一层第一层源码
-$hhh = @$_GET['_'];
-
-if (!$hhh){
-   
+                            极客大挑战 RCE ME三叶草招新赛里面一个比较难的题，无字母数字命令执行+bypass disable_function当时做的时候不会手搓上传就弃了，今天在buu上复现重做了一遍
+无字母数字命令执行&lt;?php
+error_repo
                         
                     </div>
                     <div class="publish-info">
                         <span class="publish-date">
-                            <i class="fa fa-clock-o fa-fw icon-date"></i>2020-02-12
+                            <i class="fa fa-clock-o fa-fw icon-date"></i>2020-02-26
                         </span>
                         <span class="publish-author">
                             
@@ -785,6 +812,10 @@ if (!$hhh){
                         <span class="chip bg-color">wp</span>
                     </a>
                     
+                    <a href="/tags/RCE/" target="_blank">
+                        <span class="chip bg-color">RCE</span>
+                    </a>
+                    
                 </div>
                 
             </div>
@@ -796,27 +827,27 @@ if (!$hhh){
                 Next&nbsp;<i class="fa fa-chevron-right"></i>
             </div>
             <div class="card">
-                <a href="/2019/11/10/decade%20wp/">
+                <a href="/2020/02/19/GWCTF%202019%20%E6%9E%AF%E7%87%A5%E7%9A%84%E6%8A%BD%E5%A5%96/">
                     <div class="card-image">
                         
-                        <img src="/img/ctf.jpg" class="responsive-img" alt="decade wp">
+                        <img src="/img/ctf1.jpg" class="responsive-img" alt="枯燥的抽奖">
                         
-                        <span class="card-title">decade wp</span>
+                        <span class="card-title">枯燥的抽奖</span>
                     </div>
                 </a>
                 <div class="card-content article-content">
                     <div class="summary block-with-text">
                         
-                            decade wp复现复现，是一道bytectf修改了的题，加了几个过滤
-无参数函数的命令执行&lt;?php
-highlight_file(__FILE__);
-$code = $_GET['code'];
-if (!empty($cod
+                            枯燥的抽奖伪随机数安全的一个题，通过php_mt_rand这个工具逆向出随机数种子，然后通过种子获取字符串
+贴一下源码
+&lt;?php
+header("Content-Type: text/html;charset=utf-8");
+se
                         
                     </div>
                     <div class="publish-info">
                             <span class="publish-date">
-                                <i class="fa fa-clock-o fa-fw icon-date"></i>2019-11-10
+                                <i class="fa fa-clock-o fa-fw icon-date"></i>2020-02-19
                             </span>
                         <span class="publish-author">
                             
@@ -835,6 +866,14 @@ if (!empty($cod
                     
                     <a href="/tags/php/" target="_blank">
                         <span class="chip bg-color">php</span>
+                    </a>
+                    
+                    <a href="/tags/wp/" target="_blank">
+                        <span class="chip bg-color">wp</span>
+                    </a>
+                    
+                    <a href="/tags/%E6%9A%B4%E5%8A%9B%E7%A0%B4%E8%A7%A3/" target="_blank">
+                        <span class="chip bg-color">暴力破解</span>
                     </a>
                     
                 </div>
