@@ -4,6 +4,60 @@
   
     
     <entry>
+      <title>PHP文件操作漏洞</title>
+      <link href="/2020/03/01/PHP%E6%96%87%E4%BB%B6%E6%93%8D%E4%BD%9C%E6%BC%8F%E6%B4%9E/"/>
+      <url>/2020/03/01/PHP%E6%96%87%E4%BB%B6%E6%93%8D%E4%BD%9C%E6%BC%8F%E6%B4%9E/</url>
+      
+        <content type="html"><![CDATA[<h1 id="PHP文件操作漏洞"><a href="#PHP文件操作漏洞" class="headerlink" title="PHP文件操作漏洞"></a>PHP文件操作漏洞</h1><p>今天师傅们在群里聊到一个问题，有关于PHP文件操作对目录和文件判定相关的一个点，看了师傅们找到的一篇文章，感觉很有意思</p><p>PHP底层实现存在的一些问题，导致PHP写入、读取时对畸形文件名存在一些错误处理，导致漏洞产生</p><h2 id="例一"><a href="#例一" class="headerlink" title="例一"></a>例一</h2><p>file_put_contents和fopen等函数，使用了PHP的底层封装流，面对/var/www/html/index.php/. 这种畸形路径时会将其解析为正常的/var/www/html/index.php，导致对后缀名的绕过，而对于rename，unlink等函数，则会直接将此路径在Linux下进行系统调用，得到not a directory的错误，无法删除<br>此问题在Linux与Windows系统下均存在</p><h2 id="例二"><a href="#例二" class="headerlink" title="例二"></a>例二</h2><p>/var/www/html/null/../index.php<br>在其中设置一个不存在的null目录，再使用..跳出，在Linux识别到未知目录时会引发找不到目录的错误，而Windows在不存在目录后接..则会忽略该目录，但PHP在处理时会因为Linux下的这个问题导致对已存在的index.php的重写</p><h2 id="例三"><a href="#例三" class="headerlink" title="例三"></a>例三</h2><p>PHP超全局变量$_FILES可以获取上传的全部文件，$_FILES[‘file’][‘name’]会获取上传文件名中最后一个/后的内容，而上传的文件会存在于一个tmp目录下，该名称可以由$_FILES[‘file’][‘tmp_name’]获取，并在move_uploaded_file时使用该名称进行移动，tmpfile的名称为php+六位随机字符串，在脚本执行结束时删除。<br>如果边提交文件边访问phpinfo界面，其会显示$_FILES的内容，也就是可以获取到tmp_name，虽然此时脚本已经允许完毕文件被删除，但可以尝试条件竞争进行getshell<br>贴一个链接<br><a href="https://blog.csdn.net/adminuil/article/details/104398823" target="_blank" rel="noopener">https://blog.csdn.net/adminuil/article/details/104398823</a></p><p>并且这里的$_FILE[‘file’]这里的file是上传时提交的一项参数，如果检测只对$_FILE[‘file’]进行检测，而上传使用了其他的函数将所有收到的文件进行保存的话，就可以随便上传一个文件，把file改成随便什么东西就可以进行绕过了</p><h2 id="参考链接"><a href="#参考链接" class="headerlink" title="参考链接"></a>参考链接</h2><p><a href="http://d1iv3.me/2018/04/15/%E4%BB%8EPHP%E6%BA%90%E7%A0%81%E7%9C%8BPHP%E6%96%87%E4%BB%B6%E6%93%8D%E4%BD%9C%E7%BC%BA%E9%99%B7%E4%B8%8E%E5%88%A9%E7%94%A8%E6%8A%80%E5%B7%A7/" target="_blank" rel="noopener">http://d1iv3.me/2018/04/15/%E4%BB%8EPHP%E6%BA%90%E7%A0%81%E7%9C%8BPHP%E6%96%87%E4%BB%B6%E6%93%8D%E4%BD%9C%E7%BC%BA%E9%99%B7%E4%B8%8E%E5%88%A9%E7%94%A8%E6%8A%80%E5%B7%A7/</a></p>]]></content>
+      
+      
+      <categories>
+          
+          <category> 笔记 </category>
+          
+      </categories>
+      
+      
+        <tags>
+            
+            <tag> php </tag>
+            
+            <tag> 漏洞 </tag>
+            
+        </tags>
+      
+    </entry>
+    
+    
+    
+    <entry>
+      <title>嘶吼CTF Online Proxy</title>
+      <link href="/2020/02/27/%E5%98%B6%E5%90%BCCTF%20Online%20Proxy/"/>
+      <url>/2020/02/27/%E5%98%B6%E5%90%BCCTF%20Online%20Proxy/</url>
+      
+        <content type="html"><![CDATA[<h1 id="嘶吼CTF-Online-Proxy"><a href="#嘶吼CTF-Online-Proxy" class="headerlink" title="嘶吼CTF Online Proxy"></a>嘶吼CTF Online Proxy</h1><p>嘶吼的一个题，好像上次打了嘶吼，然后一个题磨了一天没摸出来</p><p>一开始以为是ssrf，试了半天发现写死了必须要http:// 开头，感觉就没机会了，查看源码，发现一个注释显示显示了当前IP，修改XFF头发现可控，并且会保存上一次访问的IP，这里就会用到数据库，所以可能存在一个注入</p><p>测试，打一个0’ or sleep(5) or ‘0过去，无延迟，显示payload，然后再重新随便打一个xff过去，出现延迟，在输入相同的xff，返回了0，出现延迟证明存在注入，只是没懂后端的查询代码是怎么样的，给人的感觉就像是直接是一句select xff一样。union select打了一下没有反应，报错也不存在，返回值有0和1，那就只能盲注了</p><p>然后自己动手做盲注，踩了一个小坑，即or和||是一致的，而|代表按位或，一开始用0’ or length(payload) or ‘0这么打，连length的返回值都是1。因为这种用or and这些来进行判断的结果只能是true 1和false 0嘛，愚蠢了。<br>而与零按位或数字则保持不变，就能获取结果，但是0和字符串或就会把字符串强制类型转换成数字，所以还是只能盲注</p><p>然后盲注二分打本来就慢，提示flag不在当前库，需要额外查一下库名，查表名列名的操作也略有修改。然后好像脚本访问速度过快，库名打到个information_schema服务器直接connection abort了。。。。盲注失败，自闭了</p><p>查wp查到一个赵总的脚本，将取出来的字符串转化成十进制数输出，然后再转成十六进制换回ASCII码快速获取字段，效率高了很多，太强了</p>]]></content>
+      
+      
+      <categories>
+          
+          <category> 刷题记录 </category>
+          
+      </categories>
+      
+      
+        <tags>
+            
+            <tag> wp </tag>
+            
+            <tag> SQLI </tag>
+            
+        </tags>
+      
+    </entry>
+    
+    
+    
+    <entry>
       <title>极客大挑战 RCE ME</title>
       <link href="/2020/02/26/%E6%9E%81%E5%AE%A2%E5%A4%A7%E6%8C%91%E6%88%98%20RCE%20ME/"/>
       <url>/2020/02/26/%E6%9E%81%E5%AE%A2%E5%A4%A7%E6%8C%91%E6%88%98%20RCE%20ME/</url>
