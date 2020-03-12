@@ -5,8 +5,8 @@
 <head>
     <meta charset="utf-8">
     <meta name="keywords" content="嘶吼CTF Online Proxy, Z3ratu1&#39;s blog">
-    <meta name="description" content="嘶吼CTF Online Proxy嘶吼的一个题，好像上次打了嘶吼，然后一个题磨了一天没摸出来
-一开始以为是ssrf，试了半天发现写死了必须要http:// 开头，感觉就没机会了，查看源码，发现一个注释显示显示了当前IP，修改XFF头发现可">
+    <meta name="description" content="[嘶吼CTF] Online Proxy嘶吼的一个题，好像上次打了嘶吼，然后一个题磨了一天没摸出来
+一开始以为是ssrf，试了半天发现写死了必须要http:// 开头，感觉就没机会了，查看源码，发现一个注释显示显示了当前IP，修改XFF头发">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     <meta name="renderer" content="webkit|ie-stand|ie-comp">
@@ -461,7 +461,7 @@
         <hr class="clearfix">
         <div class="card-content article-card-content">
             <div id="articleContent">
-                <h1 id="嘶吼CTF-Online-Proxy"><a href="#嘶吼CTF-Online-Proxy" class="headerlink" title="嘶吼CTF Online Proxy"></a>嘶吼CTF Online Proxy</h1><p>嘶吼的一个题，好像上次打了嘶吼，然后一个题磨了一天没摸出来</p>
+                <h1 id="嘶吼CTF-Online-Proxy"><a href="#嘶吼CTF-Online-Proxy" class="headerlink" title="[嘶吼CTF] Online Proxy"></a>[嘶吼CTF] Online Proxy</h1><p>嘶吼的一个题，好像上次打了嘶吼，然后一个题磨了一天没摸出来</p>
 <p>一开始以为是ssrf，试了半天发现写死了必须要http:// 开头，感觉就没机会了，查看源码，发现一个注释显示显示了当前IP，修改XFF头发现可控，并且会保存上一次访问的IP，这里就会用到数据库，所以可能存在一个注入</p>
 <p>测试，打一个0’ or sleep(5) or ‘0过去，无延迟，显示payload，然后再重新随便打一个xff过去，出现延迟，在输入相同的xff，返回了0，出现延迟证明存在注入，只是没懂后端的查询代码是怎么样的，给人的感觉就像是直接是一句select xff一样。union select打了一下没有反应，报错也不存在，返回值有0和1，那就只能盲注了</p>
 <p>然后自己动手做盲注，踩了一个小坑，即or和||是一致的，而|代表按位或，一开始用0’ or length(payload) or ‘0这么打，连length的返回值都是1。因为这种用or and这些来进行判断的结果只能是true 1和false 0嘛，愚蠢了。<br>而与零按位或数字则保持不变，就能获取结果，但是0和字符串或就会把字符串强制类型转换成数字，所以还是只能盲注</p>
@@ -627,7 +627,7 @@
                   property="dct:title" rel="dct:type">
                     《嘶吼CTF Online Proxy》
                 </span> by
-            <a xmlns:cc="http://creativecommons.org/ns#" href="/2020/02/27/%E5%98%B6%E5%90%BCCTF%20Online%20Proxy/" property="cc:attributionName"
+            <a xmlns:cc="http://creativecommons.org/ns#" href="/2020/02/27/%5B%E5%98%B6%E5%90%BCCTF%5D%20Online%20Proxy/" property="cc:attributionName"
                rel="cc:attributionURL">
                 Z3ratu1
             </a> is licensed under a
@@ -671,7 +671,7 @@
             <div class="article-badge left-badge text-color">
                 <i class="fa fa-chevron-left"></i>&nbsp;Previous</div>
             <div class="card">
-                <a href="/2020/02/28/watevrCTF-2019%20Pickle%20Store/">
+                <a href="/2020/02/28/%5BwatevrCTF-2019%5D%20Pickle%20Store/">
                     <div class="card-image">
                         
                         <img src="/img/ctf.jpg" class="responsive-img" alt="watevrCTF-2019 Pickle Store">
@@ -682,8 +682,8 @@
                 <div class="card-content article-content">
                     <div class="summary block-with-text">
                         
-                            watevrCTF-2019 Pickle Store之前做了他们的一个cookie store的题目，cookie伪造一下就能过，是个水题，就顺着做了他们的pickle store，做起来就不太对劲了，难度upup
-同样在cookie处能
+                            [watevrCTF-2019] Pickle Store之前做了他们的一个cookie store的题目，cookie伪造一下就能过，是个水题，就顺着做了他们的pickle store，做起来就不太对劲了，难度upup
+同样在cookie
                         
                     </div>
                     <div class="publish-info">
@@ -763,12 +763,12 @@ error_repo
                 
                 <div class="card-action article-tags">
                     
-                    <a href="/tags/wp/" target="_blank">
-                        <span class="chip bg-color">wp</span>
-                    </a>
-                    
                     <a href="/tags/php/" target="_blank">
                         <span class="chip bg-color">php</span>
+                    </a>
+                    
+                    <a href="/tags/wp/" target="_blank">
+                        <span class="chip bg-color">wp</span>
                     </a>
                     
                     <a href="/tags/RCE/" target="_blank">
@@ -889,7 +889,7 @@ error_repo
         <div class="col s12 m8 l8 copy-right">
             
             &nbsp;<i class="fa fa-area-chart"></i>&nbsp;站点总字数:&nbsp;<span
-                class="white-color">25.9k</span>&nbsp;字
+                class="white-color">33.5k</span>&nbsp;字
             
             
             

