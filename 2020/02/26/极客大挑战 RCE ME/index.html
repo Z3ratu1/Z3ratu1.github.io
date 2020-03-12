@@ -404,12 +404,12 @@ error_repo">
                     
                     <div class="article-tag">
                         
-                            <a href="/tags/wp/" target="_blank">
-                                <span class="chip bg-color">wp</span>
-                            </a>
-                        
                             <a href="/tags/php/" target="_blank">
                                 <span class="chip bg-color">php</span>
+                            </a>
+                        
+                            <a href="/tags/wp/" target="_blank">
+                                <span class="chip bg-color">wp</span>
                             </a>
                         
                             <a href="/tags/RCE/" target="_blank">
@@ -715,31 +715,32 @@ r <span class="token operator">=</span> requests<span class="token punctuation">
             <div class="article-badge left-badge text-color">
                 <i class="fa fa-chevron-left"></i>&nbsp;Previous</div>
             <div class="card">
-                <a href="/2020/02/27/%E5%98%B6%E5%90%BCCTF%20Online%20Proxy/">
+                <a href="/2020/03/01/PHP%E6%96%87%E4%BB%B6%E6%93%8D%E4%BD%9C%E6%BC%8F%E6%B4%9E/">
                     <div class="card-image">
                         
-                        <img src="/img/ctf1.jpg" class="responsive-img" alt="嘶吼CTF Online Proxy">
+                        <img src="/img/php.jpg" class="responsive-img" alt="PHP文件操作漏洞">
                         
-                        <span class="card-title">嘶吼CTF Online Proxy</span>
+                        <span class="card-title">PHP文件操作漏洞</span>
                     </div>
                 </a>
                 <div class="card-content article-content">
                     <div class="summary block-with-text">
                         
-                            嘶吼CTF Online Proxy嘶吼的一个题，好像上次打了嘶吼，然后一个题磨了一天没摸出来
-一开始以为是ssrf，试了半天发现写死了必须要http:// 开头，感觉就没机会了，查看源码，发现一个注释显示显示了当前IP，修改XFF头发现可
+                            PHP文件操作漏洞今天师傅们在群里聊到一个问题，有关于PHP文件操作对目录和文件判定相关的一个点，看了师傅们找到的一篇文章，感觉很有意思
+PHP底层实现存在的一些问题，导致PHP写入、读取时对畸形文件名存在一些错误处理，导致漏洞产生
+例一f
                         
                     </div>
                     <div class="publish-info">
                         <span class="publish-date">
-                            <i class="fa fa-clock-o fa-fw icon-date"></i>2020-02-27
+                            <i class="fa fa-clock-o fa-fw icon-date"></i>2020-03-01
                         </span>
                         <span class="publish-author">
                             
                             <i class="fa fa-bookmark fa-fw icon-category"></i>
                             
-                            <a href="/categories/%E5%88%B7%E9%A2%98%E8%AE%B0%E5%BD%95/" class="post-category" target="_blank">
-                                    刷题记录
+                            <a href="/categories/%E7%AC%94%E8%AE%B0/" class="post-category" target="_blank">
+                                    笔记
                                 </a>
                             
                             
@@ -749,12 +750,12 @@ r <span class="token operator">=</span> requests<span class="token punctuation">
                 
                 <div class="card-action article-tags">
                     
-                    <a href="/tags/wp/" target="_blank">
-                        <span class="chip bg-color">wp</span>
+                    <a href="/tags/php/" target="_blank">
+                        <span class="chip bg-color">php</span>
                     </a>
                     
-                    <a href="/tags/SQLI/" target="_blank">
-                        <span class="chip bg-color">SQLI</span>
+                    <a href="/tags/%E6%BC%8F%E6%B4%9E/" target="_blank">
+                        <span class="chip bg-color">漏洞</span>
                     </a>
                     
                 </div>
@@ -768,25 +769,27 @@ r <span class="token operator">=</span> requests<span class="token punctuation">
                 Next&nbsp;<i class="fa fa-chevron-right"></i>
             </div>
             <div class="card">
-                <a href="/2020/02/21/BJDCTF2020%20%E9%83%A8%E5%88%86wp/">
+                <a href="/2020/02/19/GWCTF%202019%20%E6%9E%AF%E7%87%A5%E7%9A%84%E6%8A%BD%E5%A5%96/">
                     <div class="card-image">
                         
-                        <img src="/img/1.jpg" class="responsive-img" alt="BJDCTF2020 部分wp">
+                        <img src="/img/ctf1.jpg" class="responsive-img" alt="枯燥的抽奖">
                         
-                        <span class="card-title">BJDCTF2020 部分wp</span>
+                        <span class="card-title">枯燥的抽奖</span>
                     </div>
                 </a>
                 <div class="card-content article-content">
                     <div class="summary block-with-text">
                         
-                            BJDCTF2020 部分wpbuu平台上的一些bjdctf的题，记录一下
-Mark loves cat被戏耍了，完全是一个动脑题，输在愚钝上
-.git源码泄露最近做的几个题都是这种类型，总是要我扫一下目录，扫出来有一个/.git文件夹。想
+                            枯燥的抽奖伪随机数安全的一个题，通过php_mt_rand这个工具逆向出随机数种子，然后通过种子获取字符串
+贴一下源码
+&lt;?php
+header("Content-Type: text/html;charset=utf-8");
+se
                         
                     </div>
                     <div class="publish-info">
                             <span class="publish-date">
-                                <i class="fa fa-clock-o fa-fw icon-date"></i>2020-02-21
+                                <i class="fa fa-clock-o fa-fw icon-date"></i>2020-02-19
                             </span>
                         <span class="publish-author">
                             
@@ -803,8 +806,16 @@ Mark loves cat被戏耍了，完全是一个动脑题，输在愚钝上
                 
                 <div class="card-action article-tags">
                     
+                    <a href="/tags/php/" target="_blank">
+                        <span class="chip bg-color">php</span>
+                    </a>
+                    
                     <a href="/tags/wp/" target="_blank">
                         <span class="chip bg-color">wp</span>
+                    </a>
+                    
+                    <a href="/tags/%E6%9A%B4%E5%8A%9B%E7%A0%B4%E8%A7%A3/" target="_blank">
+                        <span class="chip bg-color">暴力破解</span>
                     </a>
                     
                 </div>
@@ -921,7 +932,7 @@ Mark loves cat被戏耍了，完全是一个动脑题，输在愚钝上
         <div class="col s12 m8 l8 copy-right">
             
             &nbsp;<i class="fa fa-area-chart"></i>&nbsp;站点总字数:&nbsp;<span
-                class="white-color">25.9k</span>&nbsp;字
+                class="white-color">21.7k</span>&nbsp;字
             
             
             
