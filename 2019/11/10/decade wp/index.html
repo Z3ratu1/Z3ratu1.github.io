@@ -464,20 +464,20 @@ if (!empty($cod">
 <h2 id="无参数函数的命令执行"><a href="#无参数函数的命令执行" class="headerlink" title="无参数函数的命令执行"></a>无参数函数的命令执行</h2><pre class=" language-php"><code class="language-php"><span class="token delimiter">&lt;?php</span>
 <span class="token function">highlight_file</span><span class="token punctuation">(</span><span class="token constant">__FILE__</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
 <span class="token variable">$code</span> <span class="token operator">=</span> <span class="token variable">$_GET</span><span class="token punctuation">[</span><span class="token string">'code'</span><span class="token punctuation">]</span><span class="token punctuation">;</span>
-<span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token operator">!</span><span class="token function">empty</span><span class="token punctuation">(</span><span class="token variable">$code</span><span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
-        <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token string">';'</span> <span class="token operator">===</span> <span class="token function">preg_replace</span><span class="token punctuation">(</span><span class="token string">'/[a-z]+\((?R)?\)/'</span><span class="token punctuation">,</span> <span class="token keyword">NULL</span><span class="token punctuation">,</span> <span class="token variable">$code</span><span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
-            <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token function">preg_match</span><span class="token punctuation">(</span><span class="token string">'/readfile|if|time|local|sqrt|et|na|nt|strlen|info|path|rand|dec|bin|hex|oct|pi|exp|log/i'</span><span class="token punctuation">,</span> <span class="token variable">$code</span><span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+<span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token operator">!</span><span class="token function">empty</span><span class="token punctuation">(</span><span class="token variable">$code</span><span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token operator">&amp;</span><span class="token shell-comment comment">#123</span>
+        <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token string">';'</span> <span class="token operator">===</span> <span class="token function">preg_replace</span><span class="token punctuation">(</span><span class="token string">'/[a-z]+\((?R)?\)/'</span><span class="token punctuation">,</span> <span class="token keyword">NULL</span><span class="token punctuation">,</span> <span class="token variable">$code</span><span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token operator">&amp;</span><span class="token shell-comment comment">#123</span>
+            <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token function">preg_match</span><span class="token punctuation">(</span><span class="token string">'/readfile|if|time|local|sqrt|et|na|nt|strlen|info|path|rand|dec|bin|hex|oct|pi|exp|log/i'</span><span class="token punctuation">,</span> <span class="token variable">$code</span><span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token operator">&amp;</span><span class="token shell-comment comment">#123</span>
                     <span class="token keyword">echo</span> <span class="token string">'bye~'</span><span class="token punctuation">;</span>
-                <span class="token punctuation">}</span> <span class="token keyword">else</span> <span class="token punctuation">{</span>
+                <span class="token operator">&amp;</span><span class="token shell-comment comment">#125 else &amp;#123</span>
                     <span class="token function">eval</span><span class="token punctuation">(</span><span class="token variable">$code</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-                <span class="token punctuation">}</span>
-            <span class="token punctuation">}</span>
-        <span class="token keyword">else</span> <span class="token punctuation">{</span>
+                <span class="token operator">&amp;</span><span class="token shell-comment comment">#125</span>
+            <span class="token operator">&amp;</span><span class="token shell-comment comment">#125</span>
+        <span class="token keyword">else</span> <span class="token operator">&amp;</span><span class="token shell-comment comment">#123</span>
             <span class="token keyword">echo</span> <span class="token string">"No way!!!"</span><span class="token punctuation">;</span>
-        <span class="token punctuation">}</span>
-<span class="token punctuation">}</span><span class="token keyword">else</span> <span class="token punctuation">{</span>
+        <span class="token operator">&amp;</span><span class="token shell-comment comment">#125</span>
+<span class="token operator">&amp;</span><span class="token shell-comment comment">#125else &amp;#123</span>
         <span class="token keyword">echo</span> <span class="token string">"No way!!!"</span><span class="token punctuation">;</span>
-    <span class="token punctuation">}</span></code></pre>
+    <span class="token operator">&amp;</span><span class="token shell-comment comment">#125</span></code></pre>
 <p>贴一下源码</p>
 <p>这个正则大概意思就是只允许无参数的函数调用，并且函数还得是全英文的，不能有下划线数字之类的，(?R)表示引用当前正则表达式，?匹配一次或零次，也就是可以<code>func1(func2(func3(())))</code>这样子，后来看了师傅们的payload发现还可以<code>func1(func2())func3()</code>这个样子</p>
 <h2 id="无中生有的用函数返回值获取字符串"><a href="#无中生有的用函数返回值获取字符串" class="headerlink" title="无中生有的用函数返回值获取字符串"></a>无中生有的用函数返回值获取字符串</h2><p>各种各样的神仙技巧，要求对各个函数的功能足够熟练才能做出来了，fuzz跑出内置函数然后做数学题或者各种各样的变换，我只能列一下学到的知识了</p>
@@ -903,7 +903,7 @@ if (!empty($cod">
         <div class="col s12 m8 l8 copy-right">
             
             &nbsp;<i class="fa fa-area-chart"></i>&nbsp;站点总字数:&nbsp;<span
-                class="white-color">44.6k</span>&nbsp;字
+                class="white-color">46.1k</span>&nbsp;字
             
             
             

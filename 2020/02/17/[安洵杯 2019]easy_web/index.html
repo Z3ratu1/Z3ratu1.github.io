@@ -436,14 +436,14 @@ error_reportin">
                     
                     <div class="info-break-policy">
                         <i class="fa fa-file-word-o fa-fw"></i>Word Count:&nbsp;&nbsp;
-                        636
+                        798
                     </div>
                     
 
                     
                     <div class="info-break-policy">
                         <i class="fa fa-clock-o fa-fw"></i>Read Times:&nbsp;&nbsp;
-                        3 Min
+                        4 Min
                     </div>
                     
                 
@@ -470,34 +470,34 @@ error_reportin">
 <span class="token variable">$file</span> <span class="token operator">=</span> <span class="token function">hex2bin</span><span class="token punctuation">(</span><span class="token function">base64_decode</span><span class="token punctuation">(</span><span class="token function">base64_decode</span><span class="token punctuation">(</span><span class="token variable">$_GET</span><span class="token punctuation">[</span><span class="token string">'img'</span><span class="token punctuation">]</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
 
 <span class="token variable">$file</span> <span class="token operator">=</span> <span class="token function">preg_replace</span><span class="token punctuation">(</span><span class="token string">"/[^a-zA-Z0-9.]+/"</span><span class="token punctuation">,</span> <span class="token string">""</span><span class="token punctuation">,</span> <span class="token variable">$file</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-<span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token function">preg_match</span><span class="token punctuation">(</span><span class="token string">"/flag/i"</span><span class="token punctuation">,</span> <span class="token variable">$file</span><span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+<span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token function">preg_match</span><span class="token punctuation">(</span><span class="token string">"/flag/i"</span><span class="token punctuation">,</span> <span class="token variable">$file</span><span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token operator">&amp;</span><span class="token shell-comment comment">#123</span>
     <span class="token keyword">echo</span> <span class="token string">'&lt;img src ="./ctf3.jpeg">'</span><span class="token punctuation">;</span>
     <span class="token keyword">die</span><span class="token punctuation">(</span><span class="token string">"xixi～ no flag"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-<span class="token punctuation">}</span> <span class="token keyword">else</span> <span class="token punctuation">{</span>
+<span class="token operator">&amp;</span><span class="token shell-comment comment">#125 else &amp;#123</span>
     <span class="token variable">$txt</span> <span class="token operator">=</span> <span class="token function">base64_encode</span><span class="token punctuation">(</span><span class="token function">file_get_contents</span><span class="token punctuation">(</span><span class="token variable">$file</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
     <span class="token keyword">echo</span> <span class="token string">"&lt;img src='data:image/gif;base64,"</span> <span class="token punctuation">.</span> <span class="token variable">$txt</span> <span class="token punctuation">.</span> <span class="token string">"'>&lt;/img>"</span><span class="token punctuation">;</span>
     <span class="token keyword">echo</span> <span class="token string">"&lt;br>"</span><span class="token punctuation">;</span>
-<span class="token punctuation">}</span>
+<span class="token operator">&amp;</span><span class="token shell-comment comment">#125</span>
 <span class="token keyword">echo</span> <span class="token variable">$cmd</span><span class="token punctuation">;</span>
 <span class="token keyword">echo</span> <span class="token string">"&lt;br>"</span><span class="token punctuation">;</span>
-<span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token function">preg_match</span><span class="token punctuation">(</span><span class="token string">"/ls|bash|tac|nl|more|less|head|wget|tail|vi|cat|od|grep|sed|bzmore|bzless|pcre|paste|diff|file|echo|sh|\'|\"|\`|;|,|\*|\?|\\|\\\\|\n|\t|\r|\xA0|\{|\}|\(|\)|\&amp;[^\d]|@|\||\\$|\[|\]|{|}|\(|\)|-|&lt;|>/i"</span><span class="token punctuation">,</span> <span class="token variable">$cmd</span><span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+<span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token function">preg_match</span><span class="token punctuation">(</span><span class="token string">"/ls|bash|tac|nl|more|less|head|wget|tail|vi|cat|od|grep|sed|bzmore|bzless|pcre|paste|diff|file|echo|sh|\'|\"|\`|;|,|\*|\?|\\|\\\\|\n|\t|\r|\xA0|\&amp;#123|\&amp;#125|\(|\)|\&amp;[^\d]|@|\||\\$|\[|\]|&amp;#123|&amp;#125|\(|\)|-|&lt;|>/i"</span><span class="token punctuation">,</span> <span class="token variable">$cmd</span><span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token operator">&amp;</span><span class="token shell-comment comment">#123</span>
     <span class="token keyword">echo</span><span class="token punctuation">(</span><span class="token string">"forbid ~"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
     <span class="token keyword">echo</span> <span class="token string">"&lt;br>"</span><span class="token punctuation">;</span>
-<span class="token punctuation">}</span> <span class="token keyword">else</span> <span class="token punctuation">{</span>
-    <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token punctuation">(</span>string<span class="token punctuation">)</span><span class="token variable">$_POST</span><span class="token punctuation">[</span><span class="token string">'a'</span><span class="token punctuation">]</span> <span class="token operator">!==</span> <span class="token punctuation">(</span>string<span class="token punctuation">)</span><span class="token variable">$_POST</span><span class="token punctuation">[</span><span class="token string">'b'</span><span class="token punctuation">]</span> <span class="token operator">&amp;&amp;</span> <span class="token function">md5</span><span class="token punctuation">(</span><span class="token variable">$_POST</span><span class="token punctuation">[</span><span class="token string">'a'</span><span class="token punctuation">]</span><span class="token punctuation">)</span> <span class="token operator">===</span> <span class="token function">md5</span><span class="token punctuation">(</span><span class="token variable">$_POST</span><span class="token punctuation">[</span><span class="token string">'b'</span><span class="token punctuation">]</span><span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+<span class="token operator">&amp;</span><span class="token shell-comment comment">#125 else &amp;#123</span>
+    <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token punctuation">(</span>string<span class="token punctuation">)</span><span class="token variable">$_POST</span><span class="token punctuation">[</span><span class="token string">'a'</span><span class="token punctuation">]</span> <span class="token operator">!==</span> <span class="token punctuation">(</span>string<span class="token punctuation">)</span><span class="token variable">$_POST</span><span class="token punctuation">[</span><span class="token string">'b'</span><span class="token punctuation">]</span> <span class="token operator">&amp;&amp;</span> <span class="token function">md5</span><span class="token punctuation">(</span><span class="token variable">$_POST</span><span class="token punctuation">[</span><span class="token string">'a'</span><span class="token punctuation">]</span><span class="token punctuation">)</span> <span class="token operator">===</span> <span class="token function">md5</span><span class="token punctuation">(</span><span class="token variable">$_POST</span><span class="token punctuation">[</span><span class="token string">'b'</span><span class="token punctuation">]</span><span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token operator">&amp;</span><span class="token shell-comment comment">#123</span>
         <span class="token keyword">echo</span> `<span class="token variable">$cmd</span>`<span class="token punctuation">;</span>
-    <span class="token punctuation">}</span> <span class="token keyword">else</span> <span class="token punctuation">{</span>
+    <span class="token operator">&amp;</span><span class="token shell-comment comment">#125 else &amp;#123</span>
         <span class="token keyword">echo</span> <span class="token punctuation">(</span><span class="token string">"md5 is funny ~"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-    <span class="token punctuation">}</span>
-<span class="token punctuation">}</span></code></pre>
+    <span class="token operator">&amp;</span><span class="token shell-comment comment">#125</span>
+<span class="token operator">&amp;</span><span class="token shell-comment comment">#125</span></code></pre>
 <p>说白了就是不让直接获取flag，强类型md5过了之后可以过一个超级过滤来执行命令</p>
 <h2 id="强类型md5"><a href="#强类型md5" class="headerlink" title="强类型md5"></a>强类型md5</h2><pre class=" language-php"><code class="language-php"><span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token punctuation">(</span>string<span class="token punctuation">)</span><span class="token variable">$_POST</span><span class="token punctuation">[</span><span class="token string">'a'</span><span class="token punctuation">]</span> <span class="token operator">!==</span> <span class="token punctuation">(</span>string<span class="token punctuation">)</span><span class="token variable">$_POST</span><span class="token punctuation">[</span><span class="token string">'b'</span><span class="token punctuation">]</span> <span class="token operator">&amp;&amp;</span> <span class="token function">md5</span><span class="token punctuation">(</span><span class="token variable">$_POST</span><span class="token punctuation">[</span><span class="token string">'a'</span><span class="token punctuation">]</span><span class="token punctuation">)</span> <span class="token operator">===</span> <span class="token function">md5</span><span class="token punctuation">(</span><span class="token variable">$_POST</span><span class="token punctuation">[</span><span class="token string">'b'</span><span class="token punctuation">]</span><span class="token punctuation">)</span><span class="token punctuation">)</span></code></pre>
 <p>限制了类型为string，且比较类型为强类型，需要硬碰撞出两个md5一样的字符串，抄一个现成的</p>
 <blockquote>
-<p>a=%4d%c9%68%ff%0e%e3%5c%20%95%72%d4%77%7b%72%15%87%d3%6f%a7%b2%1b%dc%56%b7%4a%3d%c0%78%3e%7b%95%18%af%bf%a2%00%a8%28%4b%f3%6e%8e%4b%55%b3%5f%42%75%93%d8%49%67%6d%a0%d1%55%5d%83%60%fb%5f%07%fe%a2</p>
+<p>a=&amp;#374d&amp;#37c9&amp;#3768&amp;#37ff&amp;#370e&amp;#37e3&amp;#375c&amp;#3720&amp;#3795&amp;#3772&amp;#37d4&amp;#3777&amp;#377b&amp;#3772&amp;#3715&amp;#3787&amp;#37d3&amp;#376f&amp;#37a7&amp;#37b2&amp;#371b&amp;#37dc&amp;#3756&amp;#37b7&amp;#374a&amp;#373d&amp;#37c0&amp;#3778&amp;#373e&amp;#377b&amp;#3795&amp;#3718&amp;#37af&amp;#37bf&amp;#37a2&amp;#3700&amp;#37a8&amp;#3728&amp;#374b&amp;#37f3&amp;#376e&amp;#378e&amp;#374b&amp;#3755&amp;#37b3&amp;#375f&amp;#3742&amp;#3775&amp;#3793&amp;#37d8&amp;#3749&amp;#3767&amp;#376d&amp;#37a0&amp;#37d1&amp;#3755&amp;#375d&amp;#3783&amp;#3760&amp;#37fb&amp;#375f&amp;#3707&amp;#37fe&amp;#37a2</p>
 </blockquote>
-<p>b=%4d%c9%68%ff%0e%e3%5c%20%95%72%d4%77%7b%72%15%87%d3%6f%a7%b2%1b%dc%56%b7%4a%3d%c0%78%3e%7b%95%18%af%bf%a2%02%a8%28%4b%f3%6e%8e%4b%55%b3%5f%42%75%93%d8%49%67%6d%a0%d1%d5%5d%83%60%fb%5f%07%fe%a2</p>
-<h2 id="命令执行绕过"><a href="#命令执行绕过" class="headerlink" title="命令执行绕过"></a>命令执行绕过</h2><p>Linux下的命令执行有很多绕过方法，空格使用<code>$IFS$n</code>（n为任意数字）代替，过滤关键字可以用变量拼接绕过，例如<code>a=l;${a}s;</code>即为<code>ls</code>，还可以在命令中穿插\，不会影响命令执行，如<code>c\at /fl\ag</code></p>
+<p>b=&amp;#374d&amp;#37c9&amp;#3768&amp;#37ff&amp;#370e&amp;#37e3&amp;#375c&amp;#3720&amp;#3795&amp;#3772&amp;#37d4&amp;#3777&amp;#377b&amp;#3772&amp;#3715&amp;#3787&amp;#37d3&amp;#376f&amp;#37a7&amp;#37b2&amp;#371b&amp;#37dc&amp;#3756&amp;#37b7&amp;#374a&amp;#373d&amp;#37c0&amp;#3778&amp;#373e&amp;#377b&amp;#3795&amp;#3718&amp;#37af&amp;#37bf&amp;#37a2&amp;#3702&amp;#37a8&amp;#3728&amp;#374b&amp;#37f3&amp;#376e&amp;#378e&amp;#374b&amp;#3755&amp;#37b3&amp;#375f&amp;#3742&amp;#3775&amp;#3793&amp;#37d8&amp;#3749&amp;#3767&amp;#376d&amp;#37a0&amp;#37d1&amp;#37d5&amp;#375d&amp;#3783&amp;#3760&amp;#37fb&amp;#375f&amp;#3707&amp;#37fe&amp;#37a2</p>
+<h2 id="命令执行绕过"><a href="#命令执行绕过" class="headerlink" title="命令执行绕过"></a>命令执行绕过</h2><p>Linux下的命令执行有很多绕过方法，空格使用<code>$IFS$n</code>（n为任意数字）代替，过滤关键字可以用变量拼接绕过，例如<code>a=l;$&amp;#123a&amp;#125s;</code>即为<code>ls</code>，还可以在命令中穿插\，不会影响命令执行，如<code>c\at /fl\ag</code></p>
 <h2 id="正则匹配与转义"><a href="#正则匹配与转义" class="headerlink" title="正则匹配与转义"></a>正则匹配与转义</h2><p>PHP在进行正则匹配时需要经过两层转义才能获取到真实的字符，第一层为PHP自身的转义，第二层为正则引擎的转义，因此\\\\四个反斜杠才能匹配到一个反斜杠\，而该题中\\|\\\\这一段经过两重转义之后变成了匹配<code>|\</code>，反而不能匹配单个的反斜杠了，所以光看还是不够，有的地方还是得自己本地跑一下才知道效果</p>
 
             </div>
@@ -719,8 +719,8 @@ error_reportin">
 &lt;?php
 error_reporting(0);
 //听说你很喜欢数学，不知道你是否爱它胜过爱flag
-if(!isset($_GET['c'])){
-    show_sour
+if(!isset($_GET['c']))&amp;#123
+    s
                         
                     </div>
                     <div class="publish-info">
@@ -912,7 +912,7 @@ if(!isset($_GET['c'])){
         <div class="col s12 m8 l8 copy-right">
             
             &nbsp;<i class="fa fa-area-chart"></i>&nbsp;站点总字数:&nbsp;<span
-                class="white-color">44.6k</span>&nbsp;字
+                class="white-color">46.1k</span>&nbsp;字
             
             
             

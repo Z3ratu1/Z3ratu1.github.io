@@ -560,10 +560,10 @@ url_prefix <span class="token operator">=</span> <span class="token string">'/d5
 <span class="token keyword">def</span> <span class="token function">view_handler</span><span class="token punctuation">(</span>args<span class="token punctuation">)</span><span class="token punctuation">:</span>
     page <span class="token operator">=</span> args<span class="token punctuation">[</span><span class="token number">0</span><span class="token punctuation">]</span>
     html <span class="token operator">=</span> <span class="token string">''</span>
-    html <span class="token operator">+=</span> <span class="token string">'[INFO] you have {} diamonds, {} points now.&lt;br />'</span><span class="token punctuation">.</span>format<span class="token punctuation">(</span>
+    html <span class="token operator">+=</span> <span class="token string">'[INFO] you have &amp;#123&amp;#125 diamonds, &amp;#123&amp;#125 points now.&lt;br />'</span><span class="token punctuation">.</span>format<span class="token punctuation">(</span>
         session<span class="token punctuation">[</span><span class="token string">'num_items'</span><span class="token punctuation">]</span><span class="token punctuation">,</span> session<span class="token punctuation">[</span><span class="token string">'points'</span><span class="token punctuation">]</span><span class="token punctuation">)</span>
     <span class="token keyword">if</span> page <span class="token operator">==</span> <span class="token string">'index'</span><span class="token punctuation">:</span>
-        html <span class="token operator">+=</span> <span class="token string">'&lt;a href="./?action:index;True%23False">View source code&lt;/a>&lt;br />'</span>
+        html <span class="token operator">+=</span> <span class="token string">'&lt;a href="./?action:index;True&amp;#3723False">View source code&lt;/a>&lt;br />'</span>
         html <span class="token operator">+=</span> <span class="token string">'&lt;a href="./?action:view;shop">Go to e-shop&lt;/a>&lt;br />'</span>
         html <span class="token operator">+=</span> <span class="token string">'&lt;a href="./?action:view;reset">Reset&lt;/a>&lt;br />'</span>
     <span class="token keyword">elif</span> page <span class="token operator">==</span> <span class="token string">'shop'</span><span class="token punctuation">:</span>
@@ -583,7 +583,7 @@ url_prefix <span class="token operator">=</span> <span class="token string">'/d5
         source <span class="token operator">=</span> open<span class="token punctuation">(</span><span class="token string">'eventLoop.py'</span><span class="token punctuation">,</span> <span class="token string">'r'</span><span class="token punctuation">)</span>
         html <span class="token operator">=</span> <span class="token string">''</span>
         <span class="token keyword">if</span> bool_download_source <span class="token operator">!=</span> <span class="token string">'True'</span><span class="token punctuation">:</span>
-            html <span class="token operator">+=</span> <span class="token string">'&lt;a href="./?action:index;True%23True">Download this .py file&lt;/a>&lt;br />'</span>
+            html <span class="token operator">+=</span> <span class="token string">'&lt;a href="./?action:index;True&amp;#3723True">Download this .py file&lt;/a>&lt;br />'</span>
             html <span class="token operator">+=</span> <span class="token string">'&lt;a href="./?action:view;index">Go back to index.html&lt;/a>&lt;br />'</span>
 
         <span class="token keyword">for</span> line <span class="token keyword">in</span> source<span class="token punctuation">:</span>
@@ -595,7 +595,7 @@ url_prefix <span class="token operator">=</span> <span class="token string">'/d5
         source<span class="token punctuation">.</span>close<span class="token punctuation">(</span><span class="token punctuation">)</span>
 
         <span class="token keyword">if</span> bool_download_source <span class="token operator">==</span> <span class="token string">'True'</span><span class="token punctuation">:</span>
-            headers <span class="token operator">=</span> <span class="token punctuation">{</span><span class="token punctuation">}</span>
+            headers <span class="token operator">=</span> <span class="token operator">&amp;</span><span class="token comment" spellcheck="true">#123&amp;#125</span>
             headers<span class="token punctuation">[</span><span class="token string">'Content-Type'</span><span class="token punctuation">]</span> <span class="token operator">=</span> <span class="token string">'text/plain'</span>
             headers<span class="token punctuation">[</span><span class="token string">'Content-Disposition'</span><span class="token punctuation">]</span> <span class="token operator">=</span> <span class="token string">'attachment; filename=serve.py'</span>
             <span class="token keyword">return</span> Response<span class="token punctuation">(</span>html<span class="token punctuation">,</span> headers<span class="token operator">=</span>headers<span class="token punctuation">)</span>
@@ -608,9 +608,9 @@ url_prefix <span class="token operator">=</span> <span class="token string">'/d5
 <span class="token keyword">def</span> <span class="token function">buy_handler</span><span class="token punctuation">(</span>args<span class="token punctuation">)</span><span class="token punctuation">:</span>
     num_items <span class="token operator">=</span> int<span class="token punctuation">(</span>args<span class="token punctuation">[</span><span class="token number">0</span><span class="token punctuation">]</span><span class="token punctuation">)</span>
     <span class="token keyword">if</span> num_items <span class="token operator">&lt;=</span> <span class="token number">0</span><span class="token punctuation">:</span>
-        <span class="token keyword">return</span> <span class="token string">'invalid number({}) of diamonds to buy&lt;br />'</span><span class="token punctuation">.</span>format<span class="token punctuation">(</span>args<span class="token punctuation">[</span><span class="token number">0</span><span class="token punctuation">]</span><span class="token punctuation">)</span>
+        <span class="token keyword">return</span> <span class="token string">'invalid number(&amp;#123&amp;#125) of diamonds to buy&lt;br />'</span><span class="token punctuation">.</span>format<span class="token punctuation">(</span>args<span class="token punctuation">[</span><span class="token number">0</span><span class="token punctuation">]</span><span class="token punctuation">)</span>
     session<span class="token punctuation">[</span><span class="token string">'num_items'</span><span class="token punctuation">]</span> <span class="token operator">+=</span> num_items
-    trigger_event<span class="token punctuation">(</span><span class="token punctuation">[</span><span class="token string">'func:consume_point;{}'</span><span class="token punctuation">.</span>format<span class="token punctuation">(</span>num_items<span class="token punctuation">)</span><span class="token punctuation">,</span> <span class="token string">'action:view;index'</span><span class="token punctuation">]</span><span class="token punctuation">)</span>
+    trigger_event<span class="token punctuation">(</span><span class="token punctuation">[</span><span class="token string">'func:consume_point;&amp;#123&amp;#125'</span><span class="token punctuation">.</span>format<span class="token punctuation">(</span>num_items<span class="token punctuation">)</span><span class="token punctuation">,</span> <span class="token string">'action:view;index'</span><span class="token punctuation">]</span><span class="token punctuation">)</span>
 
 
 <span class="token keyword">def</span> <span class="token function">consume_point_function</span><span class="token punctuation">(</span>args<span class="token punctuation">)</span><span class="token punctuation">:</span>
@@ -1064,7 +1064,7 @@ PHP底层实现存在的一些问题，导致PHP写入、读取时对畸形文�
         <div class="col s12 m8 l8 copy-right">
             
             &nbsp;<i class="fa fa-area-chart"></i>&nbsp;站点总字数:&nbsp;<span
-                class="white-color">44.6k</span>&nbsp;字
+                class="white-color">46.1k</span>&nbsp;字
             
             
             
