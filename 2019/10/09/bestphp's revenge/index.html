@@ -453,7 +453,7 @@ call_user_func($_G">
                     
                     <div class="info-break-policy">
                         <i class="fa fa-file-word-o fa-fw"></i>Word Count:&nbsp;&nbsp;
-                        920
+                        865
                     </div>
                     
 
@@ -483,23 +483,23 @@ call_user_func($_G">
 <span class="token function">call_user_func</span><span class="token punctuation">(</span><span class="token variable">$_GET</span><span class="token punctuation">[</span><span class="token string">'f'</span><span class="token punctuation">]</span><span class="token punctuation">,</span> <span class="token variable">$_POST</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
 <span class="token function">session_start</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
 <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token function">isset</span><span class="token punctuation">(</span><span class="token variable">$_GET</span><span class="token punctuation">[</span><span class="token string">'name'</span><span class="token punctuation">]</span><span class="token punctuation">)</span><span class="token punctuation">)</span> 
-<span class="token operator">&amp;</span><span class="token shell-comment comment">#123</span>
+<span class="token punctuation">{</span>
     <span class="token variable">$_SESSION</span><span class="token punctuation">[</span><span class="token string">'name'</span><span class="token punctuation">]</span> <span class="token operator">=</span> <span class="token variable">$_GET</span><span class="token punctuation">[</span><span class="token string">'name'</span><span class="token punctuation">]</span><span class="token punctuation">;</span>
-<span class="token operator">&amp;</span><span class="token shell-comment comment">#125</span>
+<span class="token punctuation">}</span>
 <span class="token function">var_dump</span><span class="token punctuation">(</span><span class="token variable">$_SESSION</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
 <span class="token variable">$a</span> <span class="token operator">=</span> <span class="token keyword">array</span><span class="token punctuation">(</span><span class="token function">reset</span><span class="token punctuation">(</span><span class="token variable">$_SESSION</span><span class="token punctuation">)</span><span class="token punctuation">,</span> <span class="token string">'welcome_to_the_lctf2018'</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
 <span class="token function">call_user_func</span><span class="token punctuation">(</span><span class="token variable">$b</span><span class="token punctuation">,</span> <span class="token variable">$a</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
 <span class="token delimiter">?></span></code></pre>
-<h3 id="flag-php"><a href="#flag-php" class="headerlink" title="flag.php"></a>flag.php</h3><pre class=" language-php"><code class="language-php"><span class="token variable">$flag</span> <span class="token operator">=</span> <span class="token string">'LCTF&amp;#123*************************&amp;#125'</span><span class="token punctuation">;</span>
-<span class="token keyword">if</span><span class="token punctuation">(</span><span class="token variable">$_SERVER</span><span class="token punctuation">[</span><span class="token string">"REMOTE_ADDR"</span><span class="token punctuation">]</span><span class="token operator">===</span><span class="token string">"127.0.0.1"</span><span class="token punctuation">)</span><span class="token operator">&amp;</span><span class="token shell-comment comment">#123</span>
+<h3 id="flag-php"><a href="#flag-php" class="headerlink" title="flag.php"></a>flag.php</h3><pre class=" language-php"><code class="language-php"><span class="token variable">$flag</span> <span class="token operator">=</span> <span class="token string">'LCTF{*************************}'</span><span class="token punctuation">;</span>
+<span class="token keyword">if</span><span class="token punctuation">(</span><span class="token variable">$_SERVER</span><span class="token punctuation">[</span><span class="token string">"REMOTE_ADDR"</span><span class="token punctuation">]</span><span class="token operator">===</span><span class="token string">"127.0.0.1"</span><span class="token punctuation">)</span><span class="token punctuation">{</span>
        <span class="token variable">$_SESSION</span><span class="token punctuation">[</span><span class="token string">'flag'</span><span class="token punctuation">]</span> <span class="token operator">=</span> <span class="token variable">$flag</span><span class="token punctuation">;</span>
-   <span class="token operator">&amp;</span><span class="token shell-comment comment">#125</span>
+   <span class="token punctuation">}</span>
 only localhost can get flag<span class="token operator">!</span></code></pre>
 <h2 id="SESSION反序列化"><a href="#SESSION反序列化" class="headerlink" title="SESSION反序列化"></a>SESSION反序列化</h2><p>首先需要知道，php中的session中的内容并不是放在内存中的，而是以文件的方式来存储的，PHP的session在存入时会进过序列化，再使用时在通过反序列化，存储方式就是由配置项的session.save_handler来进行确定的，不同的save_hanld存在着不同的序列化反序列化操作，从而引起反序列化漏洞。</p>
 <blockquote>
 <p>php_binary 键名的长度对应的ascii字符+键名+经过serialize()函数序列化后的值<br>php 键名+竖线（|）+经过serialize()函数处理过的值<br>php_serialize 经过serialize()函数处理过的值，会将键名和值当作一个数组序列化</p>
 </blockquote>
-<p>PHP一般默认使用php的序列化方式，这里我们可以通过<code>call_user_func</code>来调用session_start()函数将其序列化方式变为php_serialize方式，而我们构造的数据为<code>|O&amp;#373A10&amp;#373A&amp;#3722SoapClient&amp;#3722&amp;#373A3&amp;#373A&amp;#377Bs&amp;#373A3&amp;#373A&amp;#3722uri&amp;#3722&amp;#373Bs&amp;#373A25&amp;#373A&amp;#3722http&amp;#373A&amp;#372F&amp;#372F127.0.0.1&amp;#372Fflag.php&amp;#3722&amp;#373Bs&amp;#373A8&amp;#373A&amp;#3722location&amp;#3722&amp;#373Bs&amp;#373A25&amp;#373A&amp;#3722http&amp;#373A&amp;#372F&amp;#372F127.0.0.1&amp;#372Fflag.php&amp;#3722&amp;#373Bs&amp;#373A13&amp;#373A&amp;#3722_soap_version&amp;#3722&amp;#373Bi&amp;#373A1&amp;#373B&amp;#377D</code><br>注意数据最前端的那个’|’，在以php方式进行反序列化时，’|’作为一个分隔符，将后方的数据作为一个对象进行反序列化，构造出了一个soapclient对象，前方原本为php_serialize序列化的数据全部被作为键名写入了session中。</p>
+<p>PHP一般默认使用php的序列化方式，这里我们可以通过<code>call_user_func</code>来调用session_start()函数将其序列化方式变为php_serialize方式，而我们构造的数据为<code>|O%3A10%3A%22SoapClient%22%3A3%3A%7Bs%3A3%3A%22uri%22%3Bs%3A25%3A%22http%3A%2F%2F127.0.0.1%2Fflag.php%22%3Bs%3A8%3A%22location%22%3Bs%3A25%3A%22http%3A%2F%2F127.0.0.1%2Fflag.php%22%3Bs%3A13%3A%22_soap_version%22%3Bi%3A1%3B%7D</code><br>注意数据最前端的那个’|’，在以php方式进行反序列化时，’|’作为一个分隔符，将后方的数据作为一个对象进行反序列化，构造出了一个soapclient对象，前方原本为php_serialize序列化的数据全部被作为键名写入了session中。</p>
 <p>此时，我们就获得了一个储存在本地的SoapClient对象</p>
 <h2 id="SoapClient执行ssrf"><a href="#SoapClient执行ssrf" class="headerlink" title="SoapClient执行ssrf"></a>SoapClient执行ssrf</h2><p>SoapClient为PHP的一个内置类，因此我们在题目代码未包含类的情况下也可对该对象进行反序列化，而其拥有一个魔法方法__call()，调用时会发起一次soap请求（大概就是一次访问吧，访问目标可以由其location成员控制），本地测试后发现虽然请求会发出，但是运行时会直接抛出一个fatal error导致程序直接退出，后面部分就没法运行了</p>
 <p>这里就通过存储与本地服务器session中的一个SoapClient对象对flag.php发起了访问，实现了SSRF。绕过了对REMOTE_ADDR的限制（实际上REMOTE_ADDR的绕过是非常困难的），这里存在一个var_dump函数，可以直接把SoapClient对象的内容都倒出来，所以我们直接查看SoapClient对本地服务器访问的这个cookie，然后把自己的cookie修改成它的，就可以假装成为本地登录获取flag了</p>
@@ -929,7 +929,7 @@ $
         <div class="col s12 m8 l8 copy-right">
             
             &nbsp;<i class="fa fa-area-chart"></i>&nbsp;站点总字数:&nbsp;<span
-                class="white-color">46.1k</span>&nbsp;字
+                class="white-color">44.4k</span>&nbsp;字
             
             
             

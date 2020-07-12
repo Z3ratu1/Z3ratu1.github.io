@@ -4,7 +4,7 @@
 
 <head>
     <meta charset="utf-8">
-    <meta name="keywords" content="HBCTF 大美西安, Z3ratu1&#39;s blog">
+    <meta name="keywords" content="[BJDCTF 2nd]部分wp, Z3ratu1&#39;s blog">
     <meta name="description" content="[BJDCTF 2nd]部分wp据说是萌新赛，就目前做的几个题来说的确较为简单
 fake googleSSTI，测一下可以发现用的jinja2，搜一个payload直接打SSTI上一次的BJDCTF也考过，具体判断什么的可以看上次比赛的WP">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
@@ -14,7 +14,7 @@ fake googleSSTI，测一下可以发现用的jinja2，搜一个payload直接打S
     <meta name="format-detection" content="telephone=no">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <title>HBCTF 大美西安 | Z3ratu1&#39;s blog</title>
+    <title>[BJDCTF 2nd]部分wp | Z3ratu1&#39;s blog</title>
     <link rel="icon" type="image/png" href="/favicon.png">
 
     <link rel="stylesheet" type="text/css" href="/libs/awesome/css/font-awesome.min.css">
@@ -292,7 +292,7 @@ fake googleSSTI，测一下可以发现用的jinja2，搜一个payload直接打S
             <div class="col s12 m12 l12">
                 <div class="brand">
                     <div class="description center-align post-title">
-                        HBCTF 大美西安
+                        [BJDCTF 2nd]部分wp
                     </div>
                 </div>
             </div>
@@ -427,14 +427,14 @@ fake googleSSTI，测一下可以发现用的jinja2，搜一个payload直接打S
             <div class="post-info">
                 <div class="post-date info-break-policy">
                     <i class="fa fa-calendar-minus-o fa-fw"></i>Publish Date:&nbsp;&nbsp;
-                    2020-04-23
+                    2020-07-11
                 </div>
 
                 
                     
                     <div class="info-break-policy">
                         <i class="fa fa-file-word-o fa-fw"></i>Word Count:&nbsp;&nbsp;
-                        1k
+                        998
                     </div>
                     
 
@@ -462,7 +462,7 @@ fake googleSSTI，测一下可以发现用的jinja2，搜一个payload直接打S
 <h2 id="old-hack"><a href="#old-hack" class="headerlink" title="old-hack"></a>old-hack</h2><p>ThinkPHP5，开了debug模式，随便触发一个错误看一眼thinkPHP版本，然后继续搜payload打</p>
 <h2 id="duangShell"><a href="#duangShell" class="headerlink" title="duangShell"></a>duangShell</h2><p>反弹shell，用了swp源码泄漏，过滤了重定向符&gt;，使得直接弹shell不行了，但是方法还是很多的，搜一下发现一个curl反弹的，在自己的机子上放一个文件里面写一个弹shell的语句就可以了<br><a href="https://www.cnblogs.com/-zhong/p/11398877.html" target="_blank" rel="noopener">https://www.cnblogs.com/-zhong/p/11398877.html</a></p>
 <p>师傅还提到一个用if语句类似盲注的方法可以把flag测出来</p>
-<h2 id="简单注入"><a href="#简单注入" class="headerlink" title="简单注入"></a>简单注入</h2><p>过滤了一大堆东西，<code>;=&#39;&quot;like select and &amp;&amp; or --</code>什么的都没了<br>说实话感觉很棘手，因为没有select就没法做绝大多数的注入了，而去掉了分号就没法堆叠注入，感觉一度陷入困境<br>但是今天又学习到了新知识，像<code>select * from users where username=&#39;$username&#39; and password=&#39;$password&#39;</code>这种语句，我们可以username=\&amp;password=or sleep(5) #进行注入，<br>这样子原语句就变成了<code>select * from users where username=&#39;\&#39; and password=&#39;or sleep(5) # &#39;</code><br>这样子就有一个可以操控的注入点了<br>但是没有select仍然没法进行太多的操作，但是这里我们只需要获得一个password就可以了<br>发现or 后面的逻辑为true时是回显是BJD needs to be stronger，而为false时是xxx need girlfriend，就显然是一个盲注了<br>用<code>or ascii(substr(password,&amp;#37s,1))&lt;&amp;#37s #</code>这样子一句盲注就可以拿到密码，使用admin账户登录获得flag，这里注意substr不能从0开始，从1开始截取的才是第一位</p>
+<h2 id="简单注入"><a href="#简单注入" class="headerlink" title="简单注入"></a>简单注入</h2><p>过滤了一大堆东西，<code>;=&#39;&quot;like select and &amp;&amp; or --</code>什么的都没了<br>说实话感觉很棘手，因为没有select就没法做绝大多数的注入了，而去掉了分号就没法堆叠注入，感觉一度陷入困境<br>但是今天又学习到了新知识，像<code>select * from users where username=&#39;$username&#39; and password=&#39;$password&#39;</code>这种语句，我们可以username=\&amp;password=or sleep(5) #进行注入，<br>这样子原语句就变成了<code>select * from users where username=&#39;\&#39; and password=&#39;or sleep(5) # &#39;</code><br>这样子就有一个可以操控的注入点了<br>但是没有select仍然没法进行太多的操作，但是这里我们只需要获得一个password就可以了<br>发现or 后面的逻辑为true时是回显是BJD needs to be stronger，而为false时是xxx need girlfriend，就显然是一个盲注了<br>用<code>or ascii(substr(password,%s,1))&lt;%s #</code>这样子一句盲注就可以拿到密码，使用admin账户登录获得flag，这里注意substr不能从0开始，从1开始截取的才是第一位</p>
 <p>从这里开始后面的题都是比赛结束之后看的</p>
 <h2 id="假猪套天下第一"><a href="#假猪套天下第一" class="headerlink" title="假猪套天下第一"></a>假猪套天下第一</h2><p>不明所以的题名，还是个藏比，着实没意思<br>进去有登录框，登录admin会失败，剩下的随便登录，会回显登录的用户名，一开始想试ssti，或者注入，无果。<br>查看源码无果，扫描无果<br>最后看的wp，用burp抓包会在登录时有一个重定向，会告诉你一个隐藏的L0g1n.php （说实话感觉藏比题没意思）<br>进去之后是考http头的，萌新题，不过出现了两个没见过的http头<br>一个是要求你从localhost访问，但是不能用XFF，伪造remoteAddr显然不可能，所以找替代品Client-IP<br>要求使用Commodo 64的浏览器访问，查了半天还查不到是什么，最后看wp是一个叫Commodore 64的操作系统（为什么搜不到呢）<br>要求从某个邮箱访问：From<br>要求使用VPN：Via</p>
 <h2 id="element-master"><a href="#element-master" class="headerlink" title="element master"></a>element master</h2><p>藏，审查源码可以看到一个Po.php的ASCII码形式，访问之后得到一个点？？？？令人困惑<br>然后试着输入几个其他的化学元素，一开始使得H，O，之类的记得住的元素没反应，后来随手打了个Ar有反应了，发现靠后的元素会有其他的字符出现，随便写个脚本遍历元素周期表就可以了，得到一个PHP文件名，访问获得flag</p>
@@ -625,9 +625,9 @@ fake googleSSTI，测一下可以发现用的jinja2，搜一个payload直接打S
             <br/>
             <span xmlns:dct="http://purl.org/dc/terms/" href="http://purl.org/dc/dcmitype/Text"
                   property="dct:title" rel="dct:type">
-                    《HBCTF 大美西安》
+                    《[BJDCTF 2nd]部分wp》
                 </span> by
-            <a xmlns:cc="http://creativecommons.org/ns#" href="/2020/04/23/%5BBJDCTF%202nd%5D%E9%83%A8%E5%88%86wp/" property="cc:attributionName"
+            <a xmlns:cc="http://creativecommons.org/ns#" href="/2020/07/11/%5BBJDCTF%202nd%5D%E9%83%A8%E5%88%86wp/" property="cc:attributionName"
                rel="cc:attributionURL">
                 Z3ratu1
             </a> is licensed under a
@@ -671,27 +671,25 @@ fake googleSSTI，测一下可以发现用的jinja2，搜一个payload直接打S
             <div class="article-badge left-badge text-color">
                 <i class="fa fa-chevron-left"></i>&nbsp;Previous</div>
             <div class="card">
-                <a href="/2020/05/06/%5BHITCON%202017%5DSSRFme/">
+                <a href="/2020/07/11/%5B%E6%9E%81%E5%AE%A2%E5%A4%A7%E6%8C%91%E6%88%98%5D%20RCE%20ME/">
                     <div class="card-image">
                         
-                        <img src="/img/1.jpg" class="responsive-img" alt="HITCON 2017 SSRFme">
+                        <img src="/img/ctf1.jpg" class="responsive-img" alt="极客大挑战 RCE ME">
                         
-                        <span class="card-title">HITCON 2017 SSRFme</span>
+                        <span class="card-title">极客大挑战 RCE ME</span>
                     </div>
                 </a>
                 <div class="card-content article-content">
                     <div class="summary block-with-text">
                         
-                            [HITCON 2017]SSRFmebuu上的一个老题，又是不会做看wp的一天
-给了源码
-&lt;?php
-    if (isset($_SERVER['HTTP_X_FORWARDED_FOR'])) &amp;#123
-      
+                            极客大挑战 RCE ME三叶草招新赛里面一个比较难的题，无字母数字命令执行+bypass disable_function当时做的时候不会手搓上传就弃了，今天在buu上复现重做了一遍
+无字母数字命令执行&lt;?php
+error_repo
                         
                     </div>
                     <div class="publish-info">
                         <span class="publish-date">
-                            <i class="fa fa-clock-o fa-fw icon-date"></i>2020-05-06
+                            <i class="fa fa-clock-o fa-fw icon-date"></i>2020-07-11
                         </span>
                         <span class="publish-author">
                             
@@ -708,8 +706,12 @@ fake googleSSTI，测一下可以发现用的jinja2，搜一个payload直接打S
                 
                 <div class="card-action article-tags">
                     
-                    <a href="/tags/wp/" target="_blank">
-                        <span class="chip bg-color">wp</span>
+                    <a href="/tags/RCE/" target="_blank">
+                        <span class="chip bg-color">RCE</span>
+                    </a>
+                    
+                    <a href="/tags/bypass-disable-function/" target="_blank">
+                        <span class="chip bg-color">bypass_disable_function</span>
                     </a>
                     
                 </div>
@@ -723,24 +725,24 @@ fake googleSSTI，测一下可以发现用的jinja2，搜一个payload直接打S
                 Next&nbsp;<i class="fa fa-chevron-right"></i>
             </div>
             <div class="card">
-                <a href="/2020/03/23/%5BGWCTF%202019%5D%E4%BD%A0%E7%9A%84%E5%90%8D%E5%AD%97/">
+                <a href="/2020/07/11/%5BSWPU2019%5DWeb4/">
                     <div class="card-image">
                         
-                        <img src="/img/ctf1.jpg" class="responsive-img" alt="GWCTF 2019 你的名字">
+                        <img src="/img/php.jpg" class="responsive-img" alt="SWPU2019 Web4">
                         
-                        <span class="card-title">GWCTF 2019 你的名字</span>
+                        <span class="card-title">SWPU2019 Web4</span>
                     </div>
                 </a>
                 <div class="card-content article-content">
                     <div class="summary block-with-text">
                         
-                            &#91;GWCTF 2019&#93;你的名字模板注入，一开始就猜到了，然后出题人害人，过滤的字符串给了个PHP的报错，还给了一个不存在的文件，又把路由设置了一个index.php。。。。不是我看wp我绝对猜不出来发生了什么
-但是在一系列
+                            [SWPU2019]Web4buu上的一分题，说实话这个难度我是不相信它只有一分的
+题解打开是一个登录框，简单测试发现添加单引号会出现一个PHP的报错，而不是MySQL的报错，存在注入点，但不可使用报错注入测了半天，感觉有关键词屏蔽，但是无
                         
                     </div>
                     <div class="publish-info">
                             <span class="publish-date">
-                                <i class="fa fa-clock-o fa-fw icon-date"></i>2020-03-23
+                                <i class="fa fa-clock-o fa-fw icon-date"></i>2020-07-11
                             </span>
                         <span class="publish-author">
                             
@@ -757,12 +759,12 @@ fake googleSSTI，测一下可以发现用的jinja2，搜一个payload直接打S
                 
                 <div class="card-action article-tags">
                     
-                    <a href="/tags/wp/" target="_blank">
-                        <span class="chip bg-color">wp</span>
+                    <a href="/tags/SQLI/" target="_blank">
+                        <span class="chip bg-color">SQLI</span>
                     </a>
                     
-                    <a href="/tags/ssti/" target="_blank">
-                        <span class="chip bg-color">ssti</span>
+                    <a href="/tags/wp/" target="_blank">
+                        <span class="chip bg-color">wp</span>
                     </a>
                     
                 </div>
@@ -879,7 +881,7 @@ fake googleSSTI，测一下可以发现用的jinja2，搜一个payload直接打S
         <div class="col s12 m8 l8 copy-right">
             
             &nbsp;<i class="fa fa-area-chart"></i>&nbsp;站点总字数:&nbsp;<span
-                class="white-color">46.1k</span>&nbsp;字
+                class="white-color">44.4k</span>&nbsp;字
             
             
             

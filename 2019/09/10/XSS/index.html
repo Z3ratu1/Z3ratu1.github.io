@@ -474,9 +474,9 @@
 <h2 id="utf-7编码绕过"><a href="#utf-7编码绕过" class="headerlink" title="utf-7编码绕过"></a>utf-7编码绕过</h2><p>好像现在只有IE还有这个漏洞，别的浏览器都修好了</p>
 <h2 id="双写绕过"><a href="#双写绕过" class="headerlink" title="双写绕过"></a>双写绕过</h2><p>XSS在注入的时候也是后台代码进行分析，这个绕过和SQL注入也很像</p>
 <h2 id="实体编码绕过"><a href="#实体编码绕过" class="headerlink" title="实体编码绕过"></a>实体编码绕过</h2><p>&#xx;为HTML的实体编码，部分特殊符号被实体编码表示<br>但也可以用实体编码表示某些正常字符，绕过检测</p>
-<h2 id="添加制表符绕过"><a href="#添加制表符绕过" class="headerlink" title="添加制表符绕过"></a>添加制表符绕过</h2><p>可用&amp;NewLine代替空格<br>使用&amp;#3709，&#09;(有分号)分隔字符串绕过。<br>当数据以get方式传递时，&amp;#3709可使用，使用后者会导致&amp;作为元素之间的分隔符导致截断，后者可将&amp;#替换为&amp;#3726&amp;#3723后使用<br>当数据以post方式传递时，&#09;可使用，使用前者在数据post出去后会进行url编码为&amp;#372509，传入后只能解码为&amp;#3709，无法绕过，在bp中抓包添加&amp;#3709也可</p>
-<p>get传参时不会对&amp;#37进行再次编码，且存在部分特殊符号<code>&amp; #</code>不被编码，存在特殊意义，可以将其编码输入将其作为无特殊意义字符传入<br>post传参时会对&amp;#37进行再次编码<br>HTML的这个编码好像只能在字符串（值）中生效，不能用来直接分隔像onclick，onmousemove这些函数上<br>若无引号进行使用，&amp;#3709会使值产生截断被解析为两个元素<br>但是&amp;#09;不会产生问题<br>切记：&amp;#3709无引号情况下会导致空格产生截断！！！</p>
-<h3 id="原因"><a href="#原因" class="headerlink" title="原因"></a>原因</h3><p>&amp;#3709是url编码，&amp;#09;为实体编码，url编码在数据发送至后台时进行转码，在引号闭合的情况下，&amp;#3709被作为内部字符串处理，成为一个空格；在引号未闭合的情况下，成为制表符，使得内容被解析为两个元素。&amp;#09;为实体编码，在浏览器最后输出时被解析，然后被去除</p>
+<h2 id="添加制表符绕过"><a href="#添加制表符绕过" class="headerlink" title="添加制表符绕过"></a>添加制表符绕过</h2><p>可用&amp;NewLine代替空格<br>使用%09，&#09;(有分号)分隔字符串绕过。<br>当数据以get方式传递时，%09可使用，使用后者会导致&amp;作为元素之间的分隔符导致截断，后者可将&amp;#替换为%26%23后使用<br>当数据以post方式传递时，&#09;可使用，使用前者在数据post出去后会进行url编码为%2509，传入后只能解码为%09，无法绕过，在bp中抓包添加%09也可</p>
+<p>get传参时不会对%进行再次编码，且存在部分特殊符号<code>&amp; #</code>不被编码，存在特殊意义，可以将其编码输入将其作为无特殊意义字符传入<br>post传参时会对%进行再次编码<br>HTML的这个编码好像只能在字符串（值）中生效，不能用来直接分隔像onclick，onmousemove这些函数上<br>若无引号进行使用，%09会使值产生截断被解析为两个元素<br>但是&amp;#09;不会产生问题<br>切记：%09无引号情况下会导致空格产生截断！！！</p>
+<h3 id="原因"><a href="#原因" class="headerlink" title="原因"></a>原因</h3><p>%09是url编码，&amp;#09;为实体编码，url编码在数据发送至后台时进行转码，在引号闭合的情况下，%09被作为内部字符串处理，成为一个空格；在引号未闭合的情况下，成为制表符，使得内容被解析为两个元素。&amp;#09;为实体编码，在浏览器最后输出时被解析，然后被去除</p>
 <h2 id="内联标签"><a href="#内联标签" class="headerlink" title="内联标签"></a>内联标签</h2><p>&lt;iframe&gt;&lt;/iframe&gt;，定义一个内联标签，内部可使用scr=定义链接<br>例：<code>&lt;iframe src=&quot;javas&amp;#09;cript:alert(document.domain)&quot;&gt;</code><br>可代替&lt;a&gt;标签</p>
 <h2 id="IE特性"><a href="#IE特性" class="headerlink" title="IE特性"></a>IE特性</h2><p>老版本IE才具有的古老漏洞</p>
 <h3 id="解析为’"><a href="#解析为’" class="headerlink" title="`解析为’"></a>`解析为’</h3><h3 id="expression表达式"><a href="#expression表达式" class="headerlink" title="expression表达式"></a>expression表达式</h3><p>可用在css下执行js语句<br><code>expression(alert(document.domain));</code></p>
@@ -897,7 +897,7 @@
         <div class="col s12 m8 l8 copy-right">
             
             &nbsp;<i class="fa fa-area-chart"></i>&nbsp;站点总字数:&nbsp;<span
-                class="white-color">46.1k</span>&nbsp;字
+                class="white-color">44.4k</span>&nbsp;字
             
             
             

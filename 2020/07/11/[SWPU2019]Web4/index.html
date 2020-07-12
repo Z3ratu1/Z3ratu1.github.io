@@ -438,7 +438,7 @@
                     
                     <div class="info-break-policy">
                         <i class="fa fa-file-word-o fa-fw"></i>Word Count:&nbsp;&nbsp;
-                        955
+                        919
                     </div>
                     
 
@@ -463,36 +463,36 @@
             <div id="articleContent">
                 <h1 id="SWPU2019-Web4"><a href="#SWPU2019-Web4" class="headerlink" title="[SWPU2019]Web4"></a>[SWPU2019]Web4</h1><p>buu上的一分题，说实话这个难度我是不相信它只有一分的</p>
 <h2 id="题解"><a href="#题解" class="headerlink" title="题解"></a>题解</h2><p>打开是一个登录框，简单测试发现添加单引号会出现一个PHP的报错，而不是MySQL的报错，存在注入点，但不可使用报错注入<br>测了半天，感觉有关键词屏蔽，但是无论如何返回值就三种，登录成功，登录失败，PHP报错。那想直接查询回显也没机会了，只能盲注，并且登录成功啥也不给呜呜呜。<br>简单测一下发现select，sleep，or，逗号，大小于号，井号还有些七七八八的盲注需要的东西都给禁用了，但是另一个注释符–还能用，最主要的是回显根本没有帮助，完全不知道后台到底在干什么。<br>后来拿到源码之后看见了超级过滤<code>select|information|insert|union|ascii|,|like|outfile|join|&lt;|&gt;|and|substr|#|or|\|\||sleep|benchmark|if|&amp;&amp;</code><br>最后看wp说是堆叠注入，并且使用预处理将语句变为16进制表示，直接绕过超级过滤</p>
-<h3 id="MySQL堆叠注入预处理"><a href="#MySQL堆叠注入预处理" class="headerlink" title="MySQL堆叠注入预处理"></a>MySQL堆叠注入预处理</h3><p>思路是输入分号后返回的是登录失败而不是PHP报错，判断能够执行堆叠注入<br>预处理可以使转换为16进制的MySQL语句被执行<br><code>1&#39;;set @a=0x&amp;#1230&amp;#125;prepare payload from @a;execute payload--</code><br>a的内容用常规时间盲注脚本跑就可以了<br>注意这里数据是用json格式提交的，记得把数据转换一下json格式<br>贴一个常见payload<br><code>select if(ascii(substr((select group_concat(table_name) from information_schema.tables where table_schema=database()),&amp;#1230&amp;#125,1))=&amp;#1231&amp;#125,sleep(3),1)</code></p>
+<h3 id="MySQL堆叠注入预处理"><a href="#MySQL堆叠注入预处理" class="headerlink" title="MySQL堆叠注入预处理"></a>MySQL堆叠注入预处理</h3><p>思路是输入分号后返回的是登录失败而不是PHP报错，判断能够执行堆叠注入<br>预处理可以使转换为16进制的MySQL语句被执行<br><code>1&#39;;set @a=0x{0}prepare payload from @a;execute payload--</code><br>a的内容用常规时间盲注脚本跑就可以了<br>注意这里数据是用json格式提交的，记得把数据转换一下json格式<br>贴一个常见payload<br><code>select if(ascii(substr((select group_concat(table_name) from information_schema.tables where table_schema=database()),{0},1))={1},sleep(3),1)</code></p>
 <p>一直注到最后会看见一个叫赵总想要一个女朋友的zip，下载下来就是源码</p>
 <h3 id="代码审计"><a href="#代码审计" class="headerlink" title="代码审计"></a>代码审计</h3><p>index.php里面指明了Common文件夹里面的内容，只有fun.php有实际内容，写明了对r参数的解析</p>
 <pre class=" language-php"><code class="language-php">    <span class="token variable">$r</span> <span class="token operator">=</span> <span class="token function">explode</span><span class="token punctuation">(</span><span class="token string">'/'</span><span class="token punctuation">,</span> <span class="token variable">$_REQUEST</span><span class="token punctuation">[</span><span class="token string">'r'</span><span class="token punctuation">]</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
     <span class="token function">list</span><span class="token punctuation">(</span><span class="token variable">$controller</span><span class="token punctuation">,</span><span class="token variable">$action</span><span class="token punctuation">)</span> <span class="token operator">=</span> <span class="token variable">$r</span><span class="token punctuation">;</span>
-    <span class="token variable">$controller</span> <span class="token operator">=</span> <span class="token string">"&amp;#123$controller&amp;#125Controller"</span><span class="token punctuation">;</span>
-    <span class="token variable">$action</span> <span class="token operator">=</span> <span class="token string">"action&amp;#123$action&amp;#125"</span><span class="token punctuation">;</span>
+    <span class="token variable">$controller</span> <span class="token operator">=</span> <span class="token string">"{$controller}Controller"</span><span class="token punctuation">;</span>
+    <span class="token variable">$action</span> <span class="token operator">=</span> <span class="token string">"action{$action}"</span><span class="token punctuation">;</span>
     <span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span>
     <span class="token variable">$data</span> <span class="token operator">=</span> <span class="token function">call_user_func</span><span class="token punctuation">(</span><span class="token keyword">array</span><span class="token punctuation">(</span><span class="token punctuation">(</span><span class="token keyword">new</span> <span class="token variable">$controller</span><span class="token punctuation">)</span><span class="token punctuation">,</span> <span class="token variable">$action</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span></code></pre>
 <p>就是前面半边是controller，后半边是action，如果存在对应的controller和action就调用对应的controller类下的action方法<br>接下来看controller类，登录类毫无作用，就是返回之前注入时的写死的回显<br>在basecontroller类中发现函数loadView</p>
 <pre class=" language-php"><code class="language-php">    <span class="token keyword">public</span> <span class="token keyword">function</span> <span class="token function">loadView</span><span class="token punctuation">(</span><span class="token variable">$viewName</span> <span class="token operator">=</span><span class="token string">''</span><span class="token punctuation">,</span> <span class="token variable">$viewData</span> <span class="token operator">=</span> <span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token punctuation">)</span>
-    <span class="token operator">&amp;</span><span class="token shell-comment comment">#123</span>
-        <span class="token variable">$this</span><span class="token operator">-</span><span class="token operator">></span><span class="token property">viewPath</span> <span class="token operator">=</span> <span class="token constant">BASE_PATH</span> <span class="token punctuation">.</span> <span class="token string">"/View/&amp;#123$viewName&amp;#125.php"</span><span class="token punctuation">;</span>
+    <span class="token punctuation">{</span>
+        <span class="token variable">$this</span><span class="token operator">-</span><span class="token operator">></span><span class="token property">viewPath</span> <span class="token operator">=</span> <span class="token constant">BASE_PATH</span> <span class="token punctuation">.</span> <span class="token string">"/View/{$viewName}.php"</span><span class="token punctuation">;</span>
         <span class="token keyword">if</span><span class="token punctuation">(</span><span class="token function">file_exists</span><span class="token punctuation">(</span><span class="token variable">$this</span><span class="token operator">-</span><span class="token operator">></span><span class="token property">viewPath</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
-        <span class="token operator">&amp;</span><span class="token shell-comment comment">#123</span>
+        <span class="token punctuation">{</span>
             <span class="token function">extract</span><span class="token punctuation">(</span><span class="token variable">$viewData</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
             <span class="token keyword">include</span> <span class="token variable">$this</span><span class="token operator">-</span><span class="token operator">></span><span class="token property">viewPath</span><span class="token punctuation">;</span>
-        <span class="token operator">&amp;</span><span class="token shell-comment comment">#125</span>
-    <span class="token operator">&amp;</span><span class="token shell-comment comment">#125</span></code></pre>
+        <span class="token punctuation">}</span>
+    <span class="token punctuation">}</span></code></pre>
 <p>有一句<code>include $this-&gt;viewPath;</code>，且viewPath似乎可控，继续看看。可惜看完了所有loadView函数的调用，它的<code>$viewPath</code>都是写死的，但是这里还有一句<code>extract($viewData);</code>如果<code>$viewData</code>可控，也可以进行变量覆盖<br>在UserController中发现<code>actionIndex()</code>函数</p>
 <pre class=" language-php"><code class="language-php">    <span class="token keyword">public</span> <span class="token keyword">function</span> <span class="token function">actionIndex</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
-    <span class="token operator">&amp;</span><span class="token shell-comment comment">#123</span>
+    <span class="token punctuation">{</span>
         <span class="token variable">$listData</span> <span class="token operator">=</span> <span class="token variable">$_REQUEST</span><span class="token punctuation">;</span>
         <span class="token variable">$this</span><span class="token operator">-</span><span class="token operator">></span><span class="token function">loadView</span><span class="token punctuation">(</span><span class="token string">'userIndex'</span><span class="token punctuation">,</span><span class="token variable">$listData</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-    <span class="token operator">&amp;</span><span class="token shell-comment comment">#125</span></code></pre>
+    <span class="token punctuation">}</span></code></pre>
 <p>其中的<code>$listData</code>完全可控，本来想直接覆盖$this-&gt;viewPath，后来想起来怎么可能覆盖类的私有成员变量，只得作罢。<br>那就只能看看我们老老实实包含的页面有什么东西了，userIndex.php就实现了一个功能，返回一个文件的base64编码，而文件路径$img_file刚好可以通过$_REQUEST来覆盖，这样一来我们就能直接获得flag.php的base64编码，获取flag了。<br>userIndex.php</p>
 <pre class=" language-php"><code class="language-php"><span class="token keyword">if</span><span class="token punctuation">(</span><span class="token operator">!</span><span class="token function">isset</span><span class="token punctuation">(</span><span class="token variable">$img_file</span><span class="token punctuation">)</span><span class="token punctuation">)</span> 
-<span class="token operator">&amp;</span><span class="token shell-comment comment">#123</span>
+<span class="token punctuation">{</span>
     <span class="token variable">$img_file</span> <span class="token operator">=</span> <span class="token string">'/../favicon.ico'</span><span class="token punctuation">;</span>
-<span class="token operator">&amp;</span><span class="token shell-comment comment">#125</span>
+<span class="token punctuation">}</span>
 <span class="token variable">$img_dir</span> <span class="token operator">=</span> <span class="token function">dirname</span><span class="token punctuation">(</span><span class="token constant">__FILE__</span><span class="token punctuation">)</span> <span class="token punctuation">.</span> <span class="token variable">$img_file</span><span class="token punctuation">;</span>
 <span class="token variable">$img_base64</span> <span class="token operator">=</span> <span class="token function">imgToBase64</span><span class="token punctuation">(</span><span class="token variable">$img_dir</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
 <span class="token keyword">echo</span> <span class="token string">'&lt;img src="'</span> <span class="token punctuation">.</span> <span class="token variable">$img_base64</span> <span class="token punctuation">.</span> <span class="token string">'">'</span><span class="token punctuation">;</span></code></pre>
@@ -702,20 +702,19 @@
             <div class="article-badge left-badge text-color">
                 <i class="fa fa-chevron-left"></i>&nbsp;Previous</div>
             <div class="card">
-                <a href="/2020/07/11/%5B%E6%9E%81%E5%AE%A2%E5%A4%A7%E6%8C%91%E6%88%98%5D%20RCE%20ME/">
+                <a href="/2020/07/11/%5BBJDCTF%202nd%5D%E9%83%A8%E5%88%86wp/">
                     <div class="card-image">
                         
-                        <img src="/img/ctf1.jpg" class="responsive-img" alt="极客大挑战 RCE ME">
+                        <img src="/img/ctf.jpg" class="responsive-img" alt="[BJDCTF 2nd]部分wp">
                         
-                        <span class="card-title">极客大挑战 RCE ME</span>
+                        <span class="card-title">[BJDCTF 2nd]部分wp</span>
                     </div>
                 </a>
                 <div class="card-content article-content">
                     <div class="summary block-with-text">
                         
-                            极客大挑战 RCE ME三叶草招新赛里面一个比较难的题，无字母数字命令执行+bypass disable_function当时做的时候不会手搓上传就弃了，今天在buu上复现重做了一遍
-无字母数字命令执行&lt;?php
-error_repo
+                            [BJDCTF 2nd]部分wp据说是萌新赛，就目前做的几个题来说的确较为简单
+fake googleSSTI，测一下可以发现用的jinja2，搜一个payload直接打SSTI上一次的BJDCTF也考过，具体判断什么的可以看上次比赛的WP
                         
                     </div>
                     <div class="publish-info">
@@ -737,12 +736,8 @@ error_repo
                 
                 <div class="card-action article-tags">
                     
-                    <a href="/tags/RCE/" target="_blank">
-                        <span class="chip bg-color">RCE</span>
-                    </a>
-                    
-                    <a href="/tags/bypass-disable-function/" target="_blank">
-                        <span class="chip bg-color">bypass_disable_function</span>
+                    <a href="/tags/wp/" target="_blank">
+                        <span class="chip bg-color">wp</span>
                     </a>
                     
                 </div>
@@ -915,7 +910,7 @@ if (isset($_GET['sour
         <div class="col s12 m8 l8 copy-right">
             
             &nbsp;<i class="fa fa-area-chart"></i>&nbsp;站点总字数:&nbsp;<span
-                class="white-color">46.1k</span>&nbsp;字
+                class="white-color">44.4k</span>&nbsp;字
             
             
             

@@ -435,7 +435,7 @@ include &#39;config.php&#39;; // FLAG is defined in con">
                     
                     <div class="info-break-policy">
                         <i class="fa fa-file-word-o fa-fw"></i>Word Count:&nbsp;&nbsp;
-                        574
+                        549
                     </div>
                     
 
@@ -462,24 +462,24 @@ include &#39;config.php&#39;; // FLAG is defined in con">
 <h2 id="源码"><a href="#源码" class="headerlink" title="源码"></a>源码</h2><pre class=" language-php"><code class="language-php"><span class="token delimiter">&lt;?php</span>
 <span class="token keyword">include</span> <span class="token string">'config.php'</span><span class="token punctuation">;</span> <span class="token comment" spellcheck="true">// FLAG is defined in config.php</span>
 
-<span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token function">preg_match</span><span class="token punctuation">(</span><span class="token string">'/config\.php\/*$/i'</span><span class="token punctuation">,</span> <span class="token variable">$_SERVER</span><span class="token punctuation">[</span><span class="token string">'PHP_SELF'</span><span class="token punctuation">]</span><span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token operator">&amp;</span><span class="token shell-comment comment">#123</span>
+<span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token function">preg_match</span><span class="token punctuation">(</span><span class="token string">'/config\.php\/*$/i'</span><span class="token punctuation">,</span> <span class="token variable">$_SERVER</span><span class="token punctuation">[</span><span class="token string">'PHP_SELF'</span><span class="token punctuation">]</span><span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
   <span class="token function">exit</span><span class="token punctuation">(</span><span class="token string">"I don't know what you are thinking, but I won't let you read it :)"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-<span class="token operator">&amp;</span><span class="token shell-comment comment">#125</span>
+<span class="token punctuation">}</span>
 
-<span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token function">isset</span><span class="token punctuation">(</span><span class="token variable">$_GET</span><span class="token punctuation">[</span><span class="token string">'source'</span><span class="token punctuation">]</span><span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token operator">&amp;</span><span class="token shell-comment comment">#123</span>
+<span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token function">isset</span><span class="token punctuation">(</span><span class="token variable">$_GET</span><span class="token punctuation">[</span><span class="token string">'source'</span><span class="token punctuation">]</span><span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
   <span class="token function">highlight_file</span><span class="token punctuation">(</span><span class="token function">basename</span><span class="token punctuation">(</span><span class="token variable">$_SERVER</span><span class="token punctuation">[</span><span class="token string">'PHP_SELF'</span><span class="token punctuation">]</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
   <span class="token function">exit</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-<span class="token operator">&amp;</span><span class="token shell-comment comment">#125</span>
+<span class="token punctuation">}</span>
 
 <span class="token variable">$secret</span> <span class="token operator">=</span> <span class="token function">bin2hex</span><span class="token punctuation">(</span><span class="token function">random_bytes</span><span class="token punctuation">(</span><span class="token number">64</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-<span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token function">isset</span><span class="token punctuation">(</span><span class="token variable">$_POST</span><span class="token punctuation">[</span><span class="token string">'guess'</span><span class="token punctuation">]</span><span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token operator">&amp;</span><span class="token shell-comment comment">#123</span>
+<span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token function">isset</span><span class="token punctuation">(</span><span class="token variable">$_POST</span><span class="token punctuation">[</span><span class="token string">'guess'</span><span class="token punctuation">]</span><span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
   <span class="token variable">$guess</span> <span class="token operator">=</span> <span class="token punctuation">(</span>string<span class="token punctuation">)</span> <span class="token variable">$_POST</span><span class="token punctuation">[</span><span class="token string">'guess'</span><span class="token punctuation">]</span><span class="token punctuation">;</span>
-  <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token function">hash_equals</span><span class="token punctuation">(</span><span class="token variable">$secret</span><span class="token punctuation">,</span> <span class="token variable">$guess</span><span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token operator">&amp;</span><span class="token shell-comment comment">#123</span>
+  <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token function">hash_equals</span><span class="token punctuation">(</span><span class="token variable">$secret</span><span class="token punctuation">,</span> <span class="token variable">$guess</span><span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
     <span class="token variable">$message</span> <span class="token operator">=</span> <span class="token string">'Congratulations! The flag is: '</span> <span class="token punctuation">.</span> <span class="token constant">FLAG</span><span class="token punctuation">;</span>
-  <span class="token operator">&amp;</span><span class="token shell-comment comment">#125 else &amp;#123</span>
+  <span class="token punctuation">}</span> <span class="token keyword">else</span> <span class="token punctuation">{</span>
     <span class="token variable">$message</span> <span class="token operator">=</span> <span class="token string">'Wrong.'</span><span class="token punctuation">;</span>
-  <span class="token operator">&amp;</span><span class="token shell-comment comment">#125</span>
-<span class="token operator">&amp;</span><span class="token shell-comment comment">#125</span>
+  <span class="token punctuation">}</span>
+<span class="token punctuation">}</span>
 <span class="token delimiter">?></span>
 <span class="token markup"><span class="token doctype">&lt;!doctype html></span></span>
 <span class="token markup"><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>html</span> <span class="token attr-name">lang</span><span class="token attr-value"><span class="token punctuation">=</span><span class="token punctuation">"</span>en<span class="token punctuation">"</span></span><span class="token punctuation">></span></span></span>
@@ -492,9 +492,9 @@ include &#39;config.php&#39;; // FLAG is defined in con">
     <span class="token markup"><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>p</span><span class="token punctuation">></span></span></span><span class="token keyword">If</span> your guess is correct<span class="token punctuation">,</span> I'll give you the flag<span class="token punctuation">.</span><span class="token markup"><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>p</span><span class="token punctuation">></span></span></span>
     <span class="token markup"><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>p</span><span class="token punctuation">></span></span></span><span class="token markup"><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>a</span> <span class="token attr-name">href</span><span class="token attr-value"><span class="token punctuation">=</span><span class="token punctuation">"</span>?source<span class="token punctuation">"</span></span><span class="token punctuation">></span></span></span>Source<span class="token markup"><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>a</span><span class="token punctuation">></span></span></span><span class="token markup"><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>p</span><span class="token punctuation">></span></span></span>
     <span class="token markup"><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>hr</span><span class="token punctuation">></span></span></span>
-<span class="token delimiter">&lt;?php</span> <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token function">isset</span><span class="token punctuation">(</span><span class="token variable">$message</span><span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token operator">&amp;</span><span class="token shell-comment comment">#123 ?></span>
+<span class="token delimiter">&lt;?php</span> <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token function">isset</span><span class="token punctuation">(</span><span class="token variable">$message</span><span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token punctuation">{</span> <span class="token delimiter">?></span>
     <span class="token markup"><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>p</span><span class="token punctuation">></span></span></span><span class="token delimiter">&lt;?</span><span class="token operator">=</span> <span class="token variable">$message</span> <span class="token delimiter">?></span><span class="token markup"><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>p</span><span class="token punctuation">></span></span></span>
-<span class="token delimiter">&lt;?php</span> <span class="token operator">&amp;</span><span class="token shell-comment comment">#125 ?></span>
+<span class="token delimiter">&lt;?php</span> <span class="token punctuation">}</span> <span class="token delimiter">?></span>
     <span class="token markup"><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>form</span> <span class="token attr-name">action</span><span class="token attr-value"><span class="token punctuation">=</span><span class="token punctuation">"</span>index.php<span class="token punctuation">"</span></span> <span class="token attr-name">method</span><span class="token attr-value"><span class="token punctuation">=</span><span class="token punctuation">"</span>POST<span class="token punctuation">"</span></span><span class="token punctuation">></span></span></span>
       <span class="token markup"><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>input</span> <span class="token attr-name">type</span><span class="token attr-value"><span class="token punctuation">=</span><span class="token punctuation">"</span>text<span class="token punctuation">"</span></span> <span class="token attr-name">name</span><span class="token attr-value"><span class="token punctuation">=</span><span class="token punctuation">"</span>guess<span class="token punctuation">"</span></span><span class="token punctuation">></span></span></span>
       <span class="token markup"><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>input</span> <span class="token attr-name">type</span><span class="token attr-value"><span class="token punctuation">=</span><span class="token punctuation">"</span>submit<span class="token punctuation">"</span></span><span class="token punctuation">></span></span></span>
@@ -508,7 +508,7 @@ include &#39;config.php&#39;; // FLAG is defined in con">
 <p>basename() is locale aware, so for it to see the correct basename with multibyte character paths, the matching locale must be set using the setlocale() function.</p>
 </blockquote>
 <p>basename在处理多比特编码的字符串时会出现一些问题（比如中文，百度这个函数的时候全是说获取中文的问题），那么使用一个超出ascii码范围的字符就可以绕过</p>
-<p>payload: <a href="http://de3fca4a-7648-4d0e-844e-60cfc5cb2a63.node3.buuoj.cn/index.php/config.php/&amp;#37aa?source" target="_blank" rel="noopener">http://de3fca4a-7648-4d0e-844e-60cfc5cb2a63.node3.buuoj.cn/index.php/config.php/&amp;#37aa?source</a></p>
+<p>payload: <a href="http://de3fca4a-7648-4d0e-844e-60cfc5cb2a63.node3.buuoj.cn/index.php/config.php/%aa?source" target="_blank" rel="noopener">http://de3fca4a-7648-4d0e-844e-60cfc5cb2a63.node3.buuoj.cn/index.php/config.php/%aa?source</a></p>
 
             </div>
             <hr/>
@@ -716,16 +716,16 @@ include &#39;config.php&#39;; // FLAG is defined in con">
                 <a href="/2020/03/23/%5BGWCTF%202019%5D%E4%BD%A0%E7%9A%84%E5%90%8D%E5%AD%97/">
                     <div class="card-image">
                         
-                        <img src="/img/ctf1.jpg" class="responsive-img" alt="GWCTF 2019 你的名字">
+                        <img src="/img/ctf1.jpg" class="responsive-img" alt="[GWCTF 2019] 你的名字">
                         
-                        <span class="card-title">GWCTF 2019 你的名字</span>
+                        <span class="card-title">[GWCTF 2019] 你的名字</span>
                     </div>
                 </a>
                 <div class="card-content article-content">
                     <div class="summary block-with-text">
                         
-                            &#91;GWCTF 2019&#93;你的名字模板注入，一开始就猜到了，然后出题人害人，过滤的字符串给了个PHP的报错，还给了一个不存在的文件，又把路由设置了一个index.php。。。。不是我看wp我绝对猜不出来发生了什么
-但是在一系列
+                            [GWCTF 2019]你的名字模板注入，一开始就猜到了，然后出题人害人，过滤的字符串给了个PHP的报错，还给了一个不存在的文件，又把路由设置了一个index.php。。。。不是我看wp我绝对猜不出来发生了什么
+但是在一系列fuzz(乱按)
                         
                     </div>
                     <div class="publish-info">
@@ -924,7 +924,7 @@ key = $key;
         <div class="col s12 m8 l8 copy-right">
             
             &nbsp;<i class="fa fa-area-chart"></i>&nbsp;站点总字数:&nbsp;<span
-                class="white-color">46.1k</span>&nbsp;字
+                class="white-color">44.4k</span>&nbsp;字
             
             
             

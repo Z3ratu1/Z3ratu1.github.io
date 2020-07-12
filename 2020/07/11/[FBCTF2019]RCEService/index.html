@@ -5,8 +5,8 @@
 <head>
     <meta charset="utf-8">
     <meta name="keywords" content="[FBCTF2019]RCEService, Z3ratu1&#39;s blog">
-    <meta name="description" content="&amp;#91;FBCTF2019&amp;#93;RCEServicebuu上的题，最近打工开始划水，又要搞网鼎杯了，赶紧报一下佛脚
-json文件格式我太菜了，json属性字段一定要用双引号括起来，单引号是不可以的，为此我一开始试了半天，为什么输入什么">
+    <meta name="description" content="[FBCTF2019]RCEServicebuu上的题，最近打工开始划水，又要搞网鼎杯了，赶紧报一下佛脚
+json文件格式我太菜了，json属性字段一定要用双引号括起来，单引号是不可以的，为此我一开始试了半天，为什么输入什么东西都显示上了w">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     <meta name="renderer" content="webkit|ie-stand|ie-comp">
@@ -434,7 +434,7 @@ json文件格式我太菜了，json属性字段一定要用双引号括起来，
                     
                     <div class="info-break-policy">
                         <i class="fa fa-file-word-o fa-fw"></i>Word Count:&nbsp;&nbsp;
-                        659
+                        646
                     </div>
                     
 
@@ -457,12 +457,12 @@ json文件格式我太菜了，json属性字段一定要用双引号括起来，
         <hr class="clearfix">
         <div class="card-content article-card-content">
             <div id="articleContent">
-                <h1 id="91-FBCTF2019-93-RCEService"><a href="#91-FBCTF2019-93-RCEService" class="headerlink" title="&#91;FBCTF2019&#93;RCEService"></a>&#91;FBCTF2019&#93;RCEService</h1><p>buu上的题，最近打工开始划水，又要搞网鼎杯了，赶紧报一下佛脚</p>
+                <h1 id="FBCTF2019-RCEService"><a href="#FBCTF2019-RCEService" class="headerlink" title="[FBCTF2019]RCEService"></a>[FBCTF2019]RCEService</h1><p>buu上的题，最近打工开始划水，又要搞网鼎杯了，赶紧报一下佛脚</p>
 <h2 id="json文件格式"><a href="#json文件格式" class="headerlink" title="json文件格式"></a>json文件格式</h2><p>我太菜了，json属性字段一定要用双引号括起来，单引号是不可以的，为此我一开始试了半天，为什么输入什么东西都显示上了waf。。。</p>
 <h2 id="题解"><a href="#题解" class="headerlink" title="题解"></a>题解</h2><p>这个题，buu上什么都没给，后来去查wp，才知道题目描述是只允许使用ls，然后顺便还翻到了源码，一开始设置了一句<code>putenv(&#39;PATH=/home/rceservice/jail&#39;);</code>，这个文件夹下面就放了一个ls的二进制文件。这样子就能让我们只能使用这个文件夹下的命令了吗？显然我们可以用绝对路径的方法去使用需要的命令，/bin/ls之类的就可以了</p>
 <p>然后是一个超级禁用，用preg_match函数ban掉了各种各样的东西，能ban的都ban了。但是preg_match这个函数本身是存在缺陷的，有两点，分别导致了预期解和非预期解</p>
 <h3 id="正则匹配回溯上限"><a href="#正则匹配回溯上限" class="headerlink" title="正则匹配回溯上限"></a>正则匹配回溯上限</h3><p>正则匹配是通过不断回溯的方式去寻找字符串的，如果字符串听特别特别长，就可能导致回溯过多消耗大量资源，所以php设置有正则迭代上限，默认100w，如果我们的数据超过回溯上限，那个preg_match函数会返回false，表示匹配失败（找没找到返回的是1和0）,所以preg_match的判断失当会导致绕过<br>在json中加一项无关紧要的项整个100w长的字符串就可以了，不过这里有一个点，buu上这个题是通过GET传参的，而url长度是存在上限的，受不同浏览器限制，http协议并未限制url长度，根据网上的说法大部分浏览器大概在7-8k字节左右，显然不能传一个这么长的字符串，源码中接受的数据是用的$_REQUEST，也许要自己发一个post包过去才行<br>GET请求长度相关连接<br><a href="http://blog.chinaunix.net/uid-26602509-id-4495786.html" target="_blank" rel="noopener">http://blog.chinaunix.net/uid-26602509-id-4495786.html</a><br>具体正则是怎么匹配的可以看P神的文章<br><a href="https://www.leavesongs.com/PENETRATION/use-pcre-backtrack-limit-to-bypass-restrict.html" target="_blank" rel="noopener">https://www.leavesongs.com/PENETRATION/use-pcre-backtrack-limit-to-bypass-restrict.html</a></p>
-<h3 id="preg-match匹配第一行"><a href="#preg-match匹配第一行" class="headerlink" title="preg_match匹配第一行"></a>preg_match匹配第一行</h3><p>正则匹配是以换行符为结尾的，如果要匹配包括换行符的整个字符，需要设置一个正则的flag，因此我们把payload换行藏起来就可以了。<br>&amp;#370a换行符，用绝对路径调用命令<br><code>&amp;#123&amp;#370a&quot;cmd&quot;:&quot;/bin/cat /home/rceservice/flag&quot;&amp;#370a&amp;#125</code></p>
+<h3 id="preg-match匹配第一行"><a href="#preg-match匹配第一行" class="headerlink" title="preg_match匹配第一行"></a>preg_match匹配第一行</h3><p>正则匹配是以换行符为结尾的，如果要匹配包括换行符的整个字符，需要设置一个正则的flag，因此我们把payload换行藏起来就可以了。<br>%0a换行符，用绝对路径调用命令<br><code>{%0a"cmd":"/bin/cat /home/rceservice/flag"%0a}</code></p>
 
             </div>
             <hr/>
@@ -667,10 +667,10 @@ json文件格式我太菜了，json属性字段一定要用双引号括起来，
             <div class="article-badge left-badge text-color">
                 <i class="fa fa-chevron-left"></i>&nbsp;Previous</div>
             <div class="card">
-                <a href="/2020/07/11/%5BGYCTF2020%5DFlaskApp/">
+                <a href="/2020/07/12/%5BGYCTF2020%5DFlaskApp/">
                     <div class="card-image">
                         
-                        <img src="/img/php.jpg" class="responsive-img" alt="[GYCTF2020]FlaskApp">
+                        <img src="/img/1.jpg" class="responsive-img" alt="[GYCTF2020]FlaskApp">
                         
                         <span class="card-title">[GYCTF2020]FlaskApp</span>
                     </div>
@@ -678,13 +678,13 @@ json文件格式我太菜了，json属性字段一定要用双引号括起来，
                 <div class="card-content article-content">
                     <div class="summary block-with-text">
                         
-                            &#91;GYCTF2020&#93;FlaskAppflask的模板注入加一个debug模式下的命令执行
-题目开局给的是一个base64的加解密网站，说明了是flask写的，hint界面在注释里面藏了一句PIN（我一开始还不知道是什么意思
+                            [GYCTF2020]FlaskAppflask的模板注入加一个debug模式下的命令执行
+题目开局给的是一个base64的加解密网站，说明了是flask写的，hint界面在注释里面藏了一句PIN（我一开始还不知道是什么意思）后来在解码处输
                         
                     </div>
                     <div class="publish-info">
                         <span class="publish-date">
-                            <i class="fa fa-clock-o fa-fw icon-date"></i>2020-07-11
+                            <i class="fa fa-clock-o fa-fw icon-date"></i>2020-07-12
                         </span>
                         <span class="publish-author">
                             
@@ -727,18 +727,18 @@ json文件格式我太菜了，json属性字段一定要用双引号括起来，
                 <a href="/2020/07/11/%5BGWCTF%202019%5D%E6%9E%AF%E7%87%A5%E7%9A%84%E6%8A%BD%E5%A5%96/">
                     <div class="card-image">
                         
-                        <img src="/img/ctf1.jpg" class="responsive-img" alt="2019&#93;枯燥的抽奖">
+                        <img src="/img/ctf1.jpg" class="responsive-img" alt="[GWCTF_2019]枯燥的抽奖">
                         
-                        <span class="card-title">2019&#93;枯燥的抽奖</span>
+                        <span class="card-title">[GWCTF_2019]枯燥的抽奖</span>
                     </div>
                 </a>
                 <div class="card-content article-content">
                     <div class="summary block-with-text">
                         
-                            &#91;GWCTF 2019&#93;枯燥的抽奖伪随机数安全的一个题，通过php_mt_rand这个工具逆向出随机数种子，然后通过种子获取字符串
+                            [GWCTF 2019]枯燥的抽奖伪随机数安全的一个题，通过php_mt_rand这个工具逆向出随机数种子，然后通过种子获取字符串
 贴一下源码
 &lt;?php
-header("Content-Type: text/html
+header("Content-Type: text/html;charset
                         
                     </div>
                     <div class="publish-info">
@@ -878,7 +878,7 @@ header("Content-Type: text/html
         <div class="col s12 m8 l8 copy-right">
             
             &nbsp;<i class="fa fa-area-chart"></i>&nbsp;站点总字数:&nbsp;<span
-                class="white-color">46.1k</span>&nbsp;字
+                class="white-color">44.4k</span>&nbsp;字
             
             
             

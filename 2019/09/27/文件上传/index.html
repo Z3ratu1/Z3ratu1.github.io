@@ -506,11 +506,11 @@
 <li><code>php_flag display_errors on</code>字面意思，显示错误</li>
 <li><code>php_value zend.script_encoding “UTF-7″</code> 修改编码方式，要是我就用base64了</li>
 </ul>
-<h4 id="user-ini包含后门"><a href="#user-ini包含后门" class="headerlink" title=".user.ini包含后门"></a>.user.ini包含后门</h4><p>.user.ini文件中也有和htaccess一样的auto_append_file，并且相较于.htaccess，.user.ini存在于各种服务器之中，使用文件包含时，被包含的任何文件都会被解析为php文件，所以我们可以通过上传.user.ini文件再上传一个图片马，进行访问就可以进入后门了（当然需要一个正常的可访问php文件才能）<br>贴一个文章：<a href="https://wooyun.js.org/drops/user.ini&amp;#37E6&amp;#3796&amp;#3787&amp;#37E4&amp;#37BB&amp;#37B6&amp;#37E6&amp;#379E&amp;#3784&amp;#37E6&amp;#3788&amp;#3790&amp;#37E7&amp;#379A&amp;#3784PHP&amp;#37E5&amp;#3790&amp;#378E&amp;#37E9&amp;#3797&amp;#37A8.html" target="_blank" rel="noopener">https://wooyun.js.org/drops/user.ini&amp;#37E6&amp;#3796&amp;#3787&amp;#37E4&amp;#37BB&amp;#37B6&amp;#37E6&amp;#379E&amp;#3784&amp;#37E6&amp;#3788&amp;#3790&amp;#37E7&amp;#379A&amp;#3784PHP&amp;#37E5&amp;#3790&amp;#378E&amp;#37E9&amp;#3797&amp;#37A8.html</a></p>
+<h4 id="user-ini包含后门"><a href="#user-ini包含后门" class="headerlink" title=".user.ini包含后门"></a>.user.ini包含后门</h4><p>.user.ini文件中也有和htaccess一样的auto_append_file，并且相较于.htaccess，.user.ini存在于各种服务器之中，使用文件包含时，被包含的任何文件都会被解析为php文件，所以我们可以通过上传.user.ini文件再上传一个图片马，进行访问就可以进入后门了（当然需要一个正常的可访问php文件才能）<br>贴一个文章：<a href="https://wooyun.js.org/drops/user.ini%E6%96%87%E4%BB%B6%E6%9E%84%E6%88%90%E7%9A%84PHP%E5%90%8E%E9%97%A8.html" target="_blank" rel="noopener">https://wooyun.js.org/drops/user.ini%E6%96%87%E4%BB%B6%E6%9E%84%E6%88%90%E7%9A%84PHP%E5%90%8E%E9%97%A8.html</a></p>
 <h4 id="00截断"><a href="#00截断" class="headerlink" title="00截断"></a>00截断</h4><blockquote>
 <p>适用情形：截断条件：php版本小于5.3.4，php的magic_quotes_gpc为OFF状态<br>因为对PHP版本要求过老，基本没用</p>
 </blockquote>
-<p>在上传的时候，当文件系统读到【0x00】时，会认为文件已经结束。利用00截断就是利用程序员在写程序时对文件的上传路径过滤不严格，产生0x00上传截断漏洞。<br>出现在上传路径可控的情况下，以get方式传递时可直接使用&amp;#3700进行绕过，会自动进行url解码，以post方式执行时，需要在十六进制中对数据进行修改为00</p>
+<p>在上传的时候，当文件系统读到【0x00】时，会认为文件已经结束。利用00截断就是利用程序员在写程序时对文件的上传路径过滤不严格，产生0x00上传截断漏洞。<br>出现在上传路径可控的情况下，以get方式传递时可直接使用%00进行绕过，会自动进行url解码，以post方式执行时，需要在十六进制中对数据进行修改为00</p>
 <h4 id="图片马绕过"><a href="#图片马绕过" class="headerlink" title="图片马绕过"></a>图片马绕过</h4><p>PHP存在一些判断文件类型的函数，通常就是看看文件头尾是不是符合图片的类型，这个时候我们可以把木马拼接在图片中，即可制造出一个图片马进行上传。<br>图片马是以.jpg形式上传的，使用就需要有文件包含，或是.htaccess，或者其他的解析漏洞。<br>图片马制作<code>copy 1.jpg /b + shell.php /a shell.jpg</code>，感觉直接在010editor里面拼也差不多<br>该方法可以绕过<code>getReailFileType</code>，<code>getimagesize</code>，<code>exif_imagetype</code>等函数检验</p>
 <h5 id="exif-imagetype-绕过"><a href="#exif-imagetype-绕过" class="headerlink" title="exif_imagetype()绕过"></a>exif_imagetype()绕过</h5><p>可以在文件开头增加<code>GIF89a</code>来绕过<br><code>#define width 20</code><br><code>#define height 10</code><br>如上两行是xbm格式图片的开头，在上传.htaccess或是php脚本文件时将这两行添加进去可绕过exif_imagetype，并在解析时被作为注释，不影响脚本正常解析</p>
 <h5 id="二次渲染绕过"><a href="#二次渲染绕过" class="headerlink" title="二次渲染绕过"></a>二次渲染绕过</h5><p>图片进行二次渲染之后可能会剔除我们之前拼接在图片中的脚本，并且对于.jpg，.png和.gif图片而言，处理二次渲染的方式并不一致</p>
@@ -962,7 +962,7 @@ call_user_func($_G
         <div class="col s12 m8 l8 copy-right">
             
             &nbsp;<i class="fa fa-area-chart"></i>&nbsp;站点总字数:&nbsp;<span
-                class="white-color">46.1k</span>&nbsp;字
+                class="white-color">44.4k</span>&nbsp;字
             
             
             

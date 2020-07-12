@@ -8,8 +8,8 @@
     <meta name="description" content="[HITCON 2017]SSRFmebuu上的一个老题，又是不会做看wp的一天
 给了源码
 &amp;lt;?php
-    if (isset($_SERVER[&#39;HTTP_X_FORWARDED_FOR&#39;])) &amp;amp;#123
-      ">
+    if (isset($_SERVER[&#39;HTTP_X_FORWARDED_FOR&#39;])) {
+        $http_">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     <meta name="renderer" content="webkit|ie-stand|ie-comp">
@@ -437,7 +437,7 @@
                     
                     <div class="info-break-policy">
                         <i class="fa fa-file-word-o fa-fw"></i>Word Count:&nbsp;&nbsp;
-                        744
+                        740
                     </div>
                     
 
@@ -463,10 +463,10 @@
                 <h1 id="HITCON-2017-SSRFme"><a href="#HITCON-2017-SSRFme" class="headerlink" title="[HITCON 2017]SSRFme"></a>[HITCON 2017]SSRFme</h1><p>buu上的一个老题，又是不会做看wp的一天</p>
 <p>给了源码</p>
 <pre class=" language-php"><code class="language-php"><span class="token delimiter">&lt;?php</span>
-    <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token function">isset</span><span class="token punctuation">(</span><span class="token variable">$_SERVER</span><span class="token punctuation">[</span><span class="token string">'HTTP_X_FORWARDED_FOR'</span><span class="token punctuation">]</span><span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token operator">&amp;</span><span class="token shell-comment comment">#123</span>
+    <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token function">isset</span><span class="token punctuation">(</span><span class="token variable">$_SERVER</span><span class="token punctuation">[</span><span class="token string">'HTTP_X_FORWARDED_FOR'</span><span class="token punctuation">]</span><span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
         <span class="token variable">$http_x_headers</span> <span class="token operator">=</span> <span class="token function">explode</span><span class="token punctuation">(</span><span class="token string">','</span><span class="token punctuation">,</span> <span class="token variable">$_SERVER</span><span class="token punctuation">[</span><span class="token string">'HTTP_X_FORWARDED_FOR'</span><span class="token punctuation">]</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
         <span class="token variable">$_SERVER</span><span class="token punctuation">[</span><span class="token string">'REMOTE_ADDR'</span><span class="token punctuation">]</span> <span class="token operator">=</span> <span class="token variable">$http_x_headers</span><span class="token punctuation">[</span><span class="token number">0</span><span class="token punctuation">]</span><span class="token punctuation">;</span>
-    <span class="token operator">&amp;</span><span class="token shell-comment comment">#125</span>
+    <span class="token punctuation">}</span>
 
     <span class="token keyword">echo</span> <span class="token variable">$_SERVER</span><span class="token punctuation">[</span><span class="token string">"REMOTE_ADDR"</span><span class="token punctuation">]</span><span class="token punctuation">;</span>
 
@@ -693,9 +693,9 @@
                 <a href="/2020/05/06/%5BHFCTF2020%5DBabyUpload/">
                     <div class="card-image">
                         
-                        <img src="/img/1.jpg" class="responsive-img" alt="HFCTF2020 BabyUpload">
+                        <img src="/img/note.jpg" class="responsive-img" alt="[HFCTF2020] BabyUpload">
                         
-                        <span class="card-title">HFCTF2020 BabyUpload</span>
+                        <span class="card-title">[HFCTF2020] BabyUpload</span>
                     </div>
                 </a>
                 <div class="card-content article-content">
@@ -727,10 +727,6 @@ session_save_
                 
                 <div class="card-action article-tags">
                     
-                    <a href="/tags/wp/" target="_blank">
-                        <span class="chip bg-color">wp</span>
-                    </a>
-                    
                     <a href="/tags/session/" target="_blank">
                         <span class="chip bg-color">session</span>
                     </a>
@@ -746,24 +742,24 @@ session_save_
                 Next&nbsp;<i class="fa fa-chevron-right"></i>
             </div>
             <div class="card">
-                <a href="/2020/04/23/%5BBJDCTF%202nd%5D%E9%83%A8%E5%88%86wp/">
+                <a href="/2020/03/23/%5BGWCTF%202019%5D%E4%BD%A0%E7%9A%84%E5%90%8D%E5%AD%97/">
                     <div class="card-image">
                         
-                        <img src="/img/ctf.jpg" class="responsive-img" alt="HBCTF 大美西安">
+                        <img src="/img/ctf1.jpg" class="responsive-img" alt="[GWCTF 2019] 你的名字">
                         
-                        <span class="card-title">HBCTF 大美西安</span>
+                        <span class="card-title">[GWCTF 2019] 你的名字</span>
                     </div>
                 </a>
                 <div class="card-content article-content">
                     <div class="summary block-with-text">
                         
-                            [BJDCTF 2nd]部分wp据说是萌新赛，就目前做的几个题来说的确较为简单
-fake googleSSTI，测一下可以发现用的jinja2，搜一个payload直接打SSTI上一次的BJDCTF也考过，具体判断什么的可以看上次比赛的WP
+                            [GWCTF 2019]你的名字模板注入，一开始就猜到了，然后出题人害人，过滤的字符串给了个PHP的报错，还给了一个不存在的文件，又把路由设置了一个index.php。。。。不是我看wp我绝对猜不出来发生了什么
+但是在一系列fuzz(乱按)
                         
                     </div>
                     <div class="publish-info">
                             <span class="publish-date">
-                                <i class="fa fa-clock-o fa-fw icon-date"></i>2020-04-23
+                                <i class="fa fa-clock-o fa-fw icon-date"></i>2020-03-23
                             </span>
                         <span class="publish-author">
                             
@@ -782,6 +778,10 @@ fake googleSSTI，测一下可以发现用的jinja2，搜一个payload直接打S
                     
                     <a href="/tags/wp/" target="_blank">
                         <span class="chip bg-color">wp</span>
+                    </a>
+                    
+                    <a href="/tags/ssti/" target="_blank">
+                        <span class="chip bg-color">ssti</span>
                     </a>
                     
                 </div>
@@ -898,7 +898,7 @@ fake googleSSTI，测一下可以发现用的jinja2，搜一个payload直接打S
         <div class="col s12 m8 l8 copy-right">
             
             &nbsp;<i class="fa fa-area-chart"></i>&nbsp;站点总字数:&nbsp;<span
-                class="white-color">46.1k</span>&nbsp;字
+                class="white-color">44.4k</span>&nbsp;字
             
             
             

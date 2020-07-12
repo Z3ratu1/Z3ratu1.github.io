@@ -4,11 +4,11 @@
 
 <head>
     <meta charset="utf-8">
-    <meta name="keywords" content="2019&amp;#93;枯燥的抽奖, Z3ratu1&#39;s blog">
-    <meta name="description" content="&amp;#91;GWCTF 2019&amp;#93;枯燥的抽奖伪随机数安全的一个题，通过php_mt_rand这个工具逆向出随机数种子，然后通过种子获取字符串
+    <meta name="keywords" content="[GWCTF_2019]枯燥的抽奖, Z3ratu1&#39;s blog">
+    <meta name="description" content="[GWCTF 2019]枯燥的抽奖伪随机数安全的一个题，通过php_mt_rand这个工具逆向出随机数种子，然后通过种子获取字符串
 贴一下源码
 &amp;lt;?php
-header(&#34;Content-Type: text/html">
+header(&#34;Content-Type: text/html;charset">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     <meta name="renderer" content="webkit|ie-stand|ie-comp">
@@ -16,7 +16,7 @@ header(&#34;Content-Type: text/html">
     <meta name="format-detection" content="telephone=no">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <title>2019&amp;#93;枯燥的抽奖 | Z3ratu1&#39;s blog</title>
+    <title>[GWCTF_2019]枯燥的抽奖 | Z3ratu1&#39;s blog</title>
     <link rel="icon" type="image/png" href="/favicon.png">
 
     <link rel="stylesheet" type="text/css" href="/libs/awesome/css/font-awesome.min.css">
@@ -294,7 +294,7 @@ header(&#34;Content-Type: text/html">
             <div class="col s12 m12 l12">
                 <div class="brand">
                     <div class="description center-align post-title">
-                        2019&amp;#93;枯燥的抽奖
+                        [GWCTF_2019]枯燥的抽奖
                     </div>
                 </div>
             </div>
@@ -436,7 +436,7 @@ header(&#34;Content-Type: text/html">
                     
                     <div class="info-break-policy">
                         <i class="fa fa-file-word-o fa-fw"></i>Word Count:&nbsp;&nbsp;
-                        413
+                        361
                     </div>
                     
 
@@ -459,34 +459,34 @@ header(&#34;Content-Type: text/html">
         <hr class="clearfix">
         <div class="card-content article-card-content">
             <div id="articleContent">
-                <h1 id="91-GWCTF-2019-93-枯燥的抽奖"><a href="#91-GWCTF-2019-93-枯燥的抽奖" class="headerlink" title="&#91;GWCTF 2019&#93;枯燥的抽奖"></a>&#91;GWCTF 2019&#93;枯燥的抽奖</h1><p>伪随机数安全的一个题，通过php_mt_rand这个工具逆向出随机数种子，然后通过种子获取字符串</p>
+                <h1 id="GWCTF-2019-枯燥的抽奖"><a href="#GWCTF-2019-枯燥的抽奖" class="headerlink" title="[GWCTF 2019]枯燥的抽奖"></a>[GWCTF 2019]枯燥的抽奖</h1><p>伪随机数安全的一个题，通过php_mt_rand这个工具逆向出随机数种子，然后通过种子获取字符串</p>
 <p>贴一下源码</p>
 <pre class=" language-php"><code class="language-php"><span class="token delimiter">&lt;?php</span>
 <span class="token function">header</span><span class="token punctuation">(</span><span class="token string">"Content-Type: text/html;charset=utf-8"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
 <span class="token function">session_start</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-<span class="token keyword">if</span><span class="token punctuation">(</span><span class="token operator">!</span><span class="token function">isset</span><span class="token punctuation">(</span><span class="token variable">$_SESSION</span><span class="token operator">&amp;</span><span class="token shell-comment comment">#91;</span><span class="token string">'seed'</span><span class="token operator">&amp;</span><span class="token shell-comment comment">#93;))&amp;#123</span>
-<span class="token variable">$_SESSION</span><span class="token operator">&amp;</span><span class="token shell-comment comment">#91;</span><span class="token string">'seed'</span><span class="token operator">&amp;</span><span class="token shell-comment comment">#93;=rand(0,999999999);</span>
-<span class="token operator">&amp;</span><span class="token shell-comment comment">#125</span>
+<span class="token keyword">if</span><span class="token punctuation">(</span><span class="token operator">!</span><span class="token function">isset</span><span class="token punctuation">(</span><span class="token variable">$_SESSION</span><span class="token punctuation">[</span><span class="token string">'seed'</span><span class="token punctuation">]</span><span class="token punctuation">;</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">{</span>
+<span class="token variable">$_SESSION</span><span class="token punctuation">[</span><span class="token string">'seed'</span><span class="token punctuation">]</span><span class="token punctuation">;</span><span class="token operator">=</span><span class="token function">rand</span><span class="token punctuation">(</span><span class="token number">0</span><span class="token punctuation">,</span><span class="token number">999999999</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
 
-<span class="token function">mt_srand</span><span class="token punctuation">(</span><span class="token variable">$_SESSION</span><span class="token operator">&amp;</span><span class="token shell-comment comment">#91;</span><span class="token string">'seed'</span><span class="token operator">&amp;</span><span class="token shell-comment comment">#93;);</span>
+<span class="token function">mt_srand</span><span class="token punctuation">(</span><span class="token variable">$_SESSION</span><span class="token punctuation">[</span><span class="token string">'seed'</span><span class="token punctuation">]</span><span class="token punctuation">;</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
 <span class="token variable">$str_long1</span> <span class="token operator">=</span> <span class="token string">"abcdefghijklmnopqrstuvwxyz0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ"</span><span class="token punctuation">;</span>
 <span class="token variable">$str</span><span class="token operator">=</span><span class="token string">''</span><span class="token punctuation">;</span>
 <span class="token variable">$len1</span><span class="token operator">=</span><span class="token number">20</span><span class="token punctuation">;</span>
-<span class="token keyword">for</span> <span class="token punctuation">(</span> <span class="token variable">$i</span> <span class="token operator">=</span> <span class="token number">0</span><span class="token punctuation">;</span> <span class="token variable">$i</span> <span class="token operator">&lt;</span> <span class="token variable">$len1</span><span class="token punctuation">;</span> <span class="token variable">$i</span><span class="token operator">++</span> <span class="token punctuation">)</span><span class="token operator">&amp;</span><span class="token shell-comment comment">#123</span>
+<span class="token keyword">for</span> <span class="token punctuation">(</span> <span class="token variable">$i</span> <span class="token operator">=</span> <span class="token number">0</span><span class="token punctuation">;</span> <span class="token variable">$i</span> <span class="token operator">&lt;</span> <span class="token variable">$len1</span><span class="token punctuation">;</span> <span class="token variable">$i</span><span class="token operator">++</span> <span class="token punctuation">)</span><span class="token punctuation">{</span>
     <span class="token variable">$str</span><span class="token punctuation">.</span><span class="token operator">=</span><span class="token function">substr</span><span class="token punctuation">(</span><span class="token variable">$str_long1</span><span class="token punctuation">,</span> <span class="token function">mt_rand</span><span class="token punctuation">(</span><span class="token number">0</span><span class="token punctuation">,</span> <span class="token function">strlen</span><span class="token punctuation">(</span><span class="token variable">$str_long1</span><span class="token punctuation">)</span> <span class="token operator">-</span> <span class="token number">1</span><span class="token punctuation">)</span><span class="token punctuation">,</span> <span class="token number">1</span><span class="token punctuation">)</span><span class="token punctuation">;</span>       
-<span class="token operator">&amp;</span><span class="token shell-comment comment">#125</span>
+<span class="token punctuation">}</span>
 <span class="token variable">$str_show</span> <span class="token operator">=</span> <span class="token function">substr</span><span class="token punctuation">(</span><span class="token variable">$str</span><span class="token punctuation">,</span> <span class="token number">0</span><span class="token punctuation">,</span> <span class="token number">10</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
 <span class="token keyword">echo</span> <span class="token string">"&lt;p id='p1'>"</span><span class="token punctuation">.</span><span class="token variable">$str_show</span><span class="token punctuation">.</span><span class="token string">"&lt;/p>"</span><span class="token punctuation">;</span>
 
 
-<span class="token keyword">if</span><span class="token punctuation">(</span><span class="token function">isset</span><span class="token punctuation">(</span><span class="token variable">$_POST</span><span class="token operator">&amp;</span><span class="token shell-comment comment">#91;</span><span class="token string">'num'</span><span class="token operator">&amp;</span><span class="token shell-comment comment">#93;))&amp;#123</span>
-    <span class="token keyword">if</span><span class="token punctuation">(</span><span class="token variable">$_POST</span><span class="token operator">&amp;</span><span class="token shell-comment comment">#91;</span><span class="token string">'num'</span><span class="token operator">&amp;</span><span class="token shell-comment comment">#93;===$str)&amp;#123x</span>
-        <span class="token keyword">echo</span> <span class="token string">"&lt;p id=flag>抽奖，就是那么枯燥且无味，给你flag&amp;#123xxxxxxxxx&amp;#125&lt;/p>"</span><span class="token punctuation">;</span>
-    <span class="token operator">&amp;</span><span class="token shell-comment comment">#125</span>
-    <span class="token keyword">else</span><span class="token operator">&amp;</span><span class="token shell-comment comment">#123</span>
+<span class="token keyword">if</span><span class="token punctuation">(</span><span class="token function">isset</span><span class="token punctuation">(</span><span class="token variable">$_POST</span><span class="token punctuation">[</span><span class="token string">'num'</span><span class="token punctuation">]</span><span class="token punctuation">;</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">{</span>
+    <span class="token keyword">if</span><span class="token punctuation">(</span><span class="token variable">$_POST</span><span class="token punctuation">[</span><span class="token string">'num'</span><span class="token punctuation">]</span><span class="token punctuation">;</span><span class="token operator">===</span><span class="token variable">$str</span><span class="token punctuation">)</span><span class="token punctuation">{</span>x
+        <span class="token keyword">echo</span> <span class="token string">"&lt;p id=flag>抽奖，就是那么枯燥且无味，给你flag{xxxxxxxxx}&lt;/p>"</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+    <span class="token keyword">else</span><span class="token punctuation">{</span>
         <span class="token keyword">echo</span> <span class="token string">"&lt;p id=flag>没抽中哦，再试试吧&lt;/p>"</span><span class="token punctuation">;</span>
-    <span class="token operator">&amp;</span><span class="token shell-comment comment">#125</span>
-<span class="token operator">&amp;</span><span class="token shell-comment comment">#125</span>
+    <span class="token punctuation">}</span>
+<span class="token punctuation">}</span>
 <span class="token function">show_source</span><span class="token punctuation">(</span><span class="token string">"check.php"</span><span class="token punctuation">)</span><span class="token punctuation">;</span></code></pre>
 <p>mt_rand(min,max)函数返回该区间内的任意一个数，通过如下脚本得到逆向所需数据，通过php_mt_rand工具爆破出种子</p>
 <pre class=" language-python"><code class="language-python">str1 <span class="token operator">=</span> <span class="token string">'abcdefghijklmnopqrstuvwxyz0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ'</span>
@@ -495,7 +495,7 @@ length <span class="token operator">=</span> len<span class="token punctuation">
 res <span class="token operator">=</span> <span class="token string">''</span>
 <span class="token keyword">for</span> i <span class="token keyword">in</span> range<span class="token punctuation">(</span>len<span class="token punctuation">(</span>str2<span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
     <span class="token keyword">for</span> j <span class="token keyword">in</span> range<span class="token punctuation">(</span>len<span class="token punctuation">(</span>str1<span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
-        <span class="token keyword">if</span> str2<span class="token operator">&amp;</span><span class="token comment" spellcheck="true">#91;i&amp;#93; == str1&amp;#91;j&amp;#93;:</span>
+        <span class="token keyword">if</span> str2<span class="token punctuation">[</span>i<span class="token punctuation">]</span><span class="token punctuation">;</span> <span class="token operator">==</span> str1<span class="token punctuation">[</span>j<span class="token punctuation">]</span><span class="token punctuation">;</span><span class="token punctuation">:</span>
             res <span class="token operator">+=</span> str<span class="token punctuation">(</span>j<span class="token punctuation">)</span><span class="token operator">+</span><span class="token string">' '</span><span class="token operator">+</span>str<span class="token punctuation">(</span>j<span class="token punctuation">)</span><span class="token operator">+</span><span class="token string">' '</span><span class="token operator">+</span><span class="token string">'0'</span><span class="token operator">+</span><span class="token string">' '</span><span class="token operator">+</span>str<span class="token punctuation">(</span>len<span class="token punctuation">(</span>str1<span class="token punctuation">)</span><span class="token operator">-</span><span class="token number">1</span><span class="token punctuation">)</span><span class="token operator">+</span><span class="token string">' '</span>
             <span class="token keyword">break</span>
 <span class="token keyword">print</span><span class="token punctuation">(</span>res<span class="token punctuation">)</span></code></pre>
@@ -659,7 +659,7 @@ res <span class="token operator">=</span> <span class="token string">''</span>
             <br/>
             <span xmlns:dct="http://purl.org/dc/terms/" href="http://purl.org/dc/dcmitype/Text"
                   property="dct:title" rel="dct:type">
-                    《2019&amp;#93;枯燥的抽奖》
+                    《[GWCTF_2019]枯燥的抽奖》
                 </span> by
             <a xmlns:cc="http://creativecommons.org/ns#" href="/2020/07/11/%5BGWCTF%202019%5D%E6%9E%AF%E7%87%A5%E7%9A%84%E6%8A%BD%E5%A5%96/" property="cc:attributionName"
                rel="cc:attributionURL">
@@ -716,8 +716,8 @@ res <span class="token operator">=</span> <span class="token string">''</span>
                 <div class="card-content article-content">
                     <div class="summary block-with-text">
                         
-                            &#91;FBCTF2019&#93;RCEServicebuu上的题，最近打工开始划水，又要搞网鼎杯了，赶紧报一下佛脚
-json文件格式我太菜了，json属性字段一定要用双引号括起来，单引号是不可以的，为此我一开始试了半天，为什么输入什么
+                            [FBCTF2019]RCEServicebuu上的题，最近打工开始划水，又要搞网鼎杯了，赶紧报一下佛脚
+json文件格式我太菜了，json属性字段一定要用双引号括起来，单引号是不可以的，为此我一开始试了半天，为什么输入什么东西都显示上了w
                         
                     </div>
                     <div class="publish-info">
@@ -911,7 +911,7 @@ error_repo
         <div class="col s12 m8 l8 copy-right">
             
             &nbsp;<i class="fa fa-area-chart"></i>&nbsp;站点总字数:&nbsp;<span
-                class="white-color">46.1k</span>&nbsp;字
+                class="white-color">44.4k</span>&nbsp;字
             
             
             

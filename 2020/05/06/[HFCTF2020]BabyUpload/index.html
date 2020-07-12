@@ -4,7 +4,7 @@
 
 <head>
     <meta charset="utf-8">
-    <meta name="keywords" content="HFCTF2020 BabyUpload, Z3ratu1&#39;s blog">
+    <meta name="keywords" content="[HFCTF2020] BabyUpload, Z3ratu1&#39;s blog">
     <meta name="description" content="[HFCTF2020]BabyUpload学习了PHP的session机制，感觉还学到了点东西，懂了session是怎么存的这个题就很简单了
 源码好长一串
 &amp;lt;?php
@@ -17,7 +17,7 @@ session_save_">
     <meta name="format-detection" content="telephone=no">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <title>HFCTF2020 BabyUpload | Z3ratu1&#39;s blog</title>
+    <title>[HFCTF2020] BabyUpload | Z3ratu1&#39;s blog</title>
     <link rel="icon" type="image/png" href="/favicon.png">
 
     <link rel="stylesheet" type="text/css" href="/libs/awesome/css/font-awesome.min.css">
@@ -289,13 +289,13 @@ session_save_">
 
 
 
-<div class="bg-cover pd-header post-cover" style="background-image: url('/img/1.jpg')">
+<div class="bg-cover pd-header post-cover" style="background-image: url('/img/note.jpg')">
     <div class="container">
         <div class="row">
             <div class="col s12 m12 l12">
                 <div class="brand">
                     <div class="description center-align post-title">
-                        HFCTF2020 BabyUpload
+                        [HFCTF2020] BabyUpload
                     </div>
                 </div>
             </div>
@@ -406,10 +406,6 @@ session_save_">
                     
                     <div class="article-tag">
                         
-                            <a href="/tags/wp/" target="_blank">
-                                <span class="chip bg-color">wp</span>
-                            </a>
-                        
                             <a href="/tags/session/" target="_blank">
                                 <span class="chip bg-color">session</span>
                             </a>
@@ -441,14 +437,14 @@ session_save_">
                     
                     <div class="info-break-policy">
                         <i class="fa fa-file-word-o fa-fw"></i>Word Count:&nbsp;&nbsp;
-                        686
+                        616
                     </div>
                     
 
                     
                     <div class="info-break-policy">
                         <i class="fa fa-clock-o fa-fw"></i>Read Times:&nbsp;&nbsp;
-                        3 Min
+                        2 Min
                     </div>
                     
                 
@@ -473,64 +469,64 @@ session_save_">
 <span class="token keyword">require_once</span> <span class="token string">"/flag"</span><span class="token punctuation">;</span>
 <span class="token function">highlight_file</span><span class="token punctuation">(</span><span class="token constant">__FILE__</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
 <span class="token keyword">if</span><span class="token punctuation">(</span><span class="token variable">$_SESSION</span><span class="token punctuation">[</span><span class="token string">'username'</span><span class="token punctuation">]</span> <span class="token operator">===</span><span class="token string">'admin'</span><span class="token punctuation">)</span>
-<span class="token operator">&amp;</span><span class="token shell-comment comment">#123</span>
+<span class="token punctuation">{</span>
     <span class="token variable">$filename</span><span class="token operator">=</span><span class="token string">'/var/babyctf/success.txt'</span><span class="token punctuation">;</span>
-    <span class="token keyword">if</span><span class="token punctuation">(</span><span class="token function">file_exists</span><span class="token punctuation">(</span><span class="token variable">$filename</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token operator">&amp;</span><span class="token shell-comment comment">#123</span>
+    <span class="token keyword">if</span><span class="token punctuation">(</span><span class="token function">file_exists</span><span class="token punctuation">(</span><span class="token variable">$filename</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">{</span>
             <span class="token function">safe_delete</span><span class="token punctuation">(</span><span class="token variable">$filename</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
             <span class="token keyword">die</span><span class="token punctuation">(</span><span class="token variable">$flag</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-    <span class="token operator">&amp;</span><span class="token shell-comment comment">#125</span>
-<span class="token operator">&amp;</span><span class="token shell-comment comment">#125</span>
-<span class="token keyword">else</span><span class="token operator">&amp;</span><span class="token shell-comment comment">#123</span>
+    <span class="token punctuation">}</span>
+<span class="token punctuation">}</span>
+<span class="token keyword">else</span><span class="token punctuation">{</span>
     <span class="token variable">$_SESSION</span><span class="token punctuation">[</span><span class="token string">'username'</span><span class="token punctuation">]</span> <span class="token operator">=</span><span class="token string">'guest'</span><span class="token punctuation">;</span>
-<span class="token operator">&amp;</span><span class="token shell-comment comment">#125</span>
+<span class="token punctuation">}</span>
 <span class="token variable">$direction</span> <span class="token operator">=</span> <span class="token function">filter_input</span><span class="token punctuation">(</span><span class="token constant">INPUT_POST</span><span class="token punctuation">,</span> <span class="token string">'direction'</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
 <span class="token variable">$attr</span> <span class="token operator">=</span> <span class="token function">filter_input</span><span class="token punctuation">(</span><span class="token constant">INPUT_POST</span><span class="token punctuation">,</span> <span class="token string">'attr'</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
 <span class="token variable">$dir_path</span> <span class="token operator">=</span> <span class="token string">"/var/babyctf/"</span><span class="token punctuation">.</span><span class="token variable">$attr</span><span class="token punctuation">;</span>
-<span class="token keyword">if</span><span class="token punctuation">(</span><span class="token variable">$attr</span><span class="token operator">===</span><span class="token string">"private"</span><span class="token punctuation">)</span><span class="token operator">&amp;</span><span class="token shell-comment comment">#123</span>
+<span class="token keyword">if</span><span class="token punctuation">(</span><span class="token variable">$attr</span><span class="token operator">===</span><span class="token string">"private"</span><span class="token punctuation">)</span><span class="token punctuation">{</span>
     <span class="token variable">$dir_path</span> <span class="token punctuation">.</span><span class="token operator">=</span> <span class="token string">"/"</span><span class="token punctuation">.</span><span class="token variable">$_SESSION</span><span class="token punctuation">[</span><span class="token string">'username'</span><span class="token punctuation">]</span><span class="token punctuation">;</span>
-<span class="token operator">&amp;</span><span class="token shell-comment comment">#125</span>
-<span class="token keyword">if</span><span class="token punctuation">(</span><span class="token variable">$direction</span> <span class="token operator">===</span> <span class="token string">"upload"</span><span class="token punctuation">)</span><span class="token operator">&amp;</span><span class="token shell-comment comment">#123</span>
-    <span class="token keyword">try</span><span class="token operator">&amp;</span><span class="token shell-comment comment">#123</span>
-        <span class="token keyword">if</span><span class="token punctuation">(</span><span class="token operator">!</span><span class="token function">is_uploaded_file</span><span class="token punctuation">(</span><span class="token variable">$_FILES</span><span class="token punctuation">[</span><span class="token string">'up_file'</span><span class="token punctuation">]</span><span class="token punctuation">[</span><span class="token string">'tmp_name'</span><span class="token punctuation">]</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token operator">&amp;</span><span class="token shell-comment comment">#123</span>
+<span class="token punctuation">}</span>
+<span class="token keyword">if</span><span class="token punctuation">(</span><span class="token variable">$direction</span> <span class="token operator">===</span> <span class="token string">"upload"</span><span class="token punctuation">)</span><span class="token punctuation">{</span>
+    <span class="token keyword">try</span><span class="token punctuation">{</span>
+        <span class="token keyword">if</span><span class="token punctuation">(</span><span class="token operator">!</span><span class="token function">is_uploaded_file</span><span class="token punctuation">(</span><span class="token variable">$_FILES</span><span class="token punctuation">[</span><span class="token string">'up_file'</span><span class="token punctuation">]</span><span class="token punctuation">[</span><span class="token string">'tmp_name'</span><span class="token punctuation">]</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">{</span>
             <span class="token keyword">throw</span> <span class="token keyword">new</span> <span class="token class-name">RuntimeException</span><span class="token punctuation">(</span><span class="token string">'invalid upload'</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-        <span class="token operator">&amp;</span><span class="token shell-comment comment">#125</span>
+        <span class="token punctuation">}</span>
         <span class="token variable">$file_path</span> <span class="token operator">=</span> <span class="token variable">$dir_path</span><span class="token punctuation">.</span><span class="token string">"/"</span><span class="token punctuation">.</span><span class="token variable">$_FILES</span><span class="token punctuation">[</span><span class="token string">'up_file'</span><span class="token punctuation">]</span><span class="token punctuation">[</span><span class="token string">'name'</span><span class="token punctuation">]</span><span class="token punctuation">;</span>
         <span class="token variable">$file_path</span> <span class="token punctuation">.</span><span class="token operator">=</span> <span class="token string">"_"</span><span class="token punctuation">.</span><span class="token function">hash_file</span><span class="token punctuation">(</span><span class="token string">"sha256"</span><span class="token punctuation">,</span><span class="token variable">$_FILES</span><span class="token punctuation">[</span><span class="token string">'up_file'</span><span class="token punctuation">]</span><span class="token punctuation">[</span><span class="token string">'tmp_name'</span><span class="token punctuation">]</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-        <span class="token keyword">if</span><span class="token punctuation">(</span><span class="token function">preg_match</span><span class="token punctuation">(</span><span class="token string">'/(\.\.\/|\.\.\\\\)/'</span><span class="token punctuation">,</span> <span class="token variable">$file_path</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token operator">&amp;</span><span class="token shell-comment comment">#123</span>
+        <span class="token keyword">if</span><span class="token punctuation">(</span><span class="token function">preg_match</span><span class="token punctuation">(</span><span class="token string">'/(\.\.\/|\.\.\\\\)/'</span><span class="token punctuation">,</span> <span class="token variable">$file_path</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">{</span>
             <span class="token keyword">throw</span> <span class="token keyword">new</span> <span class="token class-name">RuntimeException</span><span class="token punctuation">(</span><span class="token string">'invalid file path'</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-        <span class="token operator">&amp;</span><span class="token shell-comment comment">#125</span>
+        <span class="token punctuation">}</span>
         @<span class="token function">mkdir</span><span class="token punctuation">(</span><span class="token variable">$dir_path</span><span class="token punctuation">,</span> <span class="token number">0700</span><span class="token punctuation">,</span> <span class="token constant">TRUE</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-        <span class="token keyword">if</span><span class="token punctuation">(</span><span class="token function">move_uploaded_file</span><span class="token punctuation">(</span><span class="token variable">$_FILES</span><span class="token punctuation">[</span><span class="token string">'up_file'</span><span class="token punctuation">]</span><span class="token punctuation">[</span><span class="token string">'tmp_name'</span><span class="token punctuation">]</span><span class="token punctuation">,</span><span class="token variable">$file_path</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token operator">&amp;</span><span class="token shell-comment comment">#123</span>
+        <span class="token keyword">if</span><span class="token punctuation">(</span><span class="token function">move_uploaded_file</span><span class="token punctuation">(</span><span class="token variable">$_FILES</span><span class="token punctuation">[</span><span class="token string">'up_file'</span><span class="token punctuation">]</span><span class="token punctuation">[</span><span class="token string">'tmp_name'</span><span class="token punctuation">]</span><span class="token punctuation">,</span><span class="token variable">$file_path</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">{</span>
             <span class="token variable">$upload_result</span> <span class="token operator">=</span> <span class="token string">"uploaded"</span><span class="token punctuation">;</span>
-        <span class="token operator">&amp;</span><span class="token shell-comment comment">#125else&amp;#123</span>
+        <span class="token punctuation">}</span><span class="token keyword">else</span><span class="token punctuation">{</span>
             <span class="token keyword">throw</span> <span class="token keyword">new</span> <span class="token class-name">RuntimeException</span><span class="token punctuation">(</span><span class="token string">'error while saving'</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-        <span class="token operator">&amp;</span><span class="token shell-comment comment">#125</span>
-    <span class="token operator">&amp;</span><span class="token shell-comment comment">#125 catch (RuntimeException $e) &amp;#123</span>
+        <span class="token punctuation">}</span>
+    <span class="token punctuation">}</span> <span class="token keyword">catch</span> <span class="token punctuation">(</span><span class="token class-name">RuntimeException</span> <span class="token variable">$e</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
         <span class="token variable">$upload_result</span> <span class="token operator">=</span> <span class="token variable">$e</span><span class="token operator">-</span><span class="token operator">></span><span class="token function">getMessage</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-    <span class="token operator">&amp;</span><span class="token shell-comment comment">#125</span>
-<span class="token operator">&amp;</span><span class="token shell-comment comment">#125 elseif ($direction === </span><span class="token string">"download"</span><span class="token punctuation">)</span> <span class="token operator">&amp;</span><span class="token shell-comment comment">#123</span>
-    <span class="token keyword">try</span><span class="token operator">&amp;</span><span class="token shell-comment comment">#123</span>
+    <span class="token punctuation">}</span>
+<span class="token punctuation">}</span> <span class="token keyword">elseif</span> <span class="token punctuation">(</span><span class="token variable">$direction</span> <span class="token operator">===</span> <span class="token string">"download"</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token keyword">try</span><span class="token punctuation">{</span>
         <span class="token variable">$filename</span> <span class="token operator">=</span> <span class="token function">basename</span><span class="token punctuation">(</span><span class="token function">filter_input</span><span class="token punctuation">(</span><span class="token constant">INPUT_POST</span><span class="token punctuation">,</span> <span class="token string">'filename'</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
         <span class="token variable">$file_path</span> <span class="token operator">=</span> <span class="token variable">$dir_path</span><span class="token punctuation">.</span><span class="token string">"/"</span><span class="token punctuation">.</span><span class="token variable">$filename</span><span class="token punctuation">;</span>
-        <span class="token keyword">if</span><span class="token punctuation">(</span><span class="token function">preg_match</span><span class="token punctuation">(</span><span class="token string">'/(\.\.\/|\.\.\\\\)/'</span><span class="token punctuation">,</span> <span class="token variable">$file_path</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token operator">&amp;</span><span class="token shell-comment comment">#123</span>
+        <span class="token keyword">if</span><span class="token punctuation">(</span><span class="token function">preg_match</span><span class="token punctuation">(</span><span class="token string">'/(\.\.\/|\.\.\\\\)/'</span><span class="token punctuation">,</span> <span class="token variable">$file_path</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">{</span>
             <span class="token keyword">throw</span> <span class="token keyword">new</span> <span class="token class-name">RuntimeException</span><span class="token punctuation">(</span><span class="token string">'invalid file path'</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-        <span class="token operator">&amp;</span><span class="token shell-comment comment">#125</span>
-        <span class="token keyword">if</span><span class="token punctuation">(</span><span class="token operator">!</span><span class="token function">file_exists</span><span class="token punctuation">(</span><span class="token variable">$file_path</span><span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token operator">&amp;</span><span class="token shell-comment comment">#123</span>
+        <span class="token punctuation">}</span>
+        <span class="token keyword">if</span><span class="token punctuation">(</span><span class="token operator">!</span><span class="token function">file_exists</span><span class="token punctuation">(</span><span class="token variable">$file_path</span><span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
             <span class="token keyword">throw</span> <span class="token keyword">new</span> <span class="token class-name">RuntimeException</span><span class="token punctuation">(</span><span class="token string">'file not exist'</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-        <span class="token operator">&amp;</span><span class="token shell-comment comment">#125</span>
+        <span class="token punctuation">}</span>
         <span class="token function">header</span><span class="token punctuation">(</span><span class="token string">'Content-Type: application/force-download'</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
         <span class="token function">header</span><span class="token punctuation">(</span><span class="token string">'Content-Length: '</span><span class="token punctuation">.</span><span class="token function">filesize</span><span class="token punctuation">(</span><span class="token variable">$file_path</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
         <span class="token function">header</span><span class="token punctuation">(</span><span class="token string">'Content-Disposition: attachment; filename="'</span><span class="token punctuation">.</span><span class="token function">substr</span><span class="token punctuation">(</span><span class="token variable">$filename</span><span class="token punctuation">,</span> <span class="token number">0</span><span class="token punctuation">,</span> <span class="token operator">-</span><span class="token number">65</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token string">'"'</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-        <span class="token keyword">if</span><span class="token punctuation">(</span><span class="token function">readfile</span><span class="token punctuation">(</span><span class="token variable">$file_path</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token operator">&amp;</span><span class="token shell-comment comment">#123</span>
+        <span class="token keyword">if</span><span class="token punctuation">(</span><span class="token function">readfile</span><span class="token punctuation">(</span><span class="token variable">$file_path</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">{</span>
             <span class="token variable">$download_result</span> <span class="token operator">=</span> <span class="token string">"downloaded"</span><span class="token punctuation">;</span>
-        <span class="token operator">&amp;</span><span class="token shell-comment comment">#125else&amp;#123</span>
+        <span class="token punctuation">}</span><span class="token keyword">else</span><span class="token punctuation">{</span>
             <span class="token keyword">throw</span> <span class="token keyword">new</span> <span class="token class-name">RuntimeException</span><span class="token punctuation">(</span><span class="token string">'error while saving'</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-        <span class="token operator">&amp;</span><span class="token shell-comment comment">#125</span>
-    <span class="token operator">&amp;</span><span class="token shell-comment comment">#125 catch (RuntimeException $e) &amp;#123</span>
+        <span class="token punctuation">}</span>
+    <span class="token punctuation">}</span> <span class="token keyword">catch</span> <span class="token punctuation">(</span><span class="token class-name">RuntimeException</span> <span class="token variable">$e</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
         <span class="token variable">$download_result</span> <span class="token operator">=</span> <span class="token variable">$e</span><span class="token operator">-</span><span class="token operator">></span><span class="token function">getMessage</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-    <span class="token operator">&amp;</span><span class="token shell-comment comment">#125</span>
+    <span class="token punctuation">}</span>
     exit<span class="token punctuation">;</span>
-<span class="token operator">&amp;</span><span class="token shell-comment comment">#125</span>
+<span class="token punctuation">}</span>
 <span class="token delimiter">?></span></code></pre>
 <h2 id="题解"><a href="#题解" class="headerlink" title="题解"></a>题解</h2><p>提供了一个上传功能和一个下载功能，上传下载都不允许跳目录，上传功能的文件名不可控，可以看到把session文件存储路径改到了我们上传下载的路径上，而取得flag的条件是我们的身份是admin且存在一个success.txt<br>由于文件名不可控，我们就无法上传一个名为success.txt的文件，但是file_exists函数的作用的是<strong>检查文件或目录是否存在</strong>，所以我们用attr创建一个名为success.txt的目录就可以过这个判断</p>
 <h3 id="php-session"><a href="#php-session" class="headerlink" title="php session"></a>php session</h3><p>session文件名以 sess_ 为前缀，后跟 SESSION ID（即cookie中PHPSESSID的值），存放的数据为序列化的session信息。<br>我们发起访问的时候就通过这个cookie的值去查询对应的session文件，这里就还可以牵扯出PHP的session反序列化导致的各种漏洞，不在这里赘述了<br>所以我们可以先用download功能下载一下自己的session文件看一看，下载出来的内容为<code>\x08usernames:5:&quot;guest&quot;;</code>，\x08为不可见字符，要注意<br>我们把guest改成admin，文件名就叫做sess，上传上去，这样子服务端就获得了一个名为sess_(file_hash(sess))的文件，我们自己计算一下文件的哈希值，得到文件叫<code>sess_f567e441819b3b6408c99607cd47e41b4c3167e9a46f82cb5c14b843ad5a25d0</code>，然后将cookie替换为该哈希值进行访问，这样子服务端就将身份替换为了admin，并且也已经创建好了success.txt这个目录，可以通过检测，获取flag了</p>
@@ -692,7 +688,7 @@ session_save_">
             <br/>
             <span xmlns:dct="http://purl.org/dc/terms/" href="http://purl.org/dc/dcmitype/Text"
                   property="dct:title" rel="dct:type">
-                    《HFCTF2020 BabyUpload》
+                    《[HFCTF2020] BabyUpload》
                 </span> by
             <a xmlns:cc="http://creativecommons.org/ns#" href="/2020/05/06/%5BHFCTF2020%5DBabyUpload/" property="cc:attributionName"
                rel="cc:attributionURL">
@@ -808,8 +804,8 @@ session_save_">
                             [HITCON 2017]SSRFmebuu上的一个老题，又是不会做看wp的一天
 给了源码
 &lt;?php
-    if (isset($_SERVER['HTTP_X_FORWARDED_FOR'])) &amp;#123
-      
+    if (isset($_SERVER['HTTP_X_FORWARDED_FOR'])) {
+        $http_
                         
                     </div>
                     <div class="publish-info">
@@ -949,7 +945,7 @@ session_save_">
         <div class="col s12 m8 l8 copy-right">
             
             &nbsp;<i class="fa fa-area-chart"></i>&nbsp;站点总字数:&nbsp;<span
-                class="white-color">46.1k</span>&nbsp;字
+                class="white-color">44.4k</span>&nbsp;字
             
             
             
