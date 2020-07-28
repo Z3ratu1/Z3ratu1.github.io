@@ -4,10 +4,8 @@
 
 <head>
     <meta charset="utf-8">
-    <meta name="keywords" content="Zer0pts2020 Can you guess it, Z3ratu1&#39;s blog">
-    <meta name="description" content="[Zer0pts2020]Can you guess it外国比赛的签到题，攻击点给的很明显吧，还有一个小小的有意思的地方
-源码&amp;lt;?php
-include &#39;config.php&#39;; // FLAG is defined in con">
+    <meta name="keywords" content="[RCTF 2019]Nextphp, Z3ratu1&#39;s blog">
+    <meta name="description" content="[RCTF 2019]Nextphp全新的知识，PHP7.4中的全新玩法上来直接给一个shell，直接执行phpinfo看一眼，open_basedir写上了，disable_function超级过滤，把平常用的mail和unsetenv都">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     <meta name="renderer" content="webkit|ie-stand|ie-comp">
@@ -15,7 +13,7 @@ include &#39;config.php&#39;; // FLAG is defined in con">
     <meta name="format-detection" content="telephone=no">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <title>Zer0pts2020 Can you guess it | Z3ratu1&#39;s blog</title>
+    <title>[RCTF 2019]Nextphp | Z3ratu1&#39;s blog</title>
     <link rel="icon" type="image/png" href="/favicon.png">
 
     <link rel="stylesheet" type="text/css" href="/libs/awesome/css/font-awesome.min.css">
@@ -287,13 +285,13 @@ include &#39;config.php&#39;; // FLAG is defined in con">
 
 
 
-<div class="bg-cover pd-header post-cover" style="background-image: url('/img/ctf.jpg')">
+<div class="bg-cover pd-header post-cover" style="background-image: url('/img/1.jpg')">
     <div class="container">
         <div class="row">
             <div class="col s12 m12 l12">
                 <div class="brand">
                     <div class="description center-align post-title">
-                        Zer0pts2020 Can you guess it
+                        [RCTF 2019]Nextphp
                     </div>
                 </div>
             </div>
@@ -404,8 +402,12 @@ include &#39;config.php&#39;; // FLAG is defined in con">
                     
                     <div class="article-tag">
                         
-                            <a href="/tags/wp/" target="_blank">
-                                <span class="chip bg-color">wp</span>
+                            <a href="/tags/FFI/" target="_blank">
+                                <span class="chip bg-color">FFI</span>
+                            </a>
+                        
+                            <a href="/tags/bypass-disable-function/" target="_blank">
+                                <span class="chip bg-color">bypass_disable_function</span>
                             </a>
                         
                     </div>
@@ -428,21 +430,21 @@ include &#39;config.php&#39;; // FLAG is defined in con">
             <div class="post-info">
                 <div class="post-date info-break-policy">
                     <i class="fa fa-calendar-minus-o fa-fw"></i>Publish Date:&nbsp;&nbsp;
-                    2020-03-23
+                    2020-07-28
                 </div>
 
                 
                     
                     <div class="info-break-policy">
                         <i class="fa fa-file-word-o fa-fw"></i>Word Count:&nbsp;&nbsp;
-                        549
+                        1k
                     </div>
                     
 
                     
                     <div class="info-break-policy">
                         <i class="fa fa-clock-o fa-fw"></i>Read Times:&nbsp;&nbsp;
-                        2 Min
+                        4 Min
                     </div>
                     
                 
@@ -458,57 +460,65 @@ include &#39;config.php&#39;; // FLAG is defined in con">
         <hr class="clearfix">
         <div class="card-content article-card-content">
             <div id="articleContent">
-                <h1 id="Zer0pts2020-Can-you-guess-it"><a href="#Zer0pts2020-Can-you-guess-it" class="headerlink" title="[Zer0pts2020]Can you guess it"></a>[Zer0pts2020]Can you guess it</h1><p>外国比赛的签到题，攻击点给的很明显吧，还有一个小小的有意思的地方</p>
-<h2 id="源码"><a href="#源码" class="headerlink" title="源码"></a>源码</h2><pre class=" language-php"><code class="language-php"><span class="token delimiter">&lt;?php</span>
-<span class="token keyword">include</span> <span class="token string">'config.php'</span><span class="token punctuation">;</span> <span class="token comment" spellcheck="true">// FLAG is defined in config.php</span>
+                <h1 id="RCTF-2019-Nextphp"><a href="#RCTF-2019-Nextphp" class="headerlink" title="[RCTF 2019]Nextphp"></a>[RCTF 2019]Nextphp</h1><p>全新的知识，PHP7.4中的全新玩法<br>上来直接给一个shell，直接执行phpinfo看一眼，open_basedir写上了，disable_function超级过滤，把平常用的mail和unsetenv都给禁了，常用的bypass_disable_function via RD_PRELOAD都不能用了，得寻找新的突破口</p>
+<p>可以先var_dump(scandir(‘.’));看一眼有没有其他的可利用文件，发现一个preload.php，里面写了一个类</p>
+<pre class=" language-php"><code class="language-php"><span class="token delimiter">&lt;?php</span>
+<span class="token keyword">final</span> <span class="token keyword">class</span> <span class="token class-name">A</span> <span class="token keyword">implements</span> <span class="token class-name">Serializable</span> <span class="token punctuation">{</span>
+    <span class="token keyword">protected</span> <span class="token variable">$data</span> <span class="token operator">=</span> <span class="token punctuation">[</span>
+        <span class="token string">'ret'</span> <span class="token operator">=</span><span class="token operator">></span> <span class="token keyword">null</span><span class="token punctuation">,</span>
+        <span class="token string">'func'</span> <span class="token operator">=</span><span class="token operator">></span> <span class="token string">'print_r'</span><span class="token punctuation">,</span>
+        <span class="token string">'arg'</span> <span class="token operator">=</span><span class="token operator">></span> <span class="token string">'1'</span>
+    <span class="token punctuation">]</span><span class="token punctuation">;</span>
 
-<span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token function">preg_match</span><span class="token punctuation">(</span><span class="token string">'/config\.php\/*$/i'</span><span class="token punctuation">,</span> <span class="token variable">$_SERVER</span><span class="token punctuation">[</span><span class="token string">'PHP_SELF'</span><span class="token punctuation">]</span><span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
-  <span class="token function">exit</span><span class="token punctuation">(</span><span class="token string">"I don't know what you are thinking, but I won't let you read it :)"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-<span class="token punctuation">}</span>
+    <span class="token keyword">private</span> <span class="token keyword">function</span> <span class="token function">run</span> <span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token variable">$this</span><span class="token operator">-</span><span class="token operator">></span><span class="token property">data</span><span class="token punctuation">[</span><span class="token string">'ret'</span><span class="token punctuation">]</span> <span class="token operator">=</span> <span class="token variable">$this</span><span class="token operator">-</span><span class="token operator">></span><span class="token property">data</span><span class="token punctuation">[</span><span class="token string">'func'</span><span class="token punctuation">]</span><span class="token punctuation">(</span><span class="token variable">$this</span><span class="token operator">-</span><span class="token operator">></span><span class="token property">data</span><span class="token punctuation">[</span><span class="token string">'arg'</span><span class="token punctuation">]</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
 
-<span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token function">isset</span><span class="token punctuation">(</span><span class="token variable">$_GET</span><span class="token punctuation">[</span><span class="token string">'source'</span><span class="token punctuation">]</span><span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
-  <span class="token function">highlight_file</span><span class="token punctuation">(</span><span class="token function">basename</span><span class="token punctuation">(</span><span class="token variable">$_SERVER</span><span class="token punctuation">[</span><span class="token string">'PHP_SELF'</span><span class="token punctuation">]</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-  <span class="token function">exit</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-<span class="token punctuation">}</span>
+    <span class="token keyword">public</span> <span class="token keyword">function</span> <span class="token function">__serialize</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">:</span> <span class="token keyword">array</span> <span class="token punctuation">{</span>
+        <span class="token keyword">return</span> <span class="token variable">$this</span><span class="token operator">-</span><span class="token operator">></span><span class="token property">data</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
 
-<span class="token variable">$secret</span> <span class="token operator">=</span> <span class="token function">bin2hex</span><span class="token punctuation">(</span><span class="token function">random_bytes</span><span class="token punctuation">(</span><span class="token number">64</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-<span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token function">isset</span><span class="token punctuation">(</span><span class="token variable">$_POST</span><span class="token punctuation">[</span><span class="token string">'guess'</span><span class="token punctuation">]</span><span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
-  <span class="token variable">$guess</span> <span class="token operator">=</span> <span class="token punctuation">(</span>string<span class="token punctuation">)</span> <span class="token variable">$_POST</span><span class="token punctuation">[</span><span class="token string">'guess'</span><span class="token punctuation">]</span><span class="token punctuation">;</span>
-  <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token function">hash_equals</span><span class="token punctuation">(</span><span class="token variable">$secret</span><span class="token punctuation">,</span> <span class="token variable">$guess</span><span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
-    <span class="token variable">$message</span> <span class="token operator">=</span> <span class="token string">'Congratulations! The flag is: '</span> <span class="token punctuation">.</span> <span class="token constant">FLAG</span><span class="token punctuation">;</span>
-  <span class="token punctuation">}</span> <span class="token keyword">else</span> <span class="token punctuation">{</span>
-    <span class="token variable">$message</span> <span class="token operator">=</span> <span class="token string">'Wrong.'</span><span class="token punctuation">;</span>
-  <span class="token punctuation">}</span>
-<span class="token punctuation">}</span>
-<span class="token delimiter">?></span>
-<span class="token markup"><span class="token doctype">&lt;!doctype html></span></span>
-<span class="token markup"><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>html</span> <span class="token attr-name">lang</span><span class="token attr-value"><span class="token punctuation">=</span><span class="token punctuation">"</span>en<span class="token punctuation">"</span></span><span class="token punctuation">></span></span></span>
-  <span class="token markup"><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>head</span><span class="token punctuation">></span></span></span>
-    <span class="token markup"><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>meta</span> <span class="token attr-name">charset</span><span class="token attr-value"><span class="token punctuation">=</span><span class="token punctuation">"</span>utf-8<span class="token punctuation">"</span></span><span class="token punctuation">></span></span></span>
-    <span class="token markup"><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>title</span><span class="token punctuation">></span></span></span>Can you guess it<span class="token operator">?</span><span class="token markup"><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>title</span><span class="token punctuation">></span></span></span>
-  <span class="token markup"><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>head</span><span class="token punctuation">></span></span></span>
-  <span class="token markup"><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>body</span><span class="token punctuation">></span></span></span>
-    <span class="token markup"><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>h1</span><span class="token punctuation">></span></span></span>Can you guess it<span class="token operator">?</span><span class="token markup"><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>h1</span><span class="token punctuation">></span></span></span>
-    <span class="token markup"><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>p</span><span class="token punctuation">></span></span></span><span class="token keyword">If</span> your guess is correct<span class="token punctuation">,</span> I'll give you the flag<span class="token punctuation">.</span><span class="token markup"><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>p</span><span class="token punctuation">></span></span></span>
-    <span class="token markup"><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>p</span><span class="token punctuation">></span></span></span><span class="token markup"><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>a</span> <span class="token attr-name">href</span><span class="token attr-value"><span class="token punctuation">=</span><span class="token punctuation">"</span>?source<span class="token punctuation">"</span></span><span class="token punctuation">></span></span></span>Source<span class="token markup"><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>a</span><span class="token punctuation">></span></span></span><span class="token markup"><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>p</span><span class="token punctuation">></span></span></span>
-    <span class="token markup"><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>hr</span><span class="token punctuation">></span></span></span>
-<span class="token delimiter">&lt;?php</span> <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token function">isset</span><span class="token punctuation">(</span><span class="token variable">$message</span><span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token punctuation">{</span> <span class="token delimiter">?></span>
-    <span class="token markup"><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>p</span><span class="token punctuation">></span></span></span><span class="token delimiter">&lt;?</span><span class="token operator">=</span> <span class="token variable">$message</span> <span class="token delimiter">?></span><span class="token markup"><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>p</span><span class="token punctuation">></span></span></span>
-<span class="token delimiter">&lt;?php</span> <span class="token punctuation">}</span> <span class="token delimiter">?></span>
-    <span class="token markup"><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>form</span> <span class="token attr-name">action</span><span class="token attr-value"><span class="token punctuation">=</span><span class="token punctuation">"</span>index.php<span class="token punctuation">"</span></span> <span class="token attr-name">method</span><span class="token attr-value"><span class="token punctuation">=</span><span class="token punctuation">"</span>POST<span class="token punctuation">"</span></span><span class="token punctuation">></span></span></span>
-      <span class="token markup"><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>input</span> <span class="token attr-name">type</span><span class="token attr-value"><span class="token punctuation">=</span><span class="token punctuation">"</span>text<span class="token punctuation">"</span></span> <span class="token attr-name">name</span><span class="token attr-value"><span class="token punctuation">=</span><span class="token punctuation">"</span>guess<span class="token punctuation">"</span></span><span class="token punctuation">></span></span></span>
-      <span class="token markup"><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>input</span> <span class="token attr-name">type</span><span class="token attr-value"><span class="token punctuation">=</span><span class="token punctuation">"</span>submit<span class="token punctuation">"</span></span><span class="token punctuation">></span></span></span>
-    <span class="token markup"><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>form</span><span class="token punctuation">></span></span></span>
-  <span class="token markup"><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>body</span><span class="token punctuation">></span></span></span>
-<span class="token markup"><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>html</span><span class="token punctuation">></span></span></span></code></pre>
-<p>两个点，一个是$_SERVER[‘PHP_SELF’]，这个是返回PHP当前目录与根目录的相对路径，但是访问路径被修改的话这个变量的内容也会对应的更改，如果我们访问的内容是url/index.php/config.php的话，$_SERVER[‘PHP_SELF’]的内容就是index.php/config.php，然后再用basename()获取到config.php，但是这样子过不了正则</p>
-<p>第二个点是猜字符，无懈可击，除非暴力破解，没机会了，这里有一个有意思的点，就是使用的对比是hash_equals函数，而不是===，搜了一下，hash_equals相较于===，它对比使用的时间是固定的，而===是逐位比较，这个函数可以防止攻击者通过时间来猜测字符串长度</p>
-<h2 id="题解"><a href="#题解" class="headerlink" title="题解"></a>题解</h2><p>所以唯一可能的攻击点就是通过$_SERVER[‘PHP_SELF’]获取源码，需要绕过basename和正则两部分，这里看PHPmanual可以看到一个点</p>
-<blockquote>
-<p>basename() is locale aware, so for it to see the correct basename with multibyte character paths, the matching locale must be set using the setlocale() function.</p>
-</blockquote>
-<p>basename在处理多比特编码的字符串时会出现一些问题（比如中文，百度这个函数的时候全是说获取中文的问题），那么使用一个超出ascii码范围的字符就可以绕过</p>
-<p>payload: <a href="http://de3fca4a-7648-4d0e-844e-60cfc5cb2a63.node3.buuoj.cn/index.php/config.php/%aa?source" target="_blank" rel="noopener">http://de3fca4a-7648-4d0e-844e-60cfc5cb2a63.node3.buuoj.cn/index.php/config.php/%aa?source</a></p>
+    <span class="token keyword">public</span> <span class="token keyword">function</span> <span class="token function">__unserialize</span><span class="token punctuation">(</span><span class="token keyword">array</span> <span class="token variable">$data</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token function">array_merge</span><span class="token punctuation">(</span><span class="token variable">$this</span><span class="token operator">-</span><span class="token operator">></span><span class="token property">data</span><span class="token punctuation">,</span> <span class="token variable">$data</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token variable">$this</span><span class="token operator">-</span><span class="token operator">></span><span class="token function">run</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+
+    <span class="token keyword">public</span> <span class="token keyword">function</span> <span class="token function">serialize</span> <span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">:</span> string <span class="token punctuation">{</span>
+        <span class="token keyword">return</span> <span class="token function">serialize</span><span class="token punctuation">(</span><span class="token variable">$this</span><span class="token operator">-</span><span class="token operator">></span><span class="token property">data</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+
+    <span class="token keyword">public</span> <span class="token keyword">function</span> <span class="token function">unserialize</span><span class="token punctuation">(</span><span class="token variable">$payload</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token variable">$this</span><span class="token operator">-</span><span class="token operator">></span><span class="token property">data</span> <span class="token operator">=</span> <span class="token function">unserialize</span><span class="token punctuation">(</span><span class="token variable">$payload</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token variable">$this</span><span class="token operator">-</span><span class="token operator">></span><span class="token function">run</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+
+    <span class="token keyword">public</span> <span class="token keyword">function</span> <span class="token function">__get</span> <span class="token punctuation">(</span><span class="token variable">$key</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token keyword">return</span> <span class="token variable">$this</span><span class="token operator">-</span><span class="token operator">></span><span class="token property">data</span><span class="token punctuation">[</span><span class="token variable">$key</span><span class="token punctuation">]</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+
+    <span class="token keyword">public</span> <span class="token keyword">function</span> <span class="token function">__set</span> <span class="token punctuation">(</span><span class="token variable">$key</span><span class="token punctuation">,</span> <span class="token variable">$value</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token keyword">throw</span> <span class="token keyword">new</span> <span class="token class-name"><span class="token punctuation">\</span>Exception</span><span class="token punctuation">(</span><span class="token string">'No implemented'</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+
+    <span class="token keyword">public</span> <span class="token keyword">function</span> <span class="token function">__construct</span> <span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token keyword">throw</span> <span class="token keyword">new</span> <span class="token class-name"><span class="token punctuation">\</span>Exception</span><span class="token punctuation">(</span><span class="token string">'No implemented'</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+<span class="token punctuation">}</span></code></pre>
+<p>说实话我是没看懂这个类能怎么利用的，虽然我印象中析构函数会将工作目录切换到根目录，但是这里显然也没有析构函数，而尝试了一下用这个类的反序列化去执行命令，显然还是PHP函数，无法绕过disable_function</p>
+<h2 id="PHP7-4的新特性"><a href="#PHP7-4的新特性" class="headerlink" title="PHP7.4的新特性"></a>PHP7.4的新特性</h2><p>PHP7.4提出了几个新的特性，在这里就使用上了几个<br>第一个就是预加载，可以在php.ini中设置opcache.preload项，将指定文件在服务启动时加载到内存，并永久可用（我的理解就是约等于给每个文件开头加上了一句include），查看phpinfo中的opcache.preload项，发现果然将preload.php作为预加载项，可以在index.php中直接利用</p>
+<p>第二个是提出了魔术方法__serialize和__unserialize来自定义对象的序列化与反序列化<br>不过以前也有__sleep()和__wakeup决定对象在序列化和反序列化时的行为，不知道这两个新的有什么区别</p>
+<p>第三个则是FFI(Foreign Function Interface)外部函数接口，允许调用C代码，这样子是不是就跳出了PHP的限制，突破了disable_function?!<br>查phpinfo，FFI是enabled，可用，开始利用<br>使用方法大概为$ffi=FFI::cdef(“int system(char* command)”, “libc.so.6”)，第一个参数为在C代码中的函数原型，第二个参数为指定的共享库，但在不指定第二个参数的情况下，会在默认路径下进行搜索，一般来说也能找到想要的函数<br>显然，这里的run()函数就可以将ret变为一个外部函数接口，我们再通过ret调用系统命令，完成RCE</p>
+<p>这里还把构造函数写成了一个抛出错误，不过没影响，之间注释掉就可以了，由于成员变量是protected的，所以序列化出来的payload用url编码一下，不然之间复制不可见字符会变成空格用不了</p>
+<p>把构造函数注释一下，然后把data改一下</p>
+<pre class=" language-php"><code class="language-php">    <span class="token keyword">protected</span> <span class="token variable">$data</span> <span class="token operator">=</span> <span class="token punctuation">[</span>
+        <span class="token string">'ret'</span> <span class="token operator">=</span><span class="token operator">></span> <span class="token keyword">null</span><span class="token punctuation">,</span>
+        <span class="token string">'func'</span> <span class="token operator">=</span><span class="token operator">></span> <span class="token string">'FFI::cdef'</span><span class="token punctuation">,</span>
+        <span class="token string">'arg'</span> <span class="token operator">=</span><span class="token operator">></span> <span class="token string">'int system(char* command);'</span>
+    <span class="token punctuation">]</span><span class="token punctuation">;</span></code></pre>
+<p>反序列化得到payload，最后访问index.php?a=serialize(payload)-&gt;__get(‘ret’)-&gt;system(cmd);即可获取flag<br>不过这里system的执行返回值是int，拿不到回显，可以尝试curl外带，不过试了一下感觉靶机可能连不到外网，又懒得开小号开内网靶机，试了一下把flag从根目录直接写到当前目录下，访问一下，也可行</p>
+<p>至今不知道那个序列化和反序列化的魔法方法有什么用（不过反序列化的时候应该调用了__unserialize这样子ret才被赋值为一个FFI了</p>
+<p>看神仙WP的时候提到了既然能直接用FFI，为什么不用shell直接调用，还多走的一步反序列化，神仙在WP中也查了文档做了解释，ffi.enable=preload为其默认值，即启用了FFI，但只在命令行模式下和preload文件中可用，所以要用preload文件中的反序列化来完成利用，而将ffi.enable=true时，则可在任意页面使用</p>
+<h2 id="参考链接"><a href="#参考链接" class="headerlink" title="参考链接"></a>参考链接</h2><p>神仙的WP<br><a href="https://mochazz.github.io/2019/05/21/RCTF2019Web%E9%A2%98%E8%A7%A3%E4%B9%8Bnextphp/#nextphp" target="_blank" rel="noopener">https://mochazz.github.io/2019/05/21/RCTF2019Web%E9%A2%98%E8%A7%A3%E4%B9%8Bnextphp/#nextphp</a></p>
 
             </div>
             <hr/>
@@ -667,9 +677,9 @@ include &#39;config.php&#39;; // FLAG is defined in con">
             <br/>
             <span xmlns:dct="http://purl.org/dc/terms/" href="http://purl.org/dc/dcmitype/Text"
                   property="dct:title" rel="dct:type">
-                    《Zer0pts2020 Can you guess it》
+                    《[RCTF 2019]Nextphp》
                 </span> by
-            <a xmlns:cc="http://creativecommons.org/ns#" href="/2020/03/23/%5BZer0pts2020%5DCan%20you%20guess%20it/" property="cc:attributionName"
+            <a xmlns:cc="http://creativecommons.org/ns#" href="/2020/07/28/%5BRCTF%202019%5DNextphp/" property="cc:attributionName"
                rel="cc:attributionURL">
                 Z3ratu1
             </a> is licensed under a
@@ -709,29 +719,29 @@ include &#39;config.php&#39;; // FLAG is defined in con">
 <article id="prenext-posts" class="prev-next articles">
     <div class="row article-row">
         
-        <div class="article col s12 m6" data-aos="fade-up">
+        <div class="article col s12 m6" data-aos="fade-up" data-aos="fade-up">
             <div class="article-badge left-badge text-color">
-                <i class="fa fa-chevron-left"></i>&nbsp;Previous</div>
+                <i class="fa fa-dot-circle-o"></i>&nbsp;Current
+            </div>
             <div class="card">
-                <a href="/2020/03/23/%5BGWCTF%202019%5D%E4%BD%A0%E7%9A%84%E5%90%8D%E5%AD%97/">
+                <a href="/2020/07/28/%5BRCTF%202019%5DNextphp/">
                     <div class="card-image">
                         
-                        <img src="/img/ctf1.jpg" class="responsive-img" alt="[GWCTF 2019] 你的名字">
+                        <img src="/img/1.jpg" class="responsive-img" alt="[RCTF 2019]Nextphp">
                         
-                        <span class="card-title">[GWCTF 2019] 你的名字</span>
+                        <span class="card-title">[RCTF 2019]Nextphp</span>
                     </div>
                 </a>
                 <div class="card-content article-content">
                     <div class="summary block-with-text">
                         
-                            [GWCTF 2019]你的名字模板注入，一开始就猜到了，然后出题人害人，过滤的字符串给了个PHP的报错，还给了一个不存在的文件，又把路由设置了一个index.php。。。。不是我看wp我绝对猜不出来发生了什么
-但是在一系列fuzz(乱按)
+                            [RCTF 2019]Nextphp全新的知识，PHP7.4中的全新玩法上来直接给一个shell，直接执行phpinfo看一眼，open_basedir写上了，disable_function超级过滤，把平常用的mail和unsetenv都
                         
                     </div>
                     <div class="publish-info">
-                        <span class="publish-date">
-                            <i class="fa fa-clock-o fa-fw icon-date"></i>2020-03-23
-                        </span>
+                            <span class="publish-date">
+                                <i class="fa fa-clock-o fa-fw icon-date"></i>2020-07-28
+                            </span>
                         <span class="publish-author">
                             
                             <i class="fa fa-bookmark fa-fw icon-category"></i>
@@ -744,15 +754,16 @@ include &#39;config.php&#39;; // FLAG is defined in con">
                         </span>
                     </div>
                 </div>
+
                 
                 <div class="card-action article-tags">
                     
-                    <a href="/tags/wp/" target="_blank">
-                        <span class="chip bg-color">wp</span>
+                    <a href="/tags/FFI/" target="_blank">
+                        <span class="chip bg-color">FFI</span>
                     </a>
                     
-                    <a href="/tags/ssti/" target="_blank">
-                        <span class="chip bg-color">ssti</span>
+                    <a href="/tags/bypass-disable-function/" target="_blank">
+                        <span class="chip bg-color">bypass_disable_function</span>
                     </a>
                     
                 </div>
@@ -766,26 +777,25 @@ include &#39;config.php&#39;; // FLAG is defined in con">
                 Next&nbsp;<i class="fa fa-chevron-right"></i>
             </div>
             <div class="card">
-                <a href="/2020/03/16/%5BEIS%202019%5Dezpop/">
+                <a href="/2020/07/27/%5Bcybrics%202020%5D%20wp/">
                     <div class="card-image">
                         
-                        <img src="/img/ctf.jpg" class="responsive-img" alt="EIS2019 ezpop">
+                        <img src="/img/1.jpg" class="responsive-img" alt="[cybrics 2020] web wp">
                         
-                        <span class="card-title">EIS2019 ezpop</span>
+                        <span class="card-title">[cybrics 2020] web wp</span>
                     </div>
                 </a>
                 <div class="card-content article-content">
                     <div class="summary block-with-text">
                         
-                            [EIS2019] ezpop看到这个标题就知道应该是反序列化构造pop链，不过实际写下来感觉pop链没什么东西，绕过的trick倒是学了一堆，先上源码
-key = $key;
-        $this->store = $store;
-
+                            [cybrics 2020] web wp金砖五国CTF？感觉还是个大一点的比赛，看得到其他国家的队伍全程看题陪跑，比赛还没结束已经开始写wp了呜呜呜呜
+Hunt用到了谷歌的验证码服务没翻墙做不了。。。。是不是该考虑一下充点钱了
+Gif2p
                         
                     </div>
                     <div class="publish-info">
                             <span class="publish-date">
-                                <i class="fa fa-clock-o fa-fw icon-date"></i>2020-03-16
+                                <i class="fa fa-clock-o fa-fw icon-date"></i>2020-07-27
                             </span>
                         <span class="publish-author">
                             
@@ -804,10 +814,6 @@ key = $key;
                     
                     <a href="/tags/wp/" target="_blank">
                         <span class="chip bg-color">wp</span>
-                    </a>
-                    
-                    <a href="/tags/%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96/" target="_blank">
-                        <span class="chip bg-color">反序列化</span>
                     </a>
                     
                 </div>
