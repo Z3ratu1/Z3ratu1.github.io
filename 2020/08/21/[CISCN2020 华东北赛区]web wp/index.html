@@ -28,7 +28,7 @@
 <meta property="og:site_name" content="Z3ratu1&#39;s blog">
 <meta property="og:description" content="[CISCN2020 华东北赛区]web wp国赛结束写wp，输出很低，web都被神仙们日穿了，每个题都几百解，太牛逼了没保留题目源码，就凑合着写吧 easyphp用pntcl库开线程，子进程里面有命令执行，call_user_func_array($_GET[&amp;#39;a&amp;#39;], array($_GET[&amp;#39;b&amp;#39;]), false, true);父进程调用了pntcl_wai">
 <meta property="og:locale" content="zh-Hans">
-<meta property="og:updated_time" content="2020-08-21T03:06:26.539Z">
+<meta property="og:updated_time" content="2020-08-21T06:17:12.038Z">
 <meta name="twitter:card" content="summary">
 
 <link rel="canonical" href="http://z3ratu1.github.io/2020/08/21/%5BCISCN2020%20%E5%8D%8E%E4%B8%9C%E5%8C%97%E8%B5%9B%E5%8C%BA%5Dweb%20wp/">
@@ -224,7 +224,7 @@
               <span class="post-meta-item-text">发表于</span>
               
 
-              <time title="创建时间：2020-08-21 11:04:48 / 修改时间：11:06:26" itemprop="dateCreated datePublished" datetime="2020-08-21T11:04:48+08:00">2020-08-21</time>
+              <time title="创建时间：2020-08-21 11:04:48 / 修改时间：14:17:12" itemprop="dateCreated datePublished" datetime="2020-08-21T11:04:48+08:00">2020-08-21</time>
             </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -277,6 +277,25 @@
 <span class="token function">setFn</span><span class="token punctuation">(</span>o<span class="token punctuation">,</span>k<span class="token punctuation">,</span>v<span class="token punctuation">)</span><span class="token punctuation">;</span>
 <span class="token keyword">let</span> b <span class="token operator">=</span> <span class="token punctuation">{</span><span class="token punctuation">}</span><span class="token punctuation">;</span>
 console<span class="token punctuation">.</span><span class="token function">log</span><span class="token punctuation">(</span>b<span class="token punctuation">[</span><span class="token string">"aaa"</span><span class="token punctuation">]</span><span class="token punctuation">)</span>    <span class="token comment" spellcheck="true">// 111</span></code></pre>
+<h3 id="trick"><a href="#trick" class="headerlink" title="trick"></a>trick</h3><p>看了师傅们的wp之后发现原来在给了package.json的时候可以运行一下npm audit直接查找当前第三方库存在什么样的问题，js类的题经常出现第三方库的漏洞，运行一下得到如下输出</p>
+<pre><code>$ npm audit
+
+                       === npm audit security report ===
+
+# Run  npm update set-value --depth 1  to resolve 1 vulnerability
+
+  High            Prototype Pollution
+
+  Package         set-value
+
+  Dependency of   set-value
+
+  Path            set-value
+
+  More info       https://npmjs.com/advisories/1012
+
+found 1 high severity vulnerability in 61 scanned packages
+  run `npm audit fix` to fix 1 of them.</code></pre><p>直接告诉了有原型链污染，太高级了</p>
 <h2 id="babyunserialize"><a href="#babyunserialize" class="headerlink" title="babyunserialize"></a>babyunserialize</h2><p>WMCTF相同的框架，把WMCTF能查到的几个wp用到的pop链的函数都删了，自己写了一个可爱的正则去找$xxx-&gt;xxx($this-&gt;xxxx)的函数调用形式，在DB\Jig\Mapper里面找到了好几个类似函数，选一个update用，WS类是反序列化出来让autoload加载Agent类的，用Agent类的析构函数构造出pop链，array($MongoMapper,”update”)()这种形式的动态调用会调用MongoMapper类的update方法</p>
 <pre class=" language-php"><code class="language-php"><span class="token delimiter">&lt;?php</span>
 <span class="token keyword">namespace</span> <span class="token package">CLI</span><span class="token punctuation">{</span>
@@ -451,7 +470,7 @@ console<span class="token punctuation">.</span><span class="token function">log<
 
       <!--noindex-->
       <div class="post-toc-wrap sidebar-panel">
-          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#CISCN2020-华东北赛区-web-wp"><span class="nav-number">1.</span> <span class="nav-text">[CISCN2020 华东北赛区]web wp</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#easyphp"><span class="nav-number">1.1.</span> <span class="nav-text">easyphp</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#littlegame"><span class="nav-number">1.2.</span> <span class="nav-text">littlegame</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#babyunserialize"><span class="nav-number">1.3.</span> <span class="nav-text">babyunserialize</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#easytrick"><span class="nav-number">1.4.</span> <span class="nav-text">easytrick</span></a></li></ol></li></ol></div>
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#CISCN2020-华东北赛区-web-wp"><span class="nav-number">1.</span> <span class="nav-text">[CISCN2020 华东北赛区]web wp</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#easyphp"><span class="nav-number">1.1.</span> <span class="nav-text">easyphp</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#littlegame"><span class="nav-number">1.2.</span> <span class="nav-text">littlegame</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#trick"><span class="nav-number">1.2.1.</span> <span class="nav-text">trick</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#babyunserialize"><span class="nav-number">1.3.</span> <span class="nav-text">babyunserialize</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#easytrick"><span class="nav-number">1.4.</span> <span class="nav-text">easytrick</span></a></li></ol></li></ol></div>
       </div>
       <!--/noindex-->
 
