@@ -20,15 +20,15 @@
     var CONFIG = {"hostname":"www.z3ratu1.cn","root":"/","scheme":"Pisces","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"always","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":true},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
   </script>
 
-  <meta name="description" content="HTTPS配置总算是等到了管局审核结束，我可爱的网站终于可以开张了，在配置完了HTTPS之后，我发现了一个很不爽的问题，居然直接输入域名访问是以http形式访问的，而且还访问的上也就是说我辛辛苦苦申请的在Chrome上的小锁没了，这显然不行，于是就开始了我与Apache的斗争。。。。 000-default.conf&amp;amp;default-ssl.conf各操作系统和各版本Apache配置文件名">
-<meta name="keywords" content="Apache,https">
+  <meta name="description" content="Apache配置HTTPS总算是等到了管局审核结束，我可爱的网站终于可以开张了，在配置完了HTTPS之后，我发现了一个很不爽的问题，居然直接输入域名访问是以http形式访问的，而且还访问的上也就是说我辛辛苦苦申请的在Chrome上的小锁没了，这显然不行，于是就开始了我与Apache的斗争。。。。 000-default.conf&amp;amp;default-ssl.conf各操作系统和各版本Apach">
+<meta name="keywords" content="https,Apache">
 <meta property="og:type" content="article">
-<meta property="og:title" content="HTTPS配置">
+<meta property="og:title" content="Apache配置HTTPS">
 <meta property="og:url" content="https:&#x2F;&#x2F;www.z3ratu1.cn&#x2F;https%E9%85%8D%E7%BD%AE.html">
 <meta property="og:site_name" content="Z3ratu1&#39;s blog">
-<meta property="og:description" content="HTTPS配置总算是等到了管局审核结束，我可爱的网站终于可以开张了，在配置完了HTTPS之后，我发现了一个很不爽的问题，居然直接输入域名访问是以http形式访问的，而且还访问的上也就是说我辛辛苦苦申请的在Chrome上的小锁没了，这显然不行，于是就开始了我与Apache的斗争。。。。 000-default.conf&amp;amp;default-ssl.conf各操作系统和各版本Apache配置文件名">
+<meta property="og:description" content="Apache配置HTTPS总算是等到了管局审核结束，我可爱的网站终于可以开张了，在配置完了HTTPS之后，我发现了一个很不爽的问题，居然直接输入域名访问是以http形式访问的，而且还访问的上也就是说我辛辛苦苦申请的在Chrome上的小锁没了，这显然不行，于是就开始了我与Apache的斗争。。。。 000-default.conf&amp;amp;default-ssl.conf各操作系统和各版本Apach">
 <meta property="og:locale" content="zh-Hans">
-<meta property="og:updated_time" content="2020-11-19T10:51:23.733Z">
+<meta property="og:updated_time" content="2020-11-19T12:10:26.325Z">
 <meta name="twitter:card" content="summary">
 
 <link rel="canonical" href="https://www.z3ratu1.cn/https%E9%85%8D%E7%BD%AE.html">
@@ -44,7 +44,7 @@
   };
 </script>
 
-  <title>HTTPS配置 | Z3ratu1's blog</title>
+  <title>Apache配置HTTPS | Z3ratu1's blog</title>
   
 
 
@@ -211,7 +211,7 @@
     </span>
       <header class="post-header">
         <h1 class="post-title" itemprop="name headline">
-          HTTPS配置
+          Apache配置HTTPS
         </h1>
 
         <div class="post-meta">
@@ -222,7 +222,7 @@
               <span class="post-meta-item-text">发表于</span>
               
 
-              <time title="创建时间：2020-11-19 17:04:22 / 修改时间：18:51:23" itemprop="dateCreated datePublished" datetime="2020-11-19T17:04:22+08:00">2020-11-19</time>
+              <time title="创建时间：2020-11-19 17:04:22 / 修改时间：20:10:26" itemprop="dateCreated datePublished" datetime="2020-11-19T17:04:22+08:00">2020-11-19</time>
             </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -235,7 +235,7 @@
             </span>
 
           
-            <span id="/https%E9%85%8D%E7%BD%AE.html" class="post-meta-item leancloud_visitors" data-flag-title="HTTPS配置" title="阅读次数">
+            <span id="/https%E9%85%8D%E7%BD%AE.html" class="post-meta-item leancloud_visitors" data-flag-title="Apache配置HTTPS" title="阅读次数">
               <span class="post-meta-item-icon">
                 <i class="fa fa-eye"></i>
               </span>
@@ -266,8 +266,8 @@
     <div class="post-body" itemprop="articleBody">
 
       
-        <h1 id="HTTPS配置"><a href="#HTTPS配置" class="headerlink" title="HTTPS配置"></a>HTTPS配置</h1><p>总算是等到了管局审核结束，我可爱的网站终于可以开张了，在配置完了HTTPS之后，我发现了一个很不爽的问题，居然直接输入域名访问是以http形式访问的，而且还访问的上<br>也就是说我辛辛苦苦申请的在Chrome上的小锁没了，这显然不行，于是就开始了我与Apache的斗争。。。。</p>
-<h2 id="000-default-conf-amp-default-ssl-conf"><a href="#000-default-conf-amp-default-ssl-conf" class="headerlink" title="000-default.conf&amp;default-ssl.conf"></a>000-default.conf&amp;default-ssl.conf</h2><p>各操作系统和各版本Apache配置文件名字都不一样，我的这版叫标题这两个名字，在/etc/apache/site-avaliable目录下<br>一开始只改了site-avaliable下面的000-default.conf，把Virtual host的端口直接改成443，然后在Directory标签里面加上这堆规则</p>
+        <h1 id="Apache配置HTTPS"><a href="#Apache配置HTTPS" class="headerlink" title="Apache配置HTTPS"></a>Apache配置HTTPS</h1><p>总算是等到了管局审核结束，我可爱的网站终于可以开张了，在配置完了HTTPS之后，我发现了一个很不爽的问题，居然直接输入域名访问是以http形式访问的，而且还访问的上<br>也就是说我辛辛苦苦申请的在Chrome上的小锁没了，这显然不行，于是就开始了我与Apache的斗争。。。。</p>
+<h2 id="000-default-conf-amp-default-ssl-conf"><a href="#000-default-conf-amp-default-ssl-conf" class="headerlink" title="000-default.conf&amp;default-ssl.conf"></a>000-default.conf&amp;default-ssl.conf</h2><p>各操作系统和各版本Apache配置文件名字都不一样，我的Ubuntu16上的这版叫标题这两个名字，在/etc/apache/site-avaliable目录下<br>一开始只改了site-avaliable下面的000-default.conf，把Virtual host的端口直接改成443，然后在Directory标签里面加上这堆规则</p>
 <pre><code>&lt;Directory &quot;/var/www/html&quot;&gt;
     RewriteEngine on
     RewriteCond   %{SERVER_PORT} !^443$
@@ -286,8 +286,8 @@
 
       <footer class="post-footer">
           <div class="post-tags">
-              <a href="/tags/Apache/" rel="tag"># Apache</a>
               <a href="/tags/https/" rel="tag"># https</a>
+              <a href="/tags/Apache/" rel="tag"># Apache</a>
           </div>
 
         
@@ -299,7 +299,10 @@
     <a href="/%E4%BB%A3%E7%90%86.html" rel="prev" title="VPN与代理设置">
       <i class="fa fa-chevron-left"></i> VPN与代理设置
     </a></div>
-      <div class="post-nav-item"></div>
+      <div class="post-nav-item">
+    <a href="/HTTPS%20Mixed%20content.html" rel="next" title="HTTPS Mixed content">
+      HTTPS Mixed content <i class="fa fa-chevron-right"></i>
+    </a></div>
     </div>
       </footer>
     
@@ -359,7 +362,7 @@
 
       <!--noindex-->
       <div class="post-toc-wrap sidebar-panel">
-          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#HTTPS配置"><span class="nav-number">1.</span> <span class="nav-text">HTTPS配置</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#000-default-conf-amp-default-ssl-conf"><span class="nav-number">1.1.</span> <span class="nav-text">000-default.conf&amp;default-ssl.conf</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#sites-available-amp-sites-enable"><span class="nav-number">1.2.</span> <span class="nav-text">sites-available&amp;sites-enable</span></a></li></ol></li></ol></div>
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#Apache配置HTTPS"><span class="nav-number">1.</span> <span class="nav-text">Apache配置HTTPS</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#000-default-conf-amp-default-ssl-conf"><span class="nav-number">1.1.</span> <span class="nav-text">000-default.conf&amp;default-ssl.conf</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#sites-available-amp-sites-enable"><span class="nav-number">1.2.</span> <span class="nav-text">sites-available&amp;sites-enable</span></a></li></ol></li></ol></div>
       </div>
       <!--/noindex-->
 
@@ -374,7 +377,7 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">75</span>
+          <span class="site-state-item-count">76</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
