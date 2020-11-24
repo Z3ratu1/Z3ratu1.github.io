@@ -220,7 +220,7 @@
               <span class="post-meta-item-text">发表于</span>
               
 
-              <time title="创建时间：2020-11-24 15:19:41 / 修改时间：15:22:19" itemprop="dateCreated datePublished" datetime="2020-11-24T15:19:41+08:00">2020-11-24</time>
+              <time title="创建时间：2020-11-24 15:19:41 / 修改时间：15:23:43" itemprop="dateCreated datePublished" datetime="2020-11-24T15:19:41+08:00">2020-11-24</time>
             </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -265,7 +265,7 @@
 
       
           <h1 id="祥云杯2020-云比赛记录"><a href="#祥云杯2020-云比赛记录" class="headerlink" title="[祥云杯2020]云比赛记录"></a>[祥云杯2020]云比赛记录</h1><p>前两天祥云杯师傅们大力输出，我大力划水看了一个题，今天比赛结束看wp开始学习</p>
-<p>学习之前先批评一下这个比赛的py程度，可能是20w的烂钱太过诱人，导致大家的py程度前所未有的高，py的具体内容见这篇知乎回答<br><img src="mbg.jpg" alt="./images/2020祥云杯/mbg.jpg"></p>
+<p>学习之前先批评一下这个比赛的py程度，可能是20w的烂钱太过诱人，导致大家的py程度前所未有的高，py的具体内容见这篇知乎回答<br><img src="./images/2020%E7%A5%A5%E4%BA%91%E6%9D%AF/mbg.jpg" alt="mbg.jpg"></p>
 <h2 id="flaskbot"><a href="#flaskbot" class="headerlink" title="flaskbot"></a>flaskbot</h2><p>是先猜数字再SSTI，SSTI经典过滤，然后额外过了了通配符和flag<br>猜数字是在限制范围内二分猜50次，理论上必然猜对<br>但是我可以直接进行一个NAN的输入，很有意思的是NAN不大于任何数，也不小于任何数，但你把它当数字输入也不报错，这样子就直接过了猜数字<br>SSTI只会抄payload，过滤了一下没调通，抄的任意文件读能用，读了下源码看过滤，flag位置没找到，还是要拼字符串去执行命令<br>经典字符串加法过过滤<br><code>{{joiner.__init__.__globals__.__builtins__['__impo'+'rt__']('o'+'s')['po'+'pen']('c'+'at /super_secret_fl'+'ag.txt').read()}}</code></p>
           <!--noindex-->
             <div class="post-button">
