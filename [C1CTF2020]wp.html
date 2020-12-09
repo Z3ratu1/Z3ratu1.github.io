@@ -28,7 +28,7 @@
 <meta property="og:site_name" content="Z3ratu1&#39;s blog">
 <meta property="og:description" content="[C1CTF2020]wp合工大的萌新赛，我是超级垃圾呜呜呜，萌新赛都打的这么吃力也学到不少东西 php_tricks就是个基础反序列化入门，反序列化一个POST的data，然后还需要file_get_contents反序列化类里的一个成员的值符合条件我是垃圾这都不会。。。一开始想的是php:&#x2F;&#x2F;input，但是这样显然和POST的数据冲突，查了很多奇怪的知识发现都不行，但是学到了一点，PHP只会">
 <meta property="og:locale" content="zh-Hans">
-<meta property="og:updated_time" content="2020-12-09T07:16:28.961Z">
+<meta property="og:updated_time" content="2020-12-09T11:17:59.228Z">
 <meta name="twitter:card" content="summary">
 
 <link rel="canonical" href="https://www.z3ratu1.cn/%5BC1CTF2020%5Dwp.html">
@@ -222,7 +222,7 @@
               <span class="post-meta-item-text">发表于</span>
               
 
-              <time title="创建时间：2020-12-09 15:15:03 / 修改时间：15:16:28" itemprop="dateCreated datePublished" datetime="2020-12-09T15:15:03+08:00">2020-12-09</time>
+              <time title="创建时间：2020-12-09 15:15:03 / 修改时间：19:17:59" itemprop="dateCreated datePublished" datetime="2020-12-09T15:15:03+08:00">2020-12-09</time>
             </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -494,8 +494,31 @@ cipher_new <span class="token operator">=</span> AES<span class="token punctuati
 <pre class=" language-python"><code class="language-python">\x80\x03capp
 User
 q\x00<span class="token punctuation">)</span>\x81q\x01<span class="token punctuation">}</span>q\x02<span class="token punctuation">(</span>X\x05\x00\x00\x00moneyq\x03K_X\x05\x00\x00\x00itemsq\x04<span class="token punctuation">]</span>q\x05X\x04\x00\x00\x00goldq\x06aub<span class="token punctuation">.</span></code></pre>
-<p>开局两个字符定义的是pickle协议的版本，略去不看，c是经典常用opcode，导入一个module，这里就是导入app的user类，q是输入一个一字节参数，我看了一圈感觉这个和一个计数器一样的，后面跟的数字从0开始，每出现一次q这个数字加1，这里最后加到了5<br>)右括号是压入一个空元组，\x81表示用__new__方法以元组为参数构建一个对象，}右大括号压入一个空字典，(左括号压入一个MARK标记，X表示”counted UTF-8 string argument”，估摸着就是计后面这个字符串多长的，输入了一个5，其实就是后面这个money变量名的长度，输入三个0字符，应该都是跟着X的参数，K输入一个无符号一字节整数，_下划线的ascii码就是95，刚好是买了一个gold剩下的钱，X再输入一个一字节参数，表示下一个输入的长度是5，也就是items，三个零字符，s为字典增加键值对，构造出money=95，]右括号压入空列表，X输入一字节，输入\x04表示接下来的长度是4，为gold，a把刚构造的gold塞入之前的空列表，u将栈顶MARK以前的元素弹出update到前一个dict，也就是把money和items都弹出来，放到前面定义的字典里去，b最后使用__dict__.update()更新一波实例属性，我估计就是更新了元组内容，用一开始的那个\x81构造出一个对象来</p>
-<p>其实也没必要分析这么多，你就看到X后面跟了个数字，然后看到pickle源码里写着counted UTF-8 string argument，就能估摸出个大概了。。也就是说修改内容的时候记得顺便改一下对应的X后面对应的长度<br>一开始就直接把gold修改成了source_code，就一直500，我一直怀疑是自己加解密有问题，最后发现原生的pickle还是和手搓的不一样，这些参数都是自己指定长度的，不像以前一个S随便压字符串<br>不过手搓压字符串是因为类有构造函数，所以直接调用构造函数当然是以字符串作为参数，不过这里是直接构造的对象，所以使用的方法也更为复杂</p>
+<pre><code>\x80 指定pickle协议版本，这里的版本是3，手搓的一般是0版本
+c 引入app.User，压入栈顶
+q 输入单字节参数，不知道有什么用，每次出现q后面的数字加一，类似计数器
+) 压入空元组
+\x81 查找不到详解，pickle源码注释为build object by applying cls.__new__ to argtuple使用class的new属性，以元组为参数，构造类对象 后来读到题目源码的时候发现User类不存在构造函数，应该是把空元祖和app.User弹出来整了一个实例User对象压回去
+q 又输入了奇奇怪怪的东西
+} 压入空字典
+q 再输入一个奇怪的东西
+( 压入MARK
+X utf-8string长度计数，输入5 0 0 0 money (X这个参数无详解也看不懂源码注释说的是什么，暂且这么理解)
+q 再再输入一个奇怪的东西
+K 压入一字节无符号整数，_下划线的ascii码为95
+X 又输入 5 0 0 0 items
+q 再再再输入奇怪的东西
+] 压入空列表
+q 再再再再输入奇怪的东西
+X 输入 4 0 0 0 gold
+q 再再再再再输入奇怪的东西
+
+此时栈结构从栈底到栈顶为 User {} MARK 长度为5的字符串money 无符号整数95 长度为5的字符串items [] 长度为4的字符串gold
+
+a 将栈的第一个元素append到第二个元素(必须为列表)中  此时栈内容变成User {} MARK money 95 items [&#39;gold&#39;]
+u     寻找栈中的上一个MARK，组合之间的数据(数据必须有偶数个，即呈key-value对)并全部添加或更新到该MARK之前的一个元素(必须为字典)中 栈变为User {&quot;money&quot;:95, items:[&quot;gold&quot;]}
+b 调用__dict__.update() 使用栈中的第一个元素（储存多个属性名: 属性值的字典）对第二个元素（对象实例）进行属性设置 用字典的键值对User的属性进行赋值
+. 结束</code></pre><p>其实也没必要分析这么多，你就看到X后面跟了个数字，然后看到pickle源码里写着counted UTF-8 string argument，就能估摸出个大概了。。也就是说修改内容的时候记得顺便改一下对应的X后面对应的长度<br>一开始就直接把gold修改成了source_code，就一直500，我一直怀疑是自己加解密有问题，最后发现原生的pickle还是和手搓的不一样，这些参数都是自己指定长度的，不像以前一个S随便压字符串<br>不过手搓压字符串是因为类有构造函数，所以直接调用构造函数当然是以字符串作为参数，不过这里没有构造函数，是构造空对象然后构造字典再update过去</p>
 <p>然后，到这一步才算拿到源码，我已经学死了，我好弱呜呜呜<br>服务以及都关了，还有一个java题不看了，反序列化真不会，没有rmb教我可能上面好多题都不会呜呜呜呜呜呜呜呜<br>明天看一下源码打，感觉是个手搓命令执行，应该不会太难了（吧）</p>
 <h3 id="反序列化限制绕过"><a href="#反序列化限制绕过" class="headerlink" title="反序列化限制绕过"></a>反序列化限制绕过</h3><p>就放源码反序列化限制相关的内容</p>
 <pre class=" language-python"><code class="language-python"><span class="token keyword">class</span> <span class="token class-name">RestrictedUnpickler</span><span class="token punctuation">(</span>Unpickler<span class="token punctuation">)</span><span class="token punctuation">:</span>
@@ -581,10 +604,13 @@ tR 将payload弹出，调用os.system(payload)
         
     <div class="post-nav">
       <div class="post-nav-item">
-    <a href="/%5BN1CTF2020%5DDockerManager.html" rel="prev" title="[N1CTF2020]DockerManager">
-      <i class="fa fa-chevron-left"></i> [N1CTF2020]DockerManager
+    <a href="/%5BRoarCTF2020%5Dwp.html" rel="prev" title="[RoarCTF2020]wp">
+      <i class="fa fa-chevron-left"></i> [RoarCTF2020]wp
     </a></div>
-      <div class="post-nav-item"></div>
+      <div class="post-nav-item">
+    <a href="/Python%E7%89%B9%E6%AE%8A%E5%B1%9E%E6%80%A7.html" rel="next" title="Python特殊属性">
+      Python特殊属性 <i class="fa fa-chevron-right"></i>
+    </a></div>
     </div>
       </footer>
     
@@ -659,7 +685,7 @@ tR 将payload弹出，调用os.system(payload)
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">82</span>
+          <span class="site-state-item-count">84</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>

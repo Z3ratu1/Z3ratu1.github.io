@@ -195,6 +195,265 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
+    <link itemprop="mainEntityOfPage" href="https://www.z3ratu1.cn/%5BGWCTF%202019%5D%E4%BD%A0%E7%9A%84%E5%90%8D%E5%AD%97.html">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="https://q2.qlogo.cn/headimg_dl?dst_uin=1207039417&spec=160">
+      <meta itemprop="name" content="Z3ratu1">
+      <meta itemprop="description" content="与其感慨路难行，不如现在出发">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Z3ratu1's blog">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/%5BGWCTF%202019%5D%E4%BD%A0%E7%9A%84%E5%90%8D%E5%AD%97.html" class="post-title-link" itemprop="url">[GWCTF 2019] 你的名字</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2020-03-23 20:28:00" itemprop="dateCreated datePublished" datetime="2020-03-23T20:28:00+08:00">2020-03-23</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2020-07-12 16:33:48" itemprop="dateModified" datetime="2020-07-12T16:33:48+08:00">2020-07-12</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E5%88%B7%E9%A2%98%E8%AE%B0%E5%BD%95/" itemprop="url" rel="index"><span itemprop="name">刷题记录</span></a>
+                </span>
+            </span>
+
+          
+            <span id="/%5BGWCTF%202019%5D%E4%BD%A0%E7%9A%84%E5%90%8D%E5%AD%97.html" class="post-meta-item leancloud_visitors" data-flag-title="[GWCTF 2019] 你的名字" title="阅读次数">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span class="leancloud-visitors-count"></span>
+            </span>
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="far fa-comment"></i>
+      </span>
+      <span class="post-meta-item-text">Valine：</span>
+    
+    <a title="valine" href="/%5BGWCTF%202019%5D%E4%BD%A0%E7%9A%84%E5%90%8D%E5%AD%97.html#valine-comments" itemprop="discussionUrl">
+      <span class="post-comments-count valine-comment-count" data-xid="/%5BGWCTF%202019%5D%E4%BD%A0%E7%9A%84%E5%90%8D%E5%AD%97.html" itemprop="commentCount"></span>
+    </a>
+  </span>
+  
+  
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h1 id="GWCTF-2019-你的名字"><a href="#GWCTF-2019-你的名字" class="headerlink" title="[GWCTF 2019]你的名字"></a>[GWCTF 2019]你的名字</h1><p>模板注入，一开始就猜到了，然后出题人害人，过滤的字符串给了个PHP的报错，还给了一个不存在的文件，又把路由设置了一个index.php。。。。不是我看wp我绝对猜不出来发生了什么</p>
+<p>但是在一系列fuzz(乱按)之后发现过滤了if，for，class，这几个和ssti相关性很大的关键字，被替换为空了，但是嵌套一层也绕不过去，嵌套n层也绕不过去呜呜呜</p>
+<p>wp是说一直测，能发现config这个没什么用的语句在列表后面，用这个绕过过滤，直到我下载了源码才知道是怎么回事</p>
+<pre class=" language-python"><code class="language-python">blacklist <span class="token operator">=</span> <span class="token punctuation">[</span><span class="token string">'import'</span><span class="token punctuation">,</span> <span class="token string">'getattr'</span><span class="token punctuation">,</span> <span class="token string">'os'</span><span class="token punctuation">,</span> <span class="token string">'class'</span><span class="token punctuation">,</span> <span class="token string">'subclasses'</span><span class="token punctuation">,</span> <span class="token string">'mro'</span><span class="token punctuation">,</span> <span class="token string">'request'</span><span class="token punctuation">,</span> <span class="token string">'args'</span><span class="token punctuation">,</span> <span class="token string">'eval'</span><span class="token punctuation">,</span> <span class="token string">'if'</span><span class="token punctuation">,</span> <span class="token string">'for'</span><span class="token punctuation">,</span>
+                 <span class="token string">' subprocess'</span><span class="token punctuation">,</span> <span class="token string">'file'</span><span class="token punctuation">,</span> <span class="token string">'open'</span><span class="token punctuation">,</span> <span class="token string">'popen'</span><span class="token punctuation">,</span> <span class="token string">'builtins'</span><span class="token punctuation">,</span> <span class="token string">'compile'</span><span class="token punctuation">,</span> <span class="token string">'execfile'</span><span class="token punctuation">,</span> <span class="token string">'from_pyfile'</span><span class="token punctuation">,</span> <span class="token string">'local'</span><span class="token punctuation">,</span>
+                 <span class="token string">'self'</span><span class="token punctuation">,</span> <span class="token string">'item'</span><span class="token punctuation">,</span> <span class="token string">'getitem'</span><span class="token punctuation">,</span> <span class="token string">'getattribute'</span><span class="token punctuation">,</span> <span class="token string">'func_globals'</span><span class="token punctuation">,</span> <span class="token string">'config'</span><span class="token punctuation">]</span><span class="token punctuation">;</span>
+<span class="token keyword">for</span> no <span class="token keyword">in</span> blacklist<span class="token punctuation">:</span>
+    <span class="token keyword">while</span> <span class="token boolean">True</span><span class="token punctuation">:</span>
+        <span class="token keyword">if</span> no <span class="token keyword">in</span> s<span class="token punctuation">:</span>
+            s <span class="token operator">=</span> s<span class="token punctuation">.</span>replace<span class="token punctuation">(</span>no<span class="token punctuation">,</span> <span class="token string">''</span><span class="token punctuation">)</span>
+        <span class="token keyword">else</span><span class="token punctuation">:</span>
+            <span class="token keyword">break</span>
+<span class="token keyword">return</span> s</code></pre>
+          <!--noindex-->
+            <div class="post-button">
+              <a class="btn" href="/%5BGWCTF%202019%5D%E4%BD%A0%E7%9A%84%E5%90%8D%E5%AD%97.html#more" rel="contents">
+                阅读全文 &raquo;
+              </a>
+            </div>
+          <!--/noindex-->
+        
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
+    <link itemprop="mainEntityOfPage" href="https://www.z3ratu1.cn/%5BZer0pts2020%5DCan%20you%20guess%20it.html">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="https://q2.qlogo.cn/headimg_dl?dst_uin=1207039417&spec=160">
+      <meta itemprop="name" content="Z3ratu1">
+      <meta itemprop="description" content="与其感慨路难行，不如现在出发">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Z3ratu1's blog">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/%5BZer0pts2020%5DCan%20you%20guess%20it.html" class="post-title-link" itemprop="url">Zer0pts2020 Can you guess it</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2020-03-23 11:36:35" itemprop="dateCreated datePublished" datetime="2020-03-23T11:36:35+08:00">2020-03-23</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2020-07-12 16:33:48" itemprop="dateModified" datetime="2020-07-12T16:33:48+08:00">2020-07-12</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E5%88%B7%E9%A2%98%E8%AE%B0%E5%BD%95/" itemprop="url" rel="index"><span itemprop="name">刷题记录</span></a>
+                </span>
+            </span>
+
+          
+            <span id="/%5BZer0pts2020%5DCan%20you%20guess%20it.html" class="post-meta-item leancloud_visitors" data-flag-title="Zer0pts2020 Can you guess it" title="阅读次数">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span class="leancloud-visitors-count"></span>
+            </span>
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="far fa-comment"></i>
+      </span>
+      <span class="post-meta-item-text">Valine：</span>
+    
+    <a title="valine" href="/%5BZer0pts2020%5DCan%20you%20guess%20it.html#valine-comments" itemprop="discussionUrl">
+      <span class="post-comments-count valine-comment-count" data-xid="/%5BZer0pts2020%5DCan%20you%20guess%20it.html" itemprop="commentCount"></span>
+    </a>
+  </span>
+  
+  
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h1 id="Zer0pts2020-Can-you-guess-it"><a href="#Zer0pts2020-Can-you-guess-it" class="headerlink" title="[Zer0pts2020]Can you guess it"></a>[Zer0pts2020]Can you guess it</h1><p>外国比赛的签到题，攻击点给的很明显吧，还有一个小小的有意思的地方</p>
+<h2 id="源码"><a href="#源码" class="headerlink" title="源码"></a>源码</h2><pre class=" language-php"><code class="language-php"><span class="token delimiter">&lt;?php</span>
+<span class="token keyword">include</span> <span class="token string">'config.php'</span><span class="token punctuation">;</span> <span class="token comment" spellcheck="true">// FLAG is defined in config.php</span>
+
+<span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token function">preg_match</span><span class="token punctuation">(</span><span class="token string">'/config\.php\/*$/i'</span><span class="token punctuation">,</span> <span class="token variable">$_SERVER</span><span class="token punctuation">[</span><span class="token string">'PHP_SELF'</span><span class="token punctuation">]</span><span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+  <span class="token function">exit</span><span class="token punctuation">(</span><span class="token string">"I don't know what you are thinking, but I won't let you read it :)"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
+
+<span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token function">isset</span><span class="token punctuation">(</span><span class="token variable">$_GET</span><span class="token punctuation">[</span><span class="token string">'source'</span><span class="token punctuation">]</span><span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+  <span class="token function">highlight_file</span><span class="token punctuation">(</span><span class="token function">basename</span><span class="token punctuation">(</span><span class="token variable">$_SERVER</span><span class="token punctuation">[</span><span class="token string">'PHP_SELF'</span><span class="token punctuation">]</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+  <span class="token function">exit</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
+
+<span class="token variable">$secret</span> <span class="token operator">=</span> <span class="token function">bin2hex</span><span class="token punctuation">(</span><span class="token function">random_bytes</span><span class="token punctuation">(</span><span class="token number">64</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token function">isset</span><span class="token punctuation">(</span><span class="token variable">$_POST</span><span class="token punctuation">[</span><span class="token string">'guess'</span><span class="token punctuation">]</span><span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+  <span class="token variable">$guess</span> <span class="token operator">=</span> <span class="token punctuation">(</span>string<span class="token punctuation">)</span> <span class="token variable">$_POST</span><span class="token punctuation">[</span><span class="token string">'guess'</span><span class="token punctuation">]</span><span class="token punctuation">;</span>
+  <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token function">hash_equals</span><span class="token punctuation">(</span><span class="token variable">$secret</span><span class="token punctuation">,</span> <span class="token variable">$guess</span><span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token variable">$message</span> <span class="token operator">=</span> <span class="token string">'Congratulations! The flag is: '</span> <span class="token punctuation">.</span> <span class="token constant">FLAG</span><span class="token punctuation">;</span>
+  <span class="token punctuation">}</span> <span class="token keyword">else</span> <span class="token punctuation">{</span>
+    <span class="token variable">$message</span> <span class="token operator">=</span> <span class="token string">'Wrong.'</span><span class="token punctuation">;</span>
+  <span class="token punctuation">}</span>
+<span class="token punctuation">}</span>
+<span class="token delimiter">?></span>
+<span class="token markup"><span class="token doctype">&lt;!doctype html></span></span>
+<span class="token markup"><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>html</span> <span class="token attr-name">lang</span><span class="token attr-value"><span class="token punctuation">=</span><span class="token punctuation">"</span>en<span class="token punctuation">"</span></span><span class="token punctuation">></span></span></span>
+  <span class="token markup"><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>head</span><span class="token punctuation">></span></span></span>
+    <span class="token markup"><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>meta</span> <span class="token attr-name">charset</span><span class="token attr-value"><span class="token punctuation">=</span><span class="token punctuation">"</span>utf-8<span class="token punctuation">"</span></span><span class="token punctuation">></span></span></span>
+    <span class="token markup"><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>title</span><span class="token punctuation">></span></span></span>Can you guess it<span class="token operator">?</span><span class="token markup"><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>title</span><span class="token punctuation">></span></span></span>
+  <span class="token markup"><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>head</span><span class="token punctuation">></span></span></span>
+  <span class="token markup"><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>body</span><span class="token punctuation">></span></span></span>
+    <span class="token markup"><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>h1</span><span class="token punctuation">></span></span></span>Can you guess it<span class="token operator">?</span><span class="token markup"><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>h1</span><span class="token punctuation">></span></span></span>
+    <span class="token markup"><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>p</span><span class="token punctuation">></span></span></span><span class="token keyword">If</span> your guess is correct<span class="token punctuation">,</span> I'll give you the flag<span class="token punctuation">.</span><span class="token markup"><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>p</span><span class="token punctuation">></span></span></span>
+    <span class="token markup"><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>p</span><span class="token punctuation">></span></span></span><span class="token markup"><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>a</span> <span class="token attr-name">href</span><span class="token attr-value"><span class="token punctuation">=</span><span class="token punctuation">"</span>?source<span class="token punctuation">"</span></span><span class="token punctuation">></span></span></span>Source<span class="token markup"><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>a</span><span class="token punctuation">></span></span></span><span class="token markup"><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>p</span><span class="token punctuation">></span></span></span>
+    <span class="token markup"><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>hr</span><span class="token punctuation">></span></span></span>
+<span class="token delimiter">&lt;?php</span> <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token function">isset</span><span class="token punctuation">(</span><span class="token variable">$message</span><span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token punctuation">{</span> <span class="token delimiter">?></span>
+    <span class="token markup"><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>p</span><span class="token punctuation">></span></span></span><span class="token delimiter">&lt;?</span><span class="token operator">=</span> <span class="token variable">$message</span> <span class="token delimiter">?></span><span class="token markup"><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>p</span><span class="token punctuation">></span></span></span>
+<span class="token delimiter">&lt;?php</span> <span class="token punctuation">}</span> <span class="token delimiter">?></span>
+    <span class="token markup"><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>form</span> <span class="token attr-name">action</span><span class="token attr-value"><span class="token punctuation">=</span><span class="token punctuation">"</span>index.php<span class="token punctuation">"</span></span> <span class="token attr-name">method</span><span class="token attr-value"><span class="token punctuation">=</span><span class="token punctuation">"</span>POST<span class="token punctuation">"</span></span><span class="token punctuation">></span></span></span>
+      <span class="token markup"><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>input</span> <span class="token attr-name">type</span><span class="token attr-value"><span class="token punctuation">=</span><span class="token punctuation">"</span>text<span class="token punctuation">"</span></span> <span class="token attr-name">name</span><span class="token attr-value"><span class="token punctuation">=</span><span class="token punctuation">"</span>guess<span class="token punctuation">"</span></span><span class="token punctuation">></span></span></span>
+      <span class="token markup"><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>input</span> <span class="token attr-name">type</span><span class="token attr-value"><span class="token punctuation">=</span><span class="token punctuation">"</span>submit<span class="token punctuation">"</span></span><span class="token punctuation">></span></span></span>
+    <span class="token markup"><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>form</span><span class="token punctuation">></span></span></span>
+  <span class="token markup"><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>body</span><span class="token punctuation">></span></span></span>
+<span class="token markup"><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>html</span><span class="token punctuation">></span></span></span></code></pre>
+<p>两个点，一个是$_SERVER[‘PHP_SELF’]，这个是返回PHP当前目录与根目录的相对路径，但是访问路径被修改的话这个变量的内容也会对应的更改，如果我们访问的内容是url/index.php/config.php的话，$_SERVER[‘PHP_SELF’]的内容就是index.php/config.php，然后再用basename()获取到config.php，但是这样子过不了正则</p>
+          <!--noindex-->
+            <div class="post-button">
+              <a class="btn" href="/%5BZer0pts2020%5DCan%20you%20guess%20it.html#more" rel="contents">
+                阅读全文 &raquo;
+              </a>
+            </div>
+          <!--/noindex-->
+        
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
     <link itemprop="mainEntityOfPage" href="https://www.z3ratu1.cn/%5BEIS%202019%5Dezpop.html">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -698,213 +957,6 @@ app <span class="token operator">=</span> Flask<span class="token punctuation">(
   
   
 
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
-    <link itemprop="mainEntityOfPage" href="https://www.z3ratu1.cn/%5BHBCTF%5D%E5%A4%A7%E7%BE%8E%E8%A5%BF%E5%AE%89.html">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="https://q2.qlogo.cn/headimg_dl?dst_uin=1207039417&spec=160">
-      <meta itemprop="name" content="Z3ratu1">
-      <meta itemprop="description" content="与其感慨路难行，不如现在出发">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Z3ratu1's blog">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/%5BHBCTF%5D%E5%A4%A7%E7%BE%8E%E8%A5%BF%E5%AE%89.html" class="post-title-link" itemprop="url">HBCTF 大美西安</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2020-03-11 22:44:00" itemprop="dateCreated datePublished" datetime="2020-03-11T22:44:00+08:00">2020-03-11</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="far fa-calendar-check"></i>
-                </span>
-                <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2020-07-12 16:33:48" itemprop="dateModified" datetime="2020-07-12T16:33:48+08:00">2020-07-12</time>
-              </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-folder"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/%E5%88%B7%E9%A2%98%E8%AE%B0%E5%BD%95/" itemprop="url" rel="index"><span itemprop="name">刷题记录</span></a>
-                </span>
-            </span>
-
-          
-            <span id="/%5BHBCTF%5D%E5%A4%A7%E7%BE%8E%E8%A5%BF%E5%AE%89.html" class="post-meta-item leancloud_visitors" data-flag-title="HBCTF 大美西安" title="阅读次数">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-eye"></i>
-              </span>
-              <span class="post-meta-item-text">阅读次数：</span>
-              <span class="leancloud-visitors-count"></span>
-            </span>
-  
-  <span class="post-meta-item">
-    
-      <span class="post-meta-item-icon">
-        <i class="far fa-comment"></i>
-      </span>
-      <span class="post-meta-item-text">Valine：</span>
-    
-    <a title="valine" href="/%5BHBCTF%5D%E5%A4%A7%E7%BE%8E%E8%A5%BF%E5%AE%89.html#valine-comments" itemprop="discussionUrl">
-      <span class="post-comments-count valine-comment-count" data-xid="/%5BHBCTF%5D%E5%A4%A7%E7%BE%8E%E8%A5%BF%E5%AE%89.html" itemprop="commentCount"></span>
-    </a>
-  </span>
-  
-  
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <h1 id="HBCTF-大美西安"><a href="#HBCTF-大美西安" class="headerlink" title="[HBCTF]大美西安"></a>[HBCTF]大美西安</h1><p>本来看这个河北CTF的名字还以为是个水题，但是还是有难度的，学到了一点新知识</p>
-<h2 id="思路"><a href="#思路" class="headerlink" title="思路"></a>思路</h2><h3 id="获取源码"><a href="#获取源码" class="headerlink" title="获取源码"></a>获取源码</h3><p>点开是一个登录界面，看源码可以发现register.php的注释，成功注册登录而url上又有file=home的内容，估摸着是文件包含，伪协议直接读一波，发现回显禁止，这样子基本就确定了是文件包含的思路，但是源码怎么获得呢</p>
-          <!--noindex-->
-            <div class="post-button">
-              <a class="btn" href="/%5BHBCTF%5D%E5%A4%A7%E7%BE%8E%E8%A5%BF%E5%AE%89.html#more" rel="contents">
-                阅读全文 &raquo;
-              </a>
-            </div>
-          <!--/noindex-->
-        
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
-    <link itemprop="mainEntityOfPage" href="https://www.z3ratu1.cn/%5BBJDCTF2020%5D%E9%83%A8%E5%88%86wp.html">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="https://q2.qlogo.cn/headimg_dl?dst_uin=1207039417&spec=160">
-      <meta itemprop="name" content="Z3ratu1">
-      <meta itemprop="description" content="与其感慨路难行，不如现在出发">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Z3ratu1's blog">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/%5BBJDCTF2020%5D%E9%83%A8%E5%88%86wp.html" class="post-title-link" itemprop="url">BJDCTF2020 部分wp</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2020-03-10 23:17:00" itemprop="dateCreated datePublished" datetime="2020-03-10T23:17:00+08:00">2020-03-10</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="far fa-calendar-check"></i>
-                </span>
-                <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2020-07-12 16:33:48" itemprop="dateModified" datetime="2020-07-12T16:33:48+08:00">2020-07-12</time>
-              </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-folder"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/%E5%88%B7%E9%A2%98%E8%AE%B0%E5%BD%95/" itemprop="url" rel="index"><span itemprop="name">刷题记录</span></a>
-                </span>
-            </span>
-
-          
-            <span id="/%5BBJDCTF2020%5D%E9%83%A8%E5%88%86wp.html" class="post-meta-item leancloud_visitors" data-flag-title="BJDCTF2020 部分wp" title="阅读次数">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-eye"></i>
-              </span>
-              <span class="post-meta-item-text">阅读次数：</span>
-              <span class="leancloud-visitors-count"></span>
-            </span>
-  
-  <span class="post-meta-item">
-    
-      <span class="post-meta-item-icon">
-        <i class="far fa-comment"></i>
-      </span>
-      <span class="post-meta-item-text">Valine：</span>
-    
-    <a title="valine" href="/%5BBJDCTF2020%5D%E9%83%A8%E5%88%86wp.html#valine-comments" itemprop="discussionUrl">
-      <span class="post-comments-count valine-comment-count" data-xid="/%5BBJDCTF2020%5D%E9%83%A8%E5%88%86wp.html" itemprop="commentCount"></span>
-    </a>
-  </span>
-  
-  
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <h1 id="BJDCTF2020-部分wp"><a href="#BJDCTF2020-部分wp" class="headerlink" title="[BJDCTF2020]部分wp"></a>[BJDCTF2020]部分wp</h1><p>buu平台上的一些bjdctf的题，记录一下</p>
-<h2 id="Mark-loves-cat"><a href="#Mark-loves-cat" class="headerlink" title="Mark loves cat"></a>Mark loves cat</h2><p>被戏耍了，完全是一个动脑题，输在愚钝上</p>
-<h3 id="git源码泄露"><a href="#git源码泄露" class="headerlink" title=".git源码泄露"></a>.git源码泄露</h3>
-          <!--noindex-->
-            <div class="post-button">
-              <a class="btn" href="/%5BBJDCTF2020%5D%E9%83%A8%E5%88%86wp.html#more" rel="contents">
-                阅读全文 &raquo;
-              </a>
-            </div>
-          <!--/noindex-->
-        
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
 
   
   <nav class="pagination">
@@ -975,7 +1027,7 @@ app <span class="token operator">=</span> Flask<span class="token punctuation">(
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">82</span>
+          <span class="site-state-item-count">84</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
@@ -988,7 +1040,7 @@ app <span class="token operator">=</span> Flask<span class="token punctuation">(
       <div class="site-state-item site-state-tags">
             <a href="/tags/">
           
-        <span class="site-state-item-count">60</span>
+        <span class="site-state-item-count">62</span>
         <span class="site-state-item-name">标签</span></a>
       </div>
   </nav>
