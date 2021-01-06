@@ -37,7 +37,7 @@
 <meta property="og:image" content="https:&#x2F;&#x2F;www.z3ratu1.cn&#x2F;images&#x2F;Java%E7%9A%84%E5%A5%87%E6%80%AA%E5%91%BD%E4%BB%A4%E6%89%A7%E8%A1%8C&#x2F;7.png">
 <meta property="og:image" content="https:&#x2F;&#x2F;www.z3ratu1.cn&#x2F;images&#x2F;Java%E7%9A%84%E5%A5%87%E6%80%AA%E5%91%BD%E4%BB%A4%E6%89%A7%E8%A1%8C&#x2F;8.png">
 <meta property="og:image" content="https:&#x2F;&#x2F;www.z3ratu1.cn&#x2F;images&#x2F;Java%E7%9A%84%E5%A5%87%E6%80%AA%E5%91%BD%E4%BB%A4%E6%89%A7%E8%A1%8C&#x2F;9.png">
-<meta property="og:updated_time" content="2021-01-06T07:04:40.438Z">
+<meta property="og:updated_time" content="2021-01-06T07:18:02.917Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:image" content="https:&#x2F;&#x2F;www.z3ratu1.cn&#x2F;images&#x2F;Java%E7%9A%84%E5%A5%87%E6%80%AA%E5%91%BD%E4%BB%A4%E6%89%A7%E8%A1%8C&#x2F;1.png">
 
@@ -153,11 +153,6 @@
     <a href="/links/" rel="section"><i class="fa fa-link fa-fw"></i>友链</a>
 
   </li>
-        <li class="menu-item menu-item-sitemap">
-
-    <a href="/sitemap.xml" rel="section"><i class="fa fa-sitemap fa-fw"></i>站点地图</a>
-
-  </li>
       <li class="menu-item menu-item-search">
         <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
         </a>
@@ -237,7 +232,7 @@
               <span class="post-meta-item-text">发表于</span>
               
 
-              <time title="创建时间：2021-01-06 14:57:25 / 修改时间：15:04:40" itemprop="dateCreated datePublished" datetime="2021-01-06T14:57:25+08:00">2021-01-06</time>
+              <time title="创建时间：2021-01-06 14:57:25 / 修改时间：15:18:02" itemprop="dateCreated datePublished" datetime="2021-01-06T14:57:25+08:00">2021-01-06</time>
             </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -285,7 +280,7 @@
 <p>由于没有回显，因此需要想办法验证命令执行的情况，能执行一些简单的命令，比如touch文件，或者curl出来，确实能成功，但是想写shell的时候就遇到了奇怪的问题，没有回显也不知道哪报错，最后通过百度发现问题的根源在于Java.Runtime.exec的诡异实现</p>
 <p>也当头一次试着跟进超级多的java类看Java实现，记录一下一切都是怎么回事</p>
 <h2 id="Runtime-getRuntime-exec-cmd"><a href="#Runtime-getRuntime-exec-cmd" class="headerlink" title="Runtime.getRuntime().exec(cmd)"></a>Runtime.getRuntime().exec(cmd)</h2><p>IDEAnb!!!!!<br>这调试爱了，整体思路清晰的一逼<br>直接进Runtime.getRuntime().exec(cmd)这句</p>
-<p><img src="./images/Java%E7%9A%84%E5%A5%87%E6%80%AA%E5%91%BD%E4%BB%A4%E6%89%A7%E8%A1%8C/1.png" alt><br>看到调用的是exec(cmd, null, null)<br>再跟，看函数具体实现<br><img src="./images/Java%E7%9A%84%E5%A5%87%E6%80%AA%E5%91%BD%E4%BB%A4%E6%89%A7%E8%A1%8C/2.png" alt><br>用cmd创建了一个StringTokenizer，并且把我们传入的cmd用这个st变成了cmdarray，跟进构造方法<br><img src="./images/Java%E7%9A%84%E5%A5%87%E6%80%AA%E5%91%BD%E4%BB%A4%E6%89%A7%E8%A1%8C/3.png" alt><br>传入参数为str，也就是我们的cmd，还有一个默认参数delim分隔符为<code>\t\n\r\f</code>(注意开头有一个空格)分别为制表换行回车换页<br>再进一次构造函数<br><img src="./images/Java%E7%9A%84%E5%A5%87%E6%80%AA%E5%91%BD%E4%BB%A4%E6%89%A7%E8%A1%8C/4.png" alt><br>在这里可以很清楚的看见这个st的内容，str就是我们的cmd，而分隔符就是刚才构造函数默认的这一段<br>看到第二张图用st构造了一个cmdarray，我们从参数中可以看见再进一个exec时我们的参数从原来的string变成了string数组，看看内容<br><img src="./images/Java%E7%9A%84%E5%A5%87%E6%80%AA%E5%91%BD%E4%BB%A4%E6%89%A7%E8%A1%8C/5.png" alt><br>我们的cmd就变成了一个个通过空格分隔的cmdarray<br><img src="./images/Java%E7%9A%84%E5%A5%87%E6%80%AA%E5%91%BD%E4%BB%A4%E6%89%A7%E8%A1%8C/6.png" alt><br>再跟，进了ProcessBuilder，传入的参数是cmdarray，此时输入的cmd已经和我们无缘了，之后都是对打散之后的array进行操作<br>在这个start函数里面进行了一系列的判断检查，最后的进入了ProcessImpl.start<br><img src="./images/Java%E7%9A%84%E5%A5%87%E6%80%AA%E5%91%BD%E4%BB%A4%E6%89%A7%E8%A1%8C/7.png" alt><br>最后的最后进了一个ProcessImpl的构造函数<br><img src="./images/Java%E7%9A%84%E5%A5%87%E6%80%AA%E5%91%BD%E4%BB%A4%E6%89%A7%E8%A1%8C/8.png" alt><br>在这个构造函数里面我们可以清楚的看到关键所在<br><img src="./images/Java%E7%9A%84%E5%A5%87%E6%80%AA%E5%91%BD%E4%BB%A4%E6%89%A7%E8%A1%8C/9.png" alt><br><code>String executablePath = new File(cmd[0]).getPath();</code><br>再往后要进入jvm看命令执行的具体过程了。。。不会，看了看网上大哥的结论<br>jvm最后会使用execvp()这个系统调用去执行命令，把我们的executablePath作为可执行文件名，而后面的所有内容全都被视为execvp的参数传入，这样一来，我们反弹shell语句的操作把所有的内容全都变成了参数<br>java的exec和我们常见的python，PHP的system这种命令执行并不一致，这两者的命令执行都是直接将输入放到/bin/sh里去跑，而java的exec却是自己把第一个参数当二进制文件去找过来执行，并且还把所有字符串按空格分隔当参数，就导致了各种命令执行的不成功</p>
+<p><img src="/images/Java%E7%9A%84%E5%A5%87%E6%80%AA%E5%91%BD%E4%BB%A4%E6%89%A7%E8%A1%8C/1.png" alt><br>看到调用的是exec(cmd, null, null)<br>再跟，看函数具体实现<br><img src="/images/Java%E7%9A%84%E5%A5%87%E6%80%AA%E5%91%BD%E4%BB%A4%E6%89%A7%E8%A1%8C/2.png" alt><br>用cmd创建了一个StringTokenizer，并且把我们传入的cmd用这个st变成了cmdarray，跟进构造方法<br><img src="/images/Java%E7%9A%84%E5%A5%87%E6%80%AA%E5%91%BD%E4%BB%A4%E6%89%A7%E8%A1%8C/3.png" alt><br>传入参数为str，也就是我们的cmd，还有一个默认参数delim分隔符为<code>\t\n\r\f</code>(注意开头有一个空格)分别为制表换行回车换页<br>再进一次构造函数<br><img src="/images/Java%E7%9A%84%E5%A5%87%E6%80%AA%E5%91%BD%E4%BB%A4%E6%89%A7%E8%A1%8C/4.png" alt><br>在这里可以很清楚的看见这个st的内容，str就是我们的cmd，而分隔符就是刚才构造函数默认的这一段<br>看到第二张图用st构造了一个cmdarray，我们从参数中可以看见再进一个exec时我们的参数从原来的string变成了string数组，看看内容<br><img src="/images/Java%E7%9A%84%E5%A5%87%E6%80%AA%E5%91%BD%E4%BB%A4%E6%89%A7%E8%A1%8C/5.png" alt><br>我们的cmd就变成了一个个通过空格分隔的cmdarray<br><img src="/images/Java%E7%9A%84%E5%A5%87%E6%80%AA%E5%91%BD%E4%BB%A4%E6%89%A7%E8%A1%8C/6.png" alt><br>再跟，进了ProcessBuilder，传入的参数是cmdarray，此时输入的cmd已经和我们无缘了，之后都是对打散之后的array进行操作<br>在这个start函数里面进行了一系列的判断检查，最后的进入了ProcessImpl.start<br><img src="/images/Java%E7%9A%84%E5%A5%87%E6%80%AA%E5%91%BD%E4%BB%A4%E6%89%A7%E8%A1%8C/7.png" alt><br>最后的最后进了一个ProcessImpl的构造函数<br><img src="/images/Java%E7%9A%84%E5%A5%87%E6%80%AA%E5%91%BD%E4%BB%A4%E6%89%A7%E8%A1%8C/8.png" alt><br>在这个构造函数里面我们可以清楚的看到关键所在<br><img src="/images/Java%E7%9A%84%E5%A5%87%E6%80%AA%E5%91%BD%E4%BB%A4%E6%89%A7%E8%A1%8C/9.png" alt><br><code>String executablePath = new File(cmd[0]).getPath();</code><br>再往后要进入jvm看命令执行的具体过程了。。。不会，看了看网上大哥的结论<br>jvm最后会使用execvp()这个系统调用去执行命令，把我们的executablePath作为可执行文件名，而后面的所有内容全都被视为execvp的参数传入，这样一来，我们反弹shell语句的操作把所有的内容全都变成了参数<br>java的exec和我们常见的python，PHP的system这种命令执行并不一致，这两者的命令执行都是直接将输入放到/bin/sh里去跑，而java的exec却是自己把第一个参数当二进制文件去找过来执行，并且还把所有字符串按空格分隔当参数，就导致了各种命令执行的不成功</p>
 <h2 id="解决方案"><a href="#解决方案" class="headerlink" title="解决方案"></a>解决方案</h2><h3 id="直接传入string数组"><a href="#直接传入string数组" class="headerlink" title="直接传入string数组"></a>直接传入string数组</h3><p>如上是exec传入的参数为一个字符串，然后经过一系列处理最后又调用了exec(String[])，如果我们主动出击，直接传入一个Stringarray的话，就能跳过前面几步StringTokenizer，直接到达ProcessBuilder(cmdarray)，数组里的字符串不会再被打断，可以直接命令执行<br>eg:<br><code>String[] cmdarray={&quot;bash&quot;, &quot;-c&quot;, &quot;cmd&quot;}</code></p>
 <h3 id="base64编码"><a href="#base64编码" class="headerlink" title="base64编码"></a>base64编码</h3><p>说到底就是输入全都用空格打断变成了参数，有点像上了个escapeshellarg？或者说想办法进行不需要空格的命令执行？<br>第一个方法看似很棒，但是打java的话基本上都是用ysoserialize去打，而ysoserialize一般直接用Runtime.exec(cmd)这种形式产生payload，看到有一种方法是直接魔改yso创建出cmdarray形式的payload，不过我们这里还是用简单一点的方法<br>用这种形式的base64使得我们整个命令变成一个参数，不会出现被空格打断的情况<br><code>bash -c {echo,base64cmd}|{base64,-d}|{bash,-i}</code><br><a href="http://www.jackson-t.ca/runtime-exec-payloads.html" target="_blank" rel="external nofollow noopener noreferrer">runtime-exec-payloads</a><br>这个也是最佳解决方案了吧</p>
 <h3 id="IFS"><a href="#IFS" class="headerlink" title="${IFS}"></a>${IFS}</h3><p>经典Linux命令行代替空格的分隔符，大部分情况下的确可以代替空格，不过好像在偶尔还是会有问题？</p>

@@ -29,7 +29,7 @@
 <meta property="og:description" content="HTTPS代理原理摸了两天的鱼，今天晚上找了一晚上资料把这段补上HTTPS系列学习的根本原因都是因为最近在学习代理怎么用，然后对在代理下运行的HTTPS安全性产生了一定的困惑，加之以burp能明文抓取HTTPS包，更加困惑了 今天最后翻到了一个国外超级大哥文章的翻译，感觉是众多资料中讲的最清楚的了在一切开始之前，先回顾一下https链接建立到TLS握手之间的操作 正常的HTTPS链接建立过程再摸一">
 <meta property="og:locale" content="zh-Hans">
 <meta property="og:image" content="https:&#x2F;&#x2F;www.z3ratu1.cn&#x2F;images&#x2F;HTTPS%E4%BB%A3%E7%90%86%E5%8E%9F%E7%90%86&#x2F;https.png">
-<meta property="og:updated_time" content="2020-11-23T02:53:45.294Z">
+<meta property="og:updated_time" content="2021-01-06T07:20:05.889Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:image" content="https:&#x2F;&#x2F;www.z3ratu1.cn&#x2F;images&#x2F;HTTPS%E4%BB%A3%E7%90%86%E5%8E%9F%E7%90%86&#x2F;https.png">
 
@@ -145,11 +145,6 @@
     <a href="/links/" rel="section"><i class="fa fa-link fa-fw"></i>友链</a>
 
   </li>
-        <li class="menu-item menu-item-sitemap">
-
-    <a href="/sitemap.xml" rel="section"><i class="fa fa-sitemap fa-fw"></i>站点地图</a>
-
-  </li>
       <li class="menu-item menu-item-search">
         <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
         </a>
@@ -235,7 +230,7 @@
                   <i class="far fa-calendar-check"></i>
                 </span>
                 <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2020-11-23 10:53:45" itemprop="dateModified" datetime="2020-11-23T10:53:45+08:00">2020-11-23</time>
+                <time title="修改时间：2021-01-06 15:20:05" itemprop="dateModified" datetime="2021-01-06T15:20:05+08:00">2021-01-06</time>
               </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -281,7 +276,7 @@
       
         <h1 id="HTTPS代理原理"><a href="#HTTPS代理原理" class="headerlink" title="HTTPS代理原理"></a>HTTPS代理原理</h1><p>摸了两天的鱼，今天晚上找了一晚上资料把这段补上<br>HTTPS系列学习的根本原因都是因为最近在学习代理怎么用，然后对在代理下运行的HTTPS安全性产生了一定的困惑，加之以burp能明文抓取HTTPS包，更加困惑了</p>
 <p>今天最后翻到了一个国外超级大哥文章的翻译，感觉是众多资料中讲的最清楚的了<br>在一切开始之前，先回顾一下https链接建立到TLS握手之间的操作</p>
-<h2 id="正常的HTTPS链接建立过程"><a href="#正常的HTTPS链接建立过程" class="headerlink" title="正常的HTTPS链接建立过程"></a>正常的HTTPS链接建立过程</h2><p>再摸一个图出来<br><img src="./images/HTTPS%E4%BB%A3%E7%90%86%E5%8E%9F%E7%90%86/https.png" alt="HTTPS链接建立"><br>可以看到，大家还是老老实实先来一个TCP三次握手，先把TCP层面的链接建立起来，然后开始进行TLS的握手，client hello，server hello+证书，随机数验证blblbl，走上上篇文章讲到的HTTPS认证过程的老路，这里重复一次的意义就是引入这个TCP链接建立过程，方便后面讲</p>
+<h2 id="正常的HTTPS链接建立过程"><a href="#正常的HTTPS链接建立过程" class="headerlink" title="正常的HTTPS链接建立过程"></a>正常的HTTPS链接建立过程</h2><p>再摸一个图出来<br><img src="/images/HTTPS%E4%BB%A3%E7%90%86%E5%8E%9F%E7%90%86/https.png" alt="HTTPS链接建立"><br>可以看到，大家还是老老实实先来一个TCP三次握手，先把TCP层面的链接建立起来，然后开始进行TLS的握手，client hello，server hello+证书，随机数验证blblbl，走上上篇文章讲到的HTTPS认证过程的老路，这里重复一次的意义就是引入这个TCP链接建立过程，方便后面讲</p>
 <p>然后我们来看代理的两大类别，转发代理和TLS终止代理</p>
 <h2 id="转发代理"><a href="#转发代理" class="headerlink" title="转发代理"></a>转发代理</h2><p>由于TLS在TCP层之上建立起了一个安全层，那么代理就需要在安全层之下来实现流量的转发</p>
 <h3 id="CONNECT请求"><a href="#CONNECT请求" class="headerlink" title="CONNECT请求"></a>CONNECT请求</h3><p>使用代理都会发送这个请求，用于告诉代理服务器在客户端和目标站点之间建立一条隧道，当代理服务器和目标站点TCP握手成功之后，就回复给客户端一个200 connection established，就算是开了一个通道<br>在这之后，转发代理就简单的进行流量的转发，服务器和客户端之间的TLS握手对代理服务器而言是加密过的，代理服务器并不能解析，只是做一个简单的转发，代理服务器感觉上就像是一跳特殊的路由一样<br>（之前愚蠢的思考了一下为什么CONNECT明文告诉代理请求某些域名怎么不会被ban，才想起来原来代理自己还要加一层vmss加密过gfw）<br>一般来说代理都是转发代理，毕竟代理也拿不到服务器的私钥，怎么解密加密流量呢</p>
