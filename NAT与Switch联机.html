@@ -28,7 +28,7 @@
 <meta property="og:site_name" content="Z3ratu1&#39;s blog">
 <meta property="og:description" content="NAT与Switch联机加速猛汉R试玩已经于今日上线，这不玩这不玩这不玩？盾斧的衣服好好看呜呜，我猜是影蜘蛛套，我吹爆由于穷逼没钱买加速器，所以试玩了两把太刀和盾斧之后就开始研究起了怎么用现有白嫖节点来优化Switch的联机体验，然后产生了这篇文章 Eshop加速就以我自己为例，使用香港节点直接做到600k&#x2F;s的下载速度，快速下载mhr，不要小看这个速度，任地狱的垃圾服务器下行带宽有限（虽然用了一">
 <meta property="og:locale" content="zh-Hans">
-<meta property="og:updated_time" content="2021-01-08T14:14:18.379Z">
+<meta property="og:updated_time" content="2021-01-09T09:01:31.023Z">
 <meta name="twitter:card" content="summary">
 
 <link rel="canonical" href="https://www.z3ratu1.cn/NAT%E4%B8%8ESwitch%E8%81%94%E6%9C%BA.html">
@@ -220,10 +220,16 @@
                 <i class="far fa-calendar"></i>
               </span>
               <span class="post-meta-item-text">发表于</span>
-              
 
-              <time title="创建时间：2021-01-08 17:35:59 / 修改时间：22:14:18" itemprop="dateCreated datePublished" datetime="2021-01-08T17:35:59+08:00">2021-01-08</time>
+              <time title="创建时间：2021-01-08 17:35:59" itemprop="dateCreated datePublished" datetime="2021-01-08T17:35:59+08:00">2021-01-08</time>
             </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2021-01-09 17:01:31" itemprop="dateModified" datetime="2021-01-09T17:01:31+08:00">2021-01-09</time>
+              </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
                 <i class="far fa-folder"></i>
@@ -282,6 +288,9 @@
 <p>reddit上的一个帖子说到喷喷在NAT为C的时候就玩不了了，是因为喷喷是真实P2P，游戏数据就和磁力链接一样从各个玩家的机器中下载，东一块西一块，低的NAT类型由于ip:port转换多，他人无法建立连接，从而影响联网质量<br><del>但我觉得BC在使用情况上应该无实际差距，但是这个大哥说就是不一样</del></p>
 <h2 id="结论"><a href="#结论" class="headerlink" title="结论"></a>结论</h2><p>虽然大家讨论的基本上都是NAT，但我觉得好像除了A类，BC两类在联机的表现中区别不大(或许游戏存在其他的奇怪行为会影响吧)，但就建立连接而言，感觉ABC对联机真正的影响都不大，只要不是D及以下都能玩<br>以下为个人的不成熟意见<br>实际上影响连接质量的我觉得是与境外游戏服务器直接的不通畅，国内运营商之间的延迟，以及地域网路条件导致的连接延迟（我和我大哥都在学校的时候联机就流畅的我从来没考虑过这个问题，各自回家之后就卡的连都连不上了）<br>游戏加速器本质上和一个代理服务器没什么太大的差别，不过加速器为游戏专门在各运营商处建立了专线，降低了联通电信两大ISP直接的问题，同时也有专线直连海外，提升带宽，提供一路畅通的专线服务，且不受GFW的干扰。并且主机和加速器直接建立一个socket通道，加速器的服务器就是一个直接拥有公网IP的服务器，这一连上就直接等于最好的NAT类型A<br>而使用代理服务器代替游戏加速器也能提升一定的速度，是因为<strong>优化了GFW的过滤部分，因为连接境外服务器最大的问题就在于GFW的误伤导致的丢包重传</strong>，而实际上物理距离导致的网络延迟并不是最严重的，并且代理服务器肯定也是自己有一个公网IP，也就意味着NAT类型应该也能提升到A</p>
 <p>如果mhr在CS的过程中并不向任地狱服务器发送信息，则完全可以在国内架设一个服务器，让所有人将那个国内服务器作为代理，就在国内解决问题<br>学习的时候偶然看到了类似的文章，看了下去发现是灵缇的开发者，下载了一个下来看了一眼，他们对动森等部分游戏就存在国内加速节点，估计用于就是纯P2P的加速<br>而如果还需要像境外服务器提供额外数据的话，最好是每个人都连接境外的服务器，服务器距离任地狱服务器较近，且加速器均位于同一物理地段，能获得最佳体验</p>
+<h3 id="update"><a href="#update" class="headerlink" title="update"></a>update</h3><p>我太天真了。普通的代理确实能加速下载，但是对于游戏加速可能并不实用，因为大部分的代理只代理TCP流量，而众多游戏似乎都是用UDP进行数据传输，就算Sock5支持UDP的转发，也需要看代理节点是否支持UDP转发，不然还是白给</p>
+<p>clash可以通过启动TAP或者TUN来进行全局代理，把所有流量全部劫持到自建的cfw-tap网卡上，再觉得是直接连接还是走转发，能强行扭转一些不走代理的软件的流量（但是我switch直接指定了代理服务器应该没问题？吧）暂时不知道UDP无法转发是clash设置问题还是对端节点支持问题，若是对端节点不支持UDP转发，那我switch是不是应该直接上不了网才对？</p>
+<p>有的机场好像也提供那种游戏节点，不知道是不是只有那种才提供UDP转发，剩下的只是普通的HTTP代理？</p>
 <h2 id="NAT和DHCP的区别"><a href="#NAT和DHCP的区别" class="headerlink" title="NAT和DHCP的区别"></a>NAT和DHCP的区别</h2><p>作为无关话题，思考时突然想到而进行的学习<br>NAT进行的是IP地址的转换，将内网地址转换为公网地址<br>DHCP进行的是IP的分配，给你先来个内网地址进行NAT(据说有的神仙DHCP也能分配一个公网地址)，那估计就没NAT的事情了</p>
 <h2 id="参考链接"><a href="#参考链接" class="headerlink" title="参考链接"></a>参考链接</h2><p><a href="https://zh.wikipedia.org/wiki/%E7%BD%91%E7%BB%9C%E5%9C%B0%E5%9D%80%E8%BD%AC%E6%8D%A2" target="_blank" rel="external nofollow noopener noreferrer">网络地址转换</a><br><a href="https://www.reddit.com/r/splatoon/comments/6rtgmg/nat_types_and_connection_problems_explained/?utm_source=amp&utm_medium=&utm_content=post_body" target="_blank" rel="external nofollow noopener noreferrer">nat_types_and_connection_problems_explained</a><br><a href="https://www.zhihu.com/question/66893227" target="_blank" rel="external nofollow noopener noreferrer">NAT和DHCP的区别</a><br><a href="https://www.wallmama.com/jsq/" target="_blank" rel="external nofollow noopener noreferrer">网络游戏加速器原理</a><br><a href="https://zhuanlan.zhihu.com/p/307898255" target="_blank" rel="external nofollow noopener noreferrer">Switch 的 NAT类型硬核向趣味图解</a></p>
 
@@ -365,7 +374,7 @@
 
       <!--noindex-->
       <div class="post-toc-wrap sidebar-panel">
-          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#NAT与Switch联机加速"><span class="nav-number">1.</span> <span class="nav-text">NAT与Switch联机加速</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#Eshop加速"><span class="nav-number">1.1.</span> <span class="nav-text">Eshop加速</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#加速原理"><span class="nav-number">1.1.1.</span> <span class="nav-text">加速原理</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#NAT"><span class="nav-number">1.2.</span> <span class="nav-text">NAT</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Full-Cone-NAT"><span class="nav-number">1.2.1.</span> <span class="nav-text">Full Cone NAT</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Address-Restricted-Cone-NAT"><span class="nav-number">1.2.2.</span> <span class="nav-text">Address Restricted Cone NAT</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Port-Restricted-Cone-NAT"><span class="nav-number">1.2.3.</span> <span class="nav-text">Port Restricted Cone NAT</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Symmetric-NAT"><span class="nav-number">1.2.4.</span> <span class="nav-text">Symmetric NAT</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#NAT-Type-F"><span class="nav-number">1.2.5.</span> <span class="nav-text">NAT Type F</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#NAT类型与联机"><span class="nav-number">1.2.6.</span> <span class="nav-text">NAT类型与联机</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#结论"><span class="nav-number">1.3.</span> <span class="nav-text">结论</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#NAT和DHCP的区别"><span class="nav-number">1.4.</span> <span class="nav-text">NAT和DHCP的区别</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#参考链接"><span class="nav-number">1.5.</span> <span class="nav-text">参考链接</span></a></li></ol></li></ol></div>
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#NAT与Switch联机加速"><span class="nav-number">1.</span> <span class="nav-text">NAT与Switch联机加速</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#Eshop加速"><span class="nav-number">1.1.</span> <span class="nav-text">Eshop加速</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#加速原理"><span class="nav-number">1.1.1.</span> <span class="nav-text">加速原理</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#NAT"><span class="nav-number">1.2.</span> <span class="nav-text">NAT</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Full-Cone-NAT"><span class="nav-number">1.2.1.</span> <span class="nav-text">Full Cone NAT</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Address-Restricted-Cone-NAT"><span class="nav-number">1.2.2.</span> <span class="nav-text">Address Restricted Cone NAT</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Port-Restricted-Cone-NAT"><span class="nav-number">1.2.3.</span> <span class="nav-text">Port Restricted Cone NAT</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Symmetric-NAT"><span class="nav-number">1.2.4.</span> <span class="nav-text">Symmetric NAT</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#NAT-Type-F"><span class="nav-number">1.2.5.</span> <span class="nav-text">NAT Type F</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#NAT类型与联机"><span class="nav-number">1.2.6.</span> <span class="nav-text">NAT类型与联机</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#结论"><span class="nav-number">1.3.</span> <span class="nav-text">结论</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#update"><span class="nav-number">1.3.1.</span> <span class="nav-text">update</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#NAT和DHCP的区别"><span class="nav-number">1.4.</span> <span class="nav-text">NAT和DHCP的区别</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#参考链接"><span class="nav-number">1.5.</span> <span class="nav-text">参考链接</span></a></li></ol></li></ol></div>
       </div>
       <!--/noindex-->
 
