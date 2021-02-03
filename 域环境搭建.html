@@ -28,7 +28,7 @@
 <meta property="og:site_name" content="Z3ratu1&#39;s blog">
 <meta property="og:description" content="域环境搭建科恩的任务还没完成，我是划水王前两天看了看文章，摸了两天鱼，今天搭了一天环境到这个时候呜呜还是参考的好姐姐的文章进行搭建 环境搭建先是折腾了一下午破解，不是很喜欢30天回退一次快照，万一我以后还有更改就不方便了。其次就是研究网络，其实VMware虚拟机咋整都是在一个子网内，用同一个虚拟网络适配器就行了，NAT Host-Only都行。接不接物理机进来都无所谓，DHCP开不开也无所谓（但是">
 <meta property="og:locale" content="zh-Hans">
-<meta property="og:updated_time" content="2021-01-31T09:28:25.134Z">
+<meta property="og:updated_time" content="2021-02-02T08:05:39.562Z">
 <meta name="twitter:card" content="summary">
 
 <link rel="canonical" href="https://www.z3ratu1.cn/%E5%9F%9F%E7%8E%AF%E5%A2%83%E6%90%AD%E5%BB%BA.html">
@@ -228,7 +228,7 @@
                   <i class="far fa-calendar-check"></i>
                 </span>
                 <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2021-01-31 17:28:25" itemprop="dateModified" datetime="2021-01-31T17:28:25+08:00">2021-01-31</time>
+                <time title="修改时间：2021-02-02 16:05:39" itemprop="dateModified" datetime="2021-02-02T16:05:39+08:00">2021-02-02</time>
               </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -274,19 +274,18 @@
       
         <h1 id="域环境搭建"><a href="#域环境搭建" class="headerlink" title="域环境搭建"></a>域环境搭建</h1><p>科恩的任务还没完成，我是划水王<br>前两天看了看文章，摸了两天鱼，今天搭了一天环境到这个时候呜呜<br>还是参考的好姐姐的文章进行搭建</p>
 <h2 id="环境搭建"><a href="#环境搭建" class="headerlink" title="环境搭建"></a>环境搭建</h2><p>先是折腾了一下午破解，不是很喜欢30天回退一次快照，万一我以后还有更改就不方便了。其次就是研究网络，其实VMware虚拟机咋整都是在一个子网内，用同一个虚拟网络适配器就行了，NAT Host-Only都行。接不接物理机进来都无所谓，DHCP开不开也无所谓（但是DC的ip还是写死比较好）</p>
-<p>winserver12作为域控DC，按照上面的步骤升级为域控，选择新建林，填一个二级域名进去，我这里填为z33.com，一路默认即可<br>加入域后计算机全名为: 计算机名+.z33.com</p>
-<p>winsever12<br>计算机名DC<br>域名DC.z33.com</p>
-<p>winsever08<br>主机名sever08<br>AD登录用户名<a href="mailto:server08@z33.com" target="_blank" rel="external nofollow noopener noreferrer">server08@z33.com</a> Z33\server08</p>
-<p>win7<br>主机名win7<br>AD登录用户名<a href="mailto:win7@z33.com" target="_blank" rel="external nofollow noopener noreferrer">win7@z33.com</a> Z33\win7<br><strong>WIN7不要用家庭版！！！家庭版没有加入域功能，坑死我了</strong></p>
+<p>winserver12作为域控DC，按照上面的步骤升级为域控，选择新建林，填一个二级域名进去，我这里填为z33.com，一路默认即可<br>加入域后计算机全名为: 计算机名+.z33.com<br>整个环境由如下四台机子构成<br>winsever12 DC<br>winsever08 webServer<br>winserver16 后来随便加的。。。<br>win7 管理员主机</p>
+<p><strong>WIN7不要用家庭版！！！家庭版没有加入域功能，坑死我了</strong></p>
+<p>才发现是只要拥有一个域账户就能登录到域了。。。之前还对应每个机子创建了一个域的账户<br>通过文末链接中步骤即可成功加入域，加入域后登陆机器就有了两种选项，一种是登录本机，一种是登录到域，登录本机就使用<code>主机名\本地用户名</code>,登录远程就变成了<code>域名\主机名</code>或者<code>主机名@域名</code>（似乎是这样的）</p>
+<p>可以通过每个机子配多个网卡，网卡选host-only然后搭建多层局域网</p>
 <h3 id="安装VMware-tools"><a href="#安装VMware-tools" class="headerlink" title="安装VMware tools"></a>安装VMware tools</h3><p>用VMware就是为了这个工具吧，自动调整虚拟机屏幕大小和虚拟机物理机文件复制。然后，以前都是直接左上角选项卡自动化安装，就算是Linux也是自动挂在好了命令行解压一下就行，今天遇到了整个图标是灰色的的懵逼状态，本来都说大不了U盘代替了，群里随便问了一嘴发现原来是这么装的。。。<br>只要把虚拟机的CD选择的文件改成VMware文件夹下的Windows.iso，然后虚拟机内读取就能安装了。Linux估计就是那个Linux.iso。以后装不了VMwaretools都可以这么一次性搞定了</p>
-<p>Windows server2012R2比较坑，还要先装个什么鬼补丁才能用。希望不要装补丁把要利用的洞给补上了<br>用这个大哥打包的东西就能搞定<a href="https://blog.csdn.net/weixin_38735531/article/details/105885499" target="_blank" rel="external nofollow noopener noreferrer">关于Windows Server 2012安装KB2919355补丁出错问题都看过来了！！！</a><br>记得补丁看着装。。。我装着装着发现不对劲，把kerberos的补丁也打了，然后删补丁的时候又删多了，白瞎一个晚上</p>
-<p>通过链接中步骤也能成功将网络加入域，加入域后登陆机器就有了两种选项，一种是登录本机，一种是登录到域，登录本机就使用<code>主机名\本地用户名</code>,登录远程就变成了<code>域名\主机名</code>或者<code>主机名@域名</code>（似乎是这样的）</p>
+<p>Windows server2012R2比较坑，还要先装个什么鬼补丁才能用。<br>用这个大哥打包的东西就能搞定<a href="https://blog.csdn.net/weixin_38735531/article/details/105885499" target="_blank" rel="external nofollow noopener noreferrer">关于Windows Server 2012安装KB2919355补丁出错问题都看过来了！！！</a><br>记得补丁看着装。。。我装着装着发现不对劲，把kerberos的补丁也打了，然后删补丁的时候又删多了，白瞎一个晚上</p>
 <h2 id="域网络连接"><a href="#域网络连接" class="headerlink" title="域网络连接"></a>域网络连接</h2><p>之前真没怎么研究过windows，今天域都加入完了，ping一轮ping不通，但是所有机子pingDC是通的，就开始研究网络问题，经过长达几个小时的测试，我一度怀疑VMware哪里有玄妙的网络设置，最后发现是防火墙的问题。。。防火墙一关直接全通。<br>那么，大家都有防火墙为什么只有DC能被ping通？查看网络情况发现DC连接的网络被识别为域网络，而剩下两台机子却显示的是未识别的网络，那就只能猜测是域上防火墙的策略和公用网络的防火墙策略不一致咯？<br>然后就开始研究怎么让后面两台机子识别出网络类型<br>找到这样一个网页<br><a href="https://social.technet.microsoft.com/Forums/windows/it-IT/3f156eca-c4ee-4693-aa16-882800070a82" target="_blank" rel="external nofollow noopener noreferrer">域网络识别问题</a></p>
 <blockquote>
 <p>当NLA开始检测网络位置时，计算机将尝试DC联系。如果检测成功，就可以识别到域网络，如果检测不到域或者是处理失败，就会识别为私有或公共网络</p>
 </blockquote>
 <p>一个可能就是每次我一把梭启动三个机子的时候，DC启动最慢导致出问题，不过把网络先禁用再重新启用网络的结果仍是公共网络，采用第二种方法，在IPv4的DNS设置里面添加一个后缀项，就大功告成了（ip是静态分配的让DC成为DNS），但是所有机子都连上域网络之后还是ping不通，估计是防火墙还是怎么不放ICMP过吧<br>开始开关防火墙规则，有点小小的强迫症，就是不想简单的直接关掉整个防火墙。。。<br>neorah师傅后面遇到的那个无法管理的问题也可以直接防火墙放行解决，总觉得一页钩比一页叉好看</p>
-<h2 id="update"><a href="#update" class="headerlink" title="update"></a>update</h2><p>又参考了一些其他文章，修改了一下域环境的配置。给winserver08加了一块网卡，使得其能连接外网，本来想直接桥接出来的，后来不会搞就用NAT了。可以在08上起一个web服务然后物理机访问去日，模拟内网突破口。。win7作为管理员服务器，不直接操作DC，而是通过管理员服务器登录DC进行配置之类的，大概想先整出来这么个内网环境</p>
+<h2 id="update"><a href="#update" class="headerlink" title="update"></a>update</h2><p>又参考了一些其他文章，修改了一下域环境的配置。给winserver08加了一块网卡，使得其能连接外网，直接桥接出来（之前桥接没成功，后来重启了一下又没问题了），然后再整个kali虚拟机去日。可以在08上起一个web服务然后物理机访问去日，模拟内网突破口。。win7作为管理员服务器，不直接操作DC，而是通过管理员服务器登录DC进行配置之类的，大概想先整出来这么个内网环境</p>
 <h2 id="参考文章"><a href="#参考文章" class="headerlink" title="参考文章"></a>参考文章</h2><p><a href="https://neorah.me/pentest/startpentest" target="_blank" rel="external nofollow noopener noreferrer">基础知识及环境搭建</a><br><a href="https://k-ring.github.io/2019/10/27/%E5%86%85%E7%BD%91%E6%B8%97%E9%80%8F%E5%AD%A6%E4%B9%A0%E4%B9%8B%E5%9F%9F%E7%8E%AF%E5%A2%83%E6%90%AD%E5%BB%BA/" target="_blank" rel="external nofollow noopener noreferrer">域环境搭建</a></p>
 
     </div>
@@ -309,7 +308,10 @@
     <a href="/%E5%9F%9F%E6%B8%97%E9%80%8F%E5%AD%A6%E4%B9%A0.html" rel="prev" title="域渗透学习">
       <i class="fa fa-chevron-left"></i> 域渗透学习
     </a></div>
-      <div class="post-nav-item"></div>
+      <div class="post-nav-item">
+    <a href="/Mimikatz%E4%BD%BF%E7%94%A8%E7%AE%80%E7%95%A5.html" rel="next" title="mimikatz简单使用手册">
+      mimikatz简单使用手册 <i class="fa fa-chevron-right"></i>
+    </a></div>
     </div>
       </footer>
     
@@ -384,7 +386,7 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">94</span>
+          <span class="site-state-item-count">95</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
@@ -397,7 +399,7 @@
       <div class="site-state-item site-state-tags">
             <a href="/tags/">
           
-        <span class="site-state-item-count">71</span>
+        <span class="site-state-item-count">72</span>
         <span class="site-state-item-name">标签</span></a>
       </div>
   </nav>

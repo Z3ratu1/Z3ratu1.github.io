@@ -28,7 +28,7 @@
 <meta property="og:site_name" content="Z3ratu1&#39;s blog">
 <meta property="og:description" content="域渗透学习科恩的任务罢了 前置知识windows域渗透接触的都是windows的东西，都没学过。。。。 AD">
 <meta property="og:locale" content="zh-Hans">
-<meta property="og:updated_time" content="2021-01-31T10:19:26.459Z">
+<meta property="og:updated_time" content="2021-02-02T10:07:12.927Z">
 <meta name="twitter:card" content="summary">
 
 <link rel="canonical" href="https://www.z3ratu1.cn/%E5%9F%9F%E6%B8%97%E9%80%8F%E5%AD%A6%E4%B9%A0.html">
@@ -228,7 +228,7 @@
                   <i class="far fa-calendar-check"></i>
                 </span>
                 <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2021-01-31 18:19:26" itemprop="dateModified" datetime="2021-01-31T18:19:26+08:00">2021-01-31</time>
+                <time title="修改时间：2021-02-02 18:07:12" itemprop="dateModified" datetime="2021-02-02T18:07:12+08:00">2021-02-02</time>
               </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -328,7 +328,8 @@ shell for /r \\dc/sysvol %i in (*.bat) do @echo %i</code></pre>
 <p>Enterprise Admins (member of the domain Administrators group in every domain in the forest)<br>Domain Admins (member of the domain Administrators group)<br>Administrators<br>Backup Operators<br>Account Operators<br>Print Operators</p>
 </blockquote>
 <h4 id="成为DC管理员后的操作"><a href="#成为DC管理员后的操作" class="headerlink" title="成为DC管理员后的操作"></a>成为DC管理员后的操作</h4><p>首先需要是一个管理员才能运行mimikatz<br>成为DC管理员后，mimikatz一把梭dump全部凭证，dump LSASS内存<br>创建一个Install From Media(IFM)来获取NTDS.dit文件，即上述获取NTDS.dit文件的第二种方法。创建的IFM集就是NTDS.dit文件的复制，这个文件可能会在新的DC直接共享，或者在一个还未升级为域控的服务器上发现，在升级之前这个文件可能不会受到很好的保护<br>从NTDS.dit文件中dump AD域凭证，当攻击者获得了一份NTDS.dit文件和某些能解密数据库数据的注册表项时，AD数据库文件就被打穿了。当攻击者拥有注册表中的系统配置单元和NTDS.dit文件时，即可获取整个AD的所有凭证</p>
-<h3 id="内网信息搜集"><a href="#内网信息搜集" class="headerlink" title="内网信息搜集"></a>内网信息搜集</h3><pre class=" language-powershell"><code class="language-powershell">ipconfig <span class="token operator">/</span>all    查询本机IP段，所在域等
+<h3 id="内网信息搜集"><a href="#内网信息搜集" class="headerlink" title="内网信息搜集"></a>内网信息搜集</h3><p>堆一下用的时候慢慢翻</p>
+<pre class=" language-powershell"><code class="language-powershell">ipconfig <span class="token operator">/</span>all    查询本机IP段，所在域等
 net config Workstation    当前计算机名，全名，用户名，系统版本，工作站域，登陆域
 net user    本机用户列表
 net localhroup administrators    本机管理员<span class="token punctuation">[</span>通常含有域用户<span class="token punctuation">]</span>
@@ -402,7 +403,8 @@ net <span class="token function">group</span> <span class="token string">"Domain
 </blockquote>
 <p>试了半天发现是需要以域账户登录才能成功执行，就登录本地机器的话就会拒绝访问</p>
 <h2 id="参考链接"><a href="#参考链接" class="headerlink" title="参考链接"></a>参考链接</h2><p>本文学习原文<br><a href="https://adsecurity.org/?p=2362" target="_blank" rel="external nofollow noopener noreferrer">Attack Methods for Gaining Domain Admin Rights in Active Directory</a></p>
-<p><a href="https://xz.aliyun.com/t/7784" target="_blank" rel="external nofollow noopener noreferrer">浅析域渗透中的组策略利用</a><br><a href="https://docs.microsoft.com/zh-cn/dotnet/standard/io/file-path-formats" target="_blank" rel="external nofollow noopener noreferrer">Windows系统中的文件路径格式</a><br><a href="https://xz.aliyun.com/t/8038" target="_blank" rel="external nofollow noopener noreferrer">内网渗透技巧之横向控制</a><br><a href="https://kevien.github.io/2017/09/28/windows%E5%9F%9F%E5%AE%89%E5%85%A8/" target="_blank" rel="external nofollow noopener noreferrer">Windows域安全</a><br>下面两篇文章一起看MS16-068基本上就看懂了<br><a href="https://www.anquanke.com/post/id/192810" target="_blank" rel="external nofollow noopener noreferrer">Windows内网协议学习Kerberos篇之PAC</a><br><a href="https://www.freebuf.com/vuls/56081.html" target="_blank" rel="external nofollow noopener noreferrer">深入解读MS14-068漏洞</a><br>好姐姐的中文译本<br><a href="https://neorah.me/pentest/adsecurity01/" target="_blank" rel="external nofollow noopener noreferrer">翻译和复现</a></p>
+<p><a href="https://wh0ale.github.io/2018/12/25/2018-12-25-%E5%9F%9F%E6%B8%97%E9%80%8F%E4%B9%8B%E7%A5%A8%E6%8D%AE/" target="_blank" rel="external nofollow noopener noreferrer">域渗透之票据</a><br><a href="https://xz.aliyun.com/t/7784" target="_blank" rel="external nofollow noopener noreferrer">浅析域渗透中的组策略利用</a><br><a href="https://docs.microsoft.com/zh-cn/dotnet/standard/io/file-path-formats" target="_blank" rel="external nofollow noopener noreferrer">Windows系统中的文件路径格式</a><br><a href="https://xz.aliyun.com/t/8038" target="_blank" rel="external nofollow noopener noreferrer">内网渗透技巧之横向控制</a><br><a href="https://kevien.github.io/2017/09/28/windows%E5%9F%9F%E5%AE%89%E5%85%A8/" target="_blank" rel="external nofollow noopener noreferrer">Windows域安全</a></p>
+<p>下面两篇文章一起看MS16-068基本上就看懂了<br><a href="https://www.anquanke.com/post/id/192810" target="_blank" rel="external nofollow noopener noreferrer">Windows内网协议学习Kerberos篇之PAC</a><br><a href="https://www.freebuf.com/vuls/56081.html" target="_blank" rel="external nofollow noopener noreferrer">深入解读MS14-068漏洞</a><br>好姐姐的中文译本<br><a href="https://neorah.me/pentest/adsecurity01/" target="_blank" rel="external nofollow noopener noreferrer">翻译和复现</a></p>
 
     </div>
 
@@ -502,7 +504,7 @@ net <span class="token function">group</span> <span class="token string">"Domain
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">94</span>
+          <span class="site-state-item-count">95</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
@@ -515,7 +517,7 @@ net <span class="token function">group</span> <span class="token string">"Domain
       <div class="site-state-item site-state-tags">
             <a href="/tags/">
           
-        <span class="site-state-item-count">71</span>
+        <span class="site-state-item-count">72</span>
         <span class="site-state-item-name">标签</span></a>
       </div>
   </nav>
