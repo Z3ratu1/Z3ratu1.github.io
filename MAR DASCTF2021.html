@@ -20,16 +20,18 @@
     var CONFIG = {"hostname":"www.z3ratu1.cn","root":"/","scheme":"Pisces","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"always","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":true},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
   </script>
 
-  <meta name="description" content="与其感慨路难行，不如现在出发">
-<meta property="og:type" content="website">
-<meta property="og:title" content="Z3ratu1&#39;s blog">
-<meta property="og:url" content="https:&#x2F;&#x2F;www.z3ratu1.cn&#x2F;archives&#x2F;2019&#x2F;09&#x2F;index.html">
+  <meta name="description" content="MAR DASCTF2021平台好卡，环境时不时就访问不上了。卡到不想做题。。。感觉题目也有点莫名其妙的怎么感觉这么拉跨呢。。。 baby_flask很容易验证是SSTI，先fuzz一遍过滤的字符# &amp;quot;&amp;#39;.0123456789:[\_ config chr request pop大概测出来这些，不给用引号数字点号右括号下划线和几个函数，访问属性可以用attr()|attr()这样">
+<meta name="keywords" content="SSTI">
+<meta property="og:type" content="article">
+<meta property="og:title" content="MAR DASCTF2021">
+<meta property="og:url" content="https:&#x2F;&#x2F;www.z3ratu1.cn&#x2F;MAR%20DASCTF2021.html">
 <meta property="og:site_name" content="Z3ratu1&#39;s blog">
-<meta property="og:description" content="与其感慨路难行，不如现在出发">
+<meta property="og:description" content="MAR DASCTF2021平台好卡，环境时不时就访问不上了。卡到不想做题。。。感觉题目也有点莫名其妙的怎么感觉这么拉跨呢。。。 baby_flask很容易验证是SSTI，先fuzz一遍过滤的字符# &amp;quot;&amp;#39;.0123456789:[\_ config chr request pop大概测出来这些，不给用引号数字点号右括号下划线和几个函数，访问属性可以用attr()|attr()这样">
 <meta property="og:locale" content="zh-Hans">
+<meta property="og:updated_time" content="2021-03-27T10:50:07.420Z">
 <meta name="twitter:card" content="summary">
 
-<link rel="canonical" href="https://www.z3ratu1.cn/archives/2019/09/">
+<link rel="canonical" href="https://www.z3ratu1.cn/MAR%20DASCTF2021.html">
 
 
 <script id="page-configurations">
@@ -37,12 +39,12 @@
   CONFIG.page = {
     sidebar: "",
     isHome : false,
-    isPost : false,
+    isPost : true,
     lang   : 'zh-Hans'
   };
 </script>
 
-  <title>归档 | Z3ratu1's blog</title>
+  <title>MAR DASCTF2021 | Z3ratu1's blog</title>
   
 
 
@@ -189,73 +191,121 @@
         <div class="content-wrap">
           
 
-          <div class="content archive">
+          <div class="content post posts-expand">
             
 
+    
   
   
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
+    <link itemprop="mainEntityOfPage" href="https://www.z3ratu1.cn/MAR%20DASCTF2021.html">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="https://q2.qlogo.cn/headimg_dl?dst_uin=1207039417&spec=160">
+      <meta itemprop="name" content="Z3ratu1">
+      <meta itemprop="description" content="与其感慨路难行，不如现在出发">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Z3ratu1's blog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          MAR DASCTF2021
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+              
+
+              <time title="创建时间：2021-03-27 12:26:39 / 修改时间：18:50:07" itemprop="dateCreated datePublished" datetime="2021-03-27T12:26:39+08:00">2021-03-27</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E5%88%B7%E9%A2%98%E8%AE%B0%E5%BD%95/" itemprop="url" rel="index"><span itemprop="name">刷题记录</span></a>
+                </span>
+            </span>
+
+          
+            <span id="/MAR%20DASCTF2021.html" class="post-meta-item leancloud_visitors" data-flag-title="MAR DASCTF2021" title="阅读次数">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span class="leancloud-visitors-count"></span>
+            </span>
   
-  <div class="post-block">
-    <div class="posts-collapse">
-      <div class="collection-title">
-        
-        <span class="collection-header">很好! 目前共计 103 篇日志。 继续努力。</span>
-      </div>
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="far fa-comment"></i>
+      </span>
+      <span class="post-meta-item-text">Valine：</span>
+    
+    <a title="valine" href="/MAR%20DASCTF2021.html#valine-comments" itemprop="discussionUrl">
+      <span class="post-comments-count valine-comment-count" data-xid="/MAR%20DASCTF2021.html" itemprop="commentCount"></span>
+    </a>
+  </span>
+  
+  
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
 
       
-    <div class="collection-year">
-      <span class="collection-header">2019</span>
-    </div>
-
-  <article itemscope itemtype="http://schema.org/Article">
-    <header class="post-header">
-
-      <div class="post-meta">
-        <time itemprop="dateCreated" datetime="2019-09-27T17:59:00+08:00" content="2019-09-27">
-          09-27
-        </time>
-      </div>
-
-      <div class="post-title">
-          <a class="post-title-link" href="/%E6%96%87%E4%BB%B6%E4%B8%8A%E4%BC%A0.html" itemprop="url">
-            <span itemprop="name">文件上传</span>
-          </a>
-      </div>
-
-    </header>
-  </article>
-
-  <article itemscope itemtype="http://schema.org/Article">
-    <header class="post-header">
-
-      <div class="post-meta">
-        <time itemprop="dateCreated" datetime="2019-09-10T22:12:00+08:00" content="2019-09-10">
-          09-10
-        </time>
-      </div>
-
-      <div class="post-title">
-          <a class="post-title-link" href="/XSS.html" itemprop="url">
-            <span itemprop="name">XSS</span>
-          </a>
-      </div>
-
-    </header>
-  </article>
-
+        <h1 id="MAR-DASCTF2021"><a href="#MAR-DASCTF2021" class="headerlink" title="MAR DASCTF2021"></a>MAR DASCTF2021</h1><p>平台好卡，环境时不时就访问不上了。卡到不想做题。。。感觉题目也有点莫名其妙的<br>怎么感觉这么拉跨呢。。。</p>
+<h2 id="baby-flask"><a href="#baby-flask" class="headerlink" title="baby_flask"></a>baby_flask</h2><p>很容易验证是SSTI，先fuzz一遍过滤的字符<code># &quot;&#39;.0123456789:[\_ config chr request pop</code>大概测出来这些，不给用引号数字点号右括号下划线和几个函数，访问属性可以用<code>attr()|attr()</code>这样子绕，不过下划线这些关键字符还是得想办法搞出来，并且没了数字chr和引号也不好凑字符串了<br>以前看到过”%c”%num这种方法进行格式化字符串来拼字符的，现在的问题就在于引号没得数字没得，凑不出来，看到这么文章上写了这么个东西<br><code>{%set pc = g|lower|list|first|urlencode|first%} 取得%</code><br>用set定义一堆变量开始慢慢拼，g是flask一个奇怪的模块，<code>g|lower|list|first</code>会获得一个字符<code>&lt;</code>，其URL编码为%3C，直接一波获得%c两个字符<br><code>{%set c = g|lower|list|first|urlencode|last|lower%} 取得c</code><br><code>{%set udl=(pc,c)|join%}</code><br>得到”%c”字符串，接下来就要想办法获取数字了，可以像上面的方法如法炮制url反复编码拿到数字，也可以用bool变量加加减减获得数字<code>{%set one=-(False-True)%}</code>，然后一路加法获得所有数字<br>最后通过<code>{%set a=udl%((nine|string, seven|string)|join|int) %}</code>这样子获得<br>最后的最后凑齐字母表再一个个join起来通过attr()形式命令执行。。。</p>
+<h2 id="BestDB"><a href="#BestDB" class="headerlink" title="BestDB"></a>BestDB</h2><p>很简单的SQL注入，过滤了flag,update,drop单引号空格什么的，mysql数据库给的root账户<br>过滤约等于没有，空格直接/**/都能绕，flag不能用就转16进制也能读<br>平台及其卡，幸好是union注入，盲注可能这辈子都注不出来了，最后会在dasf1ag下找到一个flag.txt，用loadfile读文件，验证了/etc/passwd可读，也试了读根目录和web根目录，但是就是没有，写文件可以写到/tmp，但是web目录没有写权限。写/tmp也没有什么用，最后我直接读/flag读到了flag。。。<br>服了，出题和部署题目的时候记得统一一下，猜路径的时候猜的我想骂人，先给出题人一拳</p>
+<p>剩下两个web一个反序列化看不懂，一个SSRF看不懂</p>
+<h2 id="参考链接"><a href="#参考链接" class="headerlink" title="参考链接"></a>参考链接</h2><p><a href="https://xz.aliyun.com/t/8029" target="_blank" rel="external nofollow noopener noreferrer">浅谈flask ssti 绕过原理</a><br><a href="https://xz.aliyun.com/t/6885" target="_blank" rel="external nofollow noopener noreferrer">Python模板注入(SSTI)深入学习</a></p>
 
     </div>
-  </div>
-  
-  
-  
 
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/SSTI/" rel="tag"># SSTI</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/switch%E5%8A%A0%E9%80%9F%E6%9C%80%E5%90%8E%E4%B8%80%E7%89%88.html" rel="prev" title="Switch自建加速终章">
+      <i class="fa fa-chevron-left"></i> Switch自建加速终章
+    </a></div>
+      <div class="post-nav-item"></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
   
 
 
 
           </div>
           
+    <div class="comments" id="valine-comments"></div>
 
 <script>
   window.addEventListener('tabs:register', () => {
@@ -302,6 +352,7 @@
 
       <!--noindex-->
       <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#MAR-DASCTF2021"><span class="nav-number">1.</span> <span class="nav-text">MAR DASCTF2021</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#baby-flask"><span class="nav-number">1.1.</span> <span class="nav-text">baby_flask</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#BestDB"><span class="nav-number">1.2.</span> <span class="nav-text">BestDB</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#参考链接"><span class="nav-number">1.3.</span> <span class="nav-text">参考链接</span></a></li></ol></li></ol></div>
       </div>
       <!--/noindex-->
 
