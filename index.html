@@ -218,10 +218,16 @@
                 <i class="far fa-calendar"></i>
               </span>
               <span class="post-meta-item-text">发表于</span>
-              
 
-              <time title="创建时间：2021-03-27 12:26:39 / 修改时间：18:50:07" itemprop="dateCreated datePublished" datetime="2021-03-27T12:26:39+08:00">2021-03-27</time>
+              <time title="创建时间：2021-03-27 12:26:39" itemprop="dateCreated datePublished" datetime="2021-03-27T12:26:39+08:00">2021-03-27</time>
             </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2021-03-29 20:31:36" itemprop="dateModified" datetime="2021-03-29T20:31:36+08:00">2021-03-29</time>
+              </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
                 <i class="far fa-folder"></i>
@@ -264,9 +270,9 @@
     <div class="post-body" itemprop="articleBody">
 
       
-          <h1 id="MAR-DASCTF2021"><a href="#MAR-DASCTF2021" class="headerlink" title="MAR DASCTF2021"></a>MAR DASCTF2021</h1><p>平台好卡，环境时不时就访问不上了。卡到不想做题。。。感觉题目也有点莫名其妙的<br>怎么感觉这么拉跨呢。。。</p>
-<h2 id="baby-flask"><a href="#baby-flask" class="headerlink" title="baby_flask"></a>baby_flask</h2><p>很容易验证是SSTI，先fuzz一遍过滤的字符<code># &quot;&#39;.0123456789:[\_ config chr request pop</code>大概测出来这些，不给用引号数字点号右括号下划线和几个函数，访问属性可以用<code>attr()|attr()</code>这样子绕，不过下划线这些关键字符还是得想办法搞出来，并且没了数字chr和引号也不好凑字符串了<br>以前看到过”%c”%num这种方法进行格式化字符串来拼字符的，现在的问题就在于引号没得数字没得，凑不出来，看到这么文章上写了这么个东西<br><code>{%set pc = g|lower|list|first|urlencode|first%} 取得%</code><br>用set定义一堆变量开始慢慢拼，g是flask一个奇怪的模块，<code>g|lower|list|first</code>会获得一个字符<code>&lt;</code>，其URL编码为%3C，直接一波获得%c两个字符<br><code>{%set c = g|lower|list|first|urlencode|last|lower%} 取得c</code><br><code>{%set udl=(pc,c)|join%}</code><br>得到”%c”字符串，接下来就要想办法获取数字了，可以像上面的方法如法炮制url反复编码拿到数字，也可以用bool变量加加减减获得数字<code>{%set one=-(False-True)%}</code>，然后一路加法获得所有数字<br>最后通过<code>{%set a=udl%((nine|string, seven|string)|join|int) %}</code>这样子获得<br>最后的最后凑齐字母表再一个个join起来通过attr()形式命令执行。。。</p>
-<h2 id="BestDB"><a href="#BestDB" class="headerlink" title="BestDB"></a>BestDB</h2>
+          <h1 id="MAR-DASCTF2021"><a href="#MAR-DASCTF2021" class="headerlink" title="MAR DASCTF2021"></a>MAR DASCTF2021</h1><p>平台好卡，环境时不时就访问不上了。卡到不想做题。。。感觉题目也有点莫名其妙的</p>
+<h2 id="baby-flask"><a href="#baby-flask" class="headerlink" title="baby_flask"></a>baby_flask</h2><p>很容易验证是SSTI，先fuzz一遍过滤的字符<code># &quot;&#39;.0123456789:[\_ config chr request pop</code>大概测出来这些，不给用引号数字点号右括号下划线和几个函数，访问属性可以用<code>attr()|attr()</code>这样子绕，不过下划线这些关键字符还是得想办法搞出来，并且没了数字chr和引号也不好凑字符串了<br>以前看到过”%c”%num这种方法进行格式化字符串来拼字符的，现在的问题就在于引号没得数字没得，凑不出来，看到这么文章上写了这么个东西<br><code>{%set pc = g|lower|list|first|urlencode|first%} 取得%</code><br>用set定义一堆变量开始慢慢拼，g是flask一个奇怪的模块，<code>g|lower|list|first</code>会获得一个字符<code>&lt;</code>，其URL编码为%3C，直接一波获得%c两个字符<br><code>{%set c = g|lower|list|first|urlencode|last|lower%} 取得c</code><br><code>{%set udl=(pc,c)|join%}</code><br>得到”%c”字符串，接下来就要想办法获取数字了，可以像上面的方法如法炮制url反复编码拿到数字，也可以用bool变量加加减减获得数字<code>{%set one=-(False-True)%}</code>，然后一路加法获得所有数字<br>最后通过<code>{%set a=udl%((nine|string, seven|string)|join|int) %}</code>这样子获得<br>最后的最后凑齐字母表再一个个join起来通过attr()形式命令执行</p>
+<h3 id="ps"><a href="#ps" class="headerlink" title="ps"></a>ps</h3>
           <!--noindex-->
             <div class="post-button">
               <a class="btn" href="/MAR%20DASCTF2021.html#more" rel="contents">

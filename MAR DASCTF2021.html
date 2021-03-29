@@ -20,15 +20,15 @@
     var CONFIG = {"hostname":"www.z3ratu1.cn","root":"/","scheme":"Pisces","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"always","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":true},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
   </script>
 
-  <meta name="description" content="MAR DASCTF2021平台好卡，环境时不时就访问不上了。卡到不想做题。。。感觉题目也有点莫名其妙的怎么感觉这么拉跨呢。。。 baby_flask很容易验证是SSTI，先fuzz一遍过滤的字符# &amp;quot;&amp;#39;.0123456789:[\_ config chr request pop大概测出来这些，不给用引号数字点号右括号下划线和几个函数，访问属性可以用attr()|attr()这样">
+  <meta name="description" content="MAR DASCTF2021平台好卡，环境时不时就访问不上了。卡到不想做题。。。感觉题目也有点莫名其妙的 baby_flask很容易验证是SSTI，先fuzz一遍过滤的字符# &amp;quot;&amp;#39;.0123456789:[\_ config chr request pop大概测出来这些，不给用引号数字点号右括号下划线和几个函数，访问属性可以用attr()|attr()这样子绕，不过下划线这些关键">
 <meta name="keywords" content="SSTI">
 <meta property="og:type" content="article">
 <meta property="og:title" content="MAR DASCTF2021">
 <meta property="og:url" content="https:&#x2F;&#x2F;www.z3ratu1.cn&#x2F;MAR%20DASCTF2021.html">
 <meta property="og:site_name" content="Z3ratu1&#39;s blog">
-<meta property="og:description" content="MAR DASCTF2021平台好卡，环境时不时就访问不上了。卡到不想做题。。。感觉题目也有点莫名其妙的怎么感觉这么拉跨呢。。。 baby_flask很容易验证是SSTI，先fuzz一遍过滤的字符# &amp;quot;&amp;#39;.0123456789:[\_ config chr request pop大概测出来这些，不给用引号数字点号右括号下划线和几个函数，访问属性可以用attr()|attr()这样">
+<meta property="og:description" content="MAR DASCTF2021平台好卡，环境时不时就访问不上了。卡到不想做题。。。感觉题目也有点莫名其妙的 baby_flask很容易验证是SSTI，先fuzz一遍过滤的字符# &amp;quot;&amp;#39;.0123456789:[\_ config chr request pop大概测出来这些，不给用引号数字点号右括号下划线和几个函数，访问属性可以用attr()|attr()这样子绕，不过下划线这些关键">
 <meta property="og:locale" content="zh-Hans">
-<meta property="og:updated_time" content="2021-03-27T10:50:07.420Z">
+<meta property="og:updated_time" content="2021-03-29T12:31:36.120Z">
 <meta name="twitter:card" content="summary">
 
 <link rel="canonical" href="https://www.z3ratu1.cn/MAR%20DASCTF2021.html">
@@ -220,10 +220,16 @@
                 <i class="far fa-calendar"></i>
               </span>
               <span class="post-meta-item-text">发表于</span>
-              
 
-              <time title="创建时间：2021-03-27 12:26:39 / 修改时间：18:50:07" itemprop="dateCreated datePublished" datetime="2021-03-27T12:26:39+08:00">2021-03-27</time>
+              <time title="创建时间：2021-03-27 12:26:39" itemprop="dateCreated datePublished" datetime="2021-03-27T12:26:39+08:00">2021-03-27</time>
             </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2021-03-29 20:31:36" itemprop="dateModified" datetime="2021-03-29T20:31:36+08:00">2021-03-29</time>
+              </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
                 <i class="far fa-folder"></i>
@@ -266,11 +272,55 @@
     <div class="post-body" itemprop="articleBody">
 
       
-        <h1 id="MAR-DASCTF2021"><a href="#MAR-DASCTF2021" class="headerlink" title="MAR DASCTF2021"></a>MAR DASCTF2021</h1><p>平台好卡，环境时不时就访问不上了。卡到不想做题。。。感觉题目也有点莫名其妙的<br>怎么感觉这么拉跨呢。。。</p>
-<h2 id="baby-flask"><a href="#baby-flask" class="headerlink" title="baby_flask"></a>baby_flask</h2><p>很容易验证是SSTI，先fuzz一遍过滤的字符<code># &quot;&#39;.0123456789:[\_ config chr request pop</code>大概测出来这些，不给用引号数字点号右括号下划线和几个函数，访问属性可以用<code>attr()|attr()</code>这样子绕，不过下划线这些关键字符还是得想办法搞出来，并且没了数字chr和引号也不好凑字符串了<br>以前看到过”%c”%num这种方法进行格式化字符串来拼字符的，现在的问题就在于引号没得数字没得，凑不出来，看到这么文章上写了这么个东西<br><code>{%set pc = g|lower|list|first|urlencode|first%} 取得%</code><br>用set定义一堆变量开始慢慢拼，g是flask一个奇怪的模块，<code>g|lower|list|first</code>会获得一个字符<code>&lt;</code>，其URL编码为%3C，直接一波获得%c两个字符<br><code>{%set c = g|lower|list|first|urlencode|last|lower%} 取得c</code><br><code>{%set udl=(pc,c)|join%}</code><br>得到”%c”字符串，接下来就要想办法获取数字了，可以像上面的方法如法炮制url反复编码拿到数字，也可以用bool变量加加减减获得数字<code>{%set one=-(False-True)%}</code>，然后一路加法获得所有数字<br>最后通过<code>{%set a=udl%((nine|string, seven|string)|join|int) %}</code>这样子获得<br>最后的最后凑齐字母表再一个个join起来通过attr()形式命令执行。。。</p>
+        <h1 id="MAR-DASCTF2021"><a href="#MAR-DASCTF2021" class="headerlink" title="MAR DASCTF2021"></a>MAR DASCTF2021</h1><p>平台好卡，环境时不时就访问不上了。卡到不想做题。。。感觉题目也有点莫名其妙的</p>
+<h2 id="baby-flask"><a href="#baby-flask" class="headerlink" title="baby_flask"></a>baby_flask</h2><p>很容易验证是SSTI，先fuzz一遍过滤的字符<code># &quot;&#39;.0123456789:[\_ config chr request pop</code>大概测出来这些，不给用引号数字点号右括号下划线和几个函数，访问属性可以用<code>attr()|attr()</code>这样子绕，不过下划线这些关键字符还是得想办法搞出来，并且没了数字chr和引号也不好凑字符串了<br>以前看到过”%c”%num这种方法进行格式化字符串来拼字符的，现在的问题就在于引号没得数字没得，凑不出来，看到这么文章上写了这么个东西<br><code>{%set pc = g|lower|list|first|urlencode|first%} 取得%</code><br>用set定义一堆变量开始慢慢拼，g是flask一个奇怪的模块，<code>g|lower|list|first</code>会获得一个字符<code>&lt;</code>，其URL编码为%3C，直接一波获得%c两个字符<br><code>{%set c = g|lower|list|first|urlencode|last|lower%} 取得c</code><br><code>{%set udl=(pc,c)|join%}</code><br>得到”%c”字符串，接下来就要想办法获取数字了，可以像上面的方法如法炮制url反复编码拿到数字，也可以用bool变量加加减减获得数字<code>{%set one=-(False-True)%}</code>，然后一路加法获得所有数字<br>最后通过<code>{%set a=udl%((nine|string, seven|string)|join|int) %}</code>这样子获得<br>最后的最后凑齐字母表再一个个join起来通过attr()形式命令执行</p>
+<h3 id="ps"><a href="#ps" class="headerlink" title="ps"></a>ps</h3><p>在模板引擎里面<code>|</code>感觉就是个管道符，也有点像<code>.</code>操作符，可以一层层调用函数套娃的感觉<br>还看到有个大哥使用奇怪编码方式的数字直接绕过对数字的限制打通</p>
 <h2 id="BestDB"><a href="#BestDB" class="headerlink" title="BestDB"></a>BestDB</h2><p>很简单的SQL注入，过滤了flag,update,drop单引号空格什么的，mysql数据库给的root账户<br>过滤约等于没有，空格直接/**/都能绕，flag不能用就转16进制也能读<br>平台及其卡，幸好是union注入，盲注可能这辈子都注不出来了，最后会在dasf1ag下找到一个flag.txt，用loadfile读文件，验证了/etc/passwd可读，也试了读根目录和web根目录，但是就是没有，写文件可以写到/tmp，但是web目录没有写权限。写/tmp也没有什么用，最后我直接读/flag读到了flag。。。<br>服了，出题和部署题目的时候记得统一一下，猜路径的时候猜的我想骂人，先给出题人一拳</p>
 <p>剩下两个web一个反序列化看不懂，一个SSRF看不懂</p>
-<h2 id="参考链接"><a href="#参考链接" class="headerlink" title="参考链接"></a>参考链接</h2><p><a href="https://xz.aliyun.com/t/8029" target="_blank" rel="external nofollow noopener noreferrer">浅谈flask ssti 绕过原理</a><br><a href="https://xz.aliyun.com/t/6885" target="_blank" rel="external nofollow noopener noreferrer">Python模板注入(SSTI)深入学习</a></p>
+<p>看了别人的wp开始复现</p>
+<h2 id="Ez-serialize"><a href="#Ez-serialize" class="headerlink" title="Ez_serialize"></a>Ez_serialize</h2><p>代码很简单，看一眼就知道应该是原生类toString利用，搜得到的原生类没有什么能利用的然后也不想fuzz就直接摸鱼了（主要是上一个SQL题搞我心态）<br>贴关键部分代码</p>
+<pre class=" language-php"><code class="language-php"><span class="token delimiter">&lt;?php</span>
+
+<span class="token keyword">class</span> <span class="token class-name">A</span><span class="token punctuation">{</span>
+    <span class="token keyword">public</span> <span class="token variable">$class</span><span class="token punctuation">;</span>
+    <span class="token keyword">public</span> <span class="token variable">$para</span><span class="token punctuation">;</span>
+    <span class="token keyword">public</span> <span class="token variable">$check</span><span class="token punctuation">;</span>
+    <span class="token keyword">public</span> <span class="token keyword">function</span> <span class="token function">__construct</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">{</span>没用<span class="token punctuation">}</span>
+    <span class="token keyword">public</span> <span class="token keyword">function</span> <span class="token function">__wakeup</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+    <span class="token punctuation">{</span>
+        <span class="token variable">$this</span><span class="token operator">-</span><span class="token operator">></span><span class="token property">check</span> <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">C</span><span class="token punctuation">;</span>
+        <span class="token keyword">if</span><span class="token punctuation">(</span><span class="token variable">$this</span><span class="token operator">-</span><span class="token operator">></span><span class="token property">check</span><span class="token operator">-</span><span class="token operator">></span><span class="token function">vaild</span><span class="token punctuation">(</span><span class="token variable">$this</span><span class="token operator">-</span><span class="token operator">></span><span class="token property">para</span><span class="token punctuation">)</span> <span class="token operator">&amp;&amp;</span> <span class="token variable">$this</span><span class="token operator">-</span><span class="token operator">></span><span class="token property">check</span><span class="token operator">-</span><span class="token operator">></span><span class="token function">vaild</span><span class="token punctuation">(</span><span class="token variable">$this</span><span class="token operator">-</span><span class="token operator">></span><span class="token keyword">class</span><span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+            <span class="token keyword">echo</span> <span class="token keyword">new</span>  <span class="token variable">$this</span><span class="token operator">-</span><span class="token operator">></span><span class="token keyword">class</span> <span class="token punctuation">(</span><span class="token variable">$this</span><span class="token operator">-</span><span class="token operator">></span><span class="token property">para</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token punctuation">}</span>
+        <span class="token keyword">else</span>
+            <span class="token keyword">die</span><span class="token punctuation">(</span><span class="token string">'bad hacker~'</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+
+<span class="token punctuation">}</span>
+<span class="token keyword">class</span> <span class="token class-name">B</span><span class="token punctuation">{</span>
+没用
+<span class="token punctuation">}</span>
+<span class="token keyword">class</span> <span class="token class-name">C</span><span class="token punctuation">{</span>
+    <span class="token comment" spellcheck="true">// check，不知道在check个啥</span>
+    <span class="token keyword">function</span> <span class="token function">vaild</span><span class="token punctuation">(</span><span class="token variable">$code</span><span class="token punctuation">)</span><span class="token punctuation">{</span>
+        <span class="token variable">$pattern</span> <span class="token operator">=</span> <span class="token string">'/[!|@|#|$|%|^|&amp;|*|=|\'|"|:|;|?]/i'</span><span class="token punctuation">;</span>
+        <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token function">preg_match</span><span class="token punctuation">(</span><span class="token variable">$pattern</span><span class="token punctuation">,</span> <span class="token variable">$code</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">{</span>
+            <span class="token keyword">return</span> <span class="token boolean">false</span><span class="token punctuation">;</span>
+        <span class="token punctuation">}</span>
+        <span class="token keyword">else</span>
+            <span class="token keyword">return</span> <span class="token boolean">true</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+<span class="token punctuation">}</span>
+
+
+<span class="token keyword">if</span><span class="token punctuation">(</span><span class="token function">isset</span><span class="token punctuation">(</span><span class="token variable">$_GET</span><span class="token punctuation">[</span><span class="token string">'pop'</span><span class="token punctuation">]</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">{</span>
+    <span class="token function">unserialize</span><span class="token punctuation">(</span><span class="token variable">$_GET</span><span class="token punctuation">[</span><span class="token string">'pop'</span><span class="token punctuation">]</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span></code></pre>
+<p>就一个check一个反序列化，check过了构造函数构造一个对象然后echo触发toString</p>
+<p>找不到原生类就不知道咋打了，看wp<br>使用这两个类</p>
+<pre><code>FilesystemIterator
+SplFileObject</code></pre><p>第一个类构造函数接受一个目录，toString的时候会把当前目录按字典顺序第一个文件输出出来（好没用）<br>第二个类构造函数接受一个文件路径，toString的时候把该文件的前30个字符输出出来（也好没用）<br>但是就够做这个题了</p>
+<h2 id="参考链接"><a href="#参考链接" class="headerlink" title="参考链接"></a>参考链接</h2><p><a href="https://xz.aliyun.com/t/8029" target="_blank" rel="external nofollow noopener noreferrer">浅谈flask ssti 绕过原理</a><br><a href="https://xz.aliyun.com/t/6885" target="_blank" rel="external nofollow noopener noreferrer">Python模板注入(SSTI)深入学习</a><br><a href="https://jan.show/?p=59" target="_blank" rel="external nofollow noopener noreferrer">MAR DASCTF Wp</a></p>
 
     </div>
 
@@ -352,7 +402,7 @@
 
       <!--noindex-->
       <div class="post-toc-wrap sidebar-panel">
-          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#MAR-DASCTF2021"><span class="nav-number">1.</span> <span class="nav-text">MAR DASCTF2021</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#baby-flask"><span class="nav-number">1.1.</span> <span class="nav-text">baby_flask</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#BestDB"><span class="nav-number">1.2.</span> <span class="nav-text">BestDB</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#参考链接"><span class="nav-number">1.3.</span> <span class="nav-text">参考链接</span></a></li></ol></li></ol></div>
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#MAR-DASCTF2021"><span class="nav-number">1.</span> <span class="nav-text">MAR DASCTF2021</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#baby-flask"><span class="nav-number">1.1.</span> <span class="nav-text">baby_flask</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#ps"><span class="nav-number">1.1.1.</span> <span class="nav-text">ps</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#BestDB"><span class="nav-number">1.2.</span> <span class="nav-text">BestDB</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Ez-serialize"><span class="nav-number">1.3.</span> <span class="nav-text">Ez_serialize</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#参考链接"><span class="nav-number">1.4.</span> <span class="nav-text">参考链接</span></a></li></ol></li></ol></div>
       </div>
       <!--/noindex-->
 
