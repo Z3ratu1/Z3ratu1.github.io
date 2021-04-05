@@ -20,18 +20,18 @@
     var CONFIG = {"hostname":"www.z3ratu1.cn","root":"/","scheme":"Pisces","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"always","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":true},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
   </script>
 
-  <meta name="description" content="[嘶吼CTF] Online Proxy嘶吼的一个题，好像上次打了嘶吼，然后一个题磨了一天没摸出来 一开始以为是ssrf，试了半天发现写死了必须要http:&#x2F;&#x2F; 开头，感觉就没机会了，查看源码，发现一个注释显示显示了当前IP，修改XFF头发现可控，并且会保存上一次访问的IP，这里就会用到数据库，所以可能存在一个注入 测试，打一个0’ or sleep(5) or ‘0过去，无延迟，显示payloa">
-<meta name="keywords" content="wp,SQLI">
+  <meta name="description" content="红明谷&amp;amp;虎符CTF周末两天两场，被暴打的两天。为什么还是这么弱呢。。。两天上午都在摸鱼，下午的题一个都做不出来，废人 红明谷上午摸鱼，听师傅说题目都很简单（虽然可能对我来说不简单），但是他都解决了。所以我就看了下午的这一个题 happysql">
+<meta name="keywords" content="wp">
 <meta property="og:type" content="article">
-<meta property="og:title" content="嘶吼CTF Online Proxy">
-<meta property="og:url" content="https:&#x2F;&#x2F;www.z3ratu1.cn&#x2F;%5B%E5%98%B6%E5%90%BCCTF%5D%20Online%20Proxy.html">
+<meta property="og:title" content="红明谷&amp;虎符CTF">
+<meta property="og:url" content="https:&#x2F;&#x2F;www.z3ratu1.cn&#x2F;%E7%BA%A2%E6%98%8E%E8%B0%B7&amp;%E8%99%8E%E7%AC%A6.html">
 <meta property="og:site_name" content="Z3ratu1&#39;s blog">
-<meta property="og:description" content="[嘶吼CTF] Online Proxy嘶吼的一个题，好像上次打了嘶吼，然后一个题磨了一天没摸出来 一开始以为是ssrf，试了半天发现写死了必须要http:&#x2F;&#x2F; 开头，感觉就没机会了，查看源码，发现一个注释显示显示了当前IP，修改XFF头发现可控，并且会保存上一次访问的IP，这里就会用到数据库，所以可能存在一个注入 测试，打一个0’ or sleep(5) or ‘0过去，无延迟，显示payloa">
+<meta property="og:description" content="红明谷&amp;amp;虎符CTF周末两天两场，被暴打的两天。为什么还是这么弱呢。。。两天上午都在摸鱼，下午的题一个都做不出来，废人 红明谷上午摸鱼，听师傅说题目都很简单（虽然可能对我来说不简单），但是他都解决了。所以我就看了下午的这一个题 happysql">
 <meta property="og:locale" content="zh-Hans">
-<meta property="og:updated_time" content="2020-07-12T08:33:48.511Z">
+<meta property="og:updated_time" content="2021-04-05T12:14:58.616Z">
 <meta name="twitter:card" content="summary">
 
-<link rel="canonical" href="https://www.z3ratu1.cn/%5B%E5%98%B6%E5%90%BCCTF%5D%20Online%20Proxy.html">
+<link rel="canonical" href="https://www.z3ratu1.cn/%E7%BA%A2%E6%98%8E%E8%B0%B7&%E8%99%8E%E7%AC%A6.html">
 
 
 <script id="page-configurations">
@@ -44,7 +44,7 @@
   };
 </script>
 
-  <title>嘶吼CTF Online Proxy | Z3ratu1's blog</title>
+  <title>红明谷&虎符CTF | Z3ratu1's blog</title>
   
 
 
@@ -198,7 +198,7 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
-    <link itemprop="mainEntityOfPage" href="https://www.z3ratu1.cn/%5B%E5%98%B6%E5%90%BCCTF%5D%20Online%20Proxy.html">
+    <link itemprop="mainEntityOfPage" href="https://www.z3ratu1.cn/%E7%BA%A2%E6%98%8E%E8%B0%B7&%E8%99%8E%E7%AC%A6.html">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="https://q2.qlogo.cn/headimg_dl?dst_uin=1207039417&spec=160">
@@ -211,7 +211,7 @@
     </span>
       <header class="post-header">
         <h1 class="post-title" itemprop="name headline">
-          嘶吼CTF Online Proxy
+          红明谷&虎符CTF
         </h1>
 
         <div class="post-meta">
@@ -221,14 +221,14 @@
               </span>
               <span class="post-meta-item-text">发表于</span>
 
-              <time title="创建时间：2020-02-27 22:44:00" itemprop="dateCreated datePublished" datetime="2020-02-27T22:44:00+08:00">2020-02-27</time>
+              <time title="创建时间：2021-04-03 19:47:31" itemprop="dateCreated datePublished" datetime="2021-04-03T19:47:31+08:00">2021-04-03</time>
             </span>
               <span class="post-meta-item">
                 <span class="post-meta-item-icon">
                   <i class="far fa-calendar-check"></i>
                 </span>
                 <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2020-07-12 16:33:48" itemprop="dateModified" datetime="2020-07-12T16:33:48+08:00">2020-07-12</time>
+                <time title="修改时间：2021-04-05 20:14:58" itemprop="dateModified" datetime="2021-04-05T20:14:58+08:00">2021-04-05</time>
               </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -241,7 +241,7 @@
             </span>
 
           
-            <span id="/%5B%E5%98%B6%E5%90%BCCTF%5D%20Online%20Proxy.html" class="post-meta-item leancloud_visitors" data-flag-title="嘶吼CTF Online Proxy" title="阅读次数">
+            <span id="/%E7%BA%A2%E6%98%8E%E8%B0%B7&%E8%99%8E%E7%AC%A6.html" class="post-meta-item leancloud_visitors" data-flag-title="红明谷&虎符CTF" title="阅读次数">
               <span class="post-meta-item-icon">
                 <i class="fa fa-eye"></i>
               </span>
@@ -256,8 +256,8 @@
       </span>
       <span class="post-meta-item-text">Valine：</span>
     
-    <a title="valine" href="/%5B%E5%98%B6%E5%90%BCCTF%5D%20Online%20Proxy.html#valine-comments" itemprop="discussionUrl">
-      <span class="post-comments-count valine-comment-count" data-xid="/%5B%E5%98%B6%E5%90%BCCTF%5D%20Online%20Proxy.html" itemprop="commentCount"></span>
+    <a title="valine" href="/%E7%BA%A2%E6%98%8E%E8%B0%B7&%E8%99%8E%E7%AC%A6.html#valine-comments" itemprop="discussionUrl">
+      <span class="post-comments-count valine-comment-count" data-xid="/%E7%BA%A2%E6%98%8E%E8%B0%B7&%E8%99%8E%E7%AC%A6.html" itemprop="commentCount"></span>
     </a>
   </span>
   
@@ -272,12 +272,32 @@
     <div class="post-body" itemprop="articleBody">
 
       
-        <h1 id="嘶吼CTF-Online-Proxy"><a href="#嘶吼CTF-Online-Proxy" class="headerlink" title="[嘶吼CTF] Online Proxy"></a>[嘶吼CTF] Online Proxy</h1><p>嘶吼的一个题，好像上次打了嘶吼，然后一个题磨了一天没摸出来</p>
-<p>一开始以为是ssrf，试了半天发现写死了必须要http:// 开头，感觉就没机会了，查看源码，发现一个注释显示显示了当前IP，修改XFF头发现可控，并且会保存上一次访问的IP，这里就会用到数据库，所以可能存在一个注入</p>
-<p>测试，打一个0’ or sleep(5) or ‘0过去，无延迟，显示payload，然后再重新随便打一个xff过去，出现延迟，在输入相同的xff，返回了0，出现延迟证明存在注入，只是没懂后端的查询代码是怎么样的，给人的感觉就像是直接是一句select xff一样。union select打了一下没有反应，报错也不存在，返回值有0和1，那就只能盲注了</p>
-<p>然后自己动手做盲注，踩了一个小坑，即or和||是一致的，而|代表按位或，一开始用0’ or length(payload) or ‘0这么打，连length的返回值都是1。因为这种用or and这些来进行判断的结果只能是true 1和false 0嘛，愚蠢了。<br>而与零按位或数字则保持不变，就能获取结果，但是0和字符串或就会把字符串强制类型转换成数字，所以还是只能盲注</p>
-<p>然后盲注二分打本来就慢，提示flag不在当前库，需要额外查一下库名，查表名列名的操作也略有修改。然后好像脚本访问速度过快，库名打到个information_schema服务器直接connection abort了。。。。盲注失败，自闭了</p>
-<p>查wp查到一个赵总的脚本，将取出来的字符串转化成十进制数输出，然后再转成十六进制换回ASCII码快速获取字段，效率高了很多，太强了</p>
+        <h1 id="红明谷-amp-虎符CTF"><a href="#红明谷-amp-虎符CTF" class="headerlink" title="红明谷&amp;虎符CTF"></a>红明谷&amp;虎符CTF</h1><p>周末两天两场，被暴打的两天。为什么还是这么弱呢。。。<br>两天上午都在摸鱼，下午的题一个都做不出来，废人</p>
+<h2 id="红明谷"><a href="#红明谷" class="headerlink" title="红明谷"></a>红明谷</h2><p>上午摸鱼，听师傅说题目都很简单（虽然可能对我来说不简单），但是他都解决了。所以我就看了下午的这一个题</p>
+<h3 id="happysql"><a href="#happysql" class="headerlink" title="happysql"></a>happysql</h3><p>据说是布尔盲注加无information_schema取表名和无列名注入。。。听起来也挺难的，无information_schema用的是<code>mysql.innodb_table_stats</code></p>
+<h3 id="writeshell"><a href="#writeshell" class="headerlink" title="writeshell"></a>writeshell</h3><p>没看不知道有哪些过滤，用短标签&lt;?=?&gt;替换PHP，反引号执行命令，通配符获取flag</p>
+<h3 id="ThinkPHP-3-2-3反序列化"><a href="#ThinkPHP-3-2-3反序列化" class="headerlink" title="ThinkPHP 3.2.3反序列化"></a>ThinkPHP 3.2.3反序列化</h3><p>远古版本的thinkPHP<br>echo了反序列化的数据，那么反序列化的利用点就是<code>__toString</code>或者<code>__destructor</code>，简单的看了一下<code>__toString</code>，完全不可利用，析构函数太多，直接翻到一篇文章<a href="https://mp.weixin.qq.com/s/S3Un1EM-cftFXr8hxG4qfA" target="_blank" rel="external nofollow noopener noreferrer">ThinkPHP v3.2.* （SQL注入&amp;文件读取）反序列化POP链</a>，题目的代码都和这篇文章的测试代码一致。估计是看的这个文章出的了。。<br>thinkphp的SQL功能不是预设定好一个数据库要用的时候直接去查，而是每次可以自己临时创建连接进行交互。这个反序列化能做的事情就是让目标向一个任意数据库发起连接并执行可控的查询语句。<br>具体的pop链就看文章吧，这个师傅也给出了一个对应的payload</p>
+<p>乍一听感觉没什么用，因为连接上一个数据库是需要提供数据库名用户名和密码的，我可完全不知道目标机器上的数据库用户名密码是什么，完全打不了</p>
+<p>所以这个师傅提出了一个我没见过的操作，恶意SQL服务端。当客户端连上SQL服务端时，服务端可以向客户端要求提供文件，从而做到任意客户端文件读取，而这个操作本身并不需要客户端主动进行文件的提供，服务端可以在任何查询语句后回复文件传输请求，又因为MySQL协议的一个特殊功能是客户端根本不跟踪请求的命令，完全基于服务器响应执行查询。所以当客户端提出了一个正常的查询请求之后，服务端的回复是请求客户端上的文件，客户端也会老老实实的发过去。为此，MYSQL文档中也曾提到客户端不应当连接到不受信任的客户端。<br>tp使用的是MySQL的PDO扩展，默认不允许读取本地文件，但是我们现在完全可控连接时的设置，所以设定MYSQL_ATTR_LOCAL_INFILE为true即可</p>
+<p>使用一些现成的工具就能伪造一个SQL服务端，执行任意文件读取<br>抄一个GitHub上的，用python2运行即可</p>
+<p>按照上面的文章里读了tp的SQL配置文件，但是SQL配置文件和发的源码是一样的，数据库各项均为空。不知道打哪</p>
+<p>直接读flag没读到，读start.sh发现应该是把flag写进了数据库，也暴露了用户名和密码是root/root，然后还是连不上去。等wping<br>想用上次比赛的那个很鸡肋的<code>__toString</code>反序列化，惊讶的发现居然这个类不能被序列化和反序列化。怪不得从来没有在原生类利用里看到这种东西过</p>
+<h4 id="看wp"><a href="#看wp" class="headerlink" title="看wp"></a>看wp</h4><p>root/root没登上去，root/123456登上去了，真有你的啊出题人，然后就是正常报错注入了。。</p>
+<h2 id="虎符"><a href="#虎符" class="headerlink" title="虎符"></a>虎符</h2><p>也是咕了上午，下午的题也不会做</p>
+<h3 id="签到"><a href="#签到" class="headerlink" title="签到"></a>签到</h3><p>最新新闻，这个题看了一下，在留言那里有一堆乱七八糟的过滤但是我还是想不到怎么利用，最后出题人放了hint才知道想表达什么。。。搞心态<br>PHP服务器被日，8.1开发版被提交了一个后门上去，只要UA里字符串以zerodium开头，就把剩下部分走一个eval<br>那么直接走一个eval就行了</p>
+<h3 id="unsetme"><a href="#unsetme" class="headerlink" title="unsetme"></a>unsetme</h3><p>也看了一眼，源码也给的极其诡异，猜得出来是一个框架，加上特殊的变量名，很容易搜到是一个叫做fatfree的框架，题目只提供了一个unset功能，下一份源码看，直接搜<code>__unset</code>方法，接受一个key，最后实际调用的是clear方法，clear方法经过了一系列判断之后把传入的key进行一个compile，然后直接拼接字符串放进eval。。。<br>compile写的相当复杂。。但是实际上好像如果我们传入的数据本身就不是什么正常数据的时候并不会发生任何改变。直接进行拼接eval就可以了</p>
+<h3 id="慢慢做"><a href="#慢慢做" class="headerlink" title="慢慢做"></a>慢慢做</h3><p>先是一个SQL注入，语句大概意思是<code>SELECT * FROM USERS WHERE password=&#39;md5($password,true) LIMIT 0,1</code>，这是后来hint放出来的。。<br>不然猜这个东西也太离谱了一点，摸出来一个玄幻串<code>129581926211651571912466741651878684928</code>md5之后会出现<code>&#39;or&#39;8</code>这种情况，字符串类型转换成数字且不是0直接万能密码登进去。然后给了一个gopher界面，可以打gopher的内网ssrf，并说ssrf登录admin.php就能获得flag<br>不知道下一步打哪里了。并且gopher感觉好像语法也没问题，写出来为什么一直504Gateway Timeout呢？</p>
+<h4 id="看wp-1"><a href="#看wp-1" class="headerlink" title="看wp"></a>看wp</h4><p>由于未知的504错误，打不通。看了别人的wp，就是gopher发POST请求进行堆叠注入，flag在另一个表下，通过rename表的方式查数据<br>（就是那个很经典的强网杯”随便注”）</p>
+<h3 id="intarnet"><a href="#intarnet" class="headerlink" title="intarnet"></a>intarnet</h3><p>也是个打内网ssrf的题，用js写的，给了源码<br>第一步登录是超级sha1，要求<code>sha256(sha256(salt + &#39;admin&#39;) + sha256(salt + &#39;admin&#39;)) === sha256(sha256(salt + username) + sha256(salt + password))</code>且不能进这个条件<code>!username || !password || username === password || username.length === password.length || username === &#39;admin&#39;</code><br>令username为数组即可绕过，username[]=admin&amp;password=admin</p>
+<p>第二步是打一个ssrf，有get和post两种方式，post的话完全不可控，感觉无法利用，get的话需要过这么一个waf</p>
+<pre class=" language-javascript"><code class="language-javascript"><span class="token keyword">function</span> <span class="token function">SSRF_WAF</span><span class="token punctuation">(</span>url<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token keyword">const</span> host <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">UrlParse</span><span class="token punctuation">(</span>url<span class="token punctuation">)</span><span class="token punctuation">.</span>hostname<span class="token punctuation">.</span><span class="token function">replace</span><span class="token punctuation">(</span><span class="token regex">/\[|]/g</span><span class="token punctuation">,</span> <span class="token string">''</span><span class="token punctuation">)</span>
+
+    <span class="token keyword">return</span> <span class="token function">isIp</span><span class="token punctuation">(</span>host<span class="token punctuation">)</span> <span class="token operator">&amp;&amp;</span> IP<span class="token punctuation">.</span><span class="token function">isPublic</span><span class="token punctuation">(</span>host<span class="token punctuation">)</span>
+<span class="token punctuation">}</span></code></pre>
+<p>这个地方我真没想到怎么过，一开始都想着去找这些库解析上的漏洞了。。。结果发现这种类型的问题都可以用302重定向解决。。。在这上面栽了两三次了还没长记性呜呜</p>
+<p>访问flag路由会得到hint，hint说内网里面还有一个Netflix的什么服务？？不会做</p>
+<h2 id="参考文章"><a href="#参考文章" class="headerlink" title="参考文章"></a>参考文章</h2><p><a href="https://xz.aliyun.com/t/3973" target="_blank" rel="external nofollow noopener noreferrer">通过MySQL LOAD DATA特性来达到任意文件读取</a><br><a href="https://paper.seebug.org/1112/" target="_blank" rel="external nofollow noopener noreferrer">CSS-T | Mysql Client 任意文件读取攻击链拓展</a></p>
 
     </div>
 
@@ -288,7 +308,6 @@
       <footer class="post-footer">
           <div class="post-tags">
               <a href="/tags/wp/" rel="tag"># wp</a>
-              <a href="/tags/SQLI/" rel="tag"># SQLI</a>
           </div>
 
         
@@ -297,13 +316,10 @@
         
     <div class="post-nav">
       <div class="post-nav-item">
-    <a href="/%E5%9B%BD%E8%B5%9BLove%20Math.html" rel="prev" title="国赛 Love Math">
-      <i class="fa fa-chevron-left"></i> 国赛 Love Math
+    <a href="/%5Bpasecactf_2019%5Dflask_ssti.html" rel="prev" title="[pasecactf_2019]flask_ssti">
+      <i class="fa fa-chevron-left"></i> [pasecactf_2019]flask_ssti
     </a></div>
-      <div class="post-nav-item">
-    <a href="/%5BwatevrCTF-2019%5DPickle%20Store.html" rel="next" title="[watevrCTF2019]Pickle_Store">
-      [watevrCTF2019]Pickle_Store <i class="fa fa-chevron-right"></i>
-    </a></div>
+      <div class="post-nav-item"></div>
     </div>
       </footer>
     
@@ -363,7 +379,7 @@
 
       <!--noindex-->
       <div class="post-toc-wrap sidebar-panel">
-          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#嘶吼CTF-Online-Proxy"><span class="nav-number">1.</span> <span class="nav-text">[嘶吼CTF] Online Proxy</span></a></li></ol></div>
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#红明谷-amp-虎符CTF"><span class="nav-number">1.</span> <span class="nav-text">红明谷&amp;虎符CTF</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#红明谷"><span class="nav-number">1.1.</span> <span class="nav-text">红明谷</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#happysql"><span class="nav-number">1.1.1.</span> <span class="nav-text">happysql</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#writeshell"><span class="nav-number">1.1.2.</span> <span class="nav-text">writeshell</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#ThinkPHP-3-2-3反序列化"><span class="nav-number">1.1.3.</span> <span class="nav-text">ThinkPHP 3.2.3反序列化</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#看wp"><span class="nav-number">1.1.3.1.</span> <span class="nav-text">看wp</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#虎符"><span class="nav-number">1.2.</span> <span class="nav-text">虎符</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#签到"><span class="nav-number">1.2.1.</span> <span class="nav-text">签到</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#unsetme"><span class="nav-number">1.2.2.</span> <span class="nav-text">unsetme</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#慢慢做"><span class="nav-number">1.2.3.</span> <span class="nav-text">慢慢做</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#看wp-1"><span class="nav-number">1.2.3.1.</span> <span class="nav-text">看wp</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#intarnet"><span class="nav-number">1.2.4.</span> <span class="nav-text">intarnet</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#参考文章"><span class="nav-number">1.3.</span> <span class="nav-text">参考文章</span></a></li></ol></li></ol></div>
       </div>
       <!--/noindex-->
 
