@@ -37,7 +37,7 @@
 <meta property="og:image" content="https:&#x2F;&#x2F;blog.z3ratu1.cn&#x2F;images&#x2F;Java%E7%9A%84%E5%A5%87%E6%80%AA%E5%91%BD%E4%BB%A4%E6%89%A7%E8%A1%8C&#x2F;7.png">
 <meta property="og:image" content="https:&#x2F;&#x2F;blog.z3ratu1.cn&#x2F;images&#x2F;Java%E7%9A%84%E5%A5%87%E6%80%AA%E5%91%BD%E4%BB%A4%E6%89%A7%E8%A1%8C&#x2F;8.png">
 <meta property="og:image" content="https:&#x2F;&#x2F;blog.z3ratu1.cn&#x2F;images&#x2F;Java%E7%9A%84%E5%A5%87%E6%80%AA%E5%91%BD%E4%BB%A4%E6%89%A7%E8%A1%8C&#x2F;9.png">
-<meta property="og:updated_time" content="2021-01-06T07:18:02.917Z">
+<meta property="og:updated_time" content="2021-04-13T11:43:23.715Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:image" content="https:&#x2F;&#x2F;blog.z3ratu1.cn&#x2F;images&#x2F;Java%E7%9A%84%E5%A5%87%E6%80%AA%E5%91%BD%E4%BB%A4%E6%89%A7%E8%A1%8C&#x2F;1.png">
 
@@ -230,10 +230,16 @@
                 <i class="far fa-calendar"></i>
               </span>
               <span class="post-meta-item-text">发表于</span>
-              
 
-              <time title="创建时间：2021-01-06 14:57:25 / 修改时间：15:18:02" itemprop="dateCreated datePublished" datetime="2021-01-06T14:57:25+08:00">2021-01-06</time>
+              <time title="创建时间：2021-01-06 14:57:25" itemprop="dateCreated datePublished" datetime="2021-01-06T14:57:25+08:00">2021-01-06</time>
             </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2021-04-13 19:43:23" itemprop="dateModified" datetime="2021-04-13T19:43:23+08:00">2021-04-13</time>
+              </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
                 <i class="far fa-folder"></i>
@@ -286,7 +292,7 @@
 <h3 id="IFS"><a href="#IFS" class="headerlink" title="${IFS}"></a>${IFS}</h3><p>经典Linux命令行代替空格的分隔符，大部分情况下的确可以代替空格，不过好像在偶尔还是会有问题？</p>
 <h3 id="朴素方案"><a href="#朴素方案" class="headerlink" title="朴素方案"></a>朴素方案</h3><p>远端下载一个shell脚本下来再用bash执行，curl -o下文件，然后任意命令执行</p>
 <h3 id="没看懂的方案"><a href="#没看懂的方案" class="headerlink" title="没看懂的方案"></a>没看懂的方案</h3><p><code>sh -c $@|sh . echo cmd</code> $@类似于一个包含所有参数的迭代器，但是这里没有任何参数输入啊？然后再把结果管道符到一个新shell？.搜了一下是source命令(我感觉可能事实上并不是），大概是说保持命令上下文不变？然后执行的也不是脚本是一个echo出来的cmd？<del>忘了这段吧，真完全看不懂呜呜</del><br><a href="http://c.biancheng.net/cpp/view/2739.html" target="_blank" rel="external nofollow noopener noreferrer">Shell特殊变量</a><br><a href="https://blog.csdn.net/violet_echo_0908/article/details/52056071" target="_blank" rel="external nofollow noopener noreferrer">Linux下source命令详解</a></p>
-<p>并且java的玄幻分隔会把上文分割成[“sh”,”-c”,”$@|sh”, “.”, “echo”, “cmd”]我真觉得跑步起来。。。</p>
+<p>并且java的玄幻分隔会把上文分割成[“sh”,”-c”,”$@|sh”, “.”, “echo”, “cmd”]我真觉得跑不起来。。。</p>
 <h2 id="其他奇怪的东西"><a href="#其他奇怪的东西" class="headerlink" title="其他奇怪的东西"></a>其他奇怪的东西</h2><p>学这个的过程中一些奇怪的边角知识点</p>
 <h3 id="bash的引号括号"><a href="#bash的引号括号" class="headerlink" title="bash的引号括号"></a>bash的引号括号</h3><h4 id="引号"><a href="#引号" class="headerlink" title="引号"></a>引号</h4><p>总觉得引号这段以前学习过<br>双引号，转义空格，重定向，管道什么的（不转义$）<br>单引号，转义一切，包括$</p>
 <h4 id="括号"><a href="#括号" class="headerlink" title="括号"></a>括号</h4><p><a href="https://blog.csdn.net/taiyang1987912/article/details/39551385" target="_blank" rel="external nofollow noopener noreferrer">shell中各种括号的作用</a><br>圆括号()</p>
@@ -298,6 +304,7 @@
 <p>代码块，又被称为内部组，这个结构事实上创建了一个<strong>匿名函数</strong> 。与小括号中的命令不同，大括号内的命令不会新开一个子shell运行，即脚本余下部分仍可使用括号内变量。括号内的命令间用分号隔开，最后一个也必须有分号。{}的第一个命令和左括号之间必须要有一个空格。</p>
 </blockquote>
 <p>但是这里的大括号逗号执行命令好像并不是上面说的内容，测试结果就是{cmd,arg}支持cmd arg这样子的命令运行，无参数可以arg留空，但参数最多只能有一个，也就是说只能绕过一个空格，如果命令存在多个空格，还想用逗号代替就会出错</p>
+<h3 id="底层命令执行"><a href="#底层命令执行" class="headerlink" title="底层命令执行"></a>底层命令执行</h3><p>分析的时候可以看到命令执行是从Runtime.exec()进入了ProcessBuilder最后进了ProcessImpl，事实上最后的一步执行应该是调用了ProcessImpl的native方法forkAndExec，这个函数就是它的名字这样，进行fork和exec的系统调用进行命令执行。<br>当目标的防御程度只在ProcessBuilder的时候，就可以直接反射构造ProcessImpl获取其forkAndExec方法进行命令执行</p>
 <h2 id="结论"><a href="#结论" class="headerlink" title="结论"></a>结论</h2><p>罗里吧嗦的说了一大堆，最后命令执行那段还不是自己调试看到的。。。得到的结论其实也很简单<br>Java的Runtime.getRuntime().exec()在传入参数为字符串时，会通过空格将字符串分隔成数组，将数组第一个元素作为可执行文件，后面所有元素作为参数进行系统调用execvp完成命令执行<br>因此导致了奇怪的命令执行失败<br>最稳定解决方案为base64编码</p>
 <h2 id="参考链接"><a href="#参考链接" class="headerlink" title="参考链接"></a>参考链接</h2><p><a href="https://xz.aliyun.com/t/7046" target="_blank" rel="external nofollow noopener noreferrer">Java Runtime.getRuntime().exec由表及里</a><br><a href="http://www.lmxspace.com/2019/10/08/Java%E4%B8%8B%E5%A5%87%E6%80%AA%E7%9A%84%E5%91%BD%E4%BB%A4%E6%89%A7%E8%A1%8C/" target="_blank" rel="external nofollow noopener noreferrer">Java下奇怪的命令执行</a><br><a href="https://mp.weixin.qq.com/s/zCe_O37rdRqgN-Yvlq1FDg" target="_blank" rel="external nofollow noopener noreferrer">在 Runtime.getRuntime().exec(String cmd) 中执行任意shell命令的几种方法</a></p>
 
@@ -385,7 +392,7 @@
 
       <!--noindex-->
       <div class="post-toc-wrap sidebar-panel">
-          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#Java的奇怪命令执行"><span class="nav-number">1.</span> <span class="nav-text">Java的奇怪命令执行</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#Runtime-getRuntime-exec-cmd"><span class="nav-number">1.1.</span> <span class="nav-text">Runtime.getRuntime().exec(cmd)</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#解决方案"><span class="nav-number">1.2.</span> <span class="nav-text">解决方案</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#直接传入string数组"><span class="nav-number">1.2.1.</span> <span class="nav-text">直接传入string数组</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#base64编码"><span class="nav-number">1.2.2.</span> <span class="nav-text">base64编码</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#IFS"><span class="nav-number">1.2.3.</span> <span class="nav-text">${IFS}</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#朴素方案"><span class="nav-number">1.2.4.</span> <span class="nav-text">朴素方案</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#没看懂的方案"><span class="nav-number">1.2.5.</span> <span class="nav-text">没看懂的方案</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#其他奇怪的东西"><span class="nav-number">1.3.</span> <span class="nav-text">其他奇怪的东西</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#bash的引号括号"><span class="nav-number">1.3.1.</span> <span class="nav-text">bash的引号括号</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#引号"><span class="nav-number">1.3.1.1.</span> <span class="nav-text">引号</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#括号"><span class="nav-number">1.3.1.2.</span> <span class="nav-text">括号</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#结论"><span class="nav-number">1.4.</span> <span class="nav-text">结论</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#参考链接"><span class="nav-number">1.5.</span> <span class="nav-text">参考链接</span></a></li></ol></li></ol></div>
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#Java的奇怪命令执行"><span class="nav-number">1.</span> <span class="nav-text">Java的奇怪命令执行</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#Runtime-getRuntime-exec-cmd"><span class="nav-number">1.1.</span> <span class="nav-text">Runtime.getRuntime().exec(cmd)</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#解决方案"><span class="nav-number">1.2.</span> <span class="nav-text">解决方案</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#直接传入string数组"><span class="nav-number">1.2.1.</span> <span class="nav-text">直接传入string数组</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#base64编码"><span class="nav-number">1.2.2.</span> <span class="nav-text">base64编码</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#IFS"><span class="nav-number">1.2.3.</span> <span class="nav-text">${IFS}</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#朴素方案"><span class="nav-number">1.2.4.</span> <span class="nav-text">朴素方案</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#没看懂的方案"><span class="nav-number">1.2.5.</span> <span class="nav-text">没看懂的方案</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#其他奇怪的东西"><span class="nav-number">1.3.</span> <span class="nav-text">其他奇怪的东西</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#bash的引号括号"><span class="nav-number">1.3.1.</span> <span class="nav-text">bash的引号括号</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#引号"><span class="nav-number">1.3.1.1.</span> <span class="nav-text">引号</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#括号"><span class="nav-number">1.3.1.2.</span> <span class="nav-text">括号</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#底层命令执行"><span class="nav-number">1.3.2.</span> <span class="nav-text">底层命令执行</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#结论"><span class="nav-number">1.4.</span> <span class="nav-text">结论</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#参考链接"><span class="nav-number">1.5.</span> <span class="nav-text">参考链接</span></a></li></ol></li></ol></div>
       </div>
       <!--/noindex-->
 

@@ -28,7 +28,7 @@
 <meta property="og:site_name" content="Z3ratu1&#39;s blog">
 <meta property="og:description" content="Java反序列化入门最近打工需要学这个，同样是反序列化，Python和PHP的就好理解多了，Java的果然还是复杂不少。。。主要是对Java的各种架构也都不怎么理解，需要进行一个从零开始的入门呜呜呜我好菜 Java反射机制反射是Java反序列化的一大关键利用点说实话，一开始完全看不懂为什么要叫反射这么个名字，我觉得应该先明白反射是怎么回事，如下反射介绍部分均参考文末大哥链接，”正射”这个概念的提出">
 <meta property="og:locale" content="zh-Hans">
-<meta property="og:updated_time" content="2020-11-29T14:05:00.228Z">
+<meta property="og:updated_time" content="2021-04-13T11:57:29.040Z">
 <meta name="twitter:card" content="summary">
 
 <link rel="canonical" href="https://blog.z3ratu1.cn/Java%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96%E5%85%A5%E9%97%A8.html">
@@ -220,10 +220,16 @@
                 <i class="far fa-calendar"></i>
               </span>
               <span class="post-meta-item-text">发表于</span>
-              
 
-              <time title="创建时间：2020-11-29 14:26:20 / 修改时间：22:05:00" itemprop="dateCreated datePublished" datetime="2020-11-29T14:26:20+08:00">2020-11-29</time>
+              <time title="创建时间：2020-11-29 14:26:20" itemprop="dateCreated datePublished" datetime="2020-11-29T14:26:20+08:00">2020-11-29</time>
             </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2021-04-13 19:57:29" itemprop="dateModified" datetime="2021-04-13T19:57:29+08:00">2021-04-13</time>
+              </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
                 <i class="far fa-folder"></i>
@@ -313,15 +319,13 @@ Apple apple <span class="token operator">=</span> <span class="token punctuation
 <p>getMethod方法返回的并不是对应类的方法，而是一个封装了对应类方法的Method对象，而invoke函数则是调用封装在Method对象中的方法，所以如上代码先是通过invoke调用封装了getRuntime方法的Method对象获取了一个runtime对象，再获取一个封装了exec的Method对象调用invoke方法执行exec函数</p>
 <p>总而言之，就是<code>getMethod(&quot;func&quot;).invoke(obj,arg...)</code>就是<code>obj.func(arg...)</code></p>
 <h2 id="反序列化漏洞"><a href="#反序列化漏洞" class="headerlink" title="反序列化漏洞"></a>反序列化漏洞</h2><p>出现在ObjectInputStream的readObject方法中，当目标对象重写了readObject时，就会使用重写方法<br>若重写的方法中存在一定的操作，就有机会通过操作去寻找可利用类，最终实现漏洞利用</p>
-<p>整体过程真的好复杂。。。。我完全讲不清楚<br>还是以看到的文章为例，简单的理一下过程，具体代码看参考链接</p>
-<p>根据文章观点，反序列化利用需要三个参与者<br>1.无德的病毒<br>2.无辜的宿主<br>3.无良的媒介</p>
-<p>无德的病毒即是触发即可执行任意命令的工具类，我们将他先准备好，去寻找一个可以隐藏的宿主</p>
-<p>无辜的宿主，为一个重写了readObject方法的，且自身为Serializable的类，并且在readObject过程中对自身的无良的媒介进行了一定的操作，触发了无德的病毒</p>
-<p>无良的媒介，无德的病毒是其成员变量，而其本身又是无辜的宿主的成员变量，在无辜的宿主进行操作时导致无德病毒的触发</p>
+<blockquote>
+<p>最近重新从头开始学了下Java，在一切理清楚的情况下感觉并没有这么复杂，之前写的垃圾作废，推倒重来</p>
+</blockquote>
 <h3 id="利用链介绍"><a href="#利用链介绍" class="headerlink" title="利用链介绍"></a>利用链介绍</h3><p>参考链接中使用了一个AnnotationInvocationHandler为宿主，TransformedMap为媒介，ChainedTransformer为病毒的利用链</p>
-<h4 id="AnnotationInvocationHandler-gt-TransformedMap-gt-ChainedTransformer"><a href="#AnnotationInvocationHandler-gt-TransformedMap-gt-ChainedTransformer" class="headerlink" title="AnnotationInvocationHandler-&gt;TransformedMap-&gt;ChainedTransformer"></a>AnnotationInvocationHandler-&gt;TransformedMap-&gt;ChainedTransformer</h4><p>AnnotationInvocationHandler类在readObject方法中遍历了自己一个Map成员的memberValues属性，并且对其中的Entry对象执行了setValue操作<br>寻找到了一个Map类TransformedMap作为无良的媒介，该对象的Entry的Key或者Value进行改变的时候，对该Key和Value进行Transformer提供的转换操作<br>ChainedTransformer即为任意命令执行的无德的病毒，转换操作即为任意命令执行的触发点<br>AnnotationInvocationHandler类在后续补丁上已经去掉了这个setValue操作，因此我们还有另一个类可以用来当做宿主</p>
-<h4 id="BadAttributeValueExpException-gt-TiedMapEntry-gt-LazyMap-gt-ChainedTransformer"><a href="#BadAttributeValueExpException-gt-TiedMapEntry-gt-LazyMap-gt-ChainedTransformer" class="headerlink" title="BadAttributeValueExpException-&gt;TiedMapEntry-&gt;LazyMap-&gt;ChainedTransformer"></a>BadAttributeValueExpException-&gt;TiedMapEntry-&gt;LazyMap-&gt;ChainedTransformer</h4><p><code>BadAttributeValueExpException</code>，这个类在很多java反序列化的CVE中均有出没，而其代码内容从未被更改，漏洞的修补均是修改其他处限制或设置黑白名单，可能就开发人员而言，这个类的实现并没有问题，因此我们才将之称为<strong>无辜的</strong>宿主</p>
-<p>这个类的readObject方法是获取自己一个名为val的属性，并在一系列判断后调用val.toString()方法<br>找到LazyMap这个类，这个类在使用get方法去查找一个不存在值时，会触发自身Transformer对象的transform方法，这一步就算找到了病毒到媒介的触发过程<br>但是这个媒介无法直接和宿主的toString相关联，我们继续寻找，得到类TiedMapEntry，该类中重写了toString函数，并在其中调用了getValue()，而getValue则进一步调用了map.get(key)，将宿主和另一个媒介串联起来，完成利用</p>
+<h4 id="AnnotationInvocationHandler-gt-TransformedMap-gt-ChainedTransformer"><a href="#AnnotationInvocationHandler-gt-TransformedMap-gt-ChainedTransformer" class="headerlink" title="AnnotationInvocationHandler-&gt;TransformedMap-&gt;ChainedTransformer"></a>AnnotationInvocationHandler-&gt;TransformedMap-&gt;ChainedTransformer</h4><p>AnnotationInvocationHandler类在readObject方法中遍历了自己一个Map成员的memberValues属性，并且对其中的Entry对象执行了setValue操作<br>Map类TransformedMap，该类的Entry的Key或者Value进行改变的时候，对该Key和Value进行Transformer提供的转换操作<br>ChainedTransformer通过对其含有的所有Transformer依次执行transform，进行命令执行<br>AnnotationInvocationHandler类在后续补丁上已经去掉了这个setValue操作，因此我们还有另一个类可以用来当做宿主</p>
+<h4 id="BadAttributeValueExpException-gt-TiedMapEntry-gt-LazyMap-gt-ChainedTransformer"><a href="#BadAttributeValueExpException-gt-TiedMapEntry-gt-LazyMap-gt-ChainedTransformer" class="headerlink" title="BadAttributeValueExpException-&gt;TiedMapEntry-&gt;LazyMap-&gt;ChainedTransformer"></a>BadAttributeValueExpException-&gt;TiedMapEntry-&gt;LazyMap-&gt;ChainedTransformer</h4><p><code>BadAttributeValueExpException</code>，这个类在很多java反序列化的CVE中均有出没，而其代码内容从未被更改，漏洞的修补均是修改其他处限制或设置黑白名单，可能就开发人员而言，这个类的实现并没有问题</p>
+<p>这个类的readObject方法是获取自己一个名为val的属性，并在一系列判断后调用val.toString()方法<br>找到LazyMap这个类，这个类在使用get方法去查找一个不存在值时，会触发自身Transformer对象的transform方法，对ChainedTransformer进行transform一把点爆<br>但是还需要一个从BadAttributeValueExpException的toString到LazyMap的get方法的中继，我们继续寻找，得到类TiedMapEntry，该类中重写了toString函数，并在其中调用了getValue()，而getValue则进一步调用了map.get(key)，将宿主和另一个媒介串联起来，完成利用</p>
 <h4 id="AnnotationInvocationHandler-gt-LazyMap-gt-ChainedTransformer"><a href="#AnnotationInvocationHandler-gt-LazyMap-gt-ChainedTransformer" class="headerlink" title="AnnotationInvocationHandler-&gt;LazyMap-&gt;ChainedTransformer"></a>AnnotationInvocationHandler-&gt;LazyMap-&gt;ChainedTransformer</h4><p>这个是rmb神仙写的分析，详细一点，但利用链和前面的例子差距不大，可以解释前两个例子中粗略描述的调用过程<br>调用栈</p>
 <pre class=" language-java"><code class="language-java">Gadget chain<span class="token operator">:</span>
     ObjectInputStream<span class="token punctuation">.</span><span class="token function">readObject</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
@@ -340,7 +344,7 @@ Apple apple <span class="token operator">=</span> <span class="token punctuation
                             InvokerTransformer<span class="token punctuation">.</span><span class="token function">transform</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
                                 Method<span class="token punctuation">.</span><span class="token function">invoke</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
                                     Runtime<span class="token punctuation">.</span><span class="token function">exec</span><span class="token punctuation">(</span><span class="token punctuation">)</span></code></pre>
-<h5 id="LazyMap-get"><a href="#LazyMap-get" class="headerlink" title="LazyMap.get"></a>LazyMap.get</h5><p>这个就是LazyMap的get方法，可以看到，当查找的key不存在时，调用自身factory属性的transform方法，无需多言，这个factory属性就是一个Transformer类</p>
+<h5 id="LazyMap-get"><a href="#LazyMap-get" class="headerlink" title="LazyMap.get"></a>LazyMap.get</h5><p>这个就是LazyMap的get方法，可以看到，当查找的key不存在时，调用自身factory属性的transform方法，factory即为一个Transformer类对象</p>
 <pre class=" language-java"><code class="language-java"><span class="token keyword">public</span> Object <span class="token function">get</span><span class="token punctuation">(</span>Object key<span class="token punctuation">)</span> <span class="token punctuation">{</span>
     <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token operator">!</span><span class="token keyword">super</span><span class="token punctuation">.</span>map<span class="token punctuation">.</span><span class="token function">containsKey</span><span class="token punctuation">(</span>key<span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
         Object value <span class="token operator">=</span> <span class="token keyword">this</span><span class="token punctuation">.</span>factory<span class="token punctuation">.</span><span class="token function">transform</span><span class="token punctuation">(</span>key<span class="token punctuation">)</span><span class="token punctuation">;</span>
@@ -411,8 +415,8 @@ Apple apple <span class="token operator">=</span> <span class="token punctuation
     Object object <span class="token operator">=</span> <span class="token keyword">this</span><span class="token punctuation">.</span>memberValues<span class="token punctuation">.</span><span class="token function">get</span><span class="token punctuation">(</span>str<span class="token punctuation">)</span><span class="token punctuation">;</span>
     <span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span></code></pre>
 <p>这里的memberValues就是一个Map，LazyMap是其子类，所以成功调用到LazyMap的get方法，而LazyMap里面就一个ChainTransformer，必然查不到，直接进ChainTransformer的transform，完成利用链</p>
-<h2 id="后记"><a href="#后记" class="headerlink" title="后记"></a>后记</h2><p>之前没稍微入门一下的时候就因为打工需要硬搜集CVE，硬看解析，实在是要老命，感觉java的反序列化比PHP复杂的原因在于java对象间的交互太多太复杂，类太多了。。。还有各种各样的方法，整体逻辑就很乱，得对java这些架构足够熟悉，能够知道每个类型的作用，继承自谁又包含哪些成员属性</p>
-<p>不过，可能熟练起来之后也反而会很轻松？<br>因为单个的类就是我们所谓的gadget，每个有一个小功能，拼拼凑凑就能拼出一条完整的链出来，因为宿主无辜，病毒无德，补丁一般都打在触发的中介上，也许今天TiedMapEntry给ban了，明天就能从其他gadget中拼拼凑凑又拿出一个从toString()到get()的调用链<br>也许多审计代码记录一些可用gadget，就能拼拼凑凑出一个新的漏洞，这就是积累吧<br>（最近看到的几个一系列的漏洞就是官方补一个马上用其他的小零件拼拼凑凑又摸出一个洞来）</p>
+<h2 id="后记"><a href="#后记" class="headerlink" title="后记"></a>后记</h2><p>Java的反序列化因为涉及的类很多，方法很复杂，所以给人很复杂的感觉（虽然PHP也有那种超级长的pop链，但是由于都是魔术方法互相调用感觉看的清楚一点），Java这里要记忆的类有点多了。。但是反序列化的入口点都是readObject，然后就看每个类的readObject里面能对什么对象调用什么方法，也是一个一个的凑最后能点爆一个构造好的ChainTransformer执行命令</p>
+<p>这种凑gadget的方法也行也能用的很灵活吧？搜集一些有各种各样小功能的类，万一那天一个类没了就拼拼凑凑又接上去了。TiedMapEntry给ban了，明天就能从其他gadget中拼拼凑凑又拿出一个从toString()到get()的调用链<br>也许多审计代码记录一些可用gadget，就能拼拼凑凑出一个新的漏洞，这就是积累吧<br>（最近看到的几个一系列的漏洞就是官方补一个马上用其他的小零件拼拼凑凑又摸出一个洞来）</p>
 <h2 id="参考链接"><a href="#参考链接" class="headerlink" title="参考链接"></a>参考链接</h2><p>强力推荐<br><a href="https://www.cnblogs.com/chanshuyi/p/head_first_of_reflection.html" target="_blank" rel="external nofollow noopener noreferrer">大白话说Java反射：入门、使用、原理</a><br>反序列化漏洞超级详细思路，但是代码具体好像还是省略了一点<br><a href="https://www.freebuf.com/vuls/170344.html" target="_blank" rel="external nofollow noopener noreferrer">Java反序列化漏洞的原理分析</a><br>rmb神仙的反序列化讲解，这个的具体代码多一点，看懂了上一篇再看这个就基本上能理解了呜呜呜<br><a href="https://xz.aliyun.com/t/7157" target="_blank" rel="external nofollow noopener noreferrer">ysoserial URLDNS, CommonsCollections1-7 分析+复现</a></p>
 
     </div>
