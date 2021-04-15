@@ -1,0 +1,544 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 4.0.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"blog.z3ratu1.cn","root":"/","scheme":"Pisces","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"always","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":true},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+  </script>
+
+  <meta name="description" content="Java RMI反序列化入门继续入门学习 名词解释没什么用的环节。Remote Method Invocation，远程方法调用JRMP，Java Remote Method Protocol，Java远程方法协议，是Java RMI过程中使用的一种协议 RMI使用方法">
+<meta name="keywords" content="Java,RMI">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Java RMI反序列化入门">
+<meta property="og:url" content="https:&#x2F;&#x2F;blog.z3ratu1.cn&#x2F;Java%20RMI%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96%E5%85%A5%E9%97%A8.html">
+<meta property="og:site_name" content="Z3ratu1&#39;s blog">
+<meta property="og:description" content="Java RMI反序列化入门继续入门学习 名词解释没什么用的环节。Remote Method Invocation，远程方法调用JRMP，Java Remote Method Protocol，Java远程方法协议，是Java RMI过程中使用的一种协议 RMI使用方法">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:updated_time" content="2021-04-15T11:42:13.119Z">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="https://blog.z3ratu1.cn/Java%20RMI%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96%E5%85%A5%E9%97%A8.html">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-Hans'
+  };
+</script>
+
+  <title>Java RMI反序列化入门 | Z3ratu1's blog</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+<link rel="stylesheet" href="/css/prism-tomorrow.css" type="text/css"></head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">Z3ratu1's blog</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">Welcome</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>关于</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+        <li class="menu-item menu-item-links">
+
+    <a href="/links/" rel="section"><i class="fa fa-link fa-fw"></i>友链</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off" placeholder="搜索..." spellcheck="false" type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+  <a href="https://github.com/Z3ratu1" class="github-corner" title="Follow me on GitHub" aria-label="Follow me on GitHub" rel="external nofollow noopener noreferrer" target="_blank"><svg width="80" height="80" viewbox="0 0 250 250" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"/><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"/><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"/></svg></a>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
+    <link itemprop="mainEntityOfPage" href="https://blog.z3ratu1.cn/Java%20RMI%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96%E5%85%A5%E9%97%A8.html">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="https://q2.qlogo.cn/headimg_dl?dst_uin=1207039417&spec=160">
+      <meta itemprop="name" content="Z3ratu1">
+      <meta itemprop="description" content="与其感慨路难行，不如现在出发">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Z3ratu1's blog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          Java RMI反序列化入门
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2021-04-13 19:57:58" itemprop="dateCreated datePublished" datetime="2021-04-13T19:57:58+08:00">2021-04-13</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2021-04-15 19:42:13" itemprop="dateModified" datetime="2021-04-15T19:42:13+08:00">2021-04-15</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E7%AC%94%E8%AE%B0/" itemprop="url" rel="index"><span itemprop="name">笔记</span></a>
+                </span>
+            </span>
+
+          
+            <span id="/Java%20RMI%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96%E5%85%A5%E9%97%A8.html" class="post-meta-item leancloud_visitors" data-flag-title="Java RMI反序列化入门" title="阅读次数">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span class="leancloud-visitors-count"></span>
+            </span>
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="far fa-comment"></i>
+      </span>
+      <span class="post-meta-item-text">Valine：</span>
+    
+    <a title="valine" href="/Java%20RMI%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96%E5%85%A5%E9%97%A8.html#valine-comments" itemprop="discussionUrl">
+      <span class="post-comments-count valine-comment-count" data-xid="/Java%20RMI%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96%E5%85%A5%E9%97%A8.html" itemprop="commentCount"></span>
+    </a>
+  </span>
+  
+  
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h1 id="Java-RMI反序列化入门"><a href="#Java-RMI反序列化入门" class="headerlink" title="Java RMI反序列化入门"></a>Java RMI反序列化入门</h1><p>继续入门学习</p>
+<h2 id="名词解释"><a href="#名词解释" class="headerlink" title="名词解释"></a>名词解释</h2><p>没什么用的环节。Remote Method Invocation，远程方法调用<br>JRMP，Java Remote Method Protocol，Java远程方法协议，是Java RMI过程中使用的一种协议</p>
+<h2 id="RMI使用方法"><a href="#RMI使用方法" class="headerlink" title="RMI使用方法"></a>RMI使用方法</h2><p>感觉具体的代码网上特别多，也就不太想复制粘贴<br>服务端需要写一个接口，并实现对应接口，同时实现接口的类还需要继承<code>UnicastRemoteObject</code>，然后里面就可以写可以远程调用的方法了。<br>服务端同时还需要提供一个注册中心<code>LocateRegistry</code>，将ip端口路径和提供的支持远程调用的类对象进行绑定，对外提供服务<br>理论上提供远程调用的服务端和查询有哪些远程方法的注册中心是可以分开的，不过在jdk某个版本之后进行了安全检查，要求注册中心和服务端是同一台机器，否则不给绑定</p>
+<p>客户端只需要知道远程提供服务的路径，通过list，lookup等方法去获取一个远程调用的类对象的代理类，对代理类进行方法调用，就转换到将类名方法参数传递到服务端，由服务端查找类方法并进行调用，最后返回得到的结果</p>
+<p>整个调用的过程就是服务端运行一个Skeleton（骨架），类的实现之类的都在服务端，而客户端进行远程方法调用的时候，服务端就返回一个Stub（存根），实际上返回的是远程调用类的一个代理对象，其invoke方法就是将参数进行一个序列化，然后发到服务端，服务端收到参数后在本地执行对应的方法，并将执行结果返回给客户端</p>
+<h2 id="RMI反序列化利用"><a href="#RMI反序列化利用" class="headerlink" title="RMI反序列化利用"></a>RMI反序列化利用</h2><h3 id="攻击注册中心"><a href="#攻击注册中心" class="headerlink" title="攻击注册中心"></a>攻击注册中心</h3><p>对注册中心调用bind和rebind的时候，是会对输入的对象进行反序列化的，在这个地方可以打一个链，不过服务端在高版本和注册中心是一个机器，也就没有打的必要了，低版本jdk的话如果服务端和注册中心分离，可以注册的时候直接提交一个恶意对象反序列化打穿<br>客户端的话就得想办法用lookup和unbind打，但是这两个函数的参数的都是String，得提交一个Object才能进行反序列化，但是可以通过模仿<code>lookup</code>方法发送请求的流程，发送一个Object，虽然会报类型转换的错误，但是注册中心仍能进行反序列化执行命令</p>
+<h3 id="注册中心攻击客户端"><a href="#注册中心攻击客户端" class="headerlink" title="注册中心攻击客户端"></a>注册中心攻击客户端</h3><p>同样也能打服务端，但是基本上注册中心和服务端都是一台机子，所以就不多说了。<br>其实从上面也能看出来，只要两个机器远程交互的时候传递了序列化的对象，那接受的机器基本上就没跑的会把序列化的对象给反序列化出来，只要目标机器上确实存在这个链，就能一键打通。<br>使用ysoserial可以生成一个恶意的注册中心，只要服务端调用注册中心的方法，就给你返回一个执行命令的Object给你反序列化</p>
+<h3 id="客户端攻击服务端"><a href="#客户端攻击服务端" class="headerlink" title="客户端攻击服务端"></a>客户端攻击服务端</h3><p>服务端对传递过来的参数放进了一个<code>unmarshalValue</code>函数进行处理，该方法在参数不是基本类型的情况下会对传入数据进行readObject，所以客户端提交给服务端的数据里得有一个Object，也就是服务端提供的函数调用中，至少得有一个函数接受的参数是一个Object（至少得不是一个基本类型才能触发readObject），才能发一个恶意对象过去进行利用</p>
+<h3 id="服务端攻击客户端"><a href="#服务端攻击客户端" class="headerlink" title="服务端攻击客户端"></a>服务端攻击客户端</h3><p>刚才说了，只要信息交换过程中给了序列化数据十有八九就会反序列化，所以当客户端调用服务端方法的时候，同样可以让服务端返回一个Object，只需要让客户端调用一个返回值是Object的方法，返回一个恶意的Object就可以把客户端打穿</p>
+<h2 id="JNDI注入"><a href="#JNDI注入" class="headerlink" title="JNDI注入"></a>JNDI注入</h2><h3 id="JNDI"><a href="#JNDI" class="headerlink" title="JNDI"></a>JNDI</h3><p>Java Naming and Directory Interface，Java命名和目录接口，通过调用JNDI的API应用程序可以定位资源和其他程序对象，现在JNDI能访问的服务有：JDBC、LDAP、RMI、DNS、NIS、CORBA。</p>
+<p>其提供如下三种服务：<br>Naming Service 命名服务：<br>命名服务将名称和对象进行关联，提供通过名称找到对象的操作，例如：DNS系统将计算机名和IP地址进行关联、文件系统将文件名和文件句柄进行关联等等。</p>
+<p>Directory Service 目录服务：<br>目录服务是命名服务的扩展，除了提供名称和对象的关联，还允许对象具有属性。目录服务中的对象称之为目录对象。目录服务提供创建、添加、删除目录对象以及修改目录对象属性等操作。</p>
+<p>Reference 引用：<br>在一些命名服务系统中，系统并不是直接将对象存储在系统中，而是保持对象的引用。引用包含了如何访问实际对象的信息。</p>
+<h3 id="RMI绑定远程对象"><a href="#RMI绑定远程对象" class="headerlink" title="RMI绑定远程对象"></a>RMI绑定远程对象</h3><p>通过在注册中心上绑定一个远程的恶意对象，将恶意的对象放在HTTP/FTP/SMB服务器上，使得客户端在加载类时在本地无法找到，通过codebase远程加载恶意类，在类实例化时触发payload<br>需要满足如下利用条件</p>
+<ul>
+<li>安装并配置了SecurityManager</li>
+<li>java.rmi.server.useCodebaseOnly=false，当useCodebasOnly为true时只允许加载信任codebase，不对未知codebase动态加载类，Java从7u21、6u45开始默认该属性为true</li>
+</ul>
+<h3 id="JNDI-Reference"><a href="#JNDI-Reference" class="headerlink" title="JNDI Reference"></a>JNDI Reference</h3><p>RMI服务端在进行bind操作的时候，可以绑定一个JNDI Naming Reference（感觉类似于之前的RMI绑定远程对象），当客户端申请Stub的时候，返回的就是一个引用（Reference）对象，该引用对象的加载与RMI Class Loading的机制不同，因此可以绕过<code>java.rmi.server.useCodebaseOnly</code>的限制，但同样有相应的利用条件，需<code>com.sun.jndi.rmi.object.trustURLCodebase=true&amp;com.sun.jndi.cosnaming.object.trustURLCodebase=true</code>，其设置为false时限制了从远程Codebase加载Reference工厂类，JDK 6u132, JDK 7u122, JDK 8u113开始将其默认设置为false</p>
+<p>Reference对象没有实现Remote接口也不继承UnicastRemoteObject类，就不能绑定到注册中心上，需要用<code>ReferenceWrapper</code>这个包装类对其进行包装</p>
+<pre class=" language-java"><code class="language-java">Reference reference <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">Reference</span><span class="token punctuation">(</span><span class="token string">"test"</span><span class="token punctuation">,</span> <span class="token string">"test"</span><span class="token punctuation">,</span> <span class="token string">"http://localhost/"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+ReferenceWrapper wrapper <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">ReferenceWrapper</span><span class="token punctuation">(</span>reference<span class="token punctuation">)</span><span class="token punctuation">;</span>
+registry<span class="token punctuation">.</span><span class="token function">bind</span><span class="token punctuation">(</span><span class="token string">"calc"</span><span class="token punctuation">,</span> wrapper<span class="token punctuation">)</span><span class="token punctuation">;</span></code></pre>
+<p>当客户端在lookup之类操作问注册中心要Stub的时候，拿到的是引用对象，经过如下调用栈（复制粘贴先知的）</p>
+<pre><code>getObjectFactoryFromReference:163, NamingManager (javax.naming.spi)
+getObjectInstance:319, NamingManager (javax.naming.spi)
+decodeObject:456, RegistryContext (com.sun.jndi.rmi.registry)
+lookup:120, RegistryContext (com.sun.jndi.rmi.registry)
+lookup:203, GenericURLContext (com.sun.jndi.toolkit.url)
+lookup:411, InitialContext (javax.naming)
+main:7, JNDI_Test (demo)</code></pre><p>在<code>getObjectFactoryFromReference</code>最后是这么一段</p>
+<pre class=" language-java"><code class="language-java">String codebase<span class="token punctuation">;</span>
+    <span class="token keyword">if</span> <span class="token punctuation">(</span>clas <span class="token operator">==</span> null <span class="token operator">&amp;&amp;</span>
+            <span class="token punctuation">(</span>codebase <span class="token operator">=</span> ref<span class="token punctuation">.</span><span class="token function">getFactoryClassLocation</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token operator">!=</span> null<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token keyword">try</span> <span class="token punctuation">{</span>
+            clas <span class="token operator">=</span> helper<span class="token punctuation">.</span><span class="token function">loadClass</span><span class="token punctuation">(</span>factoryName<span class="token punctuation">,</span> codebase<span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token punctuation">}</span> <span class="token keyword">catch</span> <span class="token punctuation">(</span><span class="token class-name">ClassNotFoundException</span> e<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token punctuation">}</span>
+    <span class="token punctuation">}</span>
+
+    <span class="token keyword">return</span> <span class="token punctuation">(</span>clas <span class="token operator">!=</span> null<span class="token punctuation">)</span> <span class="token operator">?</span> <span class="token punctuation">(</span>ObjectFactory<span class="token punctuation">)</span> clas<span class="token punctuation">.</span><span class="token function">newInstance</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">:</span> null<span class="token punctuation">;</span></code></pre>
+<p>从codebase加载远程类字节码，最后返回一个clas.newInstance，这里就触发了我们预先在恶意类中埋下的雷，实现命令执行</p>
+<h3 id="JNDI-Reference-LDAP"><a href="#JNDI-Reference-LDAP" class="headerlink" title="JNDI Reference+LDAP"></a>JNDI Reference+LDAP</h3><p>绑定的东西改成一个LDAP服务，LDAP服务同样可以返回一个JNDI Reference对象，这时通过LDAP远程加载，不受上面这两个<code>com.sun.jndi.rmi.object.trustURLCodebase&amp;com.sun.jndi.cosnaming.object.trustURLCodebase</code>属性的控制，同样也被打了补丁<br>在在Oracle JDK 11.0.1、8u191、7u201、6u211之后，<code>com.sun.jndi.ldap.object.trustURLCodebase</code>属性的默认值被调整为false</p>
+<h3 id="利用本地链进行执行"><a href="#利用本地链进行执行" class="headerlink" title="利用本地链进行执行"></a>利用本地链进行执行</h3><p>这个就是在JDK默认限制全部拉满之后的解决方案，不让从外部加载，就只能看用户本地有什么东西了，只要用户本地能摸出来一条链就可以用用户本地的链打通</p>
+<h2 id="参考链接"><a href="#参考链接" class="headerlink" title="参考链接"></a>参考链接</h2><p><a href="https://xz.aliyun.com/t/8706" target="_blank" rel="external nofollow noopener noreferrer">JAVA RMI 反序列化攻击 &amp; JEP290 Bypass分析</a><br><a href="https://xz.aliyun.com/t/6660" target="_blank" rel="external nofollow noopener noreferrer">RMI反序列化</a><br><a href="https://xz.aliyun.com/t/8214" target="_blank" rel="external nofollow noopener noreferrer">JNDI注入学习</a><br><a href="https://paper.seebug.org/942/" target="_blank" rel="external nofollow noopener noreferrer">如何绕过高版本JDK的限制进行JNDI注入利用</a></p>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/Java/" rel="tag"># Java</a>
+              <a href="/tags/RMI/" rel="tag"># RMI</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/Switch%E8%87%AA%E5%BB%BANAT%E4%BC%98%E5%8C%96%E6%8C%87%E5%8C%97.html" rel="prev" title="Switch自建NAT优化指北">
+      <i class="fa fa-chevron-left"></i> Switch自建NAT优化指北
+    </a></div>
+      <div class="post-nav-item"></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+    <div class="comments" id="valine-comments"></div>
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#Java-RMI反序列化入门"><span class="nav-number">1.</span> <span class="nav-text">Java RMI反序列化入门</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#名词解释"><span class="nav-number">1.1.</span> <span class="nav-text">名词解释</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#RMI使用方法"><span class="nav-number">1.2.</span> <span class="nav-text">RMI使用方法</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#RMI反序列化利用"><span class="nav-number">1.3.</span> <span class="nav-text">RMI反序列化利用</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#攻击注册中心"><span class="nav-number">1.3.1.</span> <span class="nav-text">攻击注册中心</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#注册中心攻击客户端"><span class="nav-number">1.3.2.</span> <span class="nav-text">注册中心攻击客户端</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#客户端攻击服务端"><span class="nav-number">1.3.3.</span> <span class="nav-text">客户端攻击服务端</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#服务端攻击客户端"><span class="nav-number">1.3.4.</span> <span class="nav-text">服务端攻击客户端</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#JNDI注入"><span class="nav-number">1.4.</span> <span class="nav-text">JNDI注入</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#JNDI"><span class="nav-number">1.4.1.</span> <span class="nav-text">JNDI</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#RMI绑定远程对象"><span class="nav-number">1.4.2.</span> <span class="nav-text">RMI绑定远程对象</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#JNDI-Reference"><span class="nav-number">1.4.3.</span> <span class="nav-text">JNDI Reference</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#JNDI-Reference-LDAP"><span class="nav-number">1.4.4.</span> <span class="nav-text">JNDI Reference+LDAP</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#利用本地链进行执行"><span class="nav-number">1.4.5.</span> <span class="nav-text">利用本地链进行执行</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#参考链接"><span class="nav-number">1.5.</span> <span class="nav-text">参考链接</span></a></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Z3ratu1" src="https://q2.qlogo.cn/headimg_dl?dst_uin=1207039417&spec=160">
+  <p class="site-author-name" itemprop="name">Z3ratu1</p>
+  <div class="site-description" itemprop="description">与其感慨路难行，不如现在出发</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">109</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">5</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">77</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+  <div class="beian"><a href="http://www.beian.miit.gov.cn/" rel="external nofollow noopener noreferrer" target="_blank">湘ICP备2020021580号 </a>
+      <img src="/./images/beian.png" style="display: inline-block;">
+  </div>
+
+<div class="copyright">
+  
+  &copy; 2019 – 
+  <span itemprop="copyrightYear">2021</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Z3ratu1</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="external nofollow noopener noreferrer" target="_blank">Hexo</a> & <a href="https://pisces.theme-next.org/" class="theme-link" rel="external nofollow noopener noreferrer" target="_blank">NexT.Pisces</a> 强力驱动
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+<script src="/js/utils.js"></script><script src="/js/motion.js"></script>
+<script src="/js/schemes/pisces.js"></script>
+<script src="/js/next-boot.js"></script>
+
+
+
+  
+
+
+
+
+  <script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+
+<script>
+NexT.utils.loadComments(document.querySelector('#valine-comments'), () => {
+  NexT.utils.getScript('https://cdn.jsdelivr.net/npm/valine@1.4.14/dist/Valine.min.js', () => {
+    var GUEST = ['nick', 'mail', 'link'];
+    var guest = 'nick,mail,link';
+    guest = guest.split(',').filter(item => {
+      return GUEST.includes(item);
+    });
+    new Valine({
+      el         : '#valine-comments',
+      verify     : false,
+      notify     : false,
+      appId      : '7H8kg0XdWO8IbhOcu4K1JaAT-gzGzoHsz',
+      appKey     : 'wPKQjkbVtvPaRR7gh2yjfLSi',
+      placeholder: "Just go go",
+      avatar     : 'mm',
+      meta       : guest,
+      pageSize   : '10' || 10,
+      visitor    : true,
+      lang       : '' || 'zh-cn',
+      path       : location.pathname,
+      recordIP   : false,
+      serverURLs : ''
+    });
+  }, window.Valine);
+});
+</script>
+
+</body>
+</html>
