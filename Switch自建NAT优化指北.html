@@ -31,7 +31,7 @@
 <meta property="og:image" content="https:&#x2F;&#x2F;blog.z3ratu1.cn&#x2F;images&#x2F;Switch%E8%87%AA%E5%BB%BANAT%E4%BC%98%E5%8C%96%E6%8C%87%E5%8C%97&#x2F;D.jpg">
 <meta property="og:image" content="https:&#x2F;&#x2F;blog.z3ratu1.cn&#x2F;images&#x2F;Switch%E8%87%AA%E5%BB%BANAT%E4%BC%98%E5%8C%96%E6%8C%87%E5%8C%97&#x2F;B.jpg">
 <meta property="og:image" content="https:&#x2F;&#x2F;blog.z3ratu1.cn&#x2F;images&#x2F;Switch%E8%87%AA%E5%BB%BANAT%E4%BC%98%E5%8C%96%E6%8C%87%E5%8C%97&#x2F;A.jpg">
-<meta property="og:updated_time" content="2021-04-09T15:49:41.349Z">
+<meta property="og:updated_time" content="2021-04-19T12:24:02.237Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:image" content="https:&#x2F;&#x2F;blog.z3ratu1.cn&#x2F;images&#x2F;Switch%E8%87%AA%E5%BB%BANAT%E4%BC%98%E5%8C%96%E6%8C%87%E5%8C%97&#x2F;D.jpg">
 
@@ -224,10 +224,16 @@
                 <i class="far fa-calendar"></i>
               </span>
               <span class="post-meta-item-text">发表于</span>
-              
 
-              <time title="创建时间：2021-04-09 16:26:17 / 修改时间：23:49:41" itemprop="dateCreated datePublished" datetime="2021-04-09T16:26:17+08:00">2021-04-09</time>
+              <time title="创建时间：2021-04-09 16:26:17" itemprop="dateCreated datePublished" datetime="2021-04-09T16:26:17+08:00">2021-04-09</time>
             </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2021-04-19 20:24:02" itemprop="dateModified" datetime="2021-04-19T20:24:02+08:00">2021-04-19</time>
+              </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
                 <i class="far fa-folder"></i>
@@ -272,7 +278,7 @@
       
         <h1 id="Switch自建NAT优化指北"><a href="#Switch自建NAT优化指北" class="headerlink" title="Switch自建NAT优化指北"></a>Switch自建NAT优化指北</h1><p>之前有一篇Switch的NAT自建加速方案遇到很多大哥和我讨论，在交流的过程中又学习了一些新的东西，很有意思。再订正一下之前写的东西，提供一个自建加速器的基本使用方案，因为纯软件实现方案总是不怎么靠谱，所以就把名字叫指北吧，借鉴自不知道什么时候看到的一个大哥写的教程的名字</p>
 <p>本文仅提供NAT类型优化方案，不一定能提升速度和联机质量，有说不清楚的地方可能在之前几篇相关文章中提到过了</p>
-<p>目前的方案已经亲测可用了，（应该）不会出现之前的问题了吧。。。</p>
+<p>目前的方案已经亲测可用了，（应该）不会出现之前的问题了吧。。。<br>之前的一些研究。。。<br><a href="https://blog.z3ratu1.cn/tags/Switch/">tag Switch</a></p>
 <h2 id="Clash流量接管"><a href="#Clash流量接管" class="headerlink" title="Clash流量接管"></a>Clash流量接管</h2><p>之前提到过，switch的代理设置只对TCP流量进行代理，就是Eshop下载和看新闻之类的功能，游戏大多使用的是UDP流量，所以不能仅通过Switch自带的代理设置加速游戏，场面上大部分的游戏都是UDP通信的，所以很多游戏加速器都是通过网络层接管流量进行代理<br>使用Clash for windows进行网络层的流量接管，照着百度配Service mode，新建一个Clash网卡全局接管流量，具体表现形式为QQ登录地点变得诡异</p>
 <p>Clash流量接管有两种方式，都需要Clash启动Service mode。<br>一种是设置Switch和PC连接同一WiFi，把Switch的网关设置为PC，但是这个方案在后来使用的时候Switch一直报DNS解析失败，明明一开始还能用的。后来也忘了当初配置是咋调的了。。。。<br>第二种是PC再开一个热点，Switch直接连接热点，在网络适配器设置那把Clash的虚拟网卡选择和热点网卡进行共享，同样能接管Switch流量</p>
 <h2 id="NAT类型提升"><a href="#NAT类型提升" class="headerlink" title="NAT类型提升"></a>NAT类型提升</h2><p>在自己的VPS上搭一个酸酸服务端，具体过程百度，自己写一个Clash规则添加VPS上去，Clash开全局代理</p>
