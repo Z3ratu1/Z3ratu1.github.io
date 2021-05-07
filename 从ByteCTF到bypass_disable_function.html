@@ -20,15 +20,15 @@
     var CONFIG = {"hostname":"blog.z3ratu1.cn","root":"/","scheme":"Pisces","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"always","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":true},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
   </script>
 
-  <meta name="description" content="从ByteCTF到bypass_disable_function起初只是简单的看了一下ByteCTF中那个bypass_disable_fuction的题，然后发现原来PHP有这么多bypass的方案我不知道，以及一些零碎的其他知识点，统一学习了 LD_PRELOAD这个是最老的操作之一了，我掌握的也就这一种，通过LD_PRELOAD这个变量可以指定动态链接库(.so文件)在libc之前被加载，编">
+  <meta name="description" content="从ByteCTF到bypass_disable_function起初只是简单的看了一下去年ByteCTF中那个bypass_disable_fuction的题，然后发现原来PHP有这么多bypass的方案我不知道，以及一些零碎的其他知识点，统一学习了 然后马上蓝帽杯遇到一个bypass发现完全不会做，进行大型update putenv在环境变量可控时执行的两大操作，需要disable_functi">
 <meta name="keywords" content="bypass_disable_function,PHP">
 <meta property="og:type" content="article">
 <meta property="og:title" content="从ByteCTF到bypass_disable_function">
 <meta property="og:url" content="https:&#x2F;&#x2F;blog.z3ratu1.cn&#x2F;%E4%BB%8EByteCTF%E5%88%B0bypass_disable_function.html">
 <meta property="og:site_name" content="Z3ratu1&#39;s blog">
-<meta property="og:description" content="从ByteCTF到bypass_disable_function起初只是简单的看了一下ByteCTF中那个bypass_disable_fuction的题，然后发现原来PHP有这么多bypass的方案我不知道，以及一些零碎的其他知识点，统一学习了 LD_PRELOAD这个是最老的操作之一了，我掌握的也就这一种，通过LD_PRELOAD这个变量可以指定动态链接库(.so文件)在libc之前被加载，编">
+<meta property="og:description" content="从ByteCTF到bypass_disable_function起初只是简单的看了一下去年ByteCTF中那个bypass_disable_fuction的题，然后发现原来PHP有这么多bypass的方案我不知道，以及一些零碎的其他知识点，统一学习了 然后马上蓝帽杯遇到一个bypass发现完全不会做，进行大型update putenv在环境变量可控时执行的两大操作，需要disable_functi">
 <meta property="og:locale" content="zh-Hans">
-<meta property="og:updated_time" content="2021-04-23T12:18:30.264Z">
+<meta property="og:updated_time" content="2021-05-05T09:19:45.604Z">
 <meta name="twitter:card" content="summary">
 
 <link rel="canonical" href="https://blog.z3ratu1.cn/%E4%BB%8EByteCTF%E5%88%B0bypass_disable_function.html">
@@ -220,10 +220,16 @@
                 <i class="far fa-calendar"></i>
               </span>
               <span class="post-meta-item-text">发表于</span>
-              
 
-              <time title="创建时间：2021-04-23 16:15:50 / 修改时间：20:18:30" itemprop="dateCreated datePublished" datetime="2021-04-23T16:15:50+08:00">2021-04-23</time>
+              <time title="创建时间：2021-04-23 16:15:50" itemprop="dateCreated datePublished" datetime="2021-04-23T16:15:50+08:00">2021-04-23</time>
             </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2021-05-05 17:19:45" itemprop="dateModified" datetime="2021-05-05T17:19:45+08:00">2021-05-05</time>
+              </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
                 <i class="far fa-folder"></i>
@@ -266,9 +272,11 @@
     <div class="post-body" itemprop="articleBody">
 
       
-        <h1 id="从ByteCTF到bypass-disable-function"><a href="#从ByteCTF到bypass-disable-function" class="headerlink" title="从ByteCTF到bypass_disable_function"></a>从ByteCTF到bypass_disable_function</h1><p>起初只是简单的看了一下ByteCTF中那个bypass_disable_fuction的题，然后发现原来PHP有这么多bypass的方案我不知道，以及一些零碎的其他知识点，统一学习了</p>
-<h2 id="LD-PRELOAD"><a href="#LD-PRELOAD" class="headerlink" title="LD_PRELOAD"></a>LD_PRELOAD</h2><p>这个是最老的操作之一了，我掌握的也就这一种，通过<code>LD_PRELOAD</code>这个变量可以指定动态链接库(.so文件)在libc之前被加载，编写一个恶意的动态链接库，使用GNU的特殊语法，在调用main函数之前对构造属性进行执行，由于是调的C库这边的函数，自然不受disable_function的影响。只要PHP启动新进程时，恶意动态链接库被加载，且其构造方法直接在一切之前运行，构造方法中写一个命令执行即可。<br>简单的说就是能劫持PHP启动的新进程<br>PHP使用mail函数的时候会用execve来启动sendmail，启动进程时成功命令执行</p>
-<h2 id="iconv"><a href="#iconv" class="headerlink" title="iconv"></a>iconv</h2><p>这个是ByteCTF的考点，基本原理也是最后的底层实现调用的是C的动态链接库。<br>PHP在使用<code>iconv()</code>时最后一路调用，进入libc函数<code>iconv_open()</code>，再一波操作调用到.so文件的方法，实现RCE<br>同样，系统不会无缘无故的调用我们自己上传的路径下的<code>.so</code>文件，其支持使用<code>GCONV_PATH</code>的自定义编码转换模块，所以可以putenv将该变量设置为目标路径，同时上传两个文件以建立该编码模块并实现利用</p>
+        <h1 id="从ByteCTF到bypass-disable-function"><a href="#从ByteCTF到bypass-disable-function" class="headerlink" title="从ByteCTF到bypass_disable_function"></a>从ByteCTF到bypass_disable_function</h1><p>起初只是简单的看了一下去年ByteCTF中那个bypass_disable_fuction的题，然后发现原来PHP有这么多bypass的方案我不知道，以及一些零碎的其他知识点，统一学习了</p>
+<p>然后马上蓝帽杯遇到一个bypass发现完全不会做，进行大型update</p>
+<h2 id="putenv"><a href="#putenv" class="headerlink" title="putenv"></a>putenv</h2><p>在环境变量可控时执行的两大操作，需要disable_function里面给用putenv</p>
+<h3 id="LD-PRELOAD"><a href="#LD-PRELOAD" class="headerlink" title="LD_PRELOAD"></a>LD_PRELOAD</h3><p>这个是最老的操作之一了，我掌握的也就这一种，通过<code>LD_PRELOAD</code>这个变量可以指定动态链接库(.so文件)在libc之前被加载，编写一个恶意的动态链接库，使用GNU的特殊语法，在调用main函数之前对构造属性进行执行，由于是调的C库这边的函数，自然不受disable_function的影响。只要PHP启动新进程时，恶意动态链接库被加载，且其构造方法直接在一切之前运行，构造方法中写一个命令执行即可。<br>简单的说就是能劫持PHP启动的新进程<br>PHP使用mail函数的时候会用execve来启动sendmail，启动进程时成功命令执行</p>
+<h3 id="iconv"><a href="#iconv" class="headerlink" title="iconv"></a>iconv</h3><p>这个是ByteCTF的考点，基本原理也是最后的底层实现调用的是C的动态链接库。<br>PHP在使用<code>iconv()</code>时最后一路调用，进入libc函数<code>iconv_open()</code>，再一波操作调用到.so文件的方法，实现RCE<br>同样，系统不会无缘无故的调用我们自己上传的路径下的<code>.so</code>文件，其支持使用<code>GCONV_PATH</code>的自定义编码转换模块，所以可以putenv将该变量设置为目标路径，同时上传两个文件以建立该编码模块并实现利用</p>
 <p>gconv-modules</p>
 <pre><code>module  PAYLOAD//    INTERNAL    ../../../../../../../../tmp/payload    2
 module  INTERNAL    PAYLOAD//    ../../../../../../../../tmp/payload    2</code></pre><p>payload.c，使用<code>gcc payload.c -o payload.so -shared -fPIC</code>编译为payload.so</p>
@@ -291,17 +299,23 @@ void gconv_init() {
 </blockquote>
 <p><a href="https://github.com/beched/php_disable_functions_bypass" target="_blank" rel="external nofollow noopener noreferrer">利用脚本</a></p>
 <h2 id="攻击PHP-FPM"><a href="#攻击PHP-FPM" class="headerlink" title="攻击PHP-FPM"></a>攻击PHP-FPM</h2><p>先了解一下前置知识</p>
-<h3 id="PHP运行类型"><a href="#PHP运行类型" class="headerlink" title="PHP运行类型"></a>PHP运行类型</h3><p>PHP运行一般来说几个类型，CLI，php-cgi，php-fpm，还有一个Apache2handler<br>CLI是Command Line Interface，命令行情况下使用，不怎么常见<br>CGI是Common Gateway Interface，webserver和其他软件通信的<strong>协议</strong>（感觉是配合Nginx使用的），有一个强化版本fast-cgi。php的cgi就是来一个请求PHP起一个解释器进程处理，处理完了关掉，就很慢很憨批，所以fast-cgi就是开局直接启动多个解释器进程常驻内存，等待接收请求，处理完了也不关，继续等下一次的请求<br>php-cgi是早期的cgi管理器，因为cgi不太行所以这个也不太行<br>php-fpm是fast-cgi的管理器，一个master进程和一堆worker进程，master接收请求分配给worker，能动态调度启动worker进程</p>
-<p>使用Apache搭建PHP的时候使用的是Apache2handler，感觉和fpm差不多，但是是Apache自己内嵌PHP的解释器，就少了一步进程间通信，Apache直接自己开PHP解释器进行处理</p>
-<h3 id="利用-1"><a href="#利用-1" class="headerlink" title="利用"></a>利用</h3><p>因为之前说到使用CGI的时候，是webserver和CGI直接进行通信的，所以就存在进程间通信的问题，在Nginx的设置中有一个fastcgi_pass的设置，指定fastcgi所在的ip端口，PHP的fpm设置中可以配置fastcgi的监听端口，可以通过配置使得PHP也能前后端分离？<br>PHP在fpm配置中若将监听端口写成0.0.0.0:9000，则接受来自任意ip的通信，可以通过伪装成Nginx与php-fpm通信来执行命令，如果配置的是127.0.0.1:9000这种情况的可能就要靠SSRF打了？<br><a href="https://gist.github.com/phith0n/9615e2420f31048f7e30f3937356cf75" target="_blank" rel="external nofollow noopener noreferrer">P神的利用脚本</a></p>
+<h3 id="PHP运行类型"><a href="#PHP运行类型" class="headerlink" title="PHP运行类型"></a>PHP运行类型</h3><p>PHP运行一般来说几个类型，CLI，php-cgi，php-fpm，Apache2.0handler<br>CLI是Command Line Interface，命令行情况下使用，不怎么常见<br>CGI是Common Gateway Interface，webserver和其他软件通信的<strong>协议</strong>（感觉是配合Nginx做反带之类的时候使用的），有一个强化版本fast-cgi。php的cgi就是来一个请求PHP起一个解释器进程处理，处理完了关掉，就很慢很憨批，所以fast-cgi就是开局直接启动多个解释器进程常驻内存，等待接收请求，处理完了也不关，继续等下一次的请求<br>php-cgi是早期的cgi管理器，因为cgi不太行所以这个也不太行<br>php-fpm是fast-cgi的管理器，一个master进程和一堆worker进程，master接收请求分配给worker，能动态调度启动worker进程，性能upup</p>
+<p>使用Apache搭建PHP的时候使用的是Apache2handler，这个时候Apache是把PHP作为一个module加载进来的，属于是Apache自己内嵌PHP的解释器，就少了一步进程间通信，Apache直接自己开PHP解释器进行处理</p>
+<h3 id="协议字段"><a href="#协议字段" class="headerlink" title="协议字段"></a>协议字段</h3><p>在通信时有几个比较有意思的字段是可以指定的<br><code>SCRIPT_FILENAME</code>，指定PHP执行的脚本文件路径，不过php5.3.9之后加入了fpm增加了security.limit_extensions，只允许执行如下后缀的文件<code>.php .php3 .php4 .php5 .php7</code><br><code>PHP_VALUE</code>，可以覆盖一些php.ini里面定义的属性，只能用于<code>PHP_INI_ALL</code>或<code>PHP_INI_PERDIR</code>类型的指令，具体看这个<a href="https://www.php.net/manual/zh/ini.list.php" target="_blank" rel="external nofollow noopener noreferrer">php.ini 配置选项列表</a>，好用的比如<code>auto_prepend_file</code>,<code>open_basedir</code><br><code>PHP_ADMIN_VALUE</code>，和上面这个差不多，区别在于这个字段设置的属性不能在用户层面上被修改，也就是不能被ini_set()之类的函数在应用里被重写，也不能被.htaccess这种配置文件覆盖，常用的有<code>allow_url_include</code>，启用后支持include url形式的文件，经典php://input伪协议打通，以及<code>extension_dir</code>，指定扩展的.so直接bypass disable_function打通，<code>safe_mode</code>，在PHP5.4之后就被删除了的东西，启用后会限制某些函数的使用，比如move_upload_file,copy这些能把远程文件下到本地的函数，和一些system，shell_exec这类直接的命令执行函数，也不允许进行dl函数加载扩展文件(.dll or .so)</p>
+<p>（找不到资料，但是感觉也许可以把低安全等级的变量也设置成PHP_ADMIN_VALUE不让动态的修改，不过<code>PHP_INI_SYSTEM</code>这个类型的属性理论上只允许在php.ini里面设置，这里能改真是玄幻）<br>与之对位的还有<code>PHP(_ADMIN)_FLAG</code>这么个属性，其区别在于其值只能为布尔值</p>
+<p>可惜的是这些属性并不能覆盖disable_function</p>
 <blockquote>
-<p>php-fpm拿到fastcgi数据包后，会判断客户端请求的文件是否存在，并且得是一个.php文件，所以利用条件是至少得知道一个.php文件的绝对路径</p>
+<p>PHP配置值通过 php_value 或者 php_flag 设置，并且会覆盖以前的值。请注意 disable_functions 或者 disable_classes 在 php.ini 之中定义的值不会被覆盖掉，但是会将新的设置附加在原有值的后面。<br>使用 php_admin_value 或者 php_admin_flag 定义的值，不能被 PHP 代码中的 ini_set() 覆盖。</p>
 </blockquote>
-<p>不过直接抄着那个脚本打并不能绕过Disable_function，因为这样子发过去的请求还是由原来的PHP解释器进行解析</p>
-<p>但是可以通过FastCGI协议去让php-fpm加载我们自定义的扩展(.so文件)，而这个扩展肯定是不受disable_function限制的，做到任意命令执行</p>
-<p>蚁剑有一个玄幻的插件，直接生成一个调用system函数的.so文件，然后输这么个命令<code>php -n -S 127.0.0.1:port -t /var/www/html</code>在目标机器上新开一个web服务，当然权限是www-data的，但是添加了<code>-n</code>参数指定不使用php.ini，可以绕过其设置的disable_function，并且还上传了一个antproxy.php文件将请求转发过去，实现比较方便的命令执行（不然应该是执行一次传一个.so吧，要我说继续搞那种接受环境变量做命令的方法也挺好的）</p>
-<h2 id="FFI"><a href="#FFI" class="headerlink" title="FFI"></a>FFI</h2><p>Foreign Function Interface，外部函数接口<br>PHP7.4的新特性，可以实验一个PHP的什么类直接调用外部代码，RCTF 2019的Nextphp出的就是这个</p>
-<h2 id="参考链接"><a href="#参考链接" class="headerlink" title="参考链接"></a>参考链接</h2><p><a href="https://xz.aliyun.com/t/8669" target="_blank" rel="external nofollow noopener noreferrer">ByteCTF WP-无需mail bypass disable_functions</a><br><a href="https://www.anquanke.com/post/id/197745" target="_blank" rel="external nofollow noopener noreferrer">PHP 突破 disable_functions 常用姿势以及使用 Fuzz 挖掘含内部系统调用的函数</a><br><a href="https://www.php.cn/php-weizijiaocheng-383223.html" target="_blank" rel="external nofollow noopener noreferrer">php之CGI、FastCGI、APACHE2HANDLER、CLI运行模式的详解s</a><br><a href="https://zhuanlan.zhihu.com/p/75114351" target="_blank" rel="external nofollow noopener noreferrer">攻击PHP-FPM 实现Bypass Disable Functions</a><br><a href="https://security.tencent.com/index.php/blog/msg/166" target="_blank" rel="external nofollow noopener noreferrer">RASP攻防 —— RASP安全应用与局限性浅析</a></p>
+<p><strong>修改PHP_(ADMIN_)VALUE会直接使得当前处理请求的fastCGI进程收到影响，如果多次请求就可能污染掉所有的进程，在重启fpm之前可能所有进程都会受到影响</strong></p>
+<h3 id="利用-1"><a href="#利用-1" class="headerlink" title="利用"></a>利用</h3><p>因为之前说到使用CGI的时候，是webserver和CGI直接进行通信的，所以就存在进程间通信的问题，在Nginx的设置中有一个fastcgi_pass的设置，指定fastcgi所在的ip端口(或Unix socket)，PHP的fpm设置中可以配置fastcgi的监听位置，可以通过配置使得PHP也能前后端分离<br>fpm并不验证数据的来源，只要是发送到监听端口的数据就一律接受<br>PHP在fpm配置中若将监听端口写成0.0.0.0:9000，则接受来自任意ip的通信，可以通过伪装成Nginx服务器与php-fpm通信来执行命令，如果配置的是127.0.0.1:9000这种情况的可能就要靠SSRF打了<br><a href="https://gist.github.com/phith0n/9615e2420f31048f7e30f3937356cf75" target="_blank" rel="external nofollow noopener noreferrer">P神的利用脚本</a></p>
+<p>SSRF也分两种，如果是监听的127.0.0.1这种ip地址就可以用gopher发TCP包打，如果直接监听Unix socket的话就得专门起一个socket去连接了</p>
+<p>利用方案：1.自己随便上传一个其他位置的马然后用script_name指定进行利用<br>2.随便找一个PHP文件然后设置auto_prepend_file为php://input，allow_url_include为On打通</p>
+<h3 id="bypass-disable-function"><a href="#bypass-disable-function" class="headerlink" title="bypass_disable_function"></a>bypass_disable_function</h3><p>直接抄着那个脚本打并不能绕过Disable_function，只是做到了命令执行。因为这样子发过去的请求还是由原来的PHP解释器进行解析</p>
+<p>但是可以通过FastCGI协议去让php-fpm加载我们自定义的扩展(.so文件)，而这个扩展肯定是不受disable_function限制的，做到任意命令执行<br>即之前提到的<code>extension_dir</code>和<code>extension</code></p>
+<p>蚁剑有一个玄幻的插件，直接生成一个调用system函数的.so文件，然后输这么个命令<code>php -n -S 127.0.0.1:port -t /var/www/html</code>在目标机器上新开一个web服务，当然权限是www-data的，但是添加了<code>-n</code>参数指定不使用php.ini，可以绕过其设置的disable_function，并且还上传了一个antproxy.php文件将请求转发过去，实现比较方便的命令执行（不然应该是执行一次传一个.so吧，要我说继续搞那种接受环境变量做命令的方法也挺好的）<br>这次这个蓝帽杯本身是一个打.so扩展的pwn题，但是我看的wp成功的拿fpm打了一个.so加载的非预期打通了</p>
+<h2 id="FFI"><a href="#FFI" class="headerlink" title="FFI"></a>FFI</h2><p>Foreign Function Interface，外部函数接口<br>PHP7.4的新特性，可以直接调用外部代码，RCTF 2019的Nextphp出的就是这个<br>需要ffi.enable=true才能任意使用，否则只能使用在对应文件中使用</p>
+<h2 id="参考链接"><a href="#参考链接" class="headerlink" title="参考链接"></a>参考链接</h2><p><a href="https://xz.aliyun.com/t/8669" target="_blank" rel="external nofollow noopener noreferrer">ByteCTF WP-无需mail bypass disable_functions</a><br><a href="https://www.anquanke.com/post/id/197745" target="_blank" rel="external nofollow noopener noreferrer">PHP 突破 disable_functions 常用姿势以及使用 Fuzz 挖掘含内部系统调用的函数</a><br><a href="https://www.php.cn/php-weizijiaocheng-383223.html" target="_blank" rel="external nofollow noopener noreferrer">php之CGI、FastCGI、APACHE2HANDLER、CLI运行模式的详解s</a><br><a href="https://zhuanlan.zhihu.com/p/75114351" target="_blank" rel="external nofollow noopener noreferrer">攻击PHP-FPM 实现Bypass Disable Functions</a><br><a href="https://security.tencent.com/index.php/blog/msg/166" target="_blank" rel="external nofollow noopener noreferrer">RASP攻防 —— RASP安全应用与局限性浅析</a><br><a href="https://www.anquanke.com/post/id/208451" target="_blank" rel="external nofollow noopener noreferrer">bypass disable_function多种方法+实例</a><br><a href="https://xz.aliyun.com/t/5598" target="_blank" rel="external nofollow noopener noreferrer">浅析php-fpm的攻击方式</a><br><a href="https://www.anquanke.com/post/id/186186" target="_blank" rel="external nofollow noopener noreferrer">从一道CTF学习Fastcgi绕过姿势</a><br><a href="https://forum.90sec.com/t/topic/129" target="_blank" rel="external nofollow noopener noreferrer">PHP 连接方式介绍以及如何攻击 PHP-FPM</a><br><a href="https://www.leavesongs.com/PENETRATION/fastcgi-and-php-fpm.html" target="_blank" rel="external nofollow noopener noreferrer">Fastcgi协议分析 &amp;&amp; PHP-FPM未授权访问漏洞 &amp;&amp; Exp编写</a><br><a href="https://www.leavesongs.com/PHP/php-bypass-open-basedir-list-directory.htm" target="_blank" rel="external nofollow noopener noreferrer">PHP绕过open_basedir列目录的研究</a></p>
 
     </div>
 
@@ -387,7 +401,7 @@ void gconv_init() {
 
       <!--noindex-->
       <div class="post-toc-wrap sidebar-panel">
-          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#从ByteCTF到bypass-disable-function"><span class="nav-number">1.</span> <span class="nav-text">从ByteCTF到bypass_disable_function</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#LD-PRELOAD"><span class="nav-number">1.1.</span> <span class="nav-text">LD_PRELOAD</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#iconv"><span class="nav-number">1.2.</span> <span class="nav-text">iconv</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#写-proc-self-mem"><span class="nav-number">1.3.</span> <span class="nav-text">写/proc/self/mem</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#二进制基础"><span class="nav-number">1.3.1.</span> <span class="nav-text">二进制基础</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#利用"><span class="nav-number">1.3.2.</span> <span class="nav-text">利用</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#攻击PHP-FPM"><span class="nav-number">1.4.</span> <span class="nav-text">攻击PHP-FPM</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#PHP运行类型"><span class="nav-number">1.4.1.</span> <span class="nav-text">PHP运行类型</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#利用-1"><span class="nav-number">1.4.2.</span> <span class="nav-text">利用</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#FFI"><span class="nav-number">1.5.</span> <span class="nav-text">FFI</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#参考链接"><span class="nav-number">1.6.</span> <span class="nav-text">参考链接</span></a></li></ol></li></ol></div>
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#从ByteCTF到bypass-disable-function"><span class="nav-number">1.</span> <span class="nav-text">从ByteCTF到bypass_disable_function</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#putenv"><span class="nav-number">1.1.</span> <span class="nav-text">putenv</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#LD-PRELOAD"><span class="nav-number">1.1.1.</span> <span class="nav-text">LD_PRELOAD</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#iconv"><span class="nav-number">1.1.2.</span> <span class="nav-text">iconv</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#写-proc-self-mem"><span class="nav-number">1.2.</span> <span class="nav-text">写/proc/self/mem</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#二进制基础"><span class="nav-number">1.2.1.</span> <span class="nav-text">二进制基础</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#利用"><span class="nav-number">1.2.2.</span> <span class="nav-text">利用</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#攻击PHP-FPM"><span class="nav-number">1.3.</span> <span class="nav-text">攻击PHP-FPM</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#PHP运行类型"><span class="nav-number">1.3.1.</span> <span class="nav-text">PHP运行类型</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#协议字段"><span class="nav-number">1.3.2.</span> <span class="nav-text">协议字段</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#利用-1"><span class="nav-number">1.3.3.</span> <span class="nav-text">利用</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#bypass-disable-function"><span class="nav-number">1.3.4.</span> <span class="nav-text">bypass_disable_function</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#FFI"><span class="nav-number">1.4.</span> <span class="nav-text">FFI</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#参考链接"><span class="nav-number">1.5.</span> <span class="nav-text">参考链接</span></a></li></ol></li></ol></div>
       </div>
       <!--/noindex-->
 
@@ -402,7 +416,7 @@ void gconv_init() {
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">111</span>
+          <span class="site-state-item-count">112</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
@@ -415,7 +429,7 @@ void gconv_init() {
       <div class="site-state-item site-state-tags">
             <a href="/tags/">
           
-        <span class="site-state-item-count">79</span>
+        <span class="site-state-item-count">80</span>
         <span class="site-state-item-name">标签</span></a>
       </div>
   </nav>
