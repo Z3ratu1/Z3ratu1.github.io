@@ -20,16 +20,16 @@
     var CONFIG = {"hostname":"blog.z3ratu1.cn","root":"/","scheme":"Pisces","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"always","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":true},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
   </script>
 
-  <meta name="description" content="熔断&amp;amp;幽灵上次看浏览器看到CORB的时候提到了熔断和幽灵漏洞，今天刚好遇到了一篇文章讲这个洞的成因，记录一下（总觉得越学方向越奇怪了并且这个图我很喜欢，很有感觉 熔断和幽灵两个漏洞的成因基本上是一致的，但在实现上有细微的区别，漏洞的危害是内核任意空间读取 熔断利用的是InterCPU在进行内存操作时先进行猜想性访问，再判断请求是否合法，如果请求并不合法则进行回滚，内存不会受到任何影响，但缓">
+  <meta name="description" content="熔断&amp;amp;幽灵上次看浏览器看到CORB的时候提到了熔断和幽灵漏洞，今天刚好遇到了一篇文章讲这个洞的成因，记录一下（总觉得越学方向越奇怪了并且这个图我很喜欢，很有感觉 熔断和幽灵两个漏洞的成因基本上是一致的，但在实现上有细微的区别，漏洞的危害是内核任意空间读取 最近又重新回顾了一下，补充一下 熔断">
 <meta name="keywords" content="spectre,meltdown">
 <meta property="og:type" content="article">
 <meta property="og:title" content="熔断&amp;幽灵">
 <meta property="og:url" content="https:&#x2F;&#x2F;blog.z3ratu1.cn&#x2F;%E7%86%94%E6%96%AD&amp;%E5%B9%BD%E7%81%B5.html">
 <meta property="og:site_name" content="Z3ratu1&#39;s blog">
-<meta property="og:description" content="熔断&amp;amp;幽灵上次看浏览器看到CORB的时候提到了熔断和幽灵漏洞，今天刚好遇到了一篇文章讲这个洞的成因，记录一下（总觉得越学方向越奇怪了并且这个图我很喜欢，很有感觉 熔断和幽灵两个漏洞的成因基本上是一致的，但在实现上有细微的区别，漏洞的危害是内核任意空间读取 熔断利用的是InterCPU在进行内存操作时先进行猜想性访问，再判断请求是否合法，如果请求并不合法则进行回滚，内存不会受到任何影响，但缓">
+<meta property="og:description" content="熔断&amp;amp;幽灵上次看浏览器看到CORB的时候提到了熔断和幽灵漏洞，今天刚好遇到了一篇文章讲这个洞的成因，记录一下（总觉得越学方向越奇怪了并且这个图我很喜欢，很有感觉 熔断和幽灵两个漏洞的成因基本上是一致的，但在实现上有细微的区别，漏洞的危害是内核任意空间读取 最近又重新回顾了一下，补充一下 熔断">
 <meta property="og:locale" content="zh-Hans">
 <meta property="og:image" content="https:&#x2F;&#x2F;blog.z3ratu1.cn&#x2F;images&#x2F;meltdown.jpg">
-<meta property="og:updated_time" content="2020-10-22T14:00:16.185Z">
+<meta property="og:updated_time" content="2021-05-24T02:33:01.525Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:image" content="https:&#x2F;&#x2F;blog.z3ratu1.cn&#x2F;images&#x2F;meltdown.jpg">
 
@@ -222,10 +222,16 @@
                 <i class="far fa-calendar"></i>
               </span>
               <span class="post-meta-item-text">发表于</span>
-              
 
-              <time title="创建时间：2020-10-22 21:53:02 / 修改时间：22:00:16" itemprop="dateCreated datePublished" datetime="2020-10-22T21:53:02+08:00">2020-10-22</time>
+              <time title="创建时间：2020-10-22 21:53:02" itemprop="dateCreated datePublished" datetime="2020-10-22T21:53:02+08:00">2020-10-22</time>
             </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2021-05-24 10:33:01" itemprop="dateModified" datetime="2021-05-24T10:33:01+08:00">2021-05-24</time>
+              </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
                 <i class="far fa-folder"></i>
@@ -270,13 +276,13 @@
       
         <h1 id="熔断-amp-幽灵"><a href="#熔断-amp-幽灵" class="headerlink" title="熔断&amp;幽灵"></a>熔断&amp;幽灵</h1><p>上次看浏览器看到CORB的时候提到了熔断和幽灵漏洞，今天刚好遇到了一篇文章讲这个洞的成因，记录一下（总觉得越学方向越奇怪了<br><img src="/images/meltdown.jpg" alt="meltdown"><br>并且这个图我很喜欢，很有感觉</p>
 <p>熔断和幽灵两个漏洞的成因基本上是一致的，但在实现上有细微的区别，漏洞的危害是内核任意空间读取</p>
-<h2 id="熔断"><a href="#熔断" class="headerlink" title="熔断"></a>熔断</h2><p>利用的是InterCPU在进行内存操作时先进行猜想性访问，再判断请求是否合法，如果请求并不合法则进行回滚，内存不会受到任何影响，但缓存会被修改</p>
-<h2 id="幽灵"><a href="#幽灵" class="headerlink" title="幽灵"></a>幽灵</h2><p>和熔断类似，也是利用的缓存，但幽灵利用的是分支预测的预先加载完成的攻击，实现难度就熔断而言更难一些</p>
+<p>最近又重新回顾了一下，补充一下</p>
+<h2 id="熔断"><a href="#熔断" class="headerlink" title="熔断"></a>熔断</h2><p>利用的是InterCPU在进行内存操作时先进行猜想性访问，再判断请求是否合法，如果请求并不合法则进行回滚，内存不会受到任何影响，但缓存会被修改<br>熔断的危害在于可以通过乱序执行访问无法触及的内核资源，熔断了内核和用户态直接的防御，使用KPTI可以使得内核页表尽可能少的暴露在用户态，但每次用户态和内核态的切换需要进行TLB的刷新，且需要存储两份页表，一份残缺的在用户态，一份完整的在内核，增加了资源消耗。<br>但由于仍有必须的内核进入页在用户态可见，因此熔断仍有可能被利用</p>
+<h2 id="幽灵"><a href="#幽灵" class="headerlink" title="幽灵"></a>幽灵</h2><p>和熔断类似，也是利用的缓存，但幽灵利用的是分支预测的预先加载完成的攻击，实现难度就熔断而言更难一些<br>幽灵是通过分支预测进行不同进程间的共享内存或是一个进程中不同线程之间进行内存读取，可以进行沙箱逃逸等操作，其并不像熔断越级访问了内核数据，而是进行进程之间的数据读取，绕过软件本身的访问限制，从而KPTI并不能防御幽灵的存在</p>
 <h2 id="攻击实现"><a href="#攻击实现" class="headerlink" title="攻击实现"></a>攻击实现</h2><p>以幽灵为例，比如如下这个大致的伪代码</p>
 <pre class=" language-C++"><code class="language-C++">char array1[128] = {0,1,2.....127}
 char array2[2]
-char temp;
-if(int x < 16)
+if(int x < limit)
 {
     temp = array1[array2+y];
 }
@@ -284,12 +290,12 @@ else
 {
     do something
 }</code></pre>
-<p>恶意程序首先多次令x&lt;16，使得CPU的分支预测认为绝大多数情形都是直接进入if语句，之后的执行再判断if语句时率先执行其中内容而不是等待if判断，而此时CPU会发起对array2+y的内存空间的访问，一般来说这会导致一个数组越界错误，然后进程就挂了。但是，这里是CPU进行分支预测，而数组越界由操作系统内核进行判断，所以CPU就开开心心的读取了这一位数据，并将其作为值访问了array1的数据</p>
+<p>恶意程序首先多次令x&lt;limit，使得CPU的分支预测认为绝大多数情形都是直接进入if语句，之后的执行再判断if语句时率先执行其中内容而不是等待if判断，而此时CPU会发起对array2+y的内存空间的访问，一般来说这会导致一个数组越界错误，然后进程就挂了。但是，这里是CPU进行分支预测，而数组越界由操作系统内核进行判断，所以CPU就开开心心的读取了这一位数据，并将其作为值访问了array1的数据</p>
 <p>攻击的核心就在于分支预测时的缓存加载<br>比如我们令y=0x????????，使y足够大以从用户空间直接访问至内核空间数据，CPU在预测时读取了array2+x的地址的数据，并且这个时候也是先进行猜测性读取再进行地址合法性检验，比如是70，再用它来访问array[70]的数据，这个时候array[70]就被放进了cache，而这个时候，x读出来的结果又大于16了，这下CPU回滚操作，但是缓存不会回滚，array[70]就这么进入了缓存中</p>
 <p>现在，我们遍历array1的所有元素，发现array[70]的响应速度特别的快。这就意味着array2+y访问的结果是70，也就是说地址为array2+y的空间中的值为70<br>按这个套路，可以逐byte读取任意内存数据</p>
 <h2 id="漏洞危害"><a href="#漏洞危害" class="headerlink" title="漏洞危害"></a>漏洞危害</h2><p>不过进程和进程之间的空间是隔离的，所以好像这个洞没法跨进程读取，但能实现进程内部任意内存读取，如果是病毒程序的话应该就去读内核空间，而浏览器的话就可以用js代码突破沙箱，读取进程的其他数据，比如存在浏览器上的一些用户密码之类的。</p>
 <h2 id="防御措施"><a href="#防御措施" class="headerlink" title="防御措施"></a>防御措施</h2><p>硬件层面应该先校验内存是否合法再去读取，而不是先去进行猜测性访问再由操作系统校验结果<br>操作系统层面推出了经典的KPTI技术，即内核页表隔离。在用户态时持有的页表不包含完整的内核空间。但这使得系统调用的开销提升了很多，因为进出内核态需要刷新页表<br>Chrome浏览器加了个防护措施是降低某个高精度时间计算函数的精度，让恶意代码看不出来缓存访问变快。还有个啥buffer禁用，忘了具体内容了</p>
-<h2 id="参考链接"><a href="#参考链接" class="headerlink" title="参考链接"></a>参考链接</h2><p><a href="http://blog.sciencenet.cn/blog-684007-1093420.html" target="_blank" rel="external nofollow noopener noreferrer">http://blog.sciencenet.cn/blog-684007-1093420.html</a><br><a href="https://my.oschina.net/u/3715845/blog/4362602" target="_blank" rel="external nofollow noopener noreferrer">https://my.oschina.net/u/3715845/blog/4362602</a> （这个博主写的文章还都挺好的）</p>
+<h2 id="参考链接"><a href="#参考链接" class="headerlink" title="参考链接"></a>参考链接</h2><p><a href="http://blog.sciencenet.cn/blog-684007-1093420.html" target="_blank" rel="external nofollow noopener noreferrer">http://blog.sciencenet.cn/blog-684007-1093420.html</a><br><a href="https://rtoax.blog.csdn.net/article/details/114794325" target="_blank" rel="external nofollow noopener noreferrer">Meltdown(熔断漏洞)- Reading Kernel Memory from User Space/KASLR | 原文+中文翻译</a><br><a href="https://xz.aliyun.com/t/6332" target="_blank" rel="external nofollow noopener noreferrer">深入Spectre V2——跨进程泄露敏感信息</a><br><a href="https://danielmiessler.com/blog/simple-explanation-difference-meltdown-spectre/" target="_blank" rel="external nofollow noopener noreferrer">A Simple Explanation of the Differences Between Meltdown and Spectre</a></p>
 
     </div>
 
