@@ -28,7 +28,7 @@
 <meta property="og:site_name" content="Z3ratu1&#39;s blog">
 <meta property="og:description" content="[RoarCTF2020]wpY1ng是嘶吼的出题人之一，很久以前就在buu群里说这次嘶吼请你吃SQL注入大礼包，我算是吃饱了虽然我都不会做，但是我吃到了超级SQL注入大礼包，注吐了，不过还是学到一点点东西，以及我是SQL注入废物 签到ssrf，先看源码正则匹配过滤flag，但是curl存在二次编码的问题，直接file协议加二次编码绕过读flag ezsql">
 <meta property="og:locale" content="zh-Hans">
-<meta property="og:updated_time" content="2020-12-09T11:27:51.170Z">
+<meta property="og:updated_time" content="2021-07-06T09:58:24.596Z">
 <meta name="twitter:card" content="summary">
 
 <link rel="canonical" href="https://blog.z3ratu1.cn/%5BRoarCTF2020%5Dwp.html">
@@ -228,7 +228,7 @@
                   <i class="far fa-calendar-check"></i>
                 </span>
                 <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2020-12-09 19:27:51" itemprop="dateModified" datetime="2020-12-09T19:27:51+08:00">2020-12-09</time>
+                <time title="修改时间：2021-07-06 17:58:24" itemprop="dateModified" datetime="2021-07-06T17:58:24+08:00">2021-07-06</time>
               </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -343,7 +343,7 @@ table_name <span class="token operator">=</span> <span class="token string">""</
 <span class="token keyword">print</span><span class="token punctuation">(</span>table_name<span class="token punctuation">)</span></code></pre>
 <p>拿到flag</p>
 <p>我是SQL注入垃圾呜呜呜</p>
-<h2 id="你能登陆成功吗"><a href="#你能登陆成功吗" class="headerlink" title="你能登陆成功吗"></a>你能登陆成功吗</h2><p>SQL注入大礼包，我服了，是没见过的postgreSQL，配合express写的，还是没学过的整数溢出注入<br>开局给的hint<code>let PostgreSQL = \</code>SELECT * FROM users WHERE username=’${username}’ AND password=’${password}’``<br>用户名限制死了admin，在password处注入，会回显注入语句，但是没闭合引号就不会回显语句，约等于语句出错不回显语句<br>万能密码登录失败，不知道为什么<br>开始学习整数溢出注入</p>
+<h2 id="你能登陆成功吗"><a href="#你能登陆成功吗" class="headerlink" title="你能登陆成功吗"></a>你能登陆成功吗</h2><p>SQL注入大礼包，我服了，是没见过的postgreSQL，配合express写的，还是没学过的整数溢出注入<br>开局给的hint<code>let PostgreSQL = `SELECT * FROM users WHERE username= &#39;${username}&#39; AND password= &#39;${password}&#39;`</code><br>用户名限制死了admin，在password处注入，会回显注入语句，但是没闭合引号就不会回显语句，约等于语句出错不回显语句<br>万能密码登录失败，不知道为什么<br>开始学习整数溢出注入</p>
 <h3 id="整数溢出注入"><a href="#整数溢出注入" class="headerlink" title="整数溢出注入"></a>整数溢出注入</h3><p>也分两种，一种是基于报错回显的整数溢出注入，另一种就是盲注<br>报错回显的如下所示</p>
 <pre class=" language-mysql"><code class="language-mysql">mysql> select ~0;
 +----------------------+
@@ -411,7 +411,7 @@ result <span class="token operator">=</span> <span class="token string">""</span
 <h3 id="获取列名"><a href="#获取列名" class="headerlink" title="获取列名"></a>获取列名</h3><p>获取列名，用的居然是information_schema，和MySQL一个操作<br><code>(select/**/ascii(substr(column_name,{},1))/**/from/**/information_schema.columns/**/where/**/table_name=&#39;users&#39;/**/limit/**/1/**/OFFSET/**/0)between/**/{}/**/and/**/127</code><br>列名是id,username,password，提示里也有。。</p>
 <h3 id="查字段"><a href="#查字段" class="headerlink" title="查字段"></a>查字段</h3><p><code>(select/**/ascii(substr(password,{},1))/**/from/**/users/**/where/**/username=&#39;admin&#39;/**/limit/**/1/**/OFFSET/**/0)between/**/{}/**/and/**/127</code><br>跑出来 Pg5QL1sF4ns1N4T1n9<br>抽象大师，我大概看懂了说的是pgsql is fansinating<br>登录获取flag</p>
 <h2 id="你能登陆成功吗-Revenge"><a href="#你能登陆成功吗-Revenge" class="headerlink" title="你能登陆成功吗-Revenge"></a>你能登陆成功吗-Revenge</h2><p>。就是基于不报错的时候会回显语句这个操作的整数溢出注入是非预期。。。实际上是一个时间盲注，没加过滤，就是无论语句咋样最后都不返回查询语句了<br>postgresql的where和MySQL的不一样，MySQL直接<code>where id=1 or sleep(5)</code>是跑得起来的，而postgresql的where后面必须得是个bool表达式，而其sleep函数pg_sleep()的返回值是void，不行</p>
-<p>抄了一个payload，外面多套一层strpos，然后在if语句里面sleep，strpos返回一个bool值即可，通过延时来判断<br><code>https://answer-id.com/zh/51434394</code>九年前的远古操作了<br>稍微改一下payload</p>
+<p>抄了一个payload，外面多套一层strpos，然后在if语句里面sleep，strpos返回一个bool值即可，通过延时来判断<br><a href="https://answer-id.com/zh/51434394" target="_blank" rel="external nofollow noopener noreferrer">https://answer-id.com/zh/51434394</a> 九年前的远古操作了<br>稍微改一下payload</p>
 <pre class=" language-python"><code class="language-python"><span class="token keyword">import</span> requests
 <span class="token keyword">import</span> time
 
@@ -622,7 +622,7 @@ result <span class="token operator">=</span> <span class="token string">""</span
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">119</span>
+          <span class="site-state-item-count">120</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>

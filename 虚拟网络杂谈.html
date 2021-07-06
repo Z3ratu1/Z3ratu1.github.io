@@ -32,7 +32,7 @@
 <meta property="og:image" content="https:&#x2F;&#x2F;blog.z3ratu1.cn&#x2F;images&#x2F;%E8%99%9A%E6%8B%9F%E7%BD%91%E7%BB%9C%E6%9D%82%E8%B0%88&#x2F;vm-bridge.png">
 <meta property="og:image" content="https:&#x2F;&#x2F;blog.z3ratu1.cn&#x2F;images&#x2F;%E8%99%9A%E6%8B%9F%E7%BD%91%E7%BB%9C%E6%9D%82%E8%B0%88&#x2F;docker_bridge.png">
 <meta property="og:image" content="https:&#x2F;&#x2F;blog.z3ratu1.cn&#x2F;images&#x2F;%E8%99%9A%E6%8B%9F%E7%BD%91%E7%BB%9C%E6%9D%82%E8%B0%88&#x2F;NAT.png">
-<meta property="og:updated_time" content="2021-07-06T04:04:15.178Z">
+<meta property="og:updated_time" content="2021-07-06T08:34:09.060Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:image" content="https:&#x2F;&#x2F;blog.z3ratu1.cn&#x2F;images&#x2F;%E8%99%9A%E6%8B%9F%E7%BD%91%E7%BB%9C%E6%9D%82%E8%B0%88&#x2F;bridge.png">
 
@@ -233,7 +233,7 @@
                   <i class="far fa-calendar-check"></i>
                 </span>
                 <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2021-07-06 12:04:15" itemprop="dateModified" datetime="2021-07-06T12:04:15+08:00">2021-07-06</time>
+                <time title="修改时间：2021-07-06 16:34:09" itemprop="dateModified" datetime="2021-07-06T16:34:09+08:00">2021-07-06</time>
               </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -281,6 +281,8 @@
 <h2 id="scapy的使用"><a href="#scapy的使用" class="headerlink" title="scapy的使用"></a>scapy的使用</h2><p>这个算是最简单的点了<br>这个库还挺好用的，可以简单地拼接各层协议，并且自动寻找出口路由选择源IP地址，不清楚各字段的话可以show方法展示一下，然后在挨个print出来就行，比如ICMP的request和reply请求，show的时候显示的是字符串，但是你实际上打印出来会发现确实是一个数字，8代表request，0代表reply</p>
 <p>当主机有多个网络出口的时候，这个库能自动的根据设置的dst ip查路由表，然后走对应的网卡出口，并且还能把src ip改成对应出口的ip，Mac地址什么的也不在话下</p>
 <p>这里学到了一个好用的命令<code>ip route get x.x.x.x</code>，能直接查看ip对应的路由出口网卡，行！<br>然后发现了我一直以来的一个认知误区，我一直以为，比如我在局域网内的ip是192.168.68.10，在192.168.68.0/24这么个网段下，那么我访问自己的ip就会从局域网网卡出去，通过局域网路由在给我发回来，只有127.0.0.1这种类型的ip才会走本地的环回口，然而事实却是路由表把每个网卡出口对应的ip都记为本机了，也就是访问192.168.68.10会直接发到loopback上，不会从ethxx发出去再接回来。当然，访问192.168.68.11就会从局域网以太网口上走<br>说起来也是，如果本地路由表查不到192.168.68.10是本机的话，就算是发到局域网里又还回来了，也不能确定这个包是不是自己收啊，所以一开始就之前确定是自己收丢环回口上转去了</p>
+<h3 id="ICMP响应问题"><a href="#ICMP响应问题" class="headerlink" title="ICMP响应问题"></a>ICMP响应问题</h3><p>scapy发出去的ICMP包似乎有点问题，不知道是我属性赋值没加齐还是怎么，从wireshark上抓包可以看到发出去的每个ICMP请求包都会有一个响应包，但wireshark并不会将该包认定为是scapy发出的ICMP请求包的响应，所以实验中有一个自己发scapy来实现traceroute的功能不太实现的了。感觉不是NAT的问题，因为如果是NAT的问题物理机上也不能用脚本跑通才对。<br>应该是请求和应答之间出了什么问题，使得这个请求和应答不能一一对应，导致物理机并不会把收到的请求发给虚拟机，所以在虚拟机中无法进行试验。而在物理机中不知道为什么，由于ttl为0导致的应答报文似乎能给正确的接受到，但同样的无法匹配正常的响应，所以traceroute会在终点时收不到对应回复</p>
+<p>但是杨老师对1.1.1.1发起请求的时候得到了非常正确的结果，我也能复现，对于1.1.1.1这个ip ICMP的响应是能正确的对上的，看来是上层网络还有些奇怪的不可抗力，不知道怎么排障了</p>
 <h2 id="桥接、桥接与桥接"><a href="#桥接、桥接与桥接" class="headerlink" title="桥接、桥接与桥接"></a>桥接、桥接与桥接</h2><p>讲述的是docker的桥接和VM的桥接不是一个概念，然后在由于互联网上错综复杂的各种原理解释让我认为他们两是一个概念，再最后绕城一团乱麻故事</p>
 <h3 id="VM桥接"><a href="#VM桥接" class="headerlink" title="VM桥接"></a>VM桥接</h3><p>这个是我对桥接最初的理解，是VMware等虚拟化软件中提到的桥接，逻辑网络拓扑如图<br><img src="/images/%E8%99%9A%E6%8B%9F%E7%BD%91%E7%BB%9C%E6%9D%82%E8%B0%88/bridge.png" alt="bridge.png"><br>对于VMware来说这个虚拟交换机就是默认的一个叫VMnet0的虚拟网络，不过我桥接的时候并没有找到对应的网卡，如果能监听该网卡的流量就可以实现对虚拟机对外流量的全部监听<br>对于桥接的工作原理，网上有很多说法，我比较认同的是通过给物理网卡加驱动，能同时分配多个ip地址，然后将网卡运行在混杂模式下，对多个Mac地址进行匹配进行处理，就做到了一个虚拟交换机的效果，就有一种把虚拟机给直接暴露出来，平行于物理机的感觉<br>桥接出来的机器可以通过像物理路由器寻求DHCP来分配一个和物理机同一网段的IP，这样子就能被该局域网的其他主机直接探测到，比如图中的_其他人的物理机_，表现出来的形式就是该局域网中增加了一台机器</p>
 <p>但是事情绝不会这么简单，桥接网上的桥接解释还有第二种形式，长这个样<br><img src="/images/%E8%99%9A%E6%8B%9F%E7%BD%91%E7%BB%9C%E6%9D%82%E8%B0%88/vm-bridge.png" alt="vm-bridge.png"><br>这和接下来即将提到的docker桥接的模式图很像，且这里的虚拟网桥还多出来了很多的网卡设备，这也只有在docker的桥接中能看到类似的设备，一度令我十分困惑</p>
@@ -296,6 +298,7 @@ docker0         8000.0242f067143f       no              veth382d563
                                                         veth9ae432c
                                                         vethc95bd77
 </code></pre><p>然后就发现docker0这个网桥上接了三个veth网卡，进容器一看，都是在docker0的172.18.0.1/24这个网段，还能互相ping通。这让我突然想起来比赛平台动态起docker的时候如果不把网桥直接进行隔离，岂不是不同用户的容器直接可能互相发现？</p>
+<p>还有一点可以验证docker上网的形式是NAT，如果你在docker内去ping一个外部网络，然后在宿主机的出口监听网卡，就能发现外送的ICMP报文实际上使用的是宿主机的IP地址，而不是网桥内的局域网地址，也没有给bridge的docker分配一个新的dhcp地址</p>
 <h2 id="其他网络模式"><a href="#其他网络模式" class="headerlink" title="其他网络模式"></a>其他网络模式</h2><h3 id="VMware-NAT"><a href="#VMware-NAT" class="headerlink" title="VMware NAT"></a>VMware NAT</h3><p>老生常谈，和正常的NAT没什么区别，物理机充当上层路由器，所有虚拟机藏在物理机后，对外不可见，且藏在物理机后的虚拟机可互联，画一个图<br><img src="/images/%E8%99%9A%E6%8B%9F%E7%BD%91%E7%BB%9C%E6%9D%82%E8%B0%88/NAT.png" alt="NAT.png"><br>很好理解嗷，其实Docker的桥接在对外访问时，使用的即是NAT模型，但是名字却是桥接，即是这个坑了我好久。NAT在VMware中默认使用的是虚拟网络VMnet8，也是VMware安装时的三大虚拟网络之一</p>
 <h3 id="VMware-host-only"><a href="#VMware-host-only" class="headerlink" title="VMware host only"></a>VMware host only</h3><p>VMware三大虚拟网络最后一个，默认为VMnet1，就是搭了个包括主机在内的局域网，不连外网，也可以把主机剔除掉，就简单的搭一个虚拟机局域网</p>
 <h3 id="docker-host"><a href="#docker-host" class="headerlink" title="docker host"></a>docker host</h3><p>docker的三大初始网络服务之一<br>某文档里有这么一句</p>
@@ -328,7 +331,10 @@ docker0         8000.0242f067143f       no              veth382d563
     <a href="/%E5%88%B7%E9%A2%98%E5%88%B7%E9%A2%98.html" rel="prev" title="刷题刷题">
       <i class="fa fa-chevron-left"></i> 刷题刷题
     </a></div>
-      <div class="post-nav-item"></div>
+      <div class="post-nav-item">
+    <a href="/pwnhub7%E6%9C%88%E5%85%AC%E5%BC%80%E8%B5%9B.html" rel="next" title="pwnhub7月公开赛">
+      pwnhub7月公开赛 <i class="fa fa-chevron-right"></i>
+    </a></div>
     </div>
       </footer>
     
@@ -388,7 +394,7 @@ docker0         8000.0242f067143f       no              veth382d563
 
       <!--noindex-->
       <div class="post-toc-wrap sidebar-panel">
-          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#虚拟网络杂谈"><span class="nav-number">1.</span> <span class="nav-text">虚拟网络杂谈</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#scapy的使用"><span class="nav-number">1.1.</span> <span class="nav-text">scapy的使用</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#桥接、桥接与桥接"><span class="nav-number">1.2.</span> <span class="nav-text">桥接、桥接与桥接</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#VM桥接"><span class="nav-number">1.2.1.</span> <span class="nav-text">VM桥接</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#docker桥接"><span class="nav-number">1.2.2.</span> <span class="nav-text">docker桥接</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#试一下docker-bridge效果"><span class="nav-number">1.2.2.1.</span> <span class="nav-text">试一下docker bridge效果</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#其他网络模式"><span class="nav-number">1.3.</span> <span class="nav-text">其他网络模式</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#VMware-NAT"><span class="nav-number">1.3.1.</span> <span class="nav-text">VMware NAT</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#VMware-host-only"><span class="nav-number">1.3.2.</span> <span class="nav-text">VMware host only</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#docker-host"><span class="nav-number">1.3.3.</span> <span class="nav-text">docker host</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#docker-none"><span class="nav-number">1.3.4.</span> <span class="nav-text">docker none</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#docker-container"><span class="nav-number">1.3.5.</span> <span class="nav-text">docker container</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#参考链接"><span class="nav-number">1.4.</span> <span class="nav-text">参考链接</span></a></li></ol></li></ol></div>
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#虚拟网络杂谈"><span class="nav-number">1.</span> <span class="nav-text">虚拟网络杂谈</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#scapy的使用"><span class="nav-number">1.1.</span> <span class="nav-text">scapy的使用</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#ICMP响应问题"><span class="nav-number">1.1.1.</span> <span class="nav-text">ICMP响应问题</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#桥接、桥接与桥接"><span class="nav-number">1.2.</span> <span class="nav-text">桥接、桥接与桥接</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#VM桥接"><span class="nav-number">1.2.1.</span> <span class="nav-text">VM桥接</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#docker桥接"><span class="nav-number">1.2.2.</span> <span class="nav-text">docker桥接</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#试一下docker-bridge效果"><span class="nav-number">1.2.2.1.</span> <span class="nav-text">试一下docker bridge效果</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#其他网络模式"><span class="nav-number">1.3.</span> <span class="nav-text">其他网络模式</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#VMware-NAT"><span class="nav-number">1.3.1.</span> <span class="nav-text">VMware NAT</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#VMware-host-only"><span class="nav-number">1.3.2.</span> <span class="nav-text">VMware host only</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#docker-host"><span class="nav-number">1.3.3.</span> <span class="nav-text">docker host</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#docker-none"><span class="nav-number">1.3.4.</span> <span class="nav-text">docker none</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#docker-container"><span class="nav-number">1.3.5.</span> <span class="nav-text">docker container</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#参考链接"><span class="nav-number">1.4.</span> <span class="nav-text">参考链接</span></a></li></ol></li></ol></div>
       </div>
       <!--/noindex-->
 
@@ -403,7 +409,7 @@ docker0         8000.0242f067143f       no              veth382d563
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">119</span>
+          <span class="site-state-item-count">120</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>

