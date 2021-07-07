@@ -28,7 +28,7 @@
 <meta property="og:site_name" content="Z3ratu1&#39;s blog">
 <meta property="og:description" content="Java RMI反序列化入门继续入门学习 名词解释没什么用的环节。Remote Method Invocation，远程方法调用JRMP，Java Remote Method Protocol，Java远程方法协议，是Java RMI过程中使用的一种协议 RMI使用方法">
 <meta property="og:locale" content="zh-Hans">
-<meta property="og:updated_time" content="2021-07-04T15:17:27.287Z">
+<meta property="og:updated_time" content="2021-07-07T06:31:42.090Z">
 <meta name="twitter:card" content="summary">
 
 <link rel="canonical" href="https://blog.z3ratu1.cn/Java%20RMI%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96%E5%85%A5%E9%97%A8.html">
@@ -228,7 +228,7 @@
                   <i class="far fa-calendar-check"></i>
                 </span>
                 <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2021-07-04 23:17:27" itemprop="dateModified" datetime="2021-07-04T23:17:27+08:00">2021-07-04</time>
+                <time title="修改时间：2021-07-07 14:31:42" itemprop="dateModified" datetime="2021-07-07T14:31:42+08:00">2021-07-07</time>
               </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -358,7 +358,9 @@
     System<span class="token punctuation">.</span>out<span class="token punctuation">.</span><span class="token function">println</span><span class="token punctuation">(</span><span class="token string">"Hello "</span> <span class="token operator">+</span> name<span class="token punctuation">.</span><span class="token function">toString</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">+</span> <span class="token string">"!"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
     <span class="token keyword">return</span> <span class="token string">"sayHelloObj"</span><span class="token punctuation">;</span>
 <span class="token punctuation">}</span></code></pre>
-<p>然后打一个喜闻乐见的cc反序列化<br>然后cc链的依赖引不进来，又折腾了半天，就是不行，最后把项目重新用maven开了一遍。。。用maven引进来了，然后发现IDEA不知道为什么开始占用一堆端口，把1000-1200中间的几十个端口给占了，然后再改了一下Registry的端口，Client里面调用一下<br>嗯，没打通，不知道是因为服务端没加CC链依赖还是jdk8版本已经修了？也不知道这个依赖是怎么算的，我本地肯定下的有，但是是不是要显示的添加进来呢</p>
+<p>然后打一个喜闻乐见的cc反序列化<br>然后cc链的依赖引不进来，又折腾了半天，就是不行，最后把项目重新用maven开了一遍。。。用maven引进来了，然后发现IDEA不知道为什么开始占用一堆端口，把1000-1200中间的几十个端口给占了，然后再改了一下Registry的端口，Client里面调用一下<br>嗯，没打通，用的CC1的链太古老了，打不通我最新版本jdk8u292<br>然后换上cc567几个链可以打高版本，成功弹出计算器。</p>
+<p>这里踩了一个小坑，我一开始是直接从rmb神仙的博客里复制粘贴了一个cc5的链，他那里填的命令执行的内容是touch一个文件，而我本地windows肯定不会有touch这个命令，也就出现了报错，但我却发现报错是在client端出现的，而server貌似平稳运行，啥也没说。</p>
+<p>经过各种下断点调试，最后我发现，命令执行确实是在server上执行的，只不过报错也好结果也好都会返回给client，我差点以为是哪里出错了导致实际上命令是在client端执行的</p>
 <h3 id="服务端攻击客户端"><a href="#服务端攻击客户端" class="headerlink" title="服务端攻击客户端"></a>服务端攻击客户端</h3><p>刚才说了，只要信息交换过程中给了序列化数据十有八九就会反序列化，所以当客户端调用服务端方法的时候，同样可以让服务端返回一个Object，只需要让客户端调用一个返回值是Object的方法，返回一个恶意的Object就可以把客户端打穿</p>
 <h2 id="JNDI注入"><a href="#JNDI注入" class="headerlink" title="JNDI注入"></a>JNDI注入</h2><h3 id="JNDI"><a href="#JNDI" class="headerlink" title="JNDI"></a>JNDI</h3><p>Java Naming and Directory Interface，Java命名和目录接口，通过调用JNDI的API应用程序可以定位资源和其他程序对象，现在JNDI能访问的服务有：JDBC、LDAP、RMI、DNS、NIS、CORBA。</p>
 <p>其提供如下三种服务：<br>Naming Service 命名服务：<br>命名服务将名称和对象进行关联，提供通过名称找到对象的操作，例如：DNS系统将计算机名和IP地址进行关联、文件系统将文件名和文件句柄进行关联等等。</p>
