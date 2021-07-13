@@ -29,7 +29,9 @@
 <meta property="og:description" content="Java RMI反序列化与JNDI注入入门本来是想更新原文章的，但是学着学着发现自己之前根本没懂，写了一万个错的东西，全部推倒重来真正的java漏洞分析都是无尽的代码截图和调试，我这种纯概念的文字叙述只能是记个笔记，先了解各大概 RMI反序列化主要是利用客户端，服务端以及注册中心交互过程中对象的传递进行反序列化 名词解释">
 <meta property="og:locale" content="zh-Hans">
 <meta property="og:image" content="https:&#x2F;&#x2F;blog.z3ratu1.cn&#x2F;images&#x2F;JavaRMI%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96%E5%85%A5%E9%97%A8&#x2F;structure.png">
-<meta property="og:updated_time" content="2021-07-10T15:00:45.928Z">
+<meta property="og:image" content="https:&#x2F;&#x2F;blog.z3ratu1.cn&#x2F;images&#x2F;JavaRMI%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96%E5%85%A5%E9%97%A8&#x2F;unmarshalValue.png">
+<meta property="og:image" content="https:&#x2F;&#x2F;blog.z3ratu1.cn&#x2F;images&#x2F;JavaRMI%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96%E5%85%A5%E9%97%A8&#x2F;isPrimitive.png">
+<meta property="og:updated_time" content="2021-07-11T08:23:31.150Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:image" content="https:&#x2F;&#x2F;blog.z3ratu1.cn&#x2F;images&#x2F;JavaRMI%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96%E5%85%A5%E9%97%A8&#x2F;structure.png">
 
@@ -230,7 +232,7 @@
                   <i class="far fa-calendar-check"></i>
                 </span>
                 <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2021-07-10 23:00:45" itemprop="dateModified" datetime="2021-07-10T23:00:45+08:00">2021-07-10</time>
+                <time title="修改时间：2021-07-11 16:23:31" itemprop="dateModified" datetime="2021-07-11T16:23:31+08:00">2021-07-11</time>
               </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -378,9 +380,12 @@
 <p>后者通过发送一个反序列化链，使得目标机器反过来对攻击者的JRMP listener发起RMI连接，并通过listener返回一个恶意的链进行攻击</p>
 <p>上文提到的白名单绕过，就是使用JRMP Client绕过白名单，让目标对攻击者服务器发送RMI连接（调用lookup函数），此时绕过了对JEP290反序列化类的限制，再从无限制的RMI方法调用中返回真正的payload打穿。<br>JRMP Listener在RMI连接可控时，能稳定打一个反序列化，其可以通过返回一个ExceptionalReturn状态，在Client处理该状态时，会直接对返回的数据进行反序列化，从而打通。<br>这个方案不仅适用于lookup函数，在client进行远程方法调用等场合，无论返回值为何种类型，均可以返回该异常类型进行反序列化</p>
 <h3 id="registry攻击client"><a href="#registry攻击client" class="headerlink" title="registry攻击client"></a>registry攻击client</h3><p>同样也能打服务端，但是基本上注册中心和服务端都是一台机子，所以就不多说了。<br>其实从上面也能看出来，只要两个机器远程交互的时候传递了序列化的对象，那接受的机器基本上就没跑的会把序列化的对象给反序列化出来，只要目标机器上确实存在这个链，就能一键打通。<br>使用ysoserial可以生成一个恶意的注册中心，只要服务端调用注册中心的方法，就给你返回一个执行命令的Object给你反序列化</p>
-<h3 id="client攻击server"><a href="#client攻击server" class="headerlink" title="client攻击server"></a>client攻击server</h3><p>服务端对传递过来的参数放进了一个<code>unmarshalValue</code>函数进行处理，该方法在参数不是基本类型的情况下会对传入数据进行readObject，所以客户端提交给服务端的数据里得有一个Object，也就是服务端提供的函数调用中，至少得有一个函数接受的参数是一个Object，<strong>至少得不是一个基本类型才能触发readObject</strong>，才能发一个恶意对象过去进行利用</p>
+<h3 id="client攻击server"><a href="#client攻击server" class="headerlink" title="client攻击server"></a>client攻击server</h3><p>服务端对传递过来的参数放进了一个<code>unmarshalValue</code>函数进行处理，该方法在参数不是基本类型的情况下会对传入数据进行readObject，所以客户端提交给服务端的数据里得有一个Object，也就是服务端提供的函数调用中，至少得有一个函数接受的参数是一个Object，<strong>至少得不是一个primitive type才能触发readObject</strong>，才能发一个恶意对象过去进行利用<br>如图<br><img src="/images/JavaRMI%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96%E5%85%A5%E9%97%A8/unmarshalValue.png" alt="unmarshalValue.png"><br>这里可以看到服务端对传过来的类进行了一个类型判断，只要不是primitive type的类就直接进行readObject反序列化，而再来看一下primitive type有哪些<br><img src="/images/JavaRMI%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96%E5%85%A5%E9%97%A8/isPrimitive.png" alt="isPrimitive.png"><br>这意味着string也不是基础类型，服务端如果接受的是string也能打通</p>
 <p>把这个复现一下</p>
-<h4 id="魔改代码"><a href="#魔改代码" class="headerlink" title="魔改代码"></a>魔改代码</h4><p>因为需要调用可序列化对象为参数的函数，所以得把之前的代码加点东西，魔改一下<br>给Hello的接口和实现里面加一个接收Object的函数就行，就算远程接受的参数是基本类型，因为客户端是完全可控的，也可以通过代理或调试器等手段强行修改序列化出来的数据为恶意对象发送过去（这就太高级了）</p>
+<h4 id="魔改代码"><a href="#魔改代码" class="headerlink" title="魔改代码"></a>魔改代码</h4><p>因为需要调用可序列化对象为参数的函数，所以得把之前的代码加点东西，魔改一下<br>简单起见，给Hello的接口和实现里面加一个接收Object的函数。</p>
+<p><em>即使我们上面说到String类型也能被反序列化，但本地代码调用远程方法的时候肯定还是得按远程方法的参数类型去发送，否则会出现方法hash校验不通过，即使接受String类型参数的远程方法会反序列化我们发过去的参数，但本地仍然无法轻松的违背调用规则发送一个非String的序列化数据，这就需要对Java源码进行一些魔改或者通过debug和注入程序的方式进行魔改。</em></p>
+<p><em>jdk8u242中修改了readObject0方法，专门对String类型做了校验，还整出来了有关readString方法专门去读String，简单的理解就是不能再远程接受参数为String的时候硬传个其他的类型上去了。但是除了String外的非基础类型千千万，这么个过滤真的有用吗？</em></p>
+<p>这里演示的是直接传Object的简单利用</p>
 <pre class=" language-java"><code class="language-java"><span class="token comment" spellcheck="true">// HelloInterface</span>
 <span class="token keyword">public</span> String <span class="token function">sayHelloObj</span><span class="token punctuation">(</span>Object name<span class="token punctuation">)</span> <span class="token keyword">throws</span> RemoteException<span class="token punctuation">;</span>
 <span class="token comment" spellcheck="true">// HelloImpl</span>
@@ -388,9 +393,9 @@
     System<span class="token punctuation">.</span>out<span class="token punctuation">.</span><span class="token function">println</span><span class="token punctuation">(</span><span class="token string">"Hello "</span> <span class="token operator">+</span> name<span class="token punctuation">.</span><span class="token function">toString</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">+</span> <span class="token string">"!"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
     <span class="token keyword">return</span> <span class="token string">"sayHelloObj"</span><span class="token punctuation">;</span>
 <span class="token punctuation">}</span></code></pre>
-<p>然后打一个喜闻乐见的cc反序列化<br>然后cc链的依赖引不进来，又折腾了半天，就是不行，最后把项目重新用maven开了一遍。。。用maven引进来了，然后发现IDEA不知道为什么开始占用一堆端口，把1000-1200中间的几十个端口给占了，然后再改了一下Registry的端口，Client里面调用一下<br>嗯，没打通，用的CC1的链太古老了，打不通我最新版本jdk8u292<br>然后换上cc567几个链可以打高版本，成功弹出计算器。</p>
+<p>然后打一个喜闻乐见的cc反序列化<br>然后cc链的依赖引不进来，又折腾了半天，就是不行，最后把项目重新用maven开了一遍。。。用maven引进来了，然后发现IDEA不知道为什么开始占用一堆端口，把1000-1200中间的几十个端口给占了，然后再改了一下Registry的端口，Client里面调用一下<br>嗯，没打通，用的CC1的链太古老了，打不通我最新版本jdk8，然后换上cc567几个链可以打高版本，成功弹出计算器。</p>
 <p>这里踩了一个小坑，我一开始是直接从rmb神仙的博客里复制粘贴了一个cc5的链，他那里填的命令执行的内容是touch一个文件，而我本地windows肯定不会有touch这个命令，也就出现了报错，但我却发现报错是在client端出现的，而server貌似平稳运行，啥也没说。</p>
-<p>经过各种下断点调试，最后我发现，命令执行确实是在server上执行的，只不过报错也好结果也好都会返回给client，我差点以为是哪里出错了导致实际上命令是在client端执行的</p>
+<p>经过各种下断点调试，最后我发现，命令执行确实是在server上执行的，只不过报错也好结果也好都会返回给client，我差点以为是哪里出错了导致实际上命令是在client端执行的，呼应了之前的JRMP Listener无论方法client调用的方法的返回值是什么类型，反正直接返回一个异常类型反序列化打通</p>
 <p>也学会了一些调试的方法，比如什么在方法处下断点，跟着报错的调用栈几十层几十层的进之类的。。。</p>
 <h3 id="server攻击client"><a href="#server攻击client" class="headerlink" title="server攻击client"></a>server攻击client</h3><p>刚才说了，只要信息交换过程中给了序列化数据十有八九就会反序列化，所以当客户端调用服务端方法的时候，同样可以让服务端返回一个Object，只需要让客户端调用一个返回值是Object的方法，返回一个恶意的Object就可以把客户端打穿，因此在你攻击其他人的时候，也有可能反手被其他人攻击</p>
 <h2 id="JNDI注入"><a href="#JNDI注入" class="headerlink" title="JNDI注入"></a>JNDI注入</h2><p>JNDI注入的关键是在用户进行远程方法调用时返回的stub是一个reference类型的对象，且用户本地CLASSPATH不存在该类字节码，导致用户需要加载reference类的字节码，直接返回恶意类字节码命令执行</p>
@@ -429,7 +434,7 @@ main:7, JNDI_Test (demo)</code></pre><p>在<code>getObjectFactoryFromReference</
 <p>从codebase加载远程类字节码，最后返回一个clas.newInstance，这里就触发了我们预先在恶意类中埋下的雷，实现命令执行</p>
 <h3 id="JNDI-Reference-LDAP"><a href="#JNDI-Reference-LDAP" class="headerlink" title="JNDI Reference+LDAP"></a>JNDI Reference+LDAP</h3><p>绑定的东西改成一个LDAP服务，LDAP服务同样可以返回一个JNDI Reference对象，这时通过LDAP远程加载，不受上面这两个<code>com.sun.jndi.rmi.object.trustURLCodebase&amp;com.sun.jndi.cosnaming.object.trustURLCodebase</code>属性的控制，同样也被打了补丁<br>在在Oracle JDK 11.0.1、8u191、7u201、6u211之后，<code>com.sun.jndi.ldap.object.trustURLCodebase</code>属性的默认值被调整为false</p>
 <h3 id="利用本地链进行执行"><a href="#利用本地链进行执行" class="headerlink" title="利用本地链进行执行"></a>利用本地链进行执行</h3><p>这个就是在JDK默认限制全部拉满之后的解决方案，不让从外部加载，就只能看用户本地有什么东西了，需要用户本地能摸出来一条链才能打通</p>
-<h2 id="参考链接"><a href="#参考链接" class="headerlink" title="参考链接"></a>参考链接</h2><p><a href="https://blog.0kami.cn/2020/02/06/java/rmi-registry-security-problem/" target="_blank" rel="external nofollow noopener noreferrer">浅谈Java RMI Registry安全问题</a><br><a href="https://xz.aliyun.com/t/8706" target="_blank" rel="external nofollow noopener noreferrer">JAVA RMI 反序列化攻击 &amp; JEP290 Bypass分析</a><br><a href="https://xz.aliyun.com/t/6660" target="_blank" rel="external nofollow noopener noreferrer">RMI反序列化</a><br><a href="https://xz.aliyun.com/t/8214" target="_blank" rel="external nofollow noopener noreferrer">JNDI注入学习</a><br><a href="https://paper.seebug.org/942/" target="_blank" rel="external nofollow noopener noreferrer">如何绕过高版本JDK的限制进行JNDI注入利用</a><br><a href="https://www.xmanblog.net/java-rmi-rce/" target="_blank" rel="external nofollow noopener noreferrer">深入理解Java RMI反序列化漏洞</a><br><a href="https://www.cnblogs.com/nice0e3/p/13927460.html" target="_blank" rel="external nofollow noopener noreferrer">Java安全之RMI反序列化</a><br><a href="https://rickgray.me/2016/08/19/jndi-injection-from-theory-to-apply-blackhat-review/" target="_blank" rel="external nofollow noopener noreferrer">BlackHat 2016 回顾之 JNDI 注入简单解析</a><br><a href="https://zhuanlan.zhihu.com/p/347364636" target="_blank" rel="external nofollow noopener noreferrer">Java安全之ysoserial-JRMP模块分析（一）</a></p>
+<h2 id="参考链接"><a href="#参考链接" class="headerlink" title="参考链接"></a>参考链接</h2><p><a href="https://blog.0kami.cn/2020/02/06/java/rmi-registry-security-problem/" target="_blank" rel="external nofollow noopener noreferrer">浅谈Java RMI Registry安全问题</a><br><a href="https://xz.aliyun.com/t/8706" target="_blank" rel="external nofollow noopener noreferrer">JAVA RMI 反序列化攻击 &amp; JEP290 Bypass分析</a><br><a href="https://xz.aliyun.com/t/6660" target="_blank" rel="external nofollow noopener noreferrer">RMI反序列化</a><br><a href="https://xz.aliyun.com/t/8214" target="_blank" rel="external nofollow noopener noreferrer">JNDI注入学习</a><br><a href="https://paper.seebug.org/942/" target="_blank" rel="external nofollow noopener noreferrer">如何绕过高版本JDK的限制进行JNDI注入利用</a><br><a href="https://www.xmanblog.net/java-rmi-rce/" target="_blank" rel="external nofollow noopener noreferrer">深入理解Java RMI反序列化漏洞</a><br><a href="https://www.cnblogs.com/nice0e3/p/13927460.html" target="_blank" rel="external nofollow noopener noreferrer">Java安全之RMI反序列化</a><br><a href="https://rickgray.me/2016/08/19/jndi-injection-from-theory-to-apply-blackhat-review/" target="_blank" rel="external nofollow noopener noreferrer">BlackHat 2016 回顾之 JNDI 注入简单解析</a><br><a href="https://zhuanlan.zhihu.com/p/347364636" target="_blank" rel="external nofollow noopener noreferrer">Java安全之ysoserial-JRMP模块分析（一）</a><br><a href="https://hg.openjdk.java.net/jdk8u/jdk8u/jdk/rev/033462472c28" target="_blank" rel="external nofollow noopener noreferrer">openjdk8u242有关readObject的更新</a></p>
 
     </div>
 
@@ -531,7 +536,7 @@ main:7, JNDI_Test (demo)</code></pre><p>在<code>getObjectFactoryFromReference</
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">119</span>
+          <span class="site-state-item-count">120</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
