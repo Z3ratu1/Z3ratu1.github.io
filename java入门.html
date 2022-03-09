@@ -1,0 +1,552 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 6.0.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"blog.z3ratu1.cn","root":"/","scheme":"Pisces","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"always","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":true},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+  </script>
+
+  <meta name="description" content="Java入门学！ ClassLoaderJava的类都不是一启动就全部加载了的，有些类只在被需要时才被临时加载进JVM。而实现类加载的就是Java的ClassLoader，这个东西感觉在学Java的时候会无数次的被提及，以及他相应的一些知识点。 类的加载时机">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Java入门">
+<meta property="og:url" content="https://blog.z3ratu1.cn/java%E5%85%A5%E9%97%A8.html">
+<meta property="og:site_name" content="Z3ratu1&#39;s blog">
+<meta property="og:description" content="Java入门学！ ClassLoaderJava的类都不是一启动就全部加载了的，有些类只在被需要时才被临时加载进JVM。而实现类加载的就是Java的ClassLoader，这个东西感觉在学Java的时候会无数次的被提及，以及他相应的一些知识点。 类的加载时机">
+<meta property="og:locale">
+<meta property="article:published_time" content="2021-04-07T06:31:40.000Z">
+<meta property="article:modified_time" content="2021-04-08T13:52:32.903Z">
+<meta property="article:author" content="Z3ratu1">
+<meta property="article:tag" content="Java">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="https://blog.z3ratu1.cn/java%E5%85%A5%E9%97%A8.html">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-Hans'
+  };
+</script>
+
+  <title>Java入门 | Z3ratu1's blog</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+<link rel="stylesheet" href="/css/prism-tomorrow.css" type="text/css"></head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">Z3ratu1's blog</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">Welcome</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>关于</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+        <li class="menu-item menu-item-links">
+
+    <a href="/links/" rel="section"><i class="fa fa-link fa-fw"></i>友链</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off" placeholder="搜索..." spellcheck="false" type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+  <a href="https://github.com/Z3ratu1" class="github-corner" title="Follow me on GitHub" aria-label="Follow me on GitHub" rel="external nofollow noopener noreferrer" target="_blank"><svg width="80" height="80" viewbox="0 0 250 250" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"/><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"/><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"/></svg></a>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
+    <link itemprop="mainEntityOfPage" href="https://blog.z3ratu1.cn/java%E5%85%A5%E9%97%A8.html">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="https://q2.qlogo.cn/headimg_dl?dst_uin=1207039417&spec=160">
+      <meta itemprop="name" content="Z3ratu1">
+      <meta itemprop="description" content="与其感慨路难行，不如现在出发">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Z3ratu1's blog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          Java入门
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2021-04-07 14:31:40" itemprop="dateCreated datePublished" datetime="2021-04-07T14:31:40+08:00">2021-04-07</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2021-04-08 21:52:32" itemprop="dateModified" datetime="2021-04-08T21:52:32+08:00">2021-04-08</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E7%AC%94%E8%AE%B0/" itemprop="url" rel="index"><span itemprop="name">笔记</span></a>
+                </span>
+            </span>
+
+          
+            <span id="/java%E5%85%A5%E9%97%A8.html" class="post-meta-item leancloud_visitors" data-flag-title="Java入门" title="阅读次数">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span class="leancloud-visitors-count"></span>
+            </span>
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="far fa-comment"></i>
+      </span>
+      <span class="post-meta-item-text">Valine：</span>
+    
+    <a title="valine" href="/java%E5%85%A5%E9%97%A8.html#valine-comments" itemprop="discussionUrl">
+      <span class="post-comments-count valine-comment-count" data-xid="/java%E5%85%A5%E9%97%A8.html" itemprop="commentCount"></span>
+    </a>
+  </span>
+  
+  
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h1 id="Java入门"><a href="#Java入门" class="headerlink" title="Java入门"></a>Java入门</h1><p>学！</p>
+<h2 id="ClassLoader"><a href="#ClassLoader" class="headerlink" title="ClassLoader"></a>ClassLoader</h2><p>Java的类都不是一启动就全部加载了的，有些类只在被需要时才被临时加载进JVM。而实现类加载的就是Java的ClassLoader，这个东西感觉在学Java的时候会无数次的被提及，以及他相应的一些知识点。</p>
+<h3 id="类的加载时机"><a href="#类的加载时机" class="headerlink" title="类的加载时机"></a>类的加载时机</h3><p>类的加载分为显式和隐式两种<br>显示加载：调用ClassLoader的loadClass，findClass方法，Class类的forName()方法<br>隐式加载：<code>new getstatic putstatic invokestatic</code> 四个指令会隐式的进行类的加载</p>
+<h3 id="常见ClassLoader"><a href="#常见ClassLoader" class="headerlink" title="常见ClassLoader"></a>常见ClassLoader</h3><p><code>BootStrap ClassLoader</code>，启动类加载器。最顶层的类加载器，负责加载java核心类库，由C++实现，写在了JVM底层，已经超脱出了java类的范畴，所以当我们尝试去获取由BootStrap ClassLoader加载的类的加载器时，得到的结果会是<code>null</code><br><code>Extension ClassLoader</code>，扩展类加载器。加载<code>JAVA_HOME/jre/lib/ext/</code>路径下的jar<br><code>App ClassLoader</code>，系统类加载器。是默认的类加载器<br>然后就是我们自定义的ClassLoader了</p>
+<h3 id="双亲委派模型"><a href="#双亲委派模型" class="headerlink" title="双亲委派模型"></a>双亲委派模型</h3><p>应该说是一种规范。就是当第一级的ClassLoader去加载一个类的时候，先把这个类提供给他的父加载器进行加载，父加载器加载不到再自己动手。<br>并不是类的继承关系，而是一种规定的父加载器关系<br>BootStrap ClassLoader -&gt; Extension ClassLoader -&gt; App ClassLoader -&gt; 自定义ClassLoader<br>双亲委派模型有各种各样的好处，比如什么不会重复加载类啦什么的</p>
+<p>并且如果同一个类使用不同的ClassLoader加载进来会导致这两个类被认为是不同类</p>
+<h3 id="ClassLoader核心方法"><a href="#ClassLoader核心方法" class="headerlink" title="ClassLoader核心方法"></a>ClassLoader核心方法</h3><ol>
+<li><code>loadClass</code>(加载指定的Java类)</li>
+<li><code>findClass</code>(查找指定的Java类)</li>
+<li><code>findLoadedClass</code>(查找JVM已经加载过的类)</li>
+<li><code>defineClass</code>(定义一个Java类)</li>
+<li><code>resolveClass</code>(链接指定的Java类)</li>
+</ol>
+<p>类加载器都是<code>java.lang.ClassLoader</code>的子类，Bootstrap不算。一般写一个自定义的ClassLoader，就是要能找到一个类的字节码文件并返回<br>findClass是统一加载类的函数，在这个函数里面一般先调用父加载器的findClass函数，找不到就自己根据路径去加载类字节码，用defineClass方法（是JVM的native方法）将类字节码注册到JVM里面去</p>
+<h2 id="反射"><a href="#反射" class="headerlink" title="反射"></a>反射</h2><p>之前看Java反序列化的时候就学了一点了，现在再复习一下<br>反射说白了就是能在程序运行时通过一些手段来动态的加载类以及调用类的方法，访问类的成员变量之类的，廖雪峰反射这段讲的也蛮好的</p>
+<p>反射操作的是Java的Class类，所以在进行反射操作的时候需要先获取到Class类对象</p>
+<h3 id="Class类"><a href="#Class类" class="headerlink" title="Class类"></a>Class类</h3><p>JVM在每次遇到一个没有加载的class的时候就会使用ClassLoader将对应类的.class文件（也就是javac编译出来的字节码文件）加载进来，然后为该类创建一个Class类的对象比如String类就是<code>Class cls = new Class(String);</code><br>Class对象是由JVM创建的，且Class类的构造方法是private的，所以只有JVM能创建class实例<br>每个Class实例会指向一个数据类型（String，Runnable之类的），同时一个Class实例也包含该类的完整信息</p>
+<h3 id="获取Class实例"><a href="#获取Class实例" class="headerlink" title="获取Class实例"></a>获取Class实例</h3><ol>
+<li>类名.class</li>
+<li>Class.forName(“类名”)</li>
+<li>classLoader.loadClass(“类名”)<br>访问一个class文件下的内部类时需要使用$，对于数组类型的需要使用奇怪的表示方式，如下<pre class=" language-java"><code class="language-java">Class<span class="token operator">&lt;</span><span class="token operator">?</span><span class="token operator">></span> doubleArray <span class="token operator">=</span> Class<span class="token punctuation">.</span><span class="token function">forName</span><span class="token punctuation">(</span><span class="token string">"[D"</span><span class="token punctuation">)</span><span class="token punctuation">;</span><span class="token comment" spellcheck="true">//相当于double[].class</span>
+Class<span class="token operator">&lt;</span><span class="token operator">?</span><span class="token operator">></span> cStringArray <span class="token operator">=</span> Class<span class="token punctuation">.</span><span class="token function">forName</span><span class="token punctuation">(</span><span class="token string">"[[Ljava.lang.String;"</span><span class="token punctuation">)</span><span class="token punctuation">;</span><span class="token comment" spellcheck="true">// 相当于String[][].class</span>
+</code></pre>
+</li>
+</ol>
+<h3 id="获取Method实例"><a href="#获取Method实例" class="headerlink" title="获取Method实例"></a>获取Method实例</h3><p>能获得任意类一般不是我们的重点，一般来说我们都是想调用某个类的特定方法，因此我们需要获得一个类的一个Method实例<br>可以通过<code>Method class.getDeclaredMethod(name)</code>从Class实例中获取到对应类的一个方法Method实例<br>Method实例并不等于对应的方法，但可以通过<code>method.invoke(Object,Object...)</code><br>在调用静态方法时类实例可以为null，参数没有可以不填</p>
+<h3 id="获取Field实例"><a href="#获取Field实例" class="headerlink" title="获取Field实例"></a>获取Field实例</h3><p>访问反射获取的Class对象时可以越过类对对象的访问控制权限进行，即private等属性的变量也可以进行访问，通过<code>class.getField(name)</code>可以访问到公有属性，<code>Field class.getDeclaredField(name)</code>可以获取任意属性，函数名加s获取全部公有&#x2F;任意属性<br>返回的均为Field对象，同样的，使用<code>Field.get(Object)</code>和<code>Field.set(Object,Object)</code>，获取类实例的name属性，或是对类实例的对应属性进行赋值但对应private属性还需先进行<code>class.setAccessible(true)</code>，但是JVM可能存在<code>SecurityManager</code>阻止对某些类使用setAccessible(true)</p>
+<h3 id="通过反射获取Unsafe类"><a href="#通过反射获取Unsafe类" class="headerlink" title="通过反射获取Unsafe类"></a>通过反射获取Unsafe类</h3><p>Unsafe类提供了Java一些非常底层的操作，为java内部用API，不允许外部调用。不能被直接new出来，当使用ClassLoader进行加载的时候只允许被Bootstrap ClassLoader加载<br>可以通过反射的方式来获取Unsafe类<br>Unsafe类中有一个<code>private static final Unsafe theUnsafe</code>成员变量，其即为Unsafe类的实例<br>可以通过如下方法来获取Unsafe类实例</p>
+<pre class=" language-java"><code class="language-java">Class <span class="token class-name">clz</span> <span class="token operator">=</span> Class<span class="token punctuation">.</span><span class="token function">forName</span><span class="token punctuation">(</span><span class="token string">"sun.misc.Unsafe"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+Field f <span class="token operator">=</span> clz<span class="token punctuation">.</span><span class="token function">getDeclaredField</span><span class="token punctuation">(</span><span class="token string">"theUnsafe"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+f<span class="token punctuation">.</span><span class="token function">setAccessible</span><span class="token punctuation">(</span><span class="token boolean">true</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+Unsafe unsafe <span class="token operator">=</span> <span class="token punctuation">(</span>Unsafe<span class="token punctuation">)</span>f<span class="token punctuation">.</span><span class="token function">get</span><span class="token punctuation">(</span>null<span class="token punctuation">)</span><span class="token punctuation">;</span>
+</code></pre>
+<p>forName要写完整路径。。我一开始没写就没成<br>Unsafe类可以使用allocateInstance无视构造函数的构建一个类实例<br>在java8之前可以通过Unsafe类的defineClass绕过ClassLoader在JVM中创建Class对象</p>
+<h3 id="代理"><a href="#代理" class="headerlink" title="代理"></a>代理</h3><p>代理的关键就是不编写实现类，直接在运行时创建某个接口（interface）的实例<br>通过一个InvocationHandler定义一个handler，其可对代理对象的方法进行增强，使用Proxy.newProxyInstance()创建一个interface实例，接受三个参数：ClassLoader，传入接口类的ClassLoader即可，要实现的接口数组（只传一个接口也行，但是一定得是数组），一个处理接口方法的InvocationHandler，代理对象的方法最终都会交给InvocationHandler的invoke方法执行<br>通过Proxy创建代理对象，然后将接口方法由InvocationHandler完成</p>
+<p>只需要被代理类和接口实现了同一个接口，即可保证其内部的结构一致，就可以通过实例化接口生成的代理对象接受被代理类，并在此基础上进行代码增强</p>
+<p>代理实际的实现原理也就是JVM在运行时用你给的ClassLoader临时生成了一个代理类的字节码并加载进了内存</p>
+<h2 id="Native方法"><a href="#Native方法" class="headerlink" title="Native方法"></a>Native方法</h2><p>是一个Java调用非Java代码的接口，一般来说就是Java交给C&#x2F;C++实现的功能<br>这个方法使用的一大原因就是跨平台，在很底层的实现上并不由Java实现，而是通过C&#x2F;C++等语言对应不同的平台进行实现，然后把这些方法按照JNI(Java Native Interface)的规范进行编写，编译成动态链接库，打包在不同平台的JDK上，实现Java的跨平台</p>
+<h2 id="参考链接"><a href="#参考链接" class="headerlink" title="参考链接"></a>参考链接</h2><p><a target="_blank" rel="external nofollow noopener noreferrer" href="https://www.liaoxuefeng.com/wiki/1252599548343744/1264799402020448">Class类-廖雪峰的官方网站</a><br><a target="_blank" rel="external nofollow noopener noreferrer" href="https://www.liaoxuefeng.com/wiki/1252599548343744/1264804593397984#0">动态代理-廖雪峰的官方网站</a><br><a target="_blank" rel="external nofollow noopener noreferrer" href="https://zhuanlan.zhihu.com/p/54693308">好怕怕的类加载器</a><br><a target="_blank" rel="external nofollow noopener noreferrer" href="https://www.zhihu.com/question/20794107">Java动态代理</a>第二个回答</p>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/Java/" rel="tag"># Java</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/%E7%BA%A2%E6%98%8E%E8%B0%B7&%E8%99%8E%E7%AC%A6.html" rel="prev" title="红明谷&虎符CTF">
+      <i class="fa fa-chevron-left"></i> 红明谷&虎符CTF
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/Switch%E8%87%AA%E5%BB%BANAT%E4%BC%98%E5%8C%96%E6%8C%87%E5%8C%97.html" rel="next" title="Switch自建NAT优化指北">
+      Switch自建NAT优化指北 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+    <div class="comments" id="valine-comments"></div>
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#Java%E5%85%A5%E9%97%A8"><span class="nav-number">1.</span> <span class="nav-text">Java入门</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#ClassLoader"><span class="nav-number">1.1.</span> <span class="nav-text">ClassLoader</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%B1%BB%E7%9A%84%E5%8A%A0%E8%BD%BD%E6%97%B6%E6%9C%BA"><span class="nav-number">1.1.1.</span> <span class="nav-text">类的加载时机</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%B8%B8%E8%A7%81ClassLoader"><span class="nav-number">1.1.2.</span> <span class="nav-text">常见ClassLoader</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%8F%8C%E4%BA%B2%E5%A7%94%E6%B4%BE%E6%A8%A1%E5%9E%8B"><span class="nav-number">1.1.3.</span> <span class="nav-text">双亲委派模型</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#ClassLoader%E6%A0%B8%E5%BF%83%E6%96%B9%E6%B3%95"><span class="nav-number">1.1.4.</span> <span class="nav-text">ClassLoader核心方法</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%8F%8D%E5%B0%84"><span class="nav-number">1.2.</span> <span class="nav-text">反射</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Class%E7%B1%BB"><span class="nav-number">1.2.1.</span> <span class="nav-text">Class类</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%8E%B7%E5%8F%96Class%E5%AE%9E%E4%BE%8B"><span class="nav-number">1.2.2.</span> <span class="nav-text">获取Class实例</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%8E%B7%E5%8F%96Method%E5%AE%9E%E4%BE%8B"><span class="nav-number">1.2.3.</span> <span class="nav-text">获取Method实例</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%8E%B7%E5%8F%96Field%E5%AE%9E%E4%BE%8B"><span class="nav-number">1.2.4.</span> <span class="nav-text">获取Field实例</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E9%80%9A%E8%BF%87%E5%8F%8D%E5%B0%84%E8%8E%B7%E5%8F%96Unsafe%E7%B1%BB"><span class="nav-number">1.2.5.</span> <span class="nav-text">通过反射获取Unsafe类</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BB%A3%E7%90%86"><span class="nav-number">1.2.6.</span> <span class="nav-text">代理</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Native%E6%96%B9%E6%B3%95"><span class="nav-number">1.3.</span> <span class="nav-text">Native方法</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%8F%82%E8%80%83%E9%93%BE%E6%8E%A5"><span class="nav-number">1.4.</span> <span class="nav-text">参考链接</span></a></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Z3ratu1" src="https://q2.qlogo.cn/headimg_dl?dst_uin=1207039417&spec=160">
+  <p class="site-author-name" itemprop="name">Z3ratu1</p>
+  <div class="site-description" itemprop="description">与其感慨路难行，不如现在出发</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">145</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">5</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">86</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+  <div class="beian"><a href="http://www.beian.miit.gov.cn/" rel="external nofollow noopener noreferrer" target="_blank">湘ICP备2020021580号 </a>
+      <img src="/./images/beian.png" style="display: inline-block;">
+  </div>
+
+<div class="copyright">
+  
+  &copy; 2019 – 
+  <span itemprop="copyrightYear">2022</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Z3ratu1</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="external nofollow noopener noreferrer" target="_blank">Hexo</a> & <a href="https://pisces.theme-next.org/" class="theme-link" rel="external nofollow noopener noreferrer" target="_blank">NexT.Pisces</a> 强力驱动
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+
+<script>
+NexT.utils.loadComments(document.querySelector('#valine-comments'), () => {
+  NexT.utils.getScript('https://cdn.jsdelivr.net/npm/valine@1.4.14/dist/Valine.min.js', () => {
+    var GUEST = ['nick', 'mail', 'link'];
+    var guest = 'nick,mail,link';
+    guest = guest.split(',').filter(item => {
+      return GUEST.includes(item);
+    });
+    new Valine({
+      el         : '#valine-comments',
+      verify     : false,
+      notify     : false,
+      appId      : '7H8kg0XdWO8IbhOcu4K1JaAT-gzGzoHsz',
+      appKey     : 'wPKQjkbVtvPaRR7gh2yjfLSi',
+      placeholder: "Just go go",
+      avatar     : 'mm',
+      meta       : guest,
+      pageSize   : '10' || 10,
+      visitor    : true,
+      lang       : '' || 'zh-cn',
+      path       : location.pathname,
+      recordIP   : false,
+      serverURLs : ''
+    });
+  }, window.Valine);
+});
+</script>
+
+</body>
+</html>

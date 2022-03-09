@@ -1,0 +1,575 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 6.0.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"blog.z3ratu1.cn","root":"/","scheme":"Pisces","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"always","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":true},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+  </script>
+
+  <meta name="description" content="[XNUCA 2019] ezphp去年XNUCA的一个题，因为一个点死扣了两天，docker配置Apache配置全都重新研究了一般，开端口防火墙全都整了一遍呜呜呜 源码&lt;?php $files &#x3D; scandir(&#39;.&#x2F;&#39;); foreach($files as $file) {     if(is_file($file)){         if ($file !&#x3D;&#x3D; &quot;index.ph">
+<meta property="og:type" content="article">
+<meta property="og:title" content="XNUCA 2019 ezphp">
+<meta property="og:url" content="https://blog.z3ratu1.cn/[XNUCA]ezphp.html">
+<meta property="og:site_name" content="Z3ratu1&#39;s blog">
+<meta property="og:description" content="[XNUCA 2019] ezphp去年XNUCA的一个题，因为一个点死扣了两天，docker配置Apache配置全都重新研究了一般，开端口防火墙全都整了一遍呜呜呜 源码&lt;?php $files &#x3D; scandir(&#39;.&#x2F;&#39;); foreach($files as $file) {     if(is_file($file)){         if ($file !&#x3D;&#x3D; &quot;index.ph">
+<meta property="og:locale">
+<meta property="article:published_time" content="2020-03-05T14:13:00.000Z">
+<meta property="article:modified_time" content="2021-02-08T10:34:22.735Z">
+<meta property="article:author" content="Z3ratu1">
+<meta property="article:tag" content="wp">
+<meta property="article:tag" content="php">
+<meta property="article:tag" content="htaccess">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="https://blog.z3ratu1.cn/[XNUCA]ezphp.html">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-Hans'
+  };
+</script>
+
+  <title>XNUCA 2019 ezphp | Z3ratu1's blog</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+<link rel="stylesheet" href="/css/prism-tomorrow.css" type="text/css"></head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">Z3ratu1's blog</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">Welcome</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>关于</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+        <li class="menu-item menu-item-links">
+
+    <a href="/links/" rel="section"><i class="fa fa-link fa-fw"></i>友链</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off" placeholder="搜索..." spellcheck="false" type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+  <a href="https://github.com/Z3ratu1" class="github-corner" title="Follow me on GitHub" aria-label="Follow me on GitHub" rel="external nofollow noopener noreferrer" target="_blank"><svg width="80" height="80" viewbox="0 0 250 250" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"/><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"/><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"/></svg></a>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
+    <link itemprop="mainEntityOfPage" href="https://blog.z3ratu1.cn/[XNUCA]ezphp.html">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="https://q2.qlogo.cn/headimg_dl?dst_uin=1207039417&spec=160">
+      <meta itemprop="name" content="Z3ratu1">
+      <meta itemprop="description" content="与其感慨路难行，不如现在出发">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Z3ratu1's blog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          XNUCA 2019 ezphp
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2020-03-05 22:13:00" itemprop="dateCreated datePublished" datetime="2020-03-05T22:13:00+08:00">2020-03-05</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2021-02-08 18:34:22" itemprop="dateModified" datetime="2021-02-08T18:34:22+08:00">2021-02-08</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E5%88%B7%E9%A2%98%E8%AE%B0%E5%BD%95/" itemprop="url" rel="index"><span itemprop="name">刷题记录</span></a>
+                </span>
+            </span>
+
+          
+            <span id="/%5BXNUCA%5Dezphp.html" class="post-meta-item leancloud_visitors" data-flag-title="XNUCA 2019 ezphp" title="阅读次数">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span class="leancloud-visitors-count"></span>
+            </span>
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="far fa-comment"></i>
+      </span>
+      <span class="post-meta-item-text">Valine：</span>
+    
+    <a title="valine" href="/%5BXNUCA%5Dezphp.html#valine-comments" itemprop="discussionUrl">
+      <span class="post-comments-count valine-comment-count" data-xid="/%5BXNUCA%5Dezphp.html" itemprop="commentCount"></span>
+    </a>
+  </span>
+  
+  
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h1 id="XNUCA-2019-ezphp"><a href="#XNUCA-2019-ezphp" class="headerlink" title="[XNUCA 2019] ezphp"></a>[XNUCA 2019] ezphp</h1><p>去年XNUCA的一个题，因为一个点死扣了两天，docker配置Apache配置全都重新研究了一般，开端口防火墙全都整了一遍呜呜呜</p>
+<h2 id="源码"><a href="#源码" class="headerlink" title="源码"></a>源码</h2><pre class=" language-php"><code class="language-php"><span class="token delimiter">&lt;?php</span>
+<span class="token variable">$files</span> <span class="token operator">=</span> <span class="token function">scandir</span><span class="token punctuation">(</span><span class="token string">'./'</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token keyword">foreach</span><span class="token punctuation">(</span><span class="token variable">$files</span> <span class="token keyword">as</span> <span class="token variable">$file</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token keyword">if</span><span class="token punctuation">(</span><span class="token function">is_file</span><span class="token punctuation">(</span><span class="token variable">$file</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">{</span>
+        <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token variable">$file</span> <span class="token operator">!==</span> <span class="token string">"index.php"</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+            <span class="token function">unlink</span><span class="token punctuation">(</span><span class="token variable">$file</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token punctuation">}</span>
+    <span class="token punctuation">}</span>
+<span class="token punctuation">}</span>
+<span class="token keyword">include_once</span><span class="token punctuation">(</span><span class="token string">"fl3g.php"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token keyword">if</span><span class="token punctuation">(</span><span class="token operator">!</span><span class="token function">isset</span><span class="token punctuation">(</span><span class="token variable">$_GET</span><span class="token punctuation">[</span><span class="token string">'content'</span><span class="token punctuation">]</span><span class="token punctuation">)</span> <span class="token operator">||</span> <span class="token operator">!</span><span class="token function">isset</span><span class="token punctuation">(</span><span class="token variable">$_GET</span><span class="token punctuation">[</span><span class="token string">'filename'</span><span class="token punctuation">]</span><span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token function">highlight_file</span><span class="token punctuation">(</span><span class="token constant">__FILE__</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token keyword">die</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
+<span class="token variable">$content</span> <span class="token operator">=</span> <span class="token variable">$_GET</span><span class="token punctuation">[</span><span class="token string">'content'</span><span class="token punctuation">]</span><span class="token punctuation">;</span>
+<span class="token keyword">if</span><span class="token punctuation">(</span><span class="token function">stristr</span><span class="token punctuation">(</span><span class="token variable">$content</span><span class="token punctuation">,</span><span class="token string">'on'</span><span class="token punctuation">)</span> <span class="token operator">||</span> <span class="token function">stristr</span><span class="token punctuation">(</span><span class="token variable">$content</span><span class="token punctuation">,</span><span class="token string">'html'</span><span class="token punctuation">)</span> <span class="token operator">||</span> <span class="token function">stristr</span><span class="token punctuation">(</span><span class="token variable">$content</span><span class="token punctuation">,</span><span class="token string">'type'</span><span class="token punctuation">)</span> <span class="token operator">||</span> <span class="token function">stristr</span><span class="token punctuation">(</span><span class="token variable">$content</span><span class="token punctuation">,</span><span class="token string">'flag'</span><span class="token punctuation">)</span> <span class="token operator">||</span> <span class="token function">stristr</span><span class="token punctuation">(</span><span class="token variable">$content</span><span class="token punctuation">,</span><span class="token string">'upload'</span><span class="token punctuation">)</span> <span class="token operator">||</span> <span class="token function">stristr</span><span class="token punctuation">(</span><span class="token variable">$content</span><span class="token punctuation">,</span><span class="token string">'file'</span><span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token keyword">echo</span> <span class="token string">"Hacker"</span><span class="token punctuation">;</span>
+    <span class="token keyword">die</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
+<span class="token variable">$filename</span> <span class="token operator">=</span> <span class="token variable">$_GET</span><span class="token punctuation">[</span><span class="token string">'filename'</span><span class="token punctuation">]</span><span class="token punctuation">;</span>
+<span class="token keyword">if</span><span class="token punctuation">(</span><span class="token function">preg_match</span><span class="token punctuation">(</span><span class="token string">"/[^a-z\.]/"</span><span class="token punctuation">,</span> <span class="token variable">$filename</span><span class="token punctuation">)</span> <span class="token operator">==</span> <span class="token number">1</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token keyword">echo</span> <span class="token string">"Hacker"</span><span class="token punctuation">;</span>
+    <span class="token keyword">die</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
+<span class="token variable">$files</span> <span class="token operator">=</span> <span class="token function">scandir</span><span class="token punctuation">(</span><span class="token string">'./'</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token keyword">foreach</span><span class="token punctuation">(</span><span class="token variable">$files</span> <span class="token keyword">as</span> <span class="token variable">$file</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token keyword">if</span><span class="token punctuation">(</span><span class="token function">is_file</span><span class="token punctuation">(</span><span class="token variable">$file</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">{</span>
+        <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token variable">$file</span> <span class="token operator">!==</span> <span class="token string">"index.php"</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+            <span class="token function">unlink</span><span class="token punctuation">(</span><span class="token variable">$file</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token punctuation">}</span>
+    <span class="token punctuation">}</span>
+<span class="token punctuation">}</span>
+<span class="token function">file_put_contents</span><span class="token punctuation">(</span><span class="token variable">$filename</span><span class="token punctuation">,</span> <span class="token variable">$content</span> <span class="token punctuation">.</span> <span class="token string">"\nJust one chance"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token delimiter">?></span>
+</code></pre>
+<p>大致意思就是访问开始和结束都把index.php以外的文件都删了，然后让你写一个文件，filename只能是字母和.，content过滤了一些奇奇怪怪的内容<br>而由于filename限制在了.a-z中，所以用伪协议编码绕过内容过滤是不可能了<br>但是这些过滤和我上传一个马有什么关系呢？，所以直接传一个shell上去，不能解析，gg<br>说实话第一次遇到不能解析除了index.php以外的php文件的情况，人都傻了，后来去看了他们的docker，发现在Apache配置里写了只解析index.php<br>后来才知道应该是传.htaccess，这就是为什么上面有那一堆奇奇怪怪的过滤，然后最后又给你加了一句无意义字符。.htaccess中如果有不符合语法的内容会直接导致当前目录爆炸500<br>因为服务器刚好是Apache，只有在Apache中才能用.htaccess重写，当然也要在配置里面设置允许重写</p>
+<h2 id="思路"><a href="#思路" class="headerlink" title="思路"></a>思路</h2><p>知道是传htaccess之后思路可以收束一点，过滤的内容就阻止了我们把htaccess写成shell再append到index.php里，普通的利用思路就断了，但是我第一眼看这个代码的时候就觉得很奇怪，为什么把所有东西都删了又include了一个fl3g.php，我一开始还以为是这个文件修改了权限删不掉，后来才知道这就是突破点</p>
+<p>htaccess可以指定errorlog写入哪个文件，也可以修改include的基础路径，也就是我们把include的路径写成一个shell，这样子include(fl3g.php)必然报错，报错信息就会有我们实质上为shell的include路径，再把errorlog写进一个地方的fl3g.php，然后再把include改成那个路径就可以实现包含fl3g.php获取shell了</p>
+<p>至于如何解决后面的无意义字符串，在.htaccess中 \是下一行的连接符，就像bash中用\连接下一行内容一样，这样子用\ #就可以把下面这一行拉上来注释掉了</p>
+<p>第一次include的时候发现errorlog里的shell被实体编码了，包含失败，但是可以用UTF-7编码绕过，并且可以在.htaccess中设置UTF-7解码，所以用UTF-7绕过就可以了</p>
+<p>UTF-7解码工具就找到一个，在外网卡死我了<br><a target="_blank" rel="external nofollow noopener noreferrer" href="http://toolswebtop.com/text/process/encode/utf-7">http://toolswebtop.com/text/process/encode/utf-7</a></p>
+<h3 id="payload"><a href="#payload" class="headerlink" title="payload"></a>payload</h3><p>记一下htaccess的payload</p>
+<h4 id="第一轮"><a href="#第一轮" class="headerlink" title="第一轮"></a>第一轮</h4><pre><code>php_value include_path &quot;&lt;?php eval($_GET[&#39;a&#39;]);__halt_compiler();&quot;
+php_value log_errors 1
+php_value error_log /tmp/fl3g.php \ #
+</code></pre>
+<p>include_path的值记得UTF-7编码，然后再url编码一遍再打过去，在burp里换行就自动变空格了，手动改%0d%0a<br>这里的__halt_compoler();作用是停止解释器继续解释，即解释器运行到这就停止对整个文件的解释了，具体作用可能能防止之后有什么奇奇怪怪的东西导致脚本解析出问题吧，毕竟包含了整个日志<br>不过话说回来如果之前有人打了这么一个payload在日志里面，那么我再怎么打也没用了啊，也不知道别人后门密码是什么，新打的shell在别人的后面也没法被解析</p>
+<h4 id="第二轮"><a href="#第二轮" class="headerlink" title="第二轮"></a>第二轮</h4><pre><code>php_value include_path &quot;\tmp&quot;
+php_value zend.multibyte 1
+php_value zend.script_encoding &quot;UTF-7&quot; \ #
+</code></pre>
+<p>更具体的解法就不详细说了，可以参考tr1ple师傅的博客，他也顺便记录了几个非预期<br><a target="_blank" rel="external nofollow noopener noreferrer" href="https://www.cnblogs.com/tr1ple/p/11439994.html">https://www.cnblogs.com/tr1ple/p/11439994.html</a></p>
+<h3 id="坑1"><a href="#坑1" class="headerlink" title="坑1"></a>坑1</h3><p>不能算是坑，应该是自己过于愚蠢，虽然后面加的那句话对PHP没有什么影响，但是我还是想注释掉它，但是它接了一个换行符，#井号注释就注释不掉，我还想着在content的末尾加一个反斜杠\，这样子就能和后面的\n拼成一个\\n，就可以把换行符吃掉了<br>想法当然是美好的，但是过于愚蠢，早该想到自己写入的这个反斜杠早该被转义了，哪还有什么机会去转义别人</p>
+<h3 id="坑2"><a href="#坑2" class="headerlink" title="坑2"></a>坑2</h3><p>理论上我访问完这个脚本.htaccess才写入，而我再次访问这个脚本的时候由于解释型语言是顺序执行的，所以条件竞争在这里也没机会，执行的肯定会先把.htaccess删掉才到include，那么.htaccess就不会生效才对，那么上述的一切步骤都不合理了，为此我本地搭环境修docker整了两天<br>本地测试的时候发现就算是先删.htaccess，他设置的内容仍会生效<br>程序在运行的时候其实是把配置文件读入内存的，之后这个内容就在内存中常驻。所以像Apache这种软件修改了配置文件之后要重启一下才能重新载入新的配置文件<br>.htaccess同理，作为配置文件它在每一次执行的时候最先被载入，之后虽然执行的时候把它删了，但是它的内容已经常驻内存，在这次执行中都会受到影响，而下一次执行时就会重新读入新的.htaccess</p>
+<h3 id="坑3"><a href="#坑3" class="headerlink" title="坑3"></a>坑3</h3><p>无关题目，是本地搭环境的时候的问题<br>从GitHub拉下来了docker一套，环境一起发现访问不了，拒绝连接<br>首先开端口，端口开了之后还要开防火墙（由于是自己的虚拟机就把整个防火墙关了，，，坏习惯）<br>然后问题就从拒绝连接变成了500，折腾了两天才解决<br>首先进入容器，发现Apache没启动（dockerfile里明明写了一个.sh文件里面有一句启动Apache的，不知道为什么不能启动，直接启动一下就可以了）<br>启动了Apache之后还是不行，写了一个index.html文件，发现可以访问了，但是index.php还是不行，那就是PHP的问题了，改php.ini中的display_errors，就可以看见报错，显示的是不能包含index.php之类的内容，还有一个permission denied，大致能猜出来是PHP的权限问题了<br>.php文件是不需要可执行权限的，只要可读就可以，因为执行都是有php.exe这种可执行文件完成，它读取PHP文件并执行，而我是用root搭建的index.php，index.php的权限是600，php.exe肯定不是root权限，那就没法读取index.php，权限改成755，终于访问的上了呜呜呜</p>
+<p>Linux复制文件的时候权限问题是有说法的，当一个用户复制一个不属于他的文件时，这个文件的所有权会变成他自己，所以我用root去搭建docker，这个index.php的所有者也就变成了root，但是文件权限怎么还默认是600的，不然就没这么多问题了</p>
+<p>但是docker正常情况下不用root也是会permission denied的，马师傅提出一个解决方案是将普通用户也加入docker的用户组中</p>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/wp/" rel="tag"># wp</a>
+              <a href="/tags/php/" rel="tag"># php</a>
+              <a href="/tags/htaccess/" rel="tag"># htaccess</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/%5BDDCTF%202019%5Dhomebrew%20event%20loop.html" rel="prev" title>
+      <i class="fa fa-chevron-left"></i> 
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/%5BBJDCTF2020%5D%E9%83%A8%E5%88%86wp.html" rel="next" title="BJDCTF2020 部分wp">
+      BJDCTF2020 部分wp <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+    <div class="comments" id="valine-comments"></div>
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#XNUCA-2019-ezphp"><span class="nav-number">1.</span> <span class="nav-text">[XNUCA 2019] ezphp</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%BA%90%E7%A0%81"><span class="nav-number">1.1.</span> <span class="nav-text">源码</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%80%9D%E8%B7%AF"><span class="nav-number">1.2.</span> <span class="nav-text">思路</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#payload"><span class="nav-number">1.2.1.</span> <span class="nav-text">payload</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E7%AC%AC%E4%B8%80%E8%BD%AE"><span class="nav-number">1.2.1.1.</span> <span class="nav-text">第一轮</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E7%AC%AC%E4%BA%8C%E8%BD%AE"><span class="nav-number">1.2.1.2.</span> <span class="nav-text">第二轮</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%9D%911"><span class="nav-number">1.2.2.</span> <span class="nav-text">坑1</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%9D%912"><span class="nav-number">1.2.3.</span> <span class="nav-text">坑2</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%9D%913"><span class="nav-number">1.2.4.</span> <span class="nav-text">坑3</span></a></li></ol></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Z3ratu1" src="https://q2.qlogo.cn/headimg_dl?dst_uin=1207039417&spec=160">
+  <p class="site-author-name" itemprop="name">Z3ratu1</p>
+  <div class="site-description" itemprop="description">与其感慨路难行，不如现在出发</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">145</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">5</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">86</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+  <div class="beian"><a href="http://www.beian.miit.gov.cn/" rel="external nofollow noopener noreferrer" target="_blank">湘ICP备2020021580号 </a>
+      <img src="/./images/beian.png" style="display: inline-block;">
+  </div>
+
+<div class="copyright">
+  
+  &copy; 2019 – 
+  <span itemprop="copyrightYear">2022</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Z3ratu1</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="external nofollow noopener noreferrer" target="_blank">Hexo</a> & <a href="https://pisces.theme-next.org/" class="theme-link" rel="external nofollow noopener noreferrer" target="_blank">NexT.Pisces</a> 强力驱动
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+
+<script>
+NexT.utils.loadComments(document.querySelector('#valine-comments'), () => {
+  NexT.utils.getScript('https://cdn.jsdelivr.net/npm/valine@1.4.14/dist/Valine.min.js', () => {
+    var GUEST = ['nick', 'mail', 'link'];
+    var guest = 'nick,mail,link';
+    guest = guest.split(',').filter(item => {
+      return GUEST.includes(item);
+    });
+    new Valine({
+      el         : '#valine-comments',
+      verify     : false,
+      notify     : false,
+      appId      : '7H8kg0XdWO8IbhOcu4K1JaAT-gzGzoHsz',
+      appKey     : 'wPKQjkbVtvPaRR7gh2yjfLSi',
+      placeholder: "Just go go",
+      avatar     : 'mm',
+      meta       : guest,
+      pageSize   : '10' || 10,
+      visitor    : true,
+      lang       : '' || 'zh-cn',
+      path       : location.pathname,
+      recordIP   : false,
+      serverURLs : ''
+    });
+  }, window.Valine);
+});
+</script>
+
+</body>
+</html>

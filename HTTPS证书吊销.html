@@ -1,0 +1,533 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 6.0.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"blog.z3ratu1.cn","root":"/","scheme":"Pisces","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"always","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":true},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+  </script>
+
+  <meta name="description" content="HTTPS证书吊销事情要说我想申请一个通配符证书说起，从通配符证书到let’s encrypt到OCSP服务器被墙到学习HTTPS证书吊销的奇怪学习链 先在这推荐一下let’s encrypt，免费发放通配符证书，再也不要一个子域名一个子域名的申请啦证书有效期只有三个月，可以自动更新，但是自动更新需要的OCSP服务器被墙，导致了这篇文章的出现，愚蠢的解决方案是每三个月重新申请新的证书 HTTPS认">
+<meta property="og:type" content="article">
+<meta property="og:title" content="HTTPS证书吊销">
+<meta property="og:url" content="https://blog.z3ratu1.cn/HTTPS%E8%AF%81%E4%B9%A6%E5%90%8A%E9%94%80.html">
+<meta property="og:site_name" content="Z3ratu1&#39;s blog">
+<meta property="og:description" content="HTTPS证书吊销事情要说我想申请一个通配符证书说起，从通配符证书到let’s encrypt到OCSP服务器被墙到学习HTTPS证书吊销的奇怪学习链 先在这推荐一下let’s encrypt，免费发放通配符证书，再也不要一个子域名一个子域名的申请啦证书有效期只有三个月，可以自动更新，但是自动更新需要的OCSP服务器被墙，导致了这篇文章的出现，愚蠢的解决方案是每三个月重新申请新的证书 HTTPS认">
+<meta property="og:locale">
+<meta property="og:image" content="https://blog.z3ratu1.cn/images/HTTPS%E8%AF%81%E4%B9%A6%E5%90%8A%E9%94%80/https.png">
+<meta property="article:published_time" content="2020-11-20T03:13:56.000Z">
+<meta property="article:modified_time" content="2021-01-06T07:20:19.267Z">
+<meta property="article:author" content="Z3ratu1">
+<meta property="article:tag" content="https">
+<meta property="article:tag" content="OCSP">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://blog.z3ratu1.cn/images/HTTPS%E8%AF%81%E4%B9%A6%E5%90%8A%E9%94%80/https.png">
+
+<link rel="canonical" href="https://blog.z3ratu1.cn/HTTPS%E8%AF%81%E4%B9%A6%E5%90%8A%E9%94%80.html">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-Hans'
+  };
+</script>
+
+  <title>HTTPS证书吊销 | Z3ratu1's blog</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+<link rel="stylesheet" href="/css/prism-tomorrow.css" type="text/css"></head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">Z3ratu1's blog</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">Welcome</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>关于</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+        <li class="menu-item menu-item-links">
+
+    <a href="/links/" rel="section"><i class="fa fa-link fa-fw"></i>友链</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off" placeholder="搜索..." spellcheck="false" type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+  <a href="https://github.com/Z3ratu1" class="github-corner" title="Follow me on GitHub" aria-label="Follow me on GitHub" rel="external nofollow noopener noreferrer" target="_blank"><svg width="80" height="80" viewbox="0 0 250 250" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"/><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"/><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"/></svg></a>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
+    <link itemprop="mainEntityOfPage" href="https://blog.z3ratu1.cn/HTTPS%E8%AF%81%E4%B9%A6%E5%90%8A%E9%94%80.html">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="https://q2.qlogo.cn/headimg_dl?dst_uin=1207039417&spec=160">
+      <meta itemprop="name" content="Z3ratu1">
+      <meta itemprop="description" content="与其感慨路难行，不如现在出发">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Z3ratu1's blog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          HTTPS证书吊销
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2020-11-20 11:13:56" itemprop="dateCreated datePublished" datetime="2020-11-20T11:13:56+08:00">2020-11-20</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2021-01-06 15:20:19" itemprop="dateModified" datetime="2021-01-06T15:20:19+08:00">2021-01-06</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E7%AC%94%E8%AE%B0/" itemprop="url" rel="index"><span itemprop="name">笔记</span></a>
+                </span>
+            </span>
+
+          
+            <span id="/HTTPS%E8%AF%81%E4%B9%A6%E5%90%8A%E9%94%80.html" class="post-meta-item leancloud_visitors" data-flag-title="HTTPS证书吊销" title="阅读次数">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span class="leancloud-visitors-count"></span>
+            </span>
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="far fa-comment"></i>
+      </span>
+      <span class="post-meta-item-text">Valine：</span>
+    
+    <a title="valine" href="/HTTPS%E8%AF%81%E4%B9%A6%E5%90%8A%E9%94%80.html#valine-comments" itemprop="discussionUrl">
+      <span class="post-comments-count valine-comment-count" data-xid="/HTTPS%E8%AF%81%E4%B9%A6%E5%90%8A%E9%94%80.html" itemprop="commentCount"></span>
+    </a>
+  </span>
+  
+  
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h1 id="HTTPS证书吊销"><a href="#HTTPS证书吊销" class="headerlink" title="HTTPS证书吊销"></a>HTTPS证书吊销</h1><p>事情要说我想申请一个通配符证书说起，从通配符证书到let’s encrypt到OCSP服务器被墙到学习HTTPS证书吊销的奇怪学习链</p>
+<p>先在这推荐一下let’s encrypt，免费发放通配符证书，再也不要一个子域名一个子域名的申请啦<br>证书有效期只有三个月，可以自动更新，但是自动更新需要的OCSP服务器被墙，导致了这篇文章的出现，愚蠢的解决方案是每三个月重新申请新的证书</p>
+<h2 id="HTTPS认证过程"><a href="#HTTPS认证过程" class="headerlink" title="HTTPS认证过程"></a>HTTPS认证过程</h2><p>在这之前，先简单的复习一下HTTPS到底是怎么完成双向认证的<br><img src="/images/HTTPS%E8%AF%81%E4%B9%A6%E5%90%8A%E9%94%80/https.png" alt="https认证"><br>1.服务器向客户端发送证书和公钥，客户端看一下证书的签发单在不在本地安装的证书里面，再看看过期时间，域名对应之类的，用发过来的公钥算一下这个证书和签名对不对得上，有机会还会看看这个证书是不是被吊销了（这就是这篇文章的主题所在）<br>2.验证通过，客户端产生一个<strong>随机数</strong>，用公钥加密还给服务器，服务器解密之后这个随机数就是两方的对称加密密钥了<br>3.开始用对称密钥通信</p>
+<p>显然，如果存在一个中间人，他用DNS污染把域名解析到了自己这边，而服务器的公钥和证书是公开的，也就是说中间人完全可以做到通过验证这一步。但是，没有私钥，也就意味着随机数解密不出来，既读不懂用户发来的请求，也无法返回伪造的回复</p>
+<p>上述安全策略是在证书的绝对不可伪造和公钥加密绝对安全的前提下成立的<br>但是如果服务器连私钥都泄露出去了，中间人就可以为所欲为了</p>
+<p>因此，如果证书私钥遭到泄露，我们就需要去吊销这份证书，防止遭受攻击</p>
+<h2 id="证书吊销"><a href="#证书吊销" class="headerlink" title="证书吊销"></a>证书吊销</h2><p>证书吊销了，但是中间人拿到的证书和密钥你肯定管不到，那就只能整个告示栏昭告天下，这个证书已经泄露了，不能用了，那么昭告天下的方式有两种，CRL和OCSP（这个服务器被墙就是文章诞生的原因）<br>证书在签发的时候就会附带上CRL和OCSP验证对应的服务器地址</p>
+<h3 id="CRL"><a href="#CRL" class="headerlink" title="CRL"></a>CRL</h3><p>Certificate Revocation Lists 证书撤销列表<br>就是各CA厂商把自己签过的已撤销的证书打包成一个大文件，把所有被吊销的证书都放进去，每个文件都至少在1M以上，并且这个文件更新的频率还取决于厂商，如果CA厂商一个星期更新一次，那这个被偷走的证书就能为所欲为一个星期，就算更新的快，用户正常访问没被偷证书的网站还要下一个1M以上的撤销列表看看有没有被撤销，用户体验，极差</p>
+<h3 id="OCSP"><a href="#OCSP" class="headerlink" title="OCSP"></a>OCSP</h3><p>Online Certificate Status Protocol 在线证书状态协议<br>就是从打包下超级大文件变成了和验证服务器交互查数据库<br>CA也不需要更新超级大文件了，吊销一个更新一个数据库就行了，效率upup<br>但是这个也不是特别棒，每次http请求都要对OCSP服务器进行额外请求，不过和下载1M+的列表相比已经很不错了，还有一个问题就是用户对网站的浏览情况被第三方（OCSP服务器）知晓，存在隐私泄露</p>
+<p>暂且不考虑额外请求的开销和隐私泄露，这一切似乎都很完美，不过下一个问题出现了<br>如果OCSP服务器不可达咋办（比如let’s encrypt的OCSP服务器被墙了。。。）<br>如果是因为网络垃圾或者墙这种不可抗力使OCSP服务不可达，有两种解决模式<br>1.hard-fail 原地爆炸，直接认定证书无效，不给访问（那可太糟糕了）<br>2.soft-fail 我们一笑而过，就当无事发生<br>hard-fail的话像OCSP被墙那我们的网站就都访问不了了，好像目前没有厂商是这么实现的浏览器，soft-fail的话就出现了严重的安全问题，因为攻击者虽然不能伪造请求，但是完全可以阻断请求，你的流量经过我手，你无法获知我现在伪造的这个服务器的证书有没有被吊销，OCSP形同虚设</p>
+<h3 id="OCSP-Stapling"><a href="#OCSP-Stapling" class="headerlink" title="OCSP Stapling"></a>OCSP Stapling</h3><p>继续修修补补，我们迎来了修订版的OCSP协议<br>让web服务器去拿OCSP响应，当然也要进行加密，不然中间人还是任意伪造，减少用户开销保护用户隐私，但是还是不能避免OCSP服务器被墙的悲惨事实（比如我的服务器也在国内。。。。）<br>然而它并没有解决OCSP不可达的问题</p>
+<h3 id="OCSP-Must-Staple"><a href="#OCSP-Must-Staple" class="headerlink" title="OCSP Must-Staple"></a>OCSP Must-Staple</h3><p>解决OCSP不可达时咋办，不过并不怎么流行<br>让域名持有者自己决定OCSP不可达时的失败方式，Let’s Encrypt支持该方式，不过并不是RFC标准</p>
+<h3 id="浏览器处理"><a href="#浏览器处理" class="headerlink" title="浏览器处理"></a>浏览器处理</h3><p>之后就是各大浏览器厂商自己对OCSP的处理方式了<br>可以通过选项决定OCSP不可达时是使用hard-fail还是soft-fail，不过用edge，Chrome和Safari试过之后感觉这三家都是soft-fail<br>Chrome似乎觉得OCSP不太行，直接放弃了对OCSP的支持开始搞自己的</p>
+<h2 id="后记"><a href="#后记" class="headerlink" title="后记"></a>后记</h2><p>总而言之，OCSP服务器被墙，在目前主流浏览器的默认情况下，并不会影响访问，大家都是默认soft-fail的，但是当你使用let’s encrypt的自动化脚本去重新更新证书的时候，会有一步与OCSP服务器通信的步骤，看看这个需要续签的证书有没有过期，然后OCSP被墙了，不能自动续签了，这就是这篇文章的由来</p>
+<h2 id="let’s-encrypt续签方式"><a href="#let’s-encrypt续签方式" class="headerlink" title="let’s encrypt续签方式"></a>let’s encrypt续签方式</h2><p>最新更新续签方式，OCSP服务器被墙其实只是污染了域名，可以自己在hosts文件里面手动添加一项<code>23.32.3.72 ocsp.int-x3.letsencrypt.org</code>就能用certbot renew自动更新了（只要他的服务器IP一直保持这个不变）</p>
+<h2 id="参考链接"><a href="#参考链接" class="headerlink" title="参考链接"></a>参考链接</h2><p>主要参考了该大哥的文章，写的很详细了（原来用的Chrome开发者版，在87之后突然出现了奇怪的bug，知乎专栏访问不上了，逼得我回到稳定版的Chrome，现在是86）<br><a target="_blank" rel="external nofollow noopener noreferrer" href="https://zhuanlan.zhihu.com/p/75475419">你不在意的HTTPS证书吊销机制</a><br>从这个大哥这里找到知乎大哥的文章的<br><a target="_blank" rel="external nofollow noopener noreferrer" href="https://blog.wolfogre.com/posts/letsencrypt-ocsp-breakdown/">Let’s Encrypt OCSP 域名被封</a></p>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/https/" rel="tag"># https</a>
+              <a href="/tags/OCSP/" rel="tag"># OCSP</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/HTTPS%20Mixed%20content.html" rel="prev" title="HTTPS Mixed content">
+      <i class="fa fa-chevron-left"></i> HTTPS Mixed content
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/HTTPS%E4%BB%A3%E7%90%86%E5%8E%9F%E7%90%86.html" rel="next" title="HTTPS代理原理">
+      HTTPS代理原理 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+    <div class="comments" id="valine-comments"></div>
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#HTTPS%E8%AF%81%E4%B9%A6%E5%90%8A%E9%94%80"><span class="nav-number">1.</span> <span class="nav-text">HTTPS证书吊销</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#HTTPS%E8%AE%A4%E8%AF%81%E8%BF%87%E7%A8%8B"><span class="nav-number">1.1.</span> <span class="nav-text">HTTPS认证过程</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%AF%81%E4%B9%A6%E5%90%8A%E9%94%80"><span class="nav-number">1.2.</span> <span class="nav-text">证书吊销</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#CRL"><span class="nav-number">1.2.1.</span> <span class="nav-text">CRL</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#OCSP"><span class="nav-number">1.2.2.</span> <span class="nav-text">OCSP</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#OCSP-Stapling"><span class="nav-number">1.2.3.</span> <span class="nav-text">OCSP Stapling</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#OCSP-Must-Staple"><span class="nav-number">1.2.4.</span> <span class="nav-text">OCSP Must-Staple</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%B5%8F%E8%A7%88%E5%99%A8%E5%A4%84%E7%90%86"><span class="nav-number">1.2.5.</span> <span class="nav-text">浏览器处理</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%90%8E%E8%AE%B0"><span class="nav-number">1.3.</span> <span class="nav-text">后记</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#let%E2%80%99s-encrypt%E7%BB%AD%E7%AD%BE%E6%96%B9%E5%BC%8F"><span class="nav-number">1.4.</span> <span class="nav-text">let’s encrypt续签方式</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%8F%82%E8%80%83%E9%93%BE%E6%8E%A5"><span class="nav-number">1.5.</span> <span class="nav-text">参考链接</span></a></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Z3ratu1" src="https://q2.qlogo.cn/headimg_dl?dst_uin=1207039417&spec=160">
+  <p class="site-author-name" itemprop="name">Z3ratu1</p>
+  <div class="site-description" itemprop="description">与其感慨路难行，不如现在出发</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">145</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">5</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">86</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+  <div class="beian"><a href="http://www.beian.miit.gov.cn/" rel="external nofollow noopener noreferrer" target="_blank">湘ICP备2020021580号 </a>
+      <img src="/./images/beian.png" style="display: inline-block;">
+  </div>
+
+<div class="copyright">
+  
+  &copy; 2019 – 
+  <span itemprop="copyrightYear">2022</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Z3ratu1</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="external nofollow noopener noreferrer" target="_blank">Hexo</a> & <a href="https://pisces.theme-next.org/" class="theme-link" rel="external nofollow noopener noreferrer" target="_blank">NexT.Pisces</a> 强力驱动
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+
+<script>
+NexT.utils.loadComments(document.querySelector('#valine-comments'), () => {
+  NexT.utils.getScript('https://cdn.jsdelivr.net/npm/valine@1.4.14/dist/Valine.min.js', () => {
+    var GUEST = ['nick', 'mail', 'link'];
+    var guest = 'nick,mail,link';
+    guest = guest.split(',').filter(item => {
+      return GUEST.includes(item);
+    });
+    new Valine({
+      el         : '#valine-comments',
+      verify     : false,
+      notify     : false,
+      appId      : '7H8kg0XdWO8IbhOcu4K1JaAT-gzGzoHsz',
+      appKey     : 'wPKQjkbVtvPaRR7gh2yjfLSi',
+      placeholder: "Just go go",
+      avatar     : 'mm',
+      meta       : guest,
+      pageSize   : '10' || 10,
+      visitor    : true,
+      lang       : '' || 'zh-cn',
+      path       : location.pathname,
+      recordIP   : false,
+      serverURLs : ''
+    });
+  }, window.Valine);
+});
+</script>
+
+</body>
+</html>

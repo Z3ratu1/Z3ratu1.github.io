@@ -1,0 +1,584 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 6.0.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"blog.z3ratu1.cn","root":"/","scheme":"Pisces","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"always","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":true},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+  </script>
+
+  <meta name="description" content="从ByteCTF到bypass_disable_function起初只是简单的看了一下去年ByteCTF中那个bypass_disable_fuction的题，然后发现原来PHP有这么多bypass的方案我不知道，以及一些零碎的其他知识点，统一学习了 然后马上蓝帽杯遇到一个bypass发现完全不会做，进行大型update putenv在环境变量可控时执行的两大操作，需要disable_functi">
+<meta property="og:type" content="article">
+<meta property="og:title" content="从ByteCTF到bypass_disable_function">
+<meta property="og:url" content="https://blog.z3ratu1.cn/%E4%BB%8EByteCTF%E5%88%B0bypass_disable_function.html">
+<meta property="og:site_name" content="Z3ratu1&#39;s blog">
+<meta property="og:description" content="从ByteCTF到bypass_disable_function起初只是简单的看了一下去年ByteCTF中那个bypass_disable_fuction的题，然后发现原来PHP有这么多bypass的方案我不知道，以及一些零碎的其他知识点，统一学习了 然后马上蓝帽杯遇到一个bypass发现完全不会做，进行大型update putenv在环境变量可控时执行的两大操作，需要disable_functi">
+<meta property="og:locale">
+<meta property="article:published_time" content="2021-04-23T08:15:50.000Z">
+<meta property="article:modified_time" content="2021-08-08T11:45:17.268Z">
+<meta property="article:author" content="Z3ratu1">
+<meta property="article:tag" content="PHP">
+<meta property="article:tag" content="bypass_disable_function">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="https://blog.z3ratu1.cn/%E4%BB%8EByteCTF%E5%88%B0bypass_disable_function.html">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-Hans'
+  };
+</script>
+
+  <title>从ByteCTF到bypass_disable_function | Z3ratu1's blog</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+<link rel="stylesheet" href="/css/prism-tomorrow.css" type="text/css"></head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">Z3ratu1's blog</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">Welcome</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>关于</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+        <li class="menu-item menu-item-links">
+
+    <a href="/links/" rel="section"><i class="fa fa-link fa-fw"></i>友链</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off" placeholder="搜索..." spellcheck="false" type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+  <a href="https://github.com/Z3ratu1" class="github-corner" title="Follow me on GitHub" aria-label="Follow me on GitHub" rel="external nofollow noopener noreferrer" target="_blank"><svg width="80" height="80" viewbox="0 0 250 250" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"/><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"/><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"/></svg></a>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
+    <link itemprop="mainEntityOfPage" href="https://blog.z3ratu1.cn/%E4%BB%8EByteCTF%E5%88%B0bypass_disable_function.html">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="https://q2.qlogo.cn/headimg_dl?dst_uin=1207039417&spec=160">
+      <meta itemprop="name" content="Z3ratu1">
+      <meta itemprop="description" content="与其感慨路难行，不如现在出发">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Z3ratu1's blog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          从ByteCTF到bypass_disable_function
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2021-04-23 16:15:50" itemprop="dateCreated datePublished" datetime="2021-04-23T16:15:50+08:00">2021-04-23</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2021-08-08 19:45:17" itemprop="dateModified" datetime="2021-08-08T19:45:17+08:00">2021-08-08</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E7%AC%94%E8%AE%B0/" itemprop="url" rel="index"><span itemprop="name">笔记</span></a>
+                </span>
+            </span>
+
+          
+            <span id="/%E4%BB%8EByteCTF%E5%88%B0bypass_disable_function.html" class="post-meta-item leancloud_visitors" data-flag-title="从ByteCTF到bypass_disable_function" title="阅读次数">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span class="leancloud-visitors-count"></span>
+            </span>
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="far fa-comment"></i>
+      </span>
+      <span class="post-meta-item-text">Valine：</span>
+    
+    <a title="valine" href="/%E4%BB%8EByteCTF%E5%88%B0bypass_disable_function.html#valine-comments" itemprop="discussionUrl">
+      <span class="post-comments-count valine-comment-count" data-xid="/%E4%BB%8EByteCTF%E5%88%B0bypass_disable_function.html" itemprop="commentCount"></span>
+    </a>
+  </span>
+  
+  
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h1 id="从ByteCTF到bypass-disable-function"><a href="#从ByteCTF到bypass-disable-function" class="headerlink" title="从ByteCTF到bypass_disable_function"></a>从ByteCTF到bypass_disable_function</h1><p>起初只是简单的看了一下去年ByteCTF中那个bypass_disable_fuction的题，然后发现原来PHP有这么多bypass的方案我不知道，以及一些零碎的其他知识点，统一学习了</p>
+<p>然后马上蓝帽杯遇到一个bypass发现完全不会做，进行大型update</p>
+<h2 id="putenv"><a href="#putenv" class="headerlink" title="putenv"></a>putenv</h2><p>在环境变量可控时执行的两大操作，需要disable_function里面给用putenv</p>
+<h3 id="LD-PRELOAD"><a href="#LD-PRELOAD" class="headerlink" title="LD_PRELOAD"></a>LD_PRELOAD</h3><p>这个是最老的操作之一了，我掌握的也就这一种，通过<code>LD_PRELOAD</code>这个变量可以指定动态链接库(.so文件)在libc之前被加载，编写一个恶意的动态链接库，使用GNU的特殊语法，在调用main函数之前对构造属性进行执行，由于是调的C库这边的函数，自然不受disable_function的影响。只要PHP启动新进程时，恶意动态链接库被加载，且其构造方法直接在一切之前运行，构造方法中写一个命令执行即可。<br>简单的说就是能劫持PHP启动的新进程</p>
+<h4 id="mail"><a href="#mail" class="headerlink" title="mail"></a>mail</h4><p>PHP使用mail函数的时候会用execve来启动sendmail，启动进程时成功命令执行</p>
+<h4 id="imap-open"><a href="#imap-open" class="headerlink" title="imap_open"></a>imap_open</h4><p>也是一个启动进程的函数</p>
+<h4 id="Imagick"><a href="#Imagick" class="headerlink" title="Imagick"></a>Imagick</h4><p>这个库在远古版本是能直接命令执行的，能直接绕过disable function，不过那个也太远古了。但是这个库也能启动新的进程，而非常有意思的一点是，LD_PRELOAD那篇文章的作者却提到他没能在imagick中启动新的进程，不过0CTF2019中的这道Wallbreaker_Easy考的就是这个点（这个题用的FPM模式，估计用FPM也能打通），Imagick再进行图片类型转换时，需要启动外部程序进行转换，这样就会启动新的进程，实现LD_PRELOAD的命令执行，这里放一个替换mail的payload</p>
+<pre class=" language-php"><code class="language-php"><span class="token variable">$a</span><span class="token operator">=</span><span class="token keyword">new</span> <span class="token class-name">Imagick</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token variable">$a</span><span class="token operator">-</span><span class="token operator">></span><span class="token function">readImage</span><span class="token punctuation">(</span><span class="token string">'123.png'</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token variable">$a</span><span class="token operator">-</span><span class="token operator">></span><span class="token function">writeImage</span><span class="token punctuation">(</span><span class="token string">'123.wdp'</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+</code></pre>
+<p>可以用之前的bypass脚本打通</p>
+<h3 id="iconv"><a href="#iconv" class="headerlink" title="iconv"></a>iconv</h3><p>这个是ByteCTF的考点，基本原理也是最后的底层实现调用的是C的动态链接库。<br>PHP在使用<code>iconv()</code>时最后一路调用，进入libc函数<code>iconv_open()</code>，再一波操作调用到.so文件的方法，实现RCE<br>同样，系统不会无缘无故的调用我们自己上传的路径下的<code>.so</code>文件，其支持使用<code>GCONV_PATH</code>的自定义编码转换模块，所以可以putenv将该变量设置为目标路径，同时上传两个文件以建立该编码模块并实现利用<br><a target="_blank" rel="external nofollow noopener noreferrer" href="https://www.gnu.org/software/libc/manual/html_node/glibc-iconv-Implementation.html">glibc iconv文档</a> 讲解了gconv-modules的基本语法</p>
+<p>这里默认后缀是.so所以不需要指定.so，默认认为动态链接库和gconv-modules在同一目录下，但是也允许相对目录，编码名后面加的<code>//</code>是glibc实现的问题，文档里说你听他的就行了</p>
+<p>gconv-modules</p>
+<pre><code>module  PAYLOAD//    INTERNAL    ../../../../../../../../tmp/payload    2
+module  INTERNAL    PAYLOAD//    ../../../../../../../../tmp/payload    2
+</code></pre>
+<p>payload.c，使用<code>gcc payload.c -o payload.so -shared -fPIC</code>编译为payload.so</p>
+<pre class=" language-C"><code class="language-C">#define _GNU_SOURCE
+
+#include <stdlib.h>
+#include <stdio.h>
+#include <string.h>
+
+extern char** environ;
+
+void gconv() {}
+
+void gconv_init() {
+    const char* cmdline = getenv("EVIL_CMDLINE");
+    int i;
+    for (i = 0; environ[i]; ++i) {
+            if (strstr(environ[i], "LD_PRELOAD")) {
+                    environ[i][0] = '\0';
+            }
+    }
+
+    system(cmdline);
+}
+</string.h></stdio.h></stdlib.h></code></pre>
+<p>此时在iconv中遇到<code>payload</code>编码时，即会调用我们这个恶意的动态链接库完成命令执行</p>
+<p>除了<code>iconv()</code>这个函数，所有能最终调用到libc的<code>iconv_open()</code>操作均能触发RCE，比如<code>iconv_strlen</code>，或者<code>php://filter</code>的<code>convert.iconv</code>过滤器等<br>这道题的预期解应该就是用php:&#x2F;&#x2F;filter<br>lfy神仙还提到了可以再套一层LD_PRELOAD劫持system这个函数启动的进程方便执行命令，但是我感觉只要自己把payload里面写好一点靠环境变量作为参数执行命令应该也很方便吧？这里直接抄那个LD_PRELOAD的payload靠环境变量命令执行也很不错</p>
+<h2 id="写-x2F-proc-x2F-self-x2F-mem"><a href="#写-x2F-proc-x2F-self-x2F-mem" class="headerlink" title="写&#x2F;proc&#x2F;self&#x2F;mem"></a>写&#x2F;proc&#x2F;self&#x2F;mem</h2><p>好像以前见到过类似的题目，偏二进制<br>PHP主进程是root的，但是子进程是www-data的，&#x2F;proc&#x2F;self&#x2F;mem属于www-data且权限是600，但&#x2F;proc&#x2F;self目录是root的，并且www-data无权限，所以正常情况下不能写入。<br>但是对于Nginx+php，且为低版本的php-fpm（PHP&lt;5.6），&#x2F;proc&#x2F;self&#x2F;属于www-data，可以通过写入GOT表的RCE</p>
+<h3 id="二进制基础"><a href="#二进制基础" class="headerlink" title="二进制基础"></a>二进制基础</h3><p>二进制文件执行函数的时候要查两个表，一个PLT一个GOT。PLT是在编译时就确定下来了的，加载进内存的时候位于代码段。但由于动态链接之类的存在，在编译的时候并不能确定所有函数的地址，因为它甚至都还没加载进来，所以PLT表项并不存放函数的地址，而是指向GOT表的对应项，再由GOT表指向函数的真实地址。GOT表就是在运行时当调用一个函数的时候临时去查询的，因为PLT处于代码段不可修改，所以查到之后回填进GOT表，下次调用该函数就可以直接查询GOT表获取到地址。期间还有各种复杂的操作，比如什么GOT表前几项是就是用来进行函数地址查询的函数之类的，还有一种程序运行时不是等需要用到再去填GOT表，而是直接全部加载完然后把GOT表也变得只读防止被修改之类的</p>
+<h3 id="利用"><a href="#利用" class="headerlink" title="利用"></a>利用</h3><p>从上面已经可以看出来函数调用时其所用的是GOT表指向的地址，那么只要修改GOT表中某个函数，在执行那个函数的时候变成执行system之类的就搞定了（修改GOT表应该是pwn那边的常见操作才是。。。。）</p>
+<p>抄一个攻击流程</p>
+<blockquote>
+<p>写一下劫持GOT表的步骤，这里直接写shellcode：<br>1.读&#x2F;proc&#x2F;self&#x2F;maps找到php和libc在内存中的基址<br>2.解析&#x2F;proc&#x2F;self&#x2F;exe找到php文件中readfile@got的偏移<br>3.找个能写的地址写shellcode<br>4.向readfile@got写shellcode地址覆盖<br>5.调用readfile</p>
+</blockquote>
+<p><a target="_blank" rel="external nofollow noopener noreferrer" href="https://github.com/beched/php_disable_functions_bypass">利用脚本</a></p>
+<h2 id="攻击PHP-FPM"><a href="#攻击PHP-FPM" class="headerlink" title="攻击PHP-FPM"></a>攻击PHP-FPM</h2><p>先了解一下前置知识</p>
+<h3 id="PHP运行类型"><a href="#PHP运行类型" class="headerlink" title="PHP运行类型"></a>PHP运行类型</h3><p>PHP运行一般来说几个类型，CLI，php-cgi，php-fpm，Apache2.0handler<br>CLI是Command Line Interface，命令行情况下使用，不怎么常见<br>CGI是Common Gateway Interface，webserver和其他软件通信的<strong>协议</strong>（感觉是配合Nginx做反带之类的时候使用的），有一个强化版本fast-cgi。php的cgi就是来一个请求PHP起一个解释器进程处理，处理完了关掉，就很慢很憨批，所以fast-cgi就是开局直接启动多个解释器进程常驻内存，等待接收请求，处理完了也不关，继续等下一次的请求<br>php-cgi是早期的cgi管理器，因为cgi不太行所以这个也不太行<br>php-fpm是fast-cgi的管理器，一个master进程和一堆worker进程，master接收请求分配给worker，能动态调度启动worker进程，性能upup</p>
+<p>使用Apache搭建PHP的时候使用的是Apache2handler，这个时候Apache是把PHP作为一个module加载进来的，属于是Apache自己内嵌PHP的解释器，就少了一步进程间通信，Apache直接自己开PHP解释器进行处理</p>
+<h3 id="协议字段"><a href="#协议字段" class="headerlink" title="协议字段"></a>协议字段</h3><p>在通信时有几个比较有意思的字段是可以指定的<br><code>SCRIPT_FILENAME</code>，指定PHP执行的脚本文件路径，不过php5.3.9之后加入了fpm增加了security.limit_extensions，只允许执行如下后缀的文件<code>.php .php3 .php4 .php5 .php7</code><br><code>PHP_VALUE</code>，可以覆盖一些php.ini里面定义的属性，只能用于<code>PHP_INI_ALL</code>或<code>PHP_INI_PERDIR</code>类型的指令，具体看这个<a target="_blank" rel="external nofollow noopener noreferrer" href="https://www.php.net/manual/zh/ini.list.php">php.ini 配置选项列表</a>，好用的比如<code>auto_prepend_file</code>,<code>open_basedir</code><br><code>PHP_ADMIN_VALUE</code>，和上面这个差不多，区别在于这个字段设置的属性不能在用户层面上被修改，也就是不能被ini_set()之类的函数在应用里被重写，也不能被.htaccess这种配置文件覆盖，常用的有<code>allow_url_include</code>，启用后支持include url形式的文件，经典php:&#x2F;&#x2F;input伪协议打通，以及<code>extension_dir</code>，指定扩展的.so直接bypass disable_function打通，<code>safe_mode</code>，在PHP5.4之后就被删除了的东西，启用后会限制某些函数的使用，比如move_upload_file,copy这些能把远程文件下到本地的函数，和一些system，shell_exec这类直接的命令执行函数，也不允许进行dl函数加载扩展文件(.dll or .so)</p>
+<p>（找不到资料，但是感觉也许可以把低安全等级的变量也设置成PHP_ADMIN_VALUE不让动态的修改，不过<code>PHP_INI_SYSTEM</code>这个类型的属性理论上只允许在php.ini里面设置，这里能改真是玄幻）<br>与之对位的还有<code>PHP(_ADMIN)_FLAG</code>这么个属性，其区别在于其值只能为布尔值</p>
+<p>可惜的是这些属性并不能覆盖disable_function</p>
+<blockquote>
+<p>PHP配置值通过 php_value 或者 php_flag 设置，并且会覆盖以前的值。请注意 disable_functions 或者 disable_classes 在 php.ini 之中定义的值不会被覆盖掉，但是会将新的设置附加在原有值的后面。<br>使用 php_admin_value 或者 php_admin_flag 定义的值，不能被 PHP 代码中的 ini_set() 覆盖。</p>
+</blockquote>
+<p><strong>修改PHP_(ADMIN_)VALUE会直接使得当前处理请求的fastCGI进程收到影响，如果多次请求就可能污染掉所有的进程，在重启fpm之前可能所有进程都会受到影响</strong></p>
+<h3 id="利用-1"><a href="#利用-1" class="headerlink" title="利用"></a>利用</h3><p>因为之前说到使用CGI的时候，是webserver和CGI直接进行通信的，所以就存在进程间通信的问题，在Nginx的设置中有一个fastcgi_pass的设置，指定fastcgi所在的ip端口(或Unix socket)，PHP的fpm设置中可以配置fastcgi的监听位置，可以通过配置使得PHP也能前后端分离<br>fpm并不验证数据的来源，只要是发送到监听端口的数据就一律接受<br>PHP在fpm配置中若将监听端口写成0.0.0.0:9000，则接受来自任意ip的通信，可以通过伪装成Nginx服务器与php-fpm通信来执行命令，如果配置的是127.0.0.1:9000这种情况的可能就要靠SSRF打了<br><a target="_blank" rel="external nofollow noopener noreferrer" href="https://gist.github.com/phith0n/9615e2420f31048f7e30f3937356cf75">P神的利用脚本</a></p>
+<p>SSRF也分两种，如果是监听的127.0.0.1这种ip地址就可以用gopher发TCP包打，如果直接监听Unix socket的话就得专门起一个socket去连接了</p>
+<p>利用方案：1.自己随便上传一个其他位置的马然后用script_name指定进行利用<br>2.随便找一个PHP文件然后设置auto_prepend_file为php:&#x2F;&#x2F;input，allow_url_include为On打通</p>
+<h3 id="bypass-disable-function"><a href="#bypass-disable-function" class="headerlink" title="bypass_disable_function"></a>bypass_disable_function</h3><p>直接抄着那个脚本打并不能绕过Disable_function，只是做到了命令执行。因为这样子发过去的请求还是由原来的PHP解释器进行解析</p>
+<p>但是可以通过FastCGI协议去让php-fpm加载我们自定义的扩展(.so文件)，而这个扩展肯定是不受disable_function限制的，做到任意命令执行<br>即之前提到的<code>extension_dir</code>和<code>extension</code></p>
+<p>蚁剑有一个玄幻的插件，直接生成一个调用system函数的.so文件，然后输这么个命令<code>php -n -S 127.0.0.1:port -t /var/www/html</code>在目标机器上新开一个web服务，当然权限是www-data的，但是添加了<code>-n</code>参数指定不使用php.ini，可以绕过其设置的disable_function，并且还上传了一个antproxy.php文件将请求转发过去，实现比较方便的命令执行（不然应该是执行一次传一个.so吧，要我说继续搞那种接受环境变量做命令的方法也挺好的）<br>这次这个蓝帽杯本身是一个打.so扩展的pwn题，但是我看的wp成功的拿fpm打了一个.so加载的非预期打通了</p>
+<h2 id="FFI"><a href="#FFI" class="headerlink" title="FFI"></a>FFI</h2><p>Foreign Function Interface，外部函数接口<br>PHP7.4的新特性，可以直接调用外部代码，RCTF 2019的Nextphp出的就是这个<br>需要ffi.enable&#x3D;true才能任意使用，否则只能使用在对应文件中使用</p>
+<h2 id="参考链接"><a href="#参考链接" class="headerlink" title="参考链接"></a>参考链接</h2><p><a target="_blank" rel="external nofollow noopener noreferrer" href="https://xz.aliyun.com/t/8669">ByteCTF WP-无需mail bypass disable_functions</a><br><a target="_blank" rel="external nofollow noopener noreferrer" href="https://www.anquanke.com/post/id/197745">PHP 突破 disable_functions 常用姿势以及使用 Fuzz 挖掘含内部系统调用的函数</a><br><a target="_blank" rel="external nofollow noopener noreferrer" href="https://www.php.cn/php-weizijiaocheng-383223.html">php之CGI、FastCGI、APACHE2HANDLER、CLI运行模式的详解</a><br><a target="_blank" rel="external nofollow noopener noreferrer" href="https://zhuanlan.zhihu.com/p/75114351">攻击PHP-FPM 实现Bypass Disable Functions</a><br><a target="_blank" rel="external nofollow noopener noreferrer" href="https://security.tencent.com/index.php/blog/msg/166">RASP攻防 —— RASP安全应用与局限性浅析</a><br><a target="_blank" rel="external nofollow noopener noreferrer" href="https://www.anquanke.com/post/id/208451">bypass disable_function多种方法+实例</a><br><a target="_blank" rel="external nofollow noopener noreferrer" href="https://xz.aliyun.com/t/5598">浅析php-fpm的攻击方式</a><br><a target="_blank" rel="external nofollow noopener noreferrer" href="https://www.anquanke.com/post/id/186186">从一道CTF学习Fastcgi绕过姿势</a><br><a target="_blank" rel="external nofollow noopener noreferrer" href="https://forum.90sec.com/t/topic/129">PHP 连接方式介绍以及如何攻击 PHP-FPM</a><br><a target="_blank" rel="external nofollow noopener noreferrer" href="https://www.leavesongs.com/PENETRATION/fastcgi-and-php-fpm.html">Fastcgi协议分析 &amp;&amp; PHP-FPM未授权访问漏洞 &amp;&amp; Exp编写</a><br><a target="_blank" rel="external nofollow noopener noreferrer" href="https://www.leavesongs.com/PHP/php-bypass-open-basedir-list-directory.htm">PHP绕过open_basedir列目录的研究</a></p>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/PHP/" rel="tag"># PHP</a>
+              <a href="/tags/bypass-disable-function/" rel="tag"># bypass_disable_function</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/Java%20RMI%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96%E4%B8%8EJNDI%E6%B3%A8%E5%85%A5%E5%85%A5%E9%97%A8.html" rel="prev" title="Java RMI反序列化与JNDI注入入门">
+      <i class="fa fa-chevron-left"></i> Java RMI反序列化与JNDI注入入门
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/windows%E4%B8%8B%E7%9A%84%E5%A5%87%E5%A6%99%E6%96%87%E4%BB%B6%E5%90%8D.html" rel="next" title="windows下的奇妙文件名">
+      windows下的奇妙文件名 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+    <div class="comments" id="valine-comments"></div>
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E4%BB%8EByteCTF%E5%88%B0bypass-disable-function"><span class="nav-number">1.</span> <span class="nav-text">从ByteCTF到bypass_disable_function</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#putenv"><span class="nav-number">1.1.</span> <span class="nav-text">putenv</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#LD-PRELOAD"><span class="nav-number">1.1.1.</span> <span class="nav-text">LD_PRELOAD</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#mail"><span class="nav-number">1.1.1.1.</span> <span class="nav-text">mail</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#imap-open"><span class="nav-number">1.1.1.2.</span> <span class="nav-text">imap_open</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Imagick"><span class="nav-number">1.1.1.3.</span> <span class="nav-text">Imagick</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#iconv"><span class="nav-number">1.1.2.</span> <span class="nav-text">iconv</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%86%99-x2F-proc-x2F-self-x2F-mem"><span class="nav-number">1.2.</span> <span class="nav-text">写&#x2F;proc&#x2F;self&#x2F;mem</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BA%8C%E8%BF%9B%E5%88%B6%E5%9F%BA%E7%A1%80"><span class="nav-number">1.2.1.</span> <span class="nav-text">二进制基础</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%88%A9%E7%94%A8"><span class="nav-number">1.2.2.</span> <span class="nav-text">利用</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%94%BB%E5%87%BBPHP-FPM"><span class="nav-number">1.3.</span> <span class="nav-text">攻击PHP-FPM</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#PHP%E8%BF%90%E8%A1%8C%E7%B1%BB%E5%9E%8B"><span class="nav-number">1.3.1.</span> <span class="nav-text">PHP运行类型</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%8D%8F%E8%AE%AE%E5%AD%97%E6%AE%B5"><span class="nav-number">1.3.2.</span> <span class="nav-text">协议字段</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%88%A9%E7%94%A8-1"><span class="nav-number">1.3.3.</span> <span class="nav-text">利用</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#bypass-disable-function"><span class="nav-number">1.3.4.</span> <span class="nav-text">bypass_disable_function</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#FFI"><span class="nav-number">1.4.</span> <span class="nav-text">FFI</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%8F%82%E8%80%83%E9%93%BE%E6%8E%A5"><span class="nav-number">1.5.</span> <span class="nav-text">参考链接</span></a></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Z3ratu1" src="https://q2.qlogo.cn/headimg_dl?dst_uin=1207039417&spec=160">
+  <p class="site-author-name" itemprop="name">Z3ratu1</p>
+  <div class="site-description" itemprop="description">与其感慨路难行，不如现在出发</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">145</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">5</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">86</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+  <div class="beian"><a href="http://www.beian.miit.gov.cn/" rel="external nofollow noopener noreferrer" target="_blank">湘ICP备2020021580号 </a>
+      <img src="/./images/beian.png" style="display: inline-block;">
+  </div>
+
+<div class="copyright">
+  
+  &copy; 2019 – 
+  <span itemprop="copyrightYear">2022</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Z3ratu1</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="external nofollow noopener noreferrer" target="_blank">Hexo</a> & <a href="https://pisces.theme-next.org/" class="theme-link" rel="external nofollow noopener noreferrer" target="_blank">NexT.Pisces</a> 强力驱动
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+
+<script>
+NexT.utils.loadComments(document.querySelector('#valine-comments'), () => {
+  NexT.utils.getScript('https://cdn.jsdelivr.net/npm/valine@1.4.14/dist/Valine.min.js', () => {
+    var GUEST = ['nick', 'mail', 'link'];
+    var guest = 'nick,mail,link';
+    guest = guest.split(',').filter(item => {
+      return GUEST.includes(item);
+    });
+    new Valine({
+      el         : '#valine-comments',
+      verify     : false,
+      notify     : false,
+      appId      : '7H8kg0XdWO8IbhOcu4K1JaAT-gzGzoHsz',
+      appKey     : 'wPKQjkbVtvPaRR7gh2yjfLSi',
+      placeholder: "Just go go",
+      avatar     : 'mm',
+      meta       : guest,
+      pageSize   : '10' || 10,
+      visitor    : true,
+      lang       : '' || 'zh-cn',
+      path       : location.pathname,
+      recordIP   : false,
+      serverURLs : ''
+    });
+  }, window.Valine);
+});
+</script>
+
+</body>
+</html>

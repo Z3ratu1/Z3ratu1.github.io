@@ -1,0 +1,650 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 6.0.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"blog.z3ratu1.cn","root":"/","scheme":"Pisces","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"always","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":true},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+  </script>
+
+  <meta name="description" content="域渗透学习科恩的任务罢了 前置知识windows域渗透接触的都是windows的东西，都没学过。。。。 AD">
+<meta property="og:type" content="article">
+<meta property="og:title" content="域渗透学习">
+<meta property="og:url" content="https://blog.z3ratu1.cn/%E5%9F%9F%E6%B8%97%E9%80%8F%E5%AD%A6%E4%B9%A0.html">
+<meta property="og:site_name" content="Z3ratu1&#39;s blog">
+<meta property="og:description" content="域渗透学习科恩的任务罢了 前置知识windows域渗透接触的都是windows的东西，都没学过。。。。 AD">
+<meta property="og:locale">
+<meta property="article:published_time" content="2021-01-24T01:57:55.000Z">
+<meta property="article:modified_time" content="2021-02-02T10:07:12.927Z">
+<meta property="article:author" content="Z3ratu1">
+<meta property="article:tag" content="pentest">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="https://blog.z3ratu1.cn/%E5%9F%9F%E6%B8%97%E9%80%8F%E5%AD%A6%E4%B9%A0.html">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-Hans'
+  };
+</script>
+
+  <title>域渗透学习 | Z3ratu1's blog</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+<link rel="stylesheet" href="/css/prism-tomorrow.css" type="text/css"></head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">Z3ratu1's blog</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">Welcome</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>关于</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+        <li class="menu-item menu-item-links">
+
+    <a href="/links/" rel="section"><i class="fa fa-link fa-fw"></i>友链</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off" placeholder="搜索..." spellcheck="false" type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+  <a href="https://github.com/Z3ratu1" class="github-corner" title="Follow me on GitHub" aria-label="Follow me on GitHub" rel="external nofollow noopener noreferrer" target="_blank"><svg width="80" height="80" viewbox="0 0 250 250" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"/><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"/><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"/></svg></a>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
+    <link itemprop="mainEntityOfPage" href="https://blog.z3ratu1.cn/%E5%9F%9F%E6%B8%97%E9%80%8F%E5%AD%A6%E4%B9%A0.html">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="https://q2.qlogo.cn/headimg_dl?dst_uin=1207039417&spec=160">
+      <meta itemprop="name" content="Z3ratu1">
+      <meta itemprop="description" content="与其感慨路难行，不如现在出发">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Z3ratu1's blog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          域渗透学习
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2021-01-24 09:57:55" itemprop="dateCreated datePublished" datetime="2021-01-24T09:57:55+08:00">2021-01-24</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2021-02-02 18:07:12" itemprop="dateModified" datetime="2021-02-02T18:07:12+08:00">2021-02-02</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E6%B8%97%E9%80%8F/" itemprop="url" rel="index"><span itemprop="name">渗透</span></a>
+                </span>
+            </span>
+
+          
+            <span id="/%E5%9F%9F%E6%B8%97%E9%80%8F%E5%AD%A6%E4%B9%A0.html" class="post-meta-item leancloud_visitors" data-flag-title="域渗透学习" title="阅读次数">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span class="leancloud-visitors-count"></span>
+            </span>
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="far fa-comment"></i>
+      </span>
+      <span class="post-meta-item-text">Valine：</span>
+    
+    <a title="valine" href="/%E5%9F%9F%E6%B8%97%E9%80%8F%E5%AD%A6%E4%B9%A0.html#valine-comments" itemprop="discussionUrl">
+      <span class="post-comments-count valine-comment-count" data-xid="/%E5%9F%9F%E6%B8%97%E9%80%8F%E5%AD%A6%E4%B9%A0.html" itemprop="commentCount"></span>
+    </a>
+  </span>
+  
+  
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h1 id="域渗透学习"><a href="#域渗透学习" class="headerlink" title="域渗透学习"></a>域渗透学习</h1><p>科恩的任务罢了</p>
+<h2 id="前置知识"><a href="#前置知识" class="headerlink" title="前置知识"></a>前置知识</h2><p>windows域渗透接触的都是windows的东西，都没学过。。。。</p>
+<h3 id="AD"><a href="#AD" class="headerlink" title="AD"></a>AD</h3><p>Active Directory，活动目录，存域内各种信息的数据库</p>
+<blockquote>
+<p>域内所有的计算机共享一个集中式的目录数据库（又称为活动目录数据库），它包含着整个域内的对象（用户账户、计算机账户、打印机、共享文件等）和安全信息等等，而活动目录负责目录数据库的添加，修改，更新和删除。</p>
+</blockquote>
+<h3 id="组策略"><a href="#组策略" class="headerlink" title="组策略"></a>组策略</h3><p>Group Policy，有本地的和域的<br>域组策略管理能够统一的对域内机器和用户进行管理</p>
+<h3 id="GPO"><a href="#GPO" class="headerlink" title="GPO"></a>GPO</h3><p>组策略对象，GPO（Group Policy Object），实际上就是组策略设置的集合</p>
+<h3 id="GPP"><a href="#GPP" class="headerlink" title="GPP"></a>GPP</h3><p>Group Policy Preference，组策略首选项，作用似乎是简单化管理</p>
+<h3 id="SYSVOL目录"><a href="#SYSVOL目录" class="headerlink" title="SYSVOL目录"></a>SYSVOL目录</h3><p>域中<strong>共享</strong>文件夹，该文件夹存储组策略数据以及一些配置文件脚本，这些策略可以被共享到域间机器，由于域控机器之间因为要自动同步域数据，SYSVOL文档允许该域内的所有DC机之间进行复制，所有的AD用户都可以访问它，包括普通用户<br>所有组策略都存储于如下目录<code>\\&lt;DOMAIN&gt;\SYSVOL\&lt;DOMAIN&gt;\Policies\</code></p>
+<h3 id="域内身份验证"><a href="#域内身份验证" class="headerlink" title="域内身份验证"></a>域内身份验证</h3><p>windows身份验证分两种，一个kerberos一个NTLM<br>NTLM就是一个用密码哈希进行的挑战应答，kerberos不多说了，在windows域环境中由DC担任KDC</p>
+<h3 id="Golden-Ticket-amp-Silver-Ticket"><a href="#Golden-Ticket-amp-Silver-Ticket" class="headerlink" title="Golden Ticket &amp; Silver Ticket"></a>Golden Ticket &amp; Silver Ticket</h3><p>黄金票据，是通过krbtgt的密码哈希计算而成的票据，绝对伪造<br>白银票据，通过对TGS的伪造，只能访问伪造的对应服务</p>
+<h2 id="攻击手法"><a href="#攻击手法" class="headerlink" title="攻击手法"></a>攻击手法</h2><h3 id="脚本明文包含"><a href="#脚本明文包含" class="headerlink" title="脚本明文包含"></a>脚本明文包含</h3><p>当管理员想通过脚本进行批量密码修改的时候，一般来说这个密码就会以明文的形式保存在脚本里，然后在通过组策略批量下发，这个时候就可以通过搜寻vbs之类的脚本看里面有没有明文密码<br>尝试搜索组策略目录下的脚本命令</p>
+<pre class=" language-bat"><code class="language-bat">shell for /r \\dc/sysvol %i in (*.vbs) do @echo %i
+shell for /r \\dc/sysvol %i in (*.bat) do @echo %i
+</code></pre>
+<h3 id="GPP密码解密"><a href="#GPP密码解密" class="headerlink" title="GPP密码解密"></a>GPP密码解密</h3><p>GPP所在的目录为<code>\\&lt;DOMAIN&gt;\SYSVOL\&lt;DOMAIN&gt;\Policies\</code>，双反斜线这个目录还有个说法，叫UNC路径，用于访问网络资源</p>
+<blockquote>
+<p>一个以<code>\\</code>开头的服务器名或主机名，支持IP地址</p>
+</blockquote>
+<p>所以只要是域成员一般就能读啦，直接文件资源管理器里面填路径就行，GPP里面有一些批量管理操作，比如定时任务，比如批量修改本地用户密码<br>GPO里面选择用户配置-&gt;首选项-&gt;控制面板设置-&gt;本地用户和组可以进行批量的密码修改（可能也能新建用户？）定时操作则可以输入用户名密码使用固定身份执行定时操作<br>每一个新建的组策略都会生成一个对应的XML文件存配置，都在对应的组策略号的文件夹下</p>
+<p>所以，可以翻一下SYSVOL目录下的所有XML，万一哪个就有这种配置呢<br>如果用户提供了密码则会在对应的XML文件下以cpassword项存储AES-256方式加密的密码<br>然后微软还把密钥放出来了</p>
+<pre><code> 4e 99 06 e8  fc b6 6c c9  fa f4 93 10  62 0f fe e8
+ f4 96 e8 06  cc 05 79 90  20 9b 09 a4  33 b6 6c 1b
+</code></pre>
+<p>直接解密就可以拿到密码</p>
+<p>补丁就是禁止输入密码，所以就不会保存密码了。。。但之前输入过密码的XML需要手动删除，不让输入密码就等于是废除了批量改密码功能了嘛（因为微软推出了新的方法LAPS）</p>
+<h4 id="其他trick"><a href="#其他trick" class="headerlink" title="其他trick"></a>其他trick</h4><p>可以使用<code>gpupdate</code>更新组策略，以及<code>gpresult /v</code>查看组策略应用情况</p>
+<h4 id="坑点"><a href="#坑点" class="headerlink" title="坑点"></a>坑点</h4><p>这个非常简单的实验花了我一个下午加一个晚上，因为改密码功能完全不生效，最后还是求助于师傅。不生效的理由很简单，一开始设的testvul这个密码太弱了。。。。但是什么提示都不给，也就写着应用成功了，我真的没想到会是这么个情况</p>
+<h4 id="最新发现"><a href="#最新发现" class="headerlink" title="最新发现"></a>最新发现</h4><p>新加入域的机器也会受到之前组策略的影响，今天刚整了个winserver2016，然后加进去之后就直接把我的admin号也给改掉了</p>
+<h3 id="MS14-068"><a href="#MS14-068" class="headerlink" title="MS14-068"></a>MS14-068</h3><p>windows最有名的提权（大概？）</p>
+<h4 id="Kerberos系统运行复习"><a href="#Kerberos系统运行复习" class="headerlink" title="Kerberos系统运行复习"></a>Kerberos系统运行复习</h4><p>打的Kerberos系统，再复习一下这个东西怎么跑的吧<br>1.用户A先向AS认证自己的身份，AS返回一个TGT票据<br>2.用户A用TGT去请求TGS并告知想请求的资源B，TGS验证TGT通过之后返回ServiceTicket<br>3.用户A用ServiceTicket请求B，B验证通过，使用Ticket中的会话密钥进行通信</p>
+<h4 id="Kerberos-with-PAC"><a href="#Kerberos-with-PAC" class="headerlink" title="Kerberos with PAC"></a>Kerberos with PAC</h4><p>上述验证过程就是正常密码学学的东西，只能完成用户的验证，却不能完成用户的权限控制，一个用户只要完成了认证就能访问任意服务了，所以引进了PAC进行权限控制<br>PAC即Privilege Attribute Certificate，特权属性证书</p>
+<p>PAC版本的kerberos变为:<br>1.第一步返回的TGT里面带一个PAC，PAC里包含用户所在的组和sid，用两个签名防篡改，一个Server Signature，一个是KDC Signature，此时的KDC为AS，Server为TGS(但是AS和TGS好像都是KDC)；<br>2.还是用TGT请求TGS，**但不管用户有没有访问服务的权限，只要TGT正确，就返回TGS票据(为什么不在这里直接做权限校验呢。。。)**，并且TGS检验PAC，若签名校验通过，回复的ServerTicke中的PAC的签名被更新为Server是B，KDC是TGS；<br>3.拿ServiceTicket去请求B，B解密ServiceTicket，把解密出来的PAC拿去问KDC有没有访问权限，KDC解密PAC，获取用户的sid和组决定是否拥有访问权限</p>
+<blockquote>
+<p>特别说明的是，PAC对于用户和服务全程都是不可见的。只有KDC能制作和查看PAC。</p>
+</blockquote>
+<h4 id="漏洞利用要素"><a href="#漏洞利用要素" class="headerlink" title="漏洞利用要素"></a>漏洞利用要素</h4><p>有三个主要因素决定了这个漏洞的完整利用<br>1.PAC的签名算法可控，虽然TGS签出来的PAC是用密钥签的名，但是如果你能伪造出一个PAC并且用MD5直接签，他也能接受<br>2.TGS接受位于TGT之外的PAC数据，本来PAC应该是塞在TGT里面的，TGT用AS的密钥加密了，用户就算伪造出一个MD5签的PAC也没法塞进TGT里再过校验，但是用户可以把伪造的PAC放到TGT以外的部分，再放一个对应的密钥，TGS不仅能解密出来进行校验，甚至还能再给你用这个PAC更新一个内嵌PAC的ServiceTicket回来<br>3.当向TGS请求的服务为krbtgt时，返回的ServiceTicket可以当TGT用</p>
+<h4 id="漏洞利用过程"><a href="#漏洞利用过程" class="headerlink" title="漏洞利用过程"></a>漏洞利用过程</h4><p>1.申请TGT时可以选择申请一个没有PAC的TGT，使用普通用户请求AS拿到无PAC的TGT<br>2.自己伪造一个PAC，PAC签名直接用MD5签，产生随机数加密PAC，PAC放在请求的 enc-authorization-data字段中，密钥放在PA-DATA里面的APREQ中，向TGS请求对krbtgt的票据<br>3.TGS拿到奇怪的PAC检验成功，签了一个目标是krbtgt的ServiceTicket，这个票能当TGT用，此时就已经获得了一个正常且高权限的TGT了<br>4.用这个TGT想申请谁申请谁，成功提权</p>
+<h3 id="Kerberos-ServiceTicket离线碰撞"><a href="#Kerberos-ServiceTicket离线碰撞" class="headerlink" title="Kerberos ServiceTicket离线碰撞"></a>Kerberos ServiceTicket离线碰撞</h3><p>就硬爆破，感觉成功率不大。。。文章里说十一二位也算弱密码。。。对不起我大部分密码都是弱密码呜呜<br>这个方法不能打windows，因为windows上运行的服务会映射到活动目录账户，其密码128位，无敌</p>
+<p>攻击流程就是向TGS申请一个目标服务账户的Service Principal Name (SPN)，然后域控就会用对应账户对Ticket加密，加密使用的算法是RC4_HMAC_MD5，这时这个账户的NTLM password的哈希值会参与进来，然后就是硬爆破环节了</p>
+<p>这个爆破的好处在于本地跑，不需要像其他爆破一样发一万个包，不容易被发现</p>
+<h3 id="凭证窃取"><a href="#凭证窃取" class="headerlink" title="凭证窃取"></a>凭证窃取</h3><p>怎么说呢。。。就是mimikatz抓密码，抓到一个就去试这个密码能不能登其他机器，登到其他机器了如法炮制，顺便收集信息，数据库，RDP之类的账号密码的信息，直到拿到想要的账户</p>
+<p>这里有几个抓密码为什么能抓到的注意点<br>1.以域管理员账户登录计算机时凭证会被放入LSASS(受保护的内存区)，但拥有admin或localSystem权限的用户可以把这个受保护内存区dump出来<br>2.RunAs切换身份的，同1（这个命令是不是和Linux的su一样啊）<br>3.在受控机上RDP远程登录其他机器的，直接抓键盘记录被打穿<br>4.如果有使用域管理员上下文账户运行的服务部署在所有服务器上，只要拿下一个系统就拿下了所有系统，当一个服务以显式凭证启动时，凭证存进LSASS，被打穿</p>
+<p><strong>win10和winserver 2012R2之后的版本默认在内存中禁止保存明文密码，需要修改注册表才行</strong><br><code>reg add HKLM\SYSTEM\CurrentControlSet\Control\SecurityProviders\WDigest /v UseLogonCredential /t REG_DWORD /d 1 /f</code>重启或用户重新登录后可以成功抓取</p>
+<p>用powershell连接远程系统不会在远程系统内存中留下凭证，不会被随便打爆<br>使用零知识证明以不传输凭证登录</p>
+<p>但是这样子就不能双重跳跃，从A跳到B时不能再从B跳到C，因为B不能提供凭证，如果在B上输入凭证B不安全就又被打穿了<br>微软提供了CredSSP来保护数据，但这个方案本身并不安全</p>
+<h5 id="传递哈希升级为传递凭证"><a href="#传递哈希升级为传递凭证" class="headerlink" title="传递哈希升级为传递凭证"></a>传递哈希升级为传递凭证</h5><p>感觉。。就是说的特别高级的重放，作为凭证窃取整个过程中的子过程进行解释<br>虽然认证需要的是用户名和密码，但因为需要零知识证明，实际用于验证的应该是他们的哈希结果，所以抓到了哈希就等于获得了授权，虽然正常人不能直接提交哈希进行验证，但是可以使用强力软件mimikatz<br>Pass-the-Ticket，偷kerboros凭证，时间戳内能重放（好垃圾哦）<br>OverPass-the-Hash 比直接传哈希复杂一点，先搞来一个哈希过的kerberos密码，然后把内存里所有的kerberos密码清空，下一次Kerberos请求票据的时候就会用上注入进内存的密码，这种方式比直接传递哈希来伪造身份更为隐蔽，无敌工具mimikatz能做到上述操作</p>
+<blockquote>
+<p>Pass-the-Hash: grab the hash and use to access a resource. Hash is valid until the user changes the account password.<br>Pass-the-Ticket: grab the Kerberos ticket(s) and use to access a resource. Ticket is valid until the ticket lifetime expires (typically 7 days).<br>OverPass-the-Hash: use the password hash to get a Kerberos ticket. Hash is valid until the user changes the account password.</p>
+</blockquote>
+<p>虽然话是这么说，不改密码打一辈子，但是大家哈希校验的时候真的不额外加一个时间戳什么的防重放吗</p>
+<h5 id="应对方案"><a href="#应对方案" class="headerlink" title="应对方案"></a>应对方案</h5><p>管理员应该使用单独的电脑登录工作站，而不是在可能执行用户操作，如收发邮件，浏览网站的机器上登录。smartcard同样会在内存中留下凭证而被日翻（虽然并不是很懂smartcard是什么东西）<br>权限控制，每个管理员应该只给与其对应所需的管理员权限<br>工作站上的本地管理员账号密码应该足够复杂<br>配置组策略以禁止管理员账号通过网络进行认证</p>
+<h3 id="接触AD数据库文件-ntds-dit"><a href="#接触AD数据库文件-ntds-dit" class="headerlink" title="接触AD数据库文件(ntds.dit)"></a>接触AD数据库文件(ntds.dit)</h3><p>AD数据库包含了AD域中所有对象的信息，这个数据库被所有的域控都复制了一遍，这个文件一般来说包含了所有用户密码的哈希，该文件只能被能够登陆DC的用户访问</p>
+<p>在不是域管理员的情况下获取NTDS.dit的方法<br>1.备份位置，从共享备份文件中接触NTDS.dit<br>2.在成员服务器变为域控之前获取到其存储的的NTDS.dit<br>3.当拥有虚拟主机管理员权限时，虚拟DC可以离线复制相关数据<br>4.控制一个能登录到DC的账户（屁话）<br>AD中大部分组是不被期待拥有默认能登录DC的权限的<br>但如下组默认能登</p>
+<blockquote>
+<p>Enterprise Admins (member of the domain Administrators group in every domain in the forest)<br>Domain Admins (member of the domain Administrators group)<br>Administrators<br>Backup Operators<br>Account Operators<br>Print Operators</p>
+</blockquote>
+<h4 id="成为DC管理员后的操作"><a href="#成为DC管理员后的操作" class="headerlink" title="成为DC管理员后的操作"></a>成为DC管理员后的操作</h4><p>首先需要是一个管理员才能运行mimikatz<br>成为DC管理员后，mimikatz一把梭dump全部凭证，dump LSASS内存<br>创建一个Install From Media(IFM)来获取NTDS.dit文件，即上述获取NTDS.dit文件的第二种方法。创建的IFM集就是NTDS.dit文件的复制，这个文件可能会在新的DC直接共享，或者在一个还未升级为域控的服务器上发现，在升级之前这个文件可能不会受到很好的保护<br>从NTDS.dit文件中dump AD域凭证，当攻击者获得了一份NTDS.dit文件和某些能解密数据库数据的注册表项时，AD数据库文件就被打穿了。当攻击者拥有注册表中的系统配置单元和NTDS.dit文件时，即可获取整个AD的所有凭证</p>
+<h3 id="内网信息搜集"><a href="#内网信息搜集" class="headerlink" title="内网信息搜集"></a>内网信息搜集</h3><p>堆一下用的时候慢慢翻</p>
+<pre class=" language-powershell"><code class="language-powershell">ipconfig <span class="token operator">/</span>all    查询本机IP段，所在域等
+net config Workstation    当前计算机名，全名，用户名，系统版本，工作站域，登陆域
+net user    本机用户列表
+net localhroup administrators    本机管理员<span class="token punctuation">[</span>通常含有域用户<span class="token punctuation">]</span>
+net user <span class="token operator">/</span>domain    查询域用户
+net user 用户名 <span class="token operator">/</span>domain    获取指定用户的账户信息
+net <span class="token function">group</span> <span class="token operator">/</span>domain    查询域里面的工作组
+net <span class="token function">group</span> 组名 <span class="token operator">/</span>domain    查询域中的某工作组
+net <span class="token function">group</span> <span class="token string">"domain admins"</span> <span class="token operator">/</span>domain    查询域管理员列表
+net <span class="token function">group</span> <span class="token string">"enterprise admins"</span> <span class="token operator">/</span>domain    获得企业管理员列表
+net <span class="token function">group</span> 组名 <span class="token operator">/</span><span class="token function">del</span> <span class="token operator">/</span>domain    删除域中的某组
+net <span class="token function">group</span> 组名 组成员名 <span class="token operator">/</span><span class="token function">del</span> <span class="token operator">/</span>domain    删除域中的某组的组成员
+net localgroup administrators <span class="token operator">/</span>domain    登录本机的域管理员
+net <span class="token function">group</span> 组名 <span class="token operator">/</span>add    增加域中的组
+net localgroup administrators workgroup\user001 <span class="token operator">/</span>add    域用户添加到本机
+net <span class="token function">group</span> <span class="token string">"domain controllers"</span> <span class="token operator">/</span>domain    查看域控制器<span class="token punctuation">(</span>如果有多台<span class="token punctuation">)</span>
+net time <span class="token operator">/</span>domain    判断主域，主域服务器都做时间服务器
+net session    查看当前会话
+net use \\ip\ipc$ pawword <span class="token operator">/</span>user:username@domain    建立IPC会话<span class="token punctuation">[</span>空连接<span class="token operator">-</span>*<span class="token operator">*</span><span class="token operator">*</span><span class="token punctuation">]</span>
+net use z: \\192<span class="token punctuation">.</span>168<span class="token punctuation">.</span>200<span class="token punctuation">.</span>21\文件夹名    建立映射到本机Z盘
+net share    查看SMB指向的路径<span class="token punctuation">[</span>即共享<span class="token punctuation">]</span>
+at \\192<span class="token punctuation">.</span>168<span class="token punctuation">.</span>200<span class="token punctuation">.</span>2  0：00 c:\windows\muma<span class="token punctuation">.</span>exe    在共享主机上执行
+net view    查询同一域内机器列表
+net view <span class="token operator">/</span>domain    查询域列表
+net view <span class="token operator">/</span>domain:M0RK    查看test域中计算机列表
+net view \\域控的机器名    查看域控共享情况
+nltest <span class="token operator">/</span>domain_trusts    获取域信任信息
+net session    查看当前会话
+net <span class="token function">start</span>    查看当前运行的服务
+net time <span class="token operator">/</span>domain    查询主域服务器的时间
+<span class="token function">echo</span> <span class="token operator">%</span>logonserver<span class="token operator">%</span>    查看登录认证的机器<span class="token punctuation">(</span>即域控机器<span class="token punctuation">)</span>
+net accounts    查看本地密码策略
+net accounts <span class="token operator">/</span>domain    查看域密码策略
+query user   查看当前的登录信息
+netsh firewall show config    查看防火墙策略
+netsh firewall show state    查看防火墙策略
+route print    路由表
+tracert IP    路由跟踪
+arp <span class="token operator">-</span>a    列出本网段内所有活跃的IP地址
+arp <span class="token operator">-</span>s <span class="token punctuation">(</span>ip <span class="token operator">+</span> mac<span class="token punctuation">)</span>    绑定mac和IP
+arp <span class="token operator">-</span>d <span class="token punctuation">(</span>iP <span class="token operator">+</span> mac<span class="token punctuation">)</span>    解绑IP和Mac
+tasklist <span class="token operator">/</span>V    查看进程<span class="token punctuation">[</span>显示对应用户<span class="token punctuation">]</span>
+tasklist <span class="token operator">/</span>S ip <span class="token operator">/</span>U domain\username <span class="token operator">/</span>P <span class="token operator">/</span>V    查看远程计算机进程列表
+tasklist <span class="token operator">/</span>S IP地址 <span class="token operator">/</span>U 域名\用户名 <span class="token operator">/</span>P <span class="token operator">/</span>V    查看远程计算机进程
+tasklist <span class="token operator">/</span>svc    查看进程
+taskkill <span class="token operator">/</span>im 进程名称<span class="token punctuation">(</span>cmd<span class="token punctuation">.</span>exe<span class="token punctuation">)</span>    结束进程
+taskkill <span class="token operator">/</span>pid<span class="token punctuation">[</span>进程码<span class="token punctuation">]</span>    <span class="token operator">-</span>t<span class="token punctuation">(</span>结束该进程<span class="token punctuation">)</span> <span class="token operator">-</span>f<span class="token punctuation">(</span>强制结束该进程以及所有子进程<span class="token punctuation">)</span>
+qprocess <span class="token operator">*</span>    类似tasklist
+qprocess <span class="token operator">/</span>SERVER:IP    远程查看计算机进程列表
+whoami <span class="token operator">/</span>all    查询当前用户权限等
+<span class="token function">set</span>    查看系统环境变量
+systeminfo    查看系统信息
+qwinsta    查看登录情况
+fsutil fsinfo drives    查看所有盘符
+wmic bios    查看bios信息
+wmic qfe    查看补丁信息
+wmic qfe get hotfixid    查看补丁<span class="token operator">-</span>Patch号，很实用
+wmic share get name<span class="token punctuation">,</span>path    查看SMB指向路径
+net view <span class="token operator">/</span>domain
+net config workstation
+net <span class="token function">group</span> <span class="token string">"Domain Admins"</span> <span class="token operator">/</span>domain
+net time <span class="token operator">/</span>domain
+ipconfig <span class="token operator">/</span>all
+nslookup xxx
+dsquery server
+
+查看域控制器
+net <span class="token function">group</span> <span class="token string">"Domain controllers"</span>
+</code></pre>
+<p>环境搞得差不多了，该手动实验了<br>上述大部分域有关的信息搜集指令执行之后都会</p>
+<blockquote>
+<p>这项请求将在域z33.com的域控制器处理<br>发生系统错误5<br>拒绝访问</p>
+</blockquote>
+<p>试了半天发现是需要以域账户登录才能成功执行，就登录本地机器的话就会拒绝访问</p>
+<h2 id="参考链接"><a href="#参考链接" class="headerlink" title="参考链接"></a>参考链接</h2><p>本文学习原文<br><a target="_blank" rel="external nofollow noopener noreferrer" href="https://adsecurity.org/?p=2362">Attack Methods for Gaining Domain Admin Rights in Active Directory</a></p>
+<p><a target="_blank" rel="external nofollow noopener noreferrer" href="https://wh0ale.github.io/2018/12/25/2018-12-25-%E5%9F%9F%E6%B8%97%E9%80%8F%E4%B9%8B%E7%A5%A8%E6%8D%AE/">域渗透之票据</a><br><a target="_blank" rel="external nofollow noopener noreferrer" href="https://xz.aliyun.com/t/7784">浅析域渗透中的组策略利用</a><br><a target="_blank" rel="external nofollow noopener noreferrer" href="https://docs.microsoft.com/zh-cn/dotnet/standard/io/file-path-formats">Windows系统中的文件路径格式</a><br><a target="_blank" rel="external nofollow noopener noreferrer" href="https://xz.aliyun.com/t/8038">内网渗透技巧之横向控制</a><br><a target="_blank" rel="external nofollow noopener noreferrer" href="https://kevien.github.io/2017/09/28/windows%E5%9F%9F%E5%AE%89%E5%85%A8/">Windows域安全</a></p>
+<p>下面两篇文章一起看MS16-068基本上就看懂了<br><a target="_blank" rel="external nofollow noopener noreferrer" href="https://www.anquanke.com/post/id/192810">Windows内网协议学习Kerberos篇之PAC</a><br><a target="_blank" rel="external nofollow noopener noreferrer" href="https://www.freebuf.com/vuls/56081.html">深入解读MS14-068漏洞</a><br>好姐姐的中文译本<br><a target="_blank" rel="external nofollow noopener noreferrer" href="https://neorah.me/pentest/adsecurity01/">翻译和复现</a></p>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/pentest/" rel="tag"># pentest</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/switch%E8%81%94%E6%9C%BA%E6%B7%B1%E7%A9%B6.html" rel="prev" title="Switch联机加速研究">
+      <i class="fa fa-chevron-left"></i> Switch联机加速研究
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/%E5%9F%9F%E7%8E%AF%E5%A2%83%E6%90%AD%E5%BB%BA.html" rel="next" title="域环境搭建">
+      域环境搭建 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+    <div class="comments" id="valine-comments"></div>
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%9F%9F%E6%B8%97%E9%80%8F%E5%AD%A6%E4%B9%A0"><span class="nav-number">1.</span> <span class="nav-text">域渗透学习</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%89%8D%E7%BD%AE%E7%9F%A5%E8%AF%86"><span class="nav-number">1.1.</span> <span class="nav-text">前置知识</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#AD"><span class="nav-number">1.1.1.</span> <span class="nav-text">AD</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%BB%84%E7%AD%96%E7%95%A5"><span class="nav-number">1.1.2.</span> <span class="nav-text">组策略</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#GPO"><span class="nav-number">1.1.3.</span> <span class="nav-text">GPO</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#GPP"><span class="nav-number">1.1.4.</span> <span class="nav-text">GPP</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#SYSVOL%E7%9B%AE%E5%BD%95"><span class="nav-number">1.1.5.</span> <span class="nav-text">SYSVOL目录</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%9F%9F%E5%86%85%E8%BA%AB%E4%BB%BD%E9%AA%8C%E8%AF%81"><span class="nav-number">1.1.6.</span> <span class="nav-text">域内身份验证</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Golden-Ticket-amp-Silver-Ticket"><span class="nav-number">1.1.7.</span> <span class="nav-text">Golden Ticket &amp; Silver Ticket</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%94%BB%E5%87%BB%E6%89%8B%E6%B3%95"><span class="nav-number">1.2.</span> <span class="nav-text">攻击手法</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%84%9A%E6%9C%AC%E6%98%8E%E6%96%87%E5%8C%85%E5%90%AB"><span class="nav-number">1.2.1.</span> <span class="nav-text">脚本明文包含</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#GPP%E5%AF%86%E7%A0%81%E8%A7%A3%E5%AF%86"><span class="nav-number">1.2.2.</span> <span class="nav-text">GPP密码解密</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%85%B6%E4%BB%96trick"><span class="nav-number">1.2.2.1.</span> <span class="nav-text">其他trick</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%9D%91%E7%82%B9"><span class="nav-number">1.2.2.2.</span> <span class="nav-text">坑点</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E6%9C%80%E6%96%B0%E5%8F%91%E7%8E%B0"><span class="nav-number">1.2.2.3.</span> <span class="nav-text">最新发现</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#MS14-068"><span class="nav-number">1.2.3.</span> <span class="nav-text">MS14-068</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#Kerberos%E7%B3%BB%E7%BB%9F%E8%BF%90%E8%A1%8C%E5%A4%8D%E4%B9%A0"><span class="nav-number">1.2.3.1.</span> <span class="nav-text">Kerberos系统运行复习</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Kerberos-with-PAC"><span class="nav-number">1.2.3.2.</span> <span class="nav-text">Kerberos with PAC</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E6%BC%8F%E6%B4%9E%E5%88%A9%E7%94%A8%E8%A6%81%E7%B4%A0"><span class="nav-number">1.2.3.3.</span> <span class="nav-text">漏洞利用要素</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E6%BC%8F%E6%B4%9E%E5%88%A9%E7%94%A8%E8%BF%87%E7%A8%8B"><span class="nav-number">1.2.3.4.</span> <span class="nav-text">漏洞利用过程</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Kerberos-ServiceTicket%E7%A6%BB%E7%BA%BF%E7%A2%B0%E6%92%9E"><span class="nav-number">1.2.4.</span> <span class="nav-text">Kerberos ServiceTicket离线碰撞</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%87%AD%E8%AF%81%E7%AA%83%E5%8F%96"><span class="nav-number">1.2.5.</span> <span class="nav-text">凭证窃取</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#%E4%BC%A0%E9%80%92%E5%93%88%E5%B8%8C%E5%8D%87%E7%BA%A7%E4%B8%BA%E4%BC%A0%E9%80%92%E5%87%AD%E8%AF%81"><span class="nav-number">1.2.5.0.1.</span> <span class="nav-text">传递哈希升级为传递凭证</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#%E5%BA%94%E5%AF%B9%E6%96%B9%E6%A1%88"><span class="nav-number">1.2.5.0.2.</span> <span class="nav-text">应对方案</span></a></li></ol></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%8E%A5%E8%A7%A6AD%E6%95%B0%E6%8D%AE%E5%BA%93%E6%96%87%E4%BB%B6-ntds-dit"><span class="nav-number">1.2.6.</span> <span class="nav-text">接触AD数据库文件(ntds.dit)</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E6%88%90%E4%B8%BADC%E7%AE%A1%E7%90%86%E5%91%98%E5%90%8E%E7%9A%84%E6%93%8D%E4%BD%9C"><span class="nav-number">1.2.6.1.</span> <span class="nav-text">成为DC管理员后的操作</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%86%85%E7%BD%91%E4%BF%A1%E6%81%AF%E6%90%9C%E9%9B%86"><span class="nav-number">1.2.7.</span> <span class="nav-text">内网信息搜集</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%8F%82%E8%80%83%E9%93%BE%E6%8E%A5"><span class="nav-number">1.3.</span> <span class="nav-text">参考链接</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Z3ratu1" src="https://q2.qlogo.cn/headimg_dl?dst_uin=1207039417&spec=160">
+  <p class="site-author-name" itemprop="name">Z3ratu1</p>
+  <div class="site-description" itemprop="description">与其感慨路难行，不如现在出发</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">145</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">5</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">86</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+  <div class="beian"><a href="http://www.beian.miit.gov.cn/" rel="external nofollow noopener noreferrer" target="_blank">湘ICP备2020021580号 </a>
+      <img src="/./images/beian.png" style="display: inline-block;">
+  </div>
+
+<div class="copyright">
+  
+  &copy; 2019 – 
+  <span itemprop="copyrightYear">2022</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Z3ratu1</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="external nofollow noopener noreferrer" target="_blank">Hexo</a> & <a href="https://pisces.theme-next.org/" class="theme-link" rel="external nofollow noopener noreferrer" target="_blank">NexT.Pisces</a> 强力驱动
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+
+<script>
+NexT.utils.loadComments(document.querySelector('#valine-comments'), () => {
+  NexT.utils.getScript('https://cdn.jsdelivr.net/npm/valine@1.4.14/dist/Valine.min.js', () => {
+    var GUEST = ['nick', 'mail', 'link'];
+    var guest = 'nick,mail,link';
+    guest = guest.split(',').filter(item => {
+      return GUEST.includes(item);
+    });
+    new Valine({
+      el         : '#valine-comments',
+      verify     : false,
+      notify     : false,
+      appId      : '7H8kg0XdWO8IbhOcu4K1JaAT-gzGzoHsz',
+      appKey     : 'wPKQjkbVtvPaRR7gh2yjfLSi',
+      placeholder: "Just go go",
+      avatar     : 'mm',
+      meta       : guest,
+      pageSize   : '10' || 10,
+      visitor    : true,
+      lang       : '' || 'zh-cn',
+      path       : location.pathname,
+      recordIP   : false,
+      serverURLs : ''
+    });
+  }, window.Valine);
+});
+</script>
+
+</body>
+</html>

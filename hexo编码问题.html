@@ -1,0 +1,576 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 6.0.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"blog.z3ratu1.cn","root":"/","scheme":"Pisces","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"always","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":true},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+  </script>
+
+  <meta name="description" content="hexo编码问题最近重拾起刷题，又需要重新推一下博客，遇到了之前遇到过但是没有解决的问题，今天重新花时间整理了一下，大致解决了问题但是经过一次全部的重构之后 title处不能使用特殊字符该问题可以通过html编码解决，将[]替换为html编码&amp;#91和&amp;#93即可，但是出现了一些衍生错误，标题中不能使用空格，否则标题可能会缺一部分，使用下划线替代空格之后显示的又是空格，暂时不清楚怎">
+<meta property="og:type" content="article">
+<meta property="og:title" content="hexo编码问题">
+<meta property="og:url" content="https://blog.z3ratu1.cn/hexo%E7%BC%96%E7%A0%81%E9%97%AE%E9%A2%98.html">
+<meta property="og:site_name" content="Z3ratu1&#39;s blog">
+<meta property="og:description" content="hexo编码问题最近重拾起刷题，又需要重新推一下博客，遇到了之前遇到过但是没有解决的问题，今天重新花时间整理了一下，大致解决了问题但是经过一次全部的重构之后 title处不能使用特殊字符该问题可以通过html编码解决，将[]替换为html编码&amp;#91和&amp;#93即可，但是出现了一些衍生错误，标题中不能使用空格，否则标题可能会缺一部分，使用下划线替代空格之后显示的又是空格，暂时不清楚怎">
+<meta property="og:locale">
+<meta property="article:published_time" content="2020-07-11T14:51:07.000Z">
+<meta property="article:modified_time" content="2021-07-02T10:17:24.654Z">
+<meta property="article:author" content="Z3ratu1">
+<meta property="article:tag" content="hexo">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="https://blog.z3ratu1.cn/hexo%E7%BC%96%E7%A0%81%E9%97%AE%E9%A2%98.html">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-Hans'
+  };
+</script>
+
+  <title>hexo编码问题 | Z3ratu1's blog</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+<link rel="stylesheet" href="/css/prism-tomorrow.css" type="text/css"></head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">Z3ratu1's blog</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">Welcome</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>关于</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+        <li class="menu-item menu-item-links">
+
+    <a href="/links/" rel="section"><i class="fa fa-link fa-fw"></i>友链</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off" placeholder="搜索..." spellcheck="false" type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+  <a href="https://github.com/Z3ratu1" class="github-corner" title="Follow me on GitHub" aria-label="Follow me on GitHub" rel="external nofollow noopener noreferrer" target="_blank"><svg width="80" height="80" viewbox="0 0 250 250" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"/><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"/><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"/></svg></a>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
+    <link itemprop="mainEntityOfPage" href="https://blog.z3ratu1.cn/hexo%E7%BC%96%E7%A0%81%E9%97%AE%E9%A2%98.html">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="https://q2.qlogo.cn/headimg_dl?dst_uin=1207039417&spec=160">
+      <meta itemprop="name" content="Z3ratu1">
+      <meta itemprop="description" content="与其感慨路难行，不如现在出发">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Z3ratu1's blog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          hexo编码问题
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2020-07-11 22:51:07" itemprop="dateCreated datePublished" datetime="2020-07-11T22:51:07+08:00">2020-07-11</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2021-07-02 18:17:24" itemprop="dateModified" datetime="2021-07-02T18:17:24+08:00">2021-07-02</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E6%9D%82%E9%A1%B9/" itemprop="url" rel="index"><span itemprop="name">杂项</span></a>
+                </span>
+            </span>
+
+          
+            <span id="/hexo%E7%BC%96%E7%A0%81%E9%97%AE%E9%A2%98.html" class="post-meta-item leancloud_visitors" data-flag-title="hexo编码问题" title="阅读次数">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span class="leancloud-visitors-count"></span>
+            </span>
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="far fa-comment"></i>
+      </span>
+      <span class="post-meta-item-text">Valine：</span>
+    
+    <a title="valine" href="/hexo%E7%BC%96%E7%A0%81%E9%97%AE%E9%A2%98.html#valine-comments" itemprop="discussionUrl">
+      <span class="post-comments-count valine-comment-count" data-xid="/hexo%E7%BC%96%E7%A0%81%E9%97%AE%E9%A2%98.html" itemprop="commentCount"></span>
+    </a>
+  </span>
+  
+  
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h1 id="hexo编码问题"><a href="#hexo编码问题" class="headerlink" title="hexo编码问题"></a>hexo编码问题</h1><p>最近重拾起刷题，又需要重新推一下博客，遇到了之前遇到过但是没有解决的问题，今天重新花时间整理了一下，大致解决了问题<br>但是经过一次全部的重构之后</p>
+<h2 id="title处不能使用特殊字符"><a href="#title处不能使用特殊字符" class="headerlink" title="title处不能使用特殊字符"></a>title处不能使用特殊字符</h2><p>该问题可以通过html编码解决，将[]替换为html编码<code>&amp;#91</code>和<code>&amp;#93</code>即可，但是出现了一些衍生错误，标题中不能使用空格，否则标题可能会缺一部分，使用下划线替代空格之后显示的又是空格，暂时不清楚怎么回事</p>
+<p>找到另一个替代方法，将title用单引号包裹起来即可，展示时不会出现单引号，较为方便，在标题不出现单引号的情况下用单引号包裹title可以保证其他特殊字符不出现解析错误</p>
+<h2 id="文章内不能出现或"><a href="#文章内不能出现或" class="headerlink" title="文章内不能出现或"></a>文章内不能出现{% %}或{{}}</h2><p>如上两个标记会被hexo引擎解析错误，每次在写和ssti相关文章时必报该错，目前只有一个较为愚蠢的解决方案。使用对应的标记对{% raw %}{% endraw %}来包裹可能出问题的内容，但不能随意使用该对，hexo会将这两个标记中的所有字符均视为普通字符，包裹内容过大会导致文章代码高亮等语法无效</p>
+<h2 id="在代码段中使用反引号"><a href="#在代码段中使用反引号" class="headerlink" title="在代码段中使用反引号"></a>在代码段中使用反引号</h2><p>之前遇到这个问题的时候都没有考虑，今天update一下，只要在外围的反引号数多于代码块中的反引号数量就可以了<br><code>print `whoami`;</code>这一段实际上是``print `whoami`;``<br>如果需要用连着的两个反引号，就在外层是连着的三个反引号就行了<br>看的这个大哥的文章<br><a target="_blank" rel="external nofollow noopener noreferrer" href="https://hui-shao.cn/hexo-code-block/">在代码块中使用反引号(代码块开始标记)的方法</a></p>
+<h2 id="贴一个自己写的hexo头部自动格式化脚本"><a href="#贴一个自己写的hexo头部自动格式化脚本" class="headerlink" title="贴一个自己写的hexo头部自动格式化脚本"></a>贴一个自己写的hexo头部自动格式化脚本</h2><p>辣鸡脚本，勉强能用就行</p>
+<pre class=" language-python"><code class="language-python"><span class="token keyword">import</span> os
+<span class="token keyword">import</span> re
+<span class="token keyword">import</span> time
+<span class="token keyword">import</span> numpy <span class="token keyword">as</span> np
+<span class="token keyword">from</span> random <span class="token keyword">import</span> randrange
+
+
+header <span class="token operator">=</span> <span class="token triple-quoted-string string">'''---
+title: {0}
+date: {1}
+tags:
+- 
+categories: 
+img: /img/{2}
+---
+
+'''</span>
+dir <span class="token operator">=</span> <span class="token string">"D:/blog/source/_posts/"</span>
+img_path <span class="token operator">=</span> <span class="token string">"D:/blog/themes/hexo-theme-matery/source/img/"</span>
+files <span class="token operator">=</span> os<span class="token punctuation">.</span>listdir<span class="token punctuation">(</span>dir<span class="token punctuation">)</span>
+file_cnt <span class="token operator">=</span> len<span class="token punctuation">(</span>files<span class="token punctuation">)</span>
+modify_cnt <span class="token operator">=</span> <span class="token number">0</span>
+
+<span class="token keyword">if</span> os<span class="token punctuation">.</span>path<span class="token punctuation">.</span>exists<span class="token punctuation">(</span><span class="token string">"log.npy"</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
+    modified_files <span class="token operator">=</span> np<span class="token punctuation">.</span>load<span class="token punctuation">(</span><span class="token string">'log.npy'</span><span class="token punctuation">)</span>
+<span class="token keyword">else</span><span class="token punctuation">:</span>
+    modified_files <span class="token operator">=</span> np<span class="token punctuation">.</span>array<span class="token punctuation">(</span><span class="token string">'example.md'</span><span class="token punctuation">)</span>
+
+<span class="token keyword">for</span> file <span class="token keyword">in</span> files<span class="token punctuation">:</span>
+    <span class="token keyword">if</span> file<span class="token punctuation">[</span><span class="token operator">-</span><span class="token number">3</span><span class="token punctuation">:</span><span class="token punctuation">]</span> <span class="token operator">==</span> <span class="token string">".md"</span><span class="token punctuation">:</span>
+        <span class="token keyword">if</span> file <span class="token operator">not</span> <span class="token keyword">in</span> modified_files<span class="token punctuation">:</span>
+            <span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string">"[+]"</span> <span class="token operator">+</span> file<span class="token punctuation">)</span>
+            file_path <span class="token operator">=</span> dir <span class="token operator">+</span> file
+            <span class="token keyword">with</span> open<span class="token punctuation">(</span>file_path<span class="token punctuation">,</span> <span class="token string">'r'</span><span class="token punctuation">,</span> encoding<span class="token operator">=</span><span class="token string">'UTF-8'</span><span class="token punctuation">)</span> <span class="token keyword">as</span> f<span class="token punctuation">:</span>
+                line <span class="token operator">=</span> f<span class="token punctuation">.</span>readline<span class="token punctuation">(</span><span class="token punctuation">)</span>
+                f<span class="token punctuation">.</span>seek<span class="token punctuation">(</span><span class="token number">0</span><span class="token punctuation">)</span>
+                result <span class="token operator">=</span> <span class="token string">""</span>
+                content <span class="token operator">=</span> f<span class="token punctuation">.</span>read<span class="token punctuation">(</span><span class="token punctuation">)</span>  <span class="token comment" spellcheck="true"># 读取整个文件</span>
+                <span class="token keyword">if</span> line <span class="token operator">!=</span> <span class="token string">"---\n"</span><span class="token punctuation">:</span>  <span class="token comment" spellcheck="true"># 未处理头部</span>
+                    title <span class="token operator">=</span> re<span class="token punctuation">.</span>sub<span class="token punctuation">(</span><span class="token string">"(# )|\n"</span><span class="token punctuation">,</span> <span class="token string">""</span><span class="token punctuation">,</span> <span class="token punctuation">(</span><span class="token string">"'"</span> <span class="token operator">+</span> line <span class="token operator">+</span> <span class="token string">"'"</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
+                    ctime <span class="token operator">=</span> os<span class="token punctuation">.</span>path<span class="token punctuation">.</span>getctime<span class="token punctuation">(</span>file_path<span class="token punctuation">)</span>  <span class="token comment" spellcheck="true"># 创建时间</span>
+                    date <span class="token operator">=</span> time<span class="token punctuation">.</span>strftime<span class="token punctuation">(</span><span class="token string">'%Y-%m-%d %H:%M:%S'</span><span class="token punctuation">,</span> time<span class="token punctuation">.</span>localtime<span class="token punctuation">(</span>ctime<span class="token punctuation">)</span><span class="token punctuation">)</span>
+                    img_list <span class="token operator">=</span> os<span class="token punctuation">.</span>listdir<span class="token punctuation">(</span>img_path<span class="token punctuation">)</span>
+                    index <span class="token operator">=</span> randrange<span class="token punctuation">(</span><span class="token number">0</span><span class="token punctuation">,</span> len<span class="token punctuation">(</span>img_list<span class="token punctuation">)</span><span class="token punctuation">)</span>
+                    img <span class="token operator">=</span> img_list<span class="token punctuation">[</span>index<span class="token punctuation">]</span>   <span class="token comment" spellcheck="true"># 随机一个封面图片</span>
+                    result <span class="token operator">=</span> header<span class="token punctuation">.</span>format<span class="token punctuation">(</span>title<span class="token punctuation">,</span> date<span class="token punctuation">,</span> img<span class="token punctuation">)</span>
+                <span class="token comment" spellcheck="true"># 编码可能出错的字符，重写整个文件</span>
+                f<span class="token punctuation">.</span>close<span class="token punctuation">(</span><span class="token punctuation">)</span>
+                <span class="token keyword">with</span> open<span class="token punctuation">(</span>file_path<span class="token punctuation">,</span> <span class="token string">'w'</span><span class="token punctuation">,</span> encoding<span class="token operator">=</span><span class="token string">"UTF-8"</span><span class="token punctuation">)</span> <span class="token keyword">as</span> f<span class="token punctuation">:</span>
+                    content <span class="token operator">=</span> <span class="token punctuation">(</span>result <span class="token operator">+</span> content<span class="token punctuation">)</span>
+                    f<span class="token punctuation">.</span>write<span class="token punctuation">(</span>content<span class="token punctuation">)</span>
+                    f<span class="token punctuation">.</span>close<span class="token punctuation">(</span><span class="token punctuation">)</span>
+                    modify_cnt <span class="token operator">+=</span> <span class="token number">1</span>
+                    modified_files <span class="token operator">=</span> np<span class="token punctuation">.</span>append<span class="token punctuation">(</span>modified_files<span class="token punctuation">,</span> file<span class="token punctuation">)</span>
+np<span class="token punctuation">.</span>save<span class="token punctuation">(</span><span class="token string">'log.npy'</span><span class="token punctuation">,</span> modified_files<span class="token punctuation">)</span>
+<span class="token keyword">print</span><span class="token punctuation">(</span>str<span class="token punctuation">(</span>modify_cnt<span class="token punctuation">)</span> <span class="token operator">+</span> <span class="token string">" file(s) modified, "</span> <span class="token operator">+</span> str<span class="token punctuation">(</span>file_cnt<span class="token punctuation">)</span> <span class="token operator">+</span> <span class="token string">" file(s) total."</span><span class="token punctuation">)</span>
+</code></pre>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/hexo/" rel="tag"># hexo</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/%5BFBCTF2019%5DRCEService.html" rel="prev" title="[FBCTF2019]RCEService">
+      <i class="fa fa-chevron-left"></i> [FBCTF2019]RCEService
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/%5BGYCTF2020%5DFlaskApp.html" rel="next" title="[GYCTF2020]FlaskApp">
+      [GYCTF2020]FlaskApp <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+    <div class="comments" id="valine-comments"></div>
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#hexo%E7%BC%96%E7%A0%81%E9%97%AE%E9%A2%98"><span class="nav-number">1.</span> <span class="nav-text">hexo编码问题</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#title%E5%A4%84%E4%B8%8D%E8%83%BD%E4%BD%BF%E7%94%A8%E7%89%B9%E6%AE%8A%E5%AD%97%E7%AC%A6"><span class="nav-number">1.1.</span> <span class="nav-text">title处不能使用特殊字符</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%96%87%E7%AB%A0%E5%86%85%E4%B8%8D%E8%83%BD%E5%87%BA%E7%8E%B0%E6%88%96"><span class="nav-number">1.2.</span> <span class="nav-text">文章内不能出现{% %}或{{}}</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%9C%A8%E4%BB%A3%E7%A0%81%E6%AE%B5%E4%B8%AD%E4%BD%BF%E7%94%A8%E5%8F%8D%E5%BC%95%E5%8F%B7"><span class="nav-number">1.3.</span> <span class="nav-text">在代码段中使用反引号</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%B4%B4%E4%B8%80%E4%B8%AA%E8%87%AA%E5%B7%B1%E5%86%99%E7%9A%84hexo%E5%A4%B4%E9%83%A8%E8%87%AA%E5%8A%A8%E6%A0%BC%E5%BC%8F%E5%8C%96%E8%84%9A%E6%9C%AC"><span class="nav-number">1.4.</span> <span class="nav-text">贴一个自己写的hexo头部自动格式化脚本</span></a></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Z3ratu1" src="https://q2.qlogo.cn/headimg_dl?dst_uin=1207039417&spec=160">
+  <p class="site-author-name" itemprop="name">Z3ratu1</p>
+  <div class="site-description" itemprop="description">与其感慨路难行，不如现在出发</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">145</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">5</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">86</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+  <div class="beian"><a href="http://www.beian.miit.gov.cn/" rel="external nofollow noopener noreferrer" target="_blank">湘ICP备2020021580号 </a>
+      <img src="/./images/beian.png" style="display: inline-block;">
+  </div>
+
+<div class="copyright">
+  
+  &copy; 2019 – 
+  <span itemprop="copyrightYear">2022</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Z3ratu1</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="external nofollow noopener noreferrer" target="_blank">Hexo</a> & <a href="https://pisces.theme-next.org/" class="theme-link" rel="external nofollow noopener noreferrer" target="_blank">NexT.Pisces</a> 强力驱动
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+
+<script>
+NexT.utils.loadComments(document.querySelector('#valine-comments'), () => {
+  NexT.utils.getScript('https://cdn.jsdelivr.net/npm/valine@1.4.14/dist/Valine.min.js', () => {
+    var GUEST = ['nick', 'mail', 'link'];
+    var guest = 'nick,mail,link';
+    guest = guest.split(',').filter(item => {
+      return GUEST.includes(item);
+    });
+    new Valine({
+      el         : '#valine-comments',
+      verify     : false,
+      notify     : false,
+      appId      : '7H8kg0XdWO8IbhOcu4K1JaAT-gzGzoHsz',
+      appKey     : 'wPKQjkbVtvPaRR7gh2yjfLSi',
+      placeholder: "Just go go",
+      avatar     : 'mm',
+      meta       : guest,
+      pageSize   : '10' || 10,
+      visitor    : true,
+      lang       : '' || 'zh-cn',
+      path       : location.pathname,
+      recordIP   : false,
+      serverURLs : ''
+    });
+  }, window.Valine);
+});
+</script>
+
+</body>
+</html>

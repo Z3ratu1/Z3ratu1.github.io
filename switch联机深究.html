@@ -1,0 +1,579 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 6.0.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"blog.z3ratu1.cn","root":"/","scheme":"Pisces","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"always","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":true},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+  </script>
+
+  <meta name="description" content="Switch联机加速研究接上一篇，研究了switch设置中的代理设置和如何自己实现一个简陋的Switch全局代理 Switch代理情况及解决方案之前和大姐联机的时候wireshark抓到的包和其在switch上连接测试显示的ip是一致的 尝试直接使用clash代理端口转发的时候，发现在STUN第一步的时候就变成了switch直接连接STUN服务器，而不是把流量转发给代理，TCP的流量都全部转发给代">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Switch联机加速研究">
+<meta property="og:url" content="https://blog.z3ratu1.cn/switch%E8%81%94%E6%9C%BA%E6%B7%B1%E7%A9%B6.html">
+<meta property="og:site_name" content="Z3ratu1&#39;s blog">
+<meta property="og:description" content="Switch联机加速研究接上一篇，研究了switch设置中的代理设置和如何自己实现一个简陋的Switch全局代理 Switch代理情况及解决方案之前和大姐联机的时候wireshark抓到的包和其在switch上连接测试显示的ip是一致的 尝试直接使用clash代理端口转发的时候，发现在STUN第一步的时候就变成了switch直接连接STUN服务器，而不是把流量转发给代理，TCP的流量都全部转发给代">
+<meta property="og:locale">
+<meta property="article:published_time" content="2021-01-13T07:30:14.000Z">
+<meta property="article:modified_time" content="2022-02-12T09:09:25.884Z">
+<meta property="article:author" content="Z3ratu1">
+<meta property="article:tag" content="Switch">
+<meta property="article:tag" content="Clash TUN">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="https://blog.z3ratu1.cn/switch%E8%81%94%E6%9C%BA%E6%B7%B1%E7%A9%B6.html">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-Hans'
+  };
+</script>
+
+  <title>Switch联机加速研究 | Z3ratu1's blog</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+<link rel="stylesheet" href="/css/prism-tomorrow.css" type="text/css"></head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">Z3ratu1's blog</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">Welcome</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>关于</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+        <li class="menu-item menu-item-links">
+
+    <a href="/links/" rel="section"><i class="fa fa-link fa-fw"></i>友链</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off" placeholder="搜索..." spellcheck="false" type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+  <a href="https://github.com/Z3ratu1" class="github-corner" title="Follow me on GitHub" aria-label="Follow me on GitHub" rel="external nofollow noopener noreferrer" target="_blank"><svg width="80" height="80" viewbox="0 0 250 250" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"/><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"/><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"/></svg></a>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
+    <link itemprop="mainEntityOfPage" href="https://blog.z3ratu1.cn/switch%E8%81%94%E6%9C%BA%E6%B7%B1%E7%A9%B6.html">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="https://q2.qlogo.cn/headimg_dl?dst_uin=1207039417&spec=160">
+      <meta itemprop="name" content="Z3ratu1">
+      <meta itemprop="description" content="与其感慨路难行，不如现在出发">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Z3ratu1's blog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          Switch联机加速研究
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2021-01-13 15:30:14" itemprop="dateCreated datePublished" datetime="2021-01-13T15:30:14+08:00">2021-01-13</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2022-02-12 17:09:25" itemprop="dateModified" datetime="2022-02-12T17:09:25+08:00">2022-02-12</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E6%9D%82%E9%A1%B9/" itemprop="url" rel="index"><span itemprop="name">杂项</span></a>
+                </span>
+            </span>
+
+          
+            <span id="/switch%E8%81%94%E6%9C%BA%E6%B7%B1%E7%A9%B6.html" class="post-meta-item leancloud_visitors" data-flag-title="Switch联机加速研究" title="阅读次数">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span class="leancloud-visitors-count"></span>
+            </span>
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="far fa-comment"></i>
+      </span>
+      <span class="post-meta-item-text">Valine：</span>
+    
+    <a title="valine" href="/switch%E8%81%94%E6%9C%BA%E6%B7%B1%E7%A9%B6.html#valine-comments" itemprop="discussionUrl">
+      <span class="post-comments-count valine-comment-count" data-xid="/switch%E8%81%94%E6%9C%BA%E6%B7%B1%E7%A9%B6.html" itemprop="commentCount"></span>
+    </a>
+  </span>
+  
+  
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h1 id="Switch联机加速研究"><a href="#Switch联机加速研究" class="headerlink" title="Switch联机加速研究"></a>Switch联机加速研究</h1><p>接上一篇，研究了switch设置中的代理设置和如何自己实现一个简陋的Switch全局代理</p>
+<h2 id="Switch代理情况及解决方案"><a href="#Switch代理情况及解决方案" class="headerlink" title="Switch代理情况及解决方案"></a>Switch代理情况及解决方案</h2><p>之前和大姐联机的时候wireshark抓到的包和其在switch上连接测试显示的ip是一致的</p>
+<p>尝试直接使用clash代理端口转发的时候，发现在STUN第一步的时候就变成了switch直接连接STUN服务器，而不是把流量转发给代理，TCP的流量都全部转发给代理了，所以在连接测试这一步的时候switch所显示的IP就是代理ip，地理位置台湾。<br>而实际玩耍的时候根据流量包来看UDP流量都是直接和对端通信的，从和STUN服务器的通信状态中可以看见，我注册了一个153开头的ip上去，查一下，江苏南京联通，铁校园网，计划完全失败。</p>
+<p>抓包研究表明，Switch设置代理的时候只转发TCP流量，而UDP流量不走代理，正如设置代理选项那一栏上写的，<strong>某些软件并不支持代理</strong>，而实际的结果却是只有eshop走代理。。。</p>
+<h3 id="通过网关接管全流量"><a href="#通过网关接管全流量" class="headerlink" title="通过网关接管全流量"></a>通过网关接管全流量</h3><p>如果说Switch的代理设置不转发UDP的话，那之前挂加速器的大姐和我联机我就不可能看到我这边的通信清一色是和她的代理IP一致的，因此单纯的设置代理服务器肯定不能实现UDP代理，需要新的实现方案<br>下了个灵缇试了一下，看看他是怎么做的<br>灵缇的实现方案为手动设置switch网关，DNS，和代理服务器三个选项</p>
+<p>把手机设为switch网关，让所有流量到达手机之后让手机进行处理，即可强行接管UDP流量<br>因为发送流量都是看路由表的嘛，然后我把默认路由填到手机地址，那数据包第一跳就稳定到手机上，手机监听网卡，接管全流量，再选择Switch的流量进行转发，的确是个很棒的想法<br>之前也看到clash上说过使用TAP或TUN模式接管全流量，使得不走代理的软件也可以走代理</p>
+<h2 id="游戏联机通信情况"><a href="#游戏联机通信情况" class="headerlink" title="游戏联机通信情况"></a>游戏联机通信情况</h2><p>确实如榜一大哥曾经和我说的，Switch使用STUN服务器使玩家互相发现，若玩家之间NAT类型较好，通信质量佳，即可让其直接通信，如果双方通信质量不佳，比如存在D类NAT，则使用STUN服务器辅助传输数据。<br>没开加速器用D类玩玩了一把，整场通信下来发现我既在和房主UDP通信，时不时也会穿插一些和任天堂STUN服务器通信的TRUN包，wireshark中显示这个包的协议仍是STUN，不过后面的附加内容写的是TURN，是用来数据传输</p>
+<p>TURN协议，用来解决P2P问题的，具体看百科吧。</p>
+<h2 id="clash-TUN全局接管"><a href="#clash-TUN全局接管" class="headerlink" title="clash TUN全局接管"></a>clash TUN全局接管</h2><h3 id="2021-4-19-update"><a href="#2021-4-19-update" class="headerlink" title="2021.4.19 update"></a>2021.4.19 update</h3><p>该方案似乎在实践上有些问题，不知道是哪里出了问题，后来还发现了一个电脑开热点的解决方案，也能用，暂时<strong>弃置这个方案</strong>，用新的<br><a href="https://blog.z3ratu1.cn/Switch%E8%87%AA%E5%BB%BANAT%E4%BC%98%E5%8C%96%E6%8C%87%E5%8C%97.html">Switch自建NAT优化指北</a><br>现在这个方案只是留着记录一下当初研究的思路</p>
+<h3 id="2021-8-6-update"><a href="#2021-8-6-update" class="headerlink" title="2021.8.6 update"></a>2021.8.6 update</h3><p>最近又学了一点网络知识，突然想起来是不是因为windows机器没开路由转发所以连不上网？可以试一下把机器的路由转发开了再试试，不过现在switch不在手边并不能做测试了，文末参考链接中有启动windows10路由转发的教程</p>
+<p>后经测试，好像还是不行。。。后文内容将更改为对该方案失败原因的研究</p>
+<h3 id="2022-2-12-update"><a href="#2022-2-12-update" class="headerlink" title="2022.2.12 update"></a>2022.2.12 update</h3><p>看到了全新的解决方案，我开始对我当初的记忆产生怀疑，为什么当初我那个很奇怪的方案成功实现了？究竟是哪里发生了玄学的问题？遵循其他大佬的足迹走到了这步，发现了一个实现方案及其优雅，且并不繁琐，<strong>甚至不需要全局接管</strong>，我一直在寻找的其实就是这样子的一个软件。也许这个才是最为正确的思路。整合更新也同步到了上面提到的《Switch自建NAT优化指北》中，<strong>本文后续内容理论上作废</strong>，这个思路的出发点并没有太大的问题，但由于对网络的浅薄认识，并不能指出问题所在的点<br>后续仅可作为clash tun配置教程</p>
+<p>但若PC不开启路由转发功能，就算有机器将其作为网关，又能实现转发吗？我觉得似乎不行，这也就是switch显示DNS查询失败的原因<br>启动wireshark，可以发现switch实践上判断是否联网就是在连接WiFi的时候对几个任天堂域名进行DNS查询，而从wireshark的结果可以看出，在未开启路由转发的情况下，虽然确实拿到了请求包，但PC对此无动于衷，该数据包被简单的抛弃，当然就无法完成DNS查询，导致失败</p>
+<p>但是如果启动PC的路由功能呢?就会出现clash上行流量几百兆，CPU内存暴增，以及疯狂创建本地socket连接等情况。。。简单抓包发现clash自己那块网卡里面炸了。每秒上百兆的流量就是从那里面来的，目前猜测是可能路由转发导致了奇怪的类似环路的流量，然后原地反复跑导致的（原来的成功实验是因为某一版本的clash不会出现该问题吗？）</p>
+<p>至此，原网关流量接管计划完全失败</p>
+<h2 id="原文章部分"><a href="#原文章部分" class="headerlink" title="原文章部分"></a>原文章部分</h2><p>————————————–分割线———————————–</p>
+<h3 id="思路"><a href="#思路" class="headerlink" title="思路"></a>思路</h3><p>和灵缇实现类似，通过在物理机上新加一个网卡，接管全局流量（物理机的也全接管了，QQ什么的都接管了。。。）<br>然后在switch上设置网关DNS为物理机，这样子Switch的全部流量第一跳也会到达物理机上的Clash网卡，被接管，不走UDP的流量也就在我们的掌控之中啦<br>然后Clash网卡上的流量会按照Proxy里面的规则转发</p>
+<h3 id="实现"><a href="#实现" class="headerlink" title="实现"></a>实现</h3><p>直接搜Clash TUN有官方教程，下载dll安装服务，小地球变绿<br>配置mixin，让开关mixin来启动TUN，这里只有一个坑点，官方教程里的mixin样例少了一行。。。<br>导致缩进和内容都不对就不能正常启动</p>
+<pre class=" language-yaml"><code class="language-yaml"><span class="token key atrule">mixin</span><span class="token punctuation">:</span> <span class="token comment" spellcheck="true"># object</span>
+  <span class="token key atrule">dns</span><span class="token punctuation">:</span>
+    <span class="token key atrule">enable</span><span class="token punctuation">:</span> <span class="token boolean important">true</span>
+    <span class="token key atrule">enhanced-mode</span><span class="token punctuation">:</span> redir<span class="token punctuation">-</span>host
+    <span class="token key atrule">nameserver</span><span class="token punctuation">:</span>
+      <span class="token punctuation">-</span> 1.1.1.1 <span class="token comment" spellcheck="true"># 真实请求DNS，可多设置几个</span>
+      <span class="token punctuation">-</span> 119.29.29.29
+      <span class="token punctuation">-</span> 223.5.5.5
+  <span class="token key atrule">tun</span><span class="token punctuation">:</span>
+    <span class="token key atrule">enable</span><span class="token punctuation">:</span> <span class="token boolean important">true</span>
+    <span class="token key atrule">stack</span><span class="token punctuation">:</span> gvisor
+    <span class="token key atrule">dns-hijack</span><span class="token punctuation">:</span>
+      <span class="token punctuation">-</span> 198.18.0.2<span class="token punctuation">:</span><span class="token number">53</span>
+    <span class="token key atrule">macOS-auto-route</span><span class="token punctuation">:</span> <span class="token boolean important">true</span>
+    <span class="token key atrule">macOS-auto-detect-interface</span><span class="token punctuation">:</span> <span class="token boolean important">true </span><span class="token comment" spellcheck="true"># 自动检测出口网卡</span>
+</code></pre>
+<p>直接复制粘贴就行，具体选项可以去看文档<br>然后开关mixin开关就能看见自己多了一个Clash网卡<br>用route print命令查看本机路由表<br>TUN开启之前</p>
+<pre><code>IPv4 路由表
+===========================================================================
+活动路由:
+网络目标        网络掩码          网关       接口   跃点数
+          0.0.0.0          0.0.0.0     10.203.128.1   10.203.236.138     45
+     10.203.128.0    255.255.128.0            在链路上    10.203.236.138    301
+   10.203.236.138  255.255.255.255            在链路上    10.203.236.138    301
+   10.203.255.255  255.255.255.255            在链路上    10.203.236.138    301
+    ......
+</code></pre>
+<p>网关为校园网网关，接口为本机WiFi网卡的IP地址<br>TUN开启后</p>
+<pre><code>IPv4 路由表
+===========================================================================
+活动路由:
+网络目标        网络掩码          网关       接口   跃点数
+          0.0.0.0          0.0.0.0     10.203.128.1   10.203.236.138     40
+          0.0.0.0          0.0.0.0            在链路上        198.18.0.1      0
+     10.203.128.0    255.255.128.0            在链路上    10.203.236.138    296
+   10.203.236.138  255.255.255.255            在链路上    10.203.236.138    296
+   10.203.255.255  255.255.255.255            在链路上    10.203.236.138    296
+    .....
+</code></pre>
+<p>显然可以看见，新增了一条指向198.18.0.1的路由，而这个IP正是clash创建的Clash网卡的IP，也就是说本机的所有流量都会按照这个路由表转发到对应的网卡上，再进行下一步处理<br>这时clash就已经接管了全部流量了，然后所有流量都会按照proxy的规则转发</p>
+<h3 id="愚蠢的思考"><a href="#愚蠢的思考" class="headerlink" title="愚蠢的思考"></a>愚蠢的思考</h3><p>之前一直在想为什么网关能直接设置，两个主机间通信应该是需要端口的，而这里我并不设置端口监听，也没让switch选择通信端口，虽然我感觉这个通信的确是属于网络层而不在传输层，但我一瞬间没能想通通信是怎么完成的。。。<br>然后还问了下学长。。。。他突然和我说监听网卡，我才想起来网卡才是机器接受信息的最原始接口，端口只不过是区别不同进程间的通信罢了。</p>
+<h3 id="小小的困难"><a href="#小小的困难" class="headerlink" title="小小的困难"></a>小小的困难</h3><p>因为我之前的设置是不开系统代理的，Clash就作为一个简单的HTTP代理用，所以Proxy直接选的GLOBAL，浏览器上设置规则，而现在开了TUN之后还走全局代理未免显得有些愚蠢，那就得去看看Rule是怎么写的<br>当然是抄的机场写好的规则，但是规则分到最后涵盖的不全面，除去几个知名网站剩下的都是其他流量。<br>如果想给switch加速的话，其他流量都走代理是最好的，不然你也不知道你的联机对端是谁，也不知道任地狱服务器是啥，好像能设置检测switch的Mac地址然后对来源匹配的进行转发，不过太麻烦了懒得研究了。。。但是这样子其实绝大多数软件的流量肯定是不在知名网站的匹配范围内的，这样子就也会有很多不必要的流量被转发，就很烦，比如QQ就会顺理成章的变成在香港登录。。<br>如果其他流量不走代理，switch加速计划直接破产。。。</p>
+<p>最终暂时决定，维持不变，就直接全局代理，在玩游戏的时候再开ClashTUN就是，不玩游戏就关掉<br>有时间再研究一下怎么配置规则</p>
+<h2 id="update"><a href="#update" class="headerlink" title="update"></a>update</h2><p>考试考完回家躺尸一个星期后更新，期间被出云大佬联系，学习了一些新名词。不过本废物暂时还不想动手去学，稍微调了一下clash的DNS设置就拉倒了，目前似乎能在体感上稍微感觉到好了一点点（大概），并不知道实际上好在哪</p>
+<p>大佬和我说游戏流量遇到的一大问题在于UDP流量容易被运营商丢弃，俗称“断流”，所以还要在外面再套一层TCP。总觉得好麻烦哦。。<br>clash关于TUN模式的DNS设置的话官方文档好像有点问题，官方mixin里面dns配置的是redir-host但是TUN里面选了一个dns-hijack，这个只在fake-ip模式中有用，如果本身的配置文件就有fake-ip的配置的话，可以只添加TUN来完成流量接管</p>
+<h2 id="相关链接"><a href="#相关链接" class="headerlink" title="相关链接"></a>相关链接</h2><p><a target="_blank" rel="external nofollow noopener noreferrer" href="https://github.com/Dreamacro/clash/issues/971">请教TUN模式下UDP转发</a><br><a target="_blank" rel="external nofollow noopener noreferrer" href="https://github.com/Fndroid/clash_for_windows_pkg/issues/1500">TUN模式开启后无法接管系统流量</a><br><a target="_blank" rel="external nofollow noopener noreferrer" href="https://blog.csdn.net/weixin_44647835/article/details/109616688">Windows 10上开启路由转发及添加路由</a><br><a target="_blank" rel="external nofollow noopener noreferrer" href="https://zankyo.cc/2845">Nintendo Switch：<del>联机加速方案的研究与折腾</del></a><br><a target="_blank" rel="external nofollow noopener noreferrer" href="https://zankyo.cc/3389/">Nintendo Switch：<del>使用Pcap2Socks给主机联机加速</del></a></p>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/Switch/" rel="tag"># Switch</a>
+              <a href="/tags/Clash-TUN/" rel="tag"># Clash TUN</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/NAT%E4%B8%8ESwitch%E8%81%94%E6%9C%BA.html" rel="prev" title="NAT与Switch联机加速">
+      <i class="fa fa-chevron-left"></i> NAT与Switch联机加速
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/%E5%9F%9F%E6%B8%97%E9%80%8F%E5%AD%A6%E4%B9%A0.html" rel="next" title="域渗透学习">
+      域渗透学习 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+    <div class="comments" id="valine-comments"></div>
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#Switch%E8%81%94%E6%9C%BA%E5%8A%A0%E9%80%9F%E7%A0%94%E7%A9%B6"><span class="nav-number">1.</span> <span class="nav-text">Switch联机加速研究</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#Switch%E4%BB%A3%E7%90%86%E6%83%85%E5%86%B5%E5%8F%8A%E8%A7%A3%E5%86%B3%E6%96%B9%E6%A1%88"><span class="nav-number">1.1.</span> <span class="nav-text">Switch代理情况及解决方案</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E9%80%9A%E8%BF%87%E7%BD%91%E5%85%B3%E6%8E%A5%E7%AE%A1%E5%85%A8%E6%B5%81%E9%87%8F"><span class="nav-number">1.1.1.</span> <span class="nav-text">通过网关接管全流量</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%B8%B8%E6%88%8F%E8%81%94%E6%9C%BA%E9%80%9A%E4%BF%A1%E6%83%85%E5%86%B5"><span class="nav-number">1.2.</span> <span class="nav-text">游戏联机通信情况</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#clash-TUN%E5%85%A8%E5%B1%80%E6%8E%A5%E7%AE%A1"><span class="nav-number">1.3.</span> <span class="nav-text">clash TUN全局接管</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#2021-4-19-update"><span class="nav-number">1.3.1.</span> <span class="nav-text">2021.4.19 update</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2021-8-6-update"><span class="nav-number">1.3.2.</span> <span class="nav-text">2021.8.6 update</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2022-2-12-update"><span class="nav-number">1.3.3.</span> <span class="nav-text">2022.2.12 update</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%8E%9F%E6%96%87%E7%AB%A0%E9%83%A8%E5%88%86"><span class="nav-number">1.4.</span> <span class="nav-text">原文章部分</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%80%9D%E8%B7%AF"><span class="nav-number">1.4.1.</span> <span class="nav-text">思路</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%AE%9E%E7%8E%B0"><span class="nav-number">1.4.2.</span> <span class="nav-text">实现</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%84%9A%E8%A0%A2%E7%9A%84%E6%80%9D%E8%80%83"><span class="nav-number">1.4.3.</span> <span class="nav-text">愚蠢的思考</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%B0%8F%E5%B0%8F%E7%9A%84%E5%9B%B0%E9%9A%BE"><span class="nav-number">1.4.4.</span> <span class="nav-text">小小的困难</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#update"><span class="nav-number">1.5.</span> <span class="nav-text">update</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%9B%B8%E5%85%B3%E9%93%BE%E6%8E%A5"><span class="nav-number">1.6.</span> <span class="nav-text">相关链接</span></a></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Z3ratu1" src="https://q2.qlogo.cn/headimg_dl?dst_uin=1207039417&spec=160">
+  <p class="site-author-name" itemprop="name">Z3ratu1</p>
+  <div class="site-description" itemprop="description">与其感慨路难行，不如现在出发</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">145</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">5</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">86</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+  <div class="beian"><a href="http://www.beian.miit.gov.cn/" rel="external nofollow noopener noreferrer" target="_blank">湘ICP备2020021580号 </a>
+      <img src="/./images/beian.png" style="display: inline-block;">
+  </div>
+
+<div class="copyright">
+  
+  &copy; 2019 – 
+  <span itemprop="copyrightYear">2022</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Z3ratu1</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="external nofollow noopener noreferrer" target="_blank">Hexo</a> & <a href="https://pisces.theme-next.org/" class="theme-link" rel="external nofollow noopener noreferrer" target="_blank">NexT.Pisces</a> 强力驱动
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+
+<script>
+NexT.utils.loadComments(document.querySelector('#valine-comments'), () => {
+  NexT.utils.getScript('https://cdn.jsdelivr.net/npm/valine@1.4.14/dist/Valine.min.js', () => {
+    var GUEST = ['nick', 'mail', 'link'];
+    var guest = 'nick,mail,link';
+    guest = guest.split(',').filter(item => {
+      return GUEST.includes(item);
+    });
+    new Valine({
+      el         : '#valine-comments',
+      verify     : false,
+      notify     : false,
+      appId      : '7H8kg0XdWO8IbhOcu4K1JaAT-gzGzoHsz',
+      appKey     : 'wPKQjkbVtvPaRR7gh2yjfLSi',
+      placeholder: "Just go go",
+      avatar     : 'mm',
+      meta       : guest,
+      pageSize   : '10' || 10,
+      visitor    : true,
+      lang       : '' || 'zh-cn',
+      path       : location.pathname,
+      recordIP   : false,
+      serverURLs : ''
+    });
+  }, window.Valine);
+});
+</script>
+
+</body>
+</html>

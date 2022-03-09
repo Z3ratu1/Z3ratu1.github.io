@@ -1,0 +1,641 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 6.0.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"blog.z3ratu1.cn","root":"/","scheme":"Pisces","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"always","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":true},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+  </script>
+
+  <meta name="description" content="[XCTF]华为第二场这个星期好像华为三连。。。今天这场选星期三刚好完全满课，下午就没机会看了，中午花了一个小时做了一个web签到呜呜，估计下午肯定还有一堆新题 babyphp给了一个莫名其妙的扫描扫描器界面，可选ip端口和超时时间，随便怎么输都是回显Port scan is deperacted and try to find the source code! &#x2F;&#x2F; Google is your">
+<meta property="og:type" content="article">
+<meta property="og:title" content="[XCTF]华为第二场">
+<meta property="og:url" content="https://blog.z3ratu1.cn/[XCTF]%E5%8D%8E%E4%B8%BA%E7%AC%AC%E4%BA%8C%E5%9C%BA.html">
+<meta property="og:site_name" content="Z3ratu1&#39;s blog">
+<meta property="og:description" content="[XCTF]华为第二场这个星期好像华为三连。。。今天这场选星期三刚好完全满课，下午就没机会看了，中午花了一个小时做了一个web签到呜呜，估计下午肯定还有一堆新题 babyphp给了一个莫名其妙的扫描扫描器界面，可选ip端口和超时时间，随便怎么输都是回显Port scan is deperacted and try to find the source code! &#x2F;&#x2F; Google is your">
+<meta property="og:locale">
+<meta property="article:published_time" content="2020-12-23T03:02:52.000Z">
+<meta property="article:modified_time" content="2020-12-25T03:26:36.492Z">
+<meta property="article:author" content="Z3ratu1">
+<meta property="article:tag" content="ssrf">
+<meta property="article:tag" content="dns rebinding">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="https://blog.z3ratu1.cn/[XCTF]%E5%8D%8E%E4%B8%BA%E7%AC%AC%E4%BA%8C%E5%9C%BA.html">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-Hans'
+  };
+</script>
+
+  <title>[XCTF]华为第二场 | Z3ratu1's blog</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+<link rel="stylesheet" href="/css/prism-tomorrow.css" type="text/css"></head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">Z3ratu1's blog</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">Welcome</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>关于</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+        <li class="menu-item menu-item-links">
+
+    <a href="/links/" rel="section"><i class="fa fa-link fa-fw"></i>友链</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off" placeholder="搜索..." spellcheck="false" type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+  <a href="https://github.com/Z3ratu1" class="github-corner" title="Follow me on GitHub" aria-label="Follow me on GitHub" rel="external nofollow noopener noreferrer" target="_blank"><svg width="80" height="80" viewbox="0 0 250 250" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"/><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"/><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"/></svg></a>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
+    <link itemprop="mainEntityOfPage" href="https://blog.z3ratu1.cn/[XCTF]%E5%8D%8E%E4%B8%BA%E7%AC%AC%E4%BA%8C%E5%9C%BA.html">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="https://q2.qlogo.cn/headimg_dl?dst_uin=1207039417&spec=160">
+      <meta itemprop="name" content="Z3ratu1">
+      <meta itemprop="description" content="与其感慨路难行，不如现在出发">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Z3ratu1's blog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          [XCTF]华为第二场
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2020-12-23 11:02:52" itemprop="dateCreated datePublished" datetime="2020-12-23T11:02:52+08:00">2020-12-23</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2020-12-25 11:26:36" itemprop="dateModified" datetime="2020-12-25T11:26:36+08:00">2020-12-25</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E5%88%B7%E9%A2%98%E8%AE%B0%E5%BD%95/" itemprop="url" rel="index"><span itemprop="name">刷题记录</span></a>
+                </span>
+            </span>
+
+          
+            <span id="/%5BXCTF%5D%E5%8D%8E%E4%B8%BA%E7%AC%AC%E4%BA%8C%E5%9C%BA.html" class="post-meta-item leancloud_visitors" data-flag-title="[XCTF]华为第二场" title="阅读次数">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span class="leancloud-visitors-count"></span>
+            </span>
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="far fa-comment"></i>
+      </span>
+      <span class="post-meta-item-text">Valine：</span>
+    
+    <a title="valine" href="/%5BXCTF%5D%E5%8D%8E%E4%B8%BA%E7%AC%AC%E4%BA%8C%E5%9C%BA.html#valine-comments" itemprop="discussionUrl">
+      <span class="post-comments-count valine-comment-count" data-xid="/%5BXCTF%5D%E5%8D%8E%E4%B8%BA%E7%AC%AC%E4%BA%8C%E5%9C%BA.html" itemprop="commentCount"></span>
+    </a>
+  </span>
+  
+  
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h1 id="XCTF-华为第二场"><a href="#XCTF-华为第二场" class="headerlink" title="[XCTF]华为第二场"></a>[XCTF]华为第二场</h1><p>这个星期好像华为三连。。。今天这场选星期三刚好完全满课，下午就没机会看了，中午花了一个小时做了一个web签到呜呜，估计下午肯定还有一堆新题</p>
+<h2 id="babyphp"><a href="#babyphp" class="headerlink" title="babyphp"></a>babyphp</h2><p>给了一个莫名其妙的扫描扫描器界面，可选ip端口和超时时间，随便怎么输都是回显<code>Port scan is deperacted and try to find the source code! // Google is your best friend</code>让人不知道想表达什么，意思是要谷歌出源码？<br>我反正是没懂什么情况，然后无敌老国王直接从GitHub给我丢了一份源码<br><strong>直接把HTML复制粘贴在GitHub上一搜就能搜到对应的代码</strong><br>太牛逼了</p>
+<pre class=" language-php"><code class="language-php"><span class="token delimiter">&lt;?php</span>
+<span class="token function">set_time_limit</span><span class="token punctuation">(</span><span class="token number">0</span><span class="token punctuation">)</span><span class="token punctuation">;</span><span class="token comment" spellcheck="true">//设置程序执行时间</span>
+<span class="token function">ob_implicit_flush</span><span class="token punctuation">(</span>True<span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token function">ob_end_flush</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token variable">$url</span> <span class="token operator">=</span> <span class="token function">isset</span><span class="token punctuation">(</span><span class="token variable">$_REQUEST</span><span class="token punctuation">[</span><span class="token string">'url'</span><span class="token punctuation">]</span><span class="token punctuation">)</span><span class="token operator">?</span><span class="token variable">$_REQUEST</span><span class="token punctuation">[</span><span class="token string">'url'</span><span class="token punctuation">]</span><span class="token punctuation">:</span><span class="token keyword">null</span><span class="token punctuation">;</span>
+
+<span class="token comment" spellcheck="true">/*端口扫描代码*/</span>
+<span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span>这段就是被出题人魔改去掉的部分
+<span class="token comment" spellcheck="true">/*内网代理代码*/</span>
+
+<span class="token keyword">function</span> <span class="token function">getHtmlContext</span><span class="token punctuation">(</span><span class="token variable">$url</span><span class="token punctuation">)</span><span class="token punctuation">{</span>
+    <span class="token variable">$ch</span> <span class="token operator">=</span> <span class="token function">curl_init</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token function">curl_setopt</span><span class="token punctuation">(</span><span class="token variable">$ch</span><span class="token punctuation">,</span> <span class="token constant">CURLOPT_URL</span><span class="token punctuation">,</span> <span class="token variable">$url</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token function">curl_setopt</span><span class="token punctuation">(</span><span class="token variable">$ch</span><span class="token punctuation">,</span> <span class="token constant">CURLOPT_HEADER</span><span class="token punctuation">,</span> <span class="token constant">TRUE</span><span class="token punctuation">)</span><span class="token punctuation">;</span>    <span class="token comment" spellcheck="true">//表示需要response header</span>
+    <span class="token function">curl_setopt</span><span class="token punctuation">(</span><span class="token variable">$ch</span><span class="token punctuation">,</span> <span class="token constant">CURLOPT_NOBODY</span><span class="token punctuation">,</span> <span class="token constant">FALSE</span><span class="token punctuation">)</span><span class="token punctuation">;</span> <span class="token comment" spellcheck="true">//表示需要response body</span>
+    <span class="token function">curl_setopt</span><span class="token punctuation">(</span><span class="token variable">$ch</span><span class="token punctuation">,</span> <span class="token constant">CURLOPT_RETURNTRANSFER</span><span class="token punctuation">,</span> <span class="token constant">TRUE</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token function">curl_setopt</span><span class="token punctuation">(</span><span class="token variable">$ch</span><span class="token punctuation">,</span> <span class="token constant">CURLOPT_TIMEOUT</span><span class="token punctuation">,</span> <span class="token number">120</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token variable">$result</span> <span class="token operator">=</span> <span class="token function">curl_exec</span><span class="token punctuation">(</span><span class="token variable">$ch</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token keyword">global</span> <span class="token variable">$header</span><span class="token punctuation">;</span>
+    <span class="token keyword">if</span><span class="token punctuation">(</span><span class="token variable">$result</span><span class="token punctuation">)</span><span class="token punctuation">{</span>
+        <span class="token variable">$headerSize</span> <span class="token operator">=</span> <span class="token function">curl_getinfo</span><span class="token punctuation">(</span><span class="token variable">$ch</span><span class="token punctuation">,</span> <span class="token constant">CURLINFO_HEADER_SIZE</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token variable">$header</span> <span class="token operator">=</span> <span class="token function">explode</span><span class="token punctuation">(</span><span class="token string">"\r\n"</span><span class="token punctuation">,</span><span class="token function">substr</span><span class="token punctuation">(</span><span class="token variable">$result</span><span class="token punctuation">,</span> <span class="token number">0</span><span class="token punctuation">,</span> <span class="token variable">$headerSize</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token variable">$body</span> <span class="token operator">=</span> <span class="token function">substr</span><span class="token punctuation">(</span><span class="token variable">$result</span><span class="token punctuation">,</span> <span class="token variable">$headerSize</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+    <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token function">curl_getinfo</span><span class="token punctuation">(</span><span class="token variable">$ch</span><span class="token punctuation">,</span> <span class="token constant">CURLINFO_HTTP_CODE</span><span class="token punctuation">)</span> <span class="token operator">==</span> <span class="token string">'200'</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token keyword">return</span> <span class="token variable">$body</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+    <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token function">curl_getinfo</span><span class="token punctuation">(</span><span class="token variable">$ch</span><span class="token punctuation">,</span> <span class="token constant">CURLINFO_HTTP_CODE</span><span class="token punctuation">)</span> <span class="token operator">==</span> <span class="token string">'302'</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token variable">$location</span> <span class="token operator">=</span> <span class="token function">getHeader</span><span class="token punctuation">(</span><span class="token string">"Location"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token keyword">if</span><span class="token punctuation">(</span><span class="token function">strpos</span><span class="token punctuation">(</span><span class="token function">getHeader</span><span class="token punctuation">(</span><span class="token string">"Location"</span><span class="token punctuation">)</span><span class="token punctuation">,</span>'http<span class="token punctuation">:</span><span class="token comment" spellcheck="true">//') == false){</span>
+            <span class="token variable">$location</span> <span class="token operator">=</span> <span class="token function">getHost</span><span class="token punctuation">(</span><span class="token variable">$url</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token variable">$location</span><span class="token punctuation">;</span>
+        <span class="token punctuation">}</span>
+        <span class="token keyword">return</span> <span class="token function">getHtmlContext</span><span class="token punctuation">(</span><span class="token variable">$location</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+    <span class="token keyword">return</span> <span class="token keyword">NULL</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
+
+<span class="token keyword">function</span> <span class="token function">getHost</span><span class="token punctuation">(</span><span class="token variable">$url</span><span class="token punctuation">)</span><span class="token punctuation">{</span>
+    <span class="token function">preg_match</span><span class="token punctuation">(</span><span class="token string">"/^(http:\/\/)?([^\/]+)/i"</span><span class="token punctuation">,</span><span class="token variable">$url</span><span class="token punctuation">,</span> <span class="token variable">$matches</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token keyword">return</span> <span class="token variable">$matches</span><span class="token punctuation">[</span><span class="token number">0</span><span class="token punctuation">]</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
+<span class="token keyword">function</span> <span class="token function">getCss</span><span class="token punctuation">(</span><span class="token variable">$host</span><span class="token punctuation">,</span><span class="token variable">$html</span><span class="token punctuation">)</span><span class="token punctuation">{</span>
+    <span class="token function">preg_match_all</span><span class="token punctuation">(</span><span class="token string">"/&lt;link[\s\S]*?href=['\"](.*?[.]css.*?)[\"'][\s\S]*?>/i"</span><span class="token punctuation">,</span><span class="token variable">$html</span><span class="token punctuation">,</span> <span class="token variable">$matches</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token keyword">foreach</span><span class="token punctuation">(</span><span class="token variable">$matches</span><span class="token punctuation">[</span><span class="token number">1</span><span class="token punctuation">]</span> <span class="token keyword">as</span> <span class="token variable">$v</span><span class="token punctuation">)</span><span class="token punctuation">{</span>
+        <span class="token variable">$cssurl</span> <span class="token operator">=</span> <span class="token variable">$v</span><span class="token punctuation">;</span>
+        <span class="token keyword">if</span><span class="token punctuation">(</span><span class="token function">strpos</span><span class="token punctuation">(</span><span class="token variable">$v</span><span class="token punctuation">,</span>'http<span class="token punctuation">:</span><span class="token comment" spellcheck="true">//') == false){</span>
+            <span class="token variable">$cssurl</span> <span class="token operator">=</span> <span class="token variable">$host</span><span class="token punctuation">.</span><span class="token string">"/"</span><span class="token punctuation">.</span><span class="token variable">$v</span><span class="token punctuation">;</span>
+        <span class="token punctuation">}</span>
+        <span class="token variable">$csshtml</span> <span class="token operator">=</span> <span class="token string">"&lt;style>"</span><span class="token punctuation">.</span><span class="token function">file_get_contents</span><span class="token punctuation">(</span><span class="token variable">$cssurl</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token string">"&lt;/style>"</span><span class="token punctuation">;</span>
+        <span class="token variable">$html</span> <span class="token punctuation">.</span><span class="token operator">=</span> <span class="token variable">$csshtml</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+    <span class="token keyword">return</span> <span class="token variable">$html</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
+
+<span class="token keyword">if</span><span class="token punctuation">(</span><span class="token variable">$url</span> <span class="token operator">!=</span> <span class="token keyword">null</span><span class="token punctuation">)</span><span class="token punctuation">{</span>
+
+    <span class="token variable">$host</span> <span class="token operator">=</span> <span class="token function">getHost</span><span class="token punctuation">(</span><span class="token variable">$url</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token keyword">echo</span> <span class="token function">getCss</span><span class="token punctuation">(</span><span class="token variable">$host</span><span class="token punctuation">,</span><span class="token function">getHtmlContext</span><span class="token punctuation">(</span><span class="token variable">$url</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
+<span class="token delimiter">?></span>
+</code></pre>
+<p>getHtmlContext就是一个能追踪重定向的函数(但是实际使用的时候发现好像不是很能追踪。。。vps上设置了http跳转https，然后好像没追踪过去，我感觉是重定向要求是http那里出问题了)<br>getHost就获取域名，限制了http协议<br>getCss，不知道为什么扫描器要抓css。。。但是这是一个ssrf的点，preg_match_all会匹配子正则表达式，就是小括号里的正则表达式<br>matches[0]存整个正则表达式匹配到的项，matches[1]及往后的项保存子组的匹配<br>所以这里的matches[1]就是所以满足<code>(.*?[.]css.*?)</code>这么个正则表达式的匹配项<br>然后检测一下matches[1]里面有没有http:&#x2F;&#x2F; 这个字符串，没得就把前面拼一个host，最后直接进行一个file_get_contents<br>其实蛮简单的，绕过.css和http:&#x2F;&#x2F; 这两个限制就行了，经典Linux跳目录之术<br>在自己vps上放一个符合getCss正则的消息就行，href填如下消息即可<br><code>.css/http://../../../../../var/www/html/index.php</code><br>读根目录flag没读到，然后试了一波flag.php，读到flag</p>
+<h2 id="云存储"><a href="#云存储" class="headerlink" title="云存储"></a>云存储</h2><p>晚上再来看题，一共就两个web，后面出的这个是nodejs的题<br>给了源码，有上传下载功能，感觉毫无用处，和ssrf功能，本地访问flag路由时返回flag<br>用的req.ip，理论上和PHP的remote_address应该是一个东西<br>ssrf功能就是给个链接就去访问，但是需要过一个超级check</p>
+<pre class=" language-javascript"><code class="language-javascript"><span class="token keyword">const</span> check <span class="token operator">=</span> <span class="token keyword">function</span><span class="token punctuation">(</span>s<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token operator">!</span><span class="token keyword">typeof</span> <span class="token punctuation">(</span>s<span class="token punctuation">)</span> <span class="token operator">==</span> <span class="token string">'string'</span> <span class="token operator">||</span> <span class="token operator">!</span>s<span class="token punctuation">.</span><span class="token function">match</span><span class="token punctuation">(</span><span class="token regex">/^http\:\/\//</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
+        <span class="token keyword">return</span> <span class="token boolean">false</span>
+
+    <span class="token keyword">let</span> blacklist <span class="token operator">=</span> <span class="token punctuation">[</span><span class="token string">'wrong'</span><span class="token punctuation">,</span> <span class="token string">'127.'</span><span class="token punctuation">,</span> <span class="token string">'local'</span><span class="token punctuation">,</span> <span class="token string">'@'</span><span class="token punctuation">,</span> <span class="token string">'flag'</span><span class="token punctuation">]</span>
+    <span class="token keyword">let</span> host<span class="token punctuation">,</span> port<span class="token punctuation">,</span> dns<span class="token punctuation">;</span>
+
+    host <span class="token operator">=</span> url<span class="token punctuation">.</span><span class="token function">parse</span><span class="token punctuation">(</span>s<span class="token punctuation">)</span><span class="token punctuation">.</span>hostname
+    port <span class="token operator">=</span> url<span class="token punctuation">.</span><span class="token function">parse</span><span class="token punctuation">(</span>s<span class="token punctuation">)</span><span class="token punctuation">.</span>port
+    <span class="token keyword">if</span> <span class="token punctuation">(</span> host <span class="token operator">==</span> <span class="token keyword">null</span> <span class="token operator">||</span> port <span class="token operator">==</span> <span class="token keyword">null</span><span class="token punctuation">)</span>
+        <span class="token keyword">return</span> <span class="token boolean">false</span>
+
+    dns <span class="token operator">=</span> <span class="token function">dnslookup</span><span class="token punctuation">(</span>host<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token keyword">if</span> <span class="token punctuation">(</span> ip<span class="token punctuation">.</span><span class="token function">isPrivate</span><span class="token punctuation">(</span>dns<span class="token punctuation">)</span> <span class="token operator">||</span> dns <span class="token operator">!=</span> docker<span class="token punctuation">.</span>ip <span class="token operator">||</span> <span class="token punctuation">[</span><span class="token string">'80'</span><span class="token punctuation">,</span><span class="token string">'8080'</span><span class="token punctuation">]</span><span class="token punctuation">.</span><span class="token function">includes</span><span class="token punctuation">(</span>port<span class="token punctuation">)</span> <span class="token punctuation">)</span>
+        <span class="token keyword">return</span> <span class="token boolean">false</span>
+
+    <span class="token keyword">for</span> <span class="token punctuation">(</span><span class="token keyword">let</span> i <span class="token operator">=</span> <span class="token number">0</span><span class="token punctuation">;</span> i <span class="token operator">&lt;</span> blacklist<span class="token punctuation">.</span>length<span class="token punctuation">;</span> i<span class="token operator">++</span><span class="token punctuation">)</span>
+    <span class="token punctuation">{</span>
+        <span class="token keyword">let</span> regex <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">RegExp</span><span class="token punctuation">(</span>blacklist<span class="token punctuation">[</span>i<span class="token punctuation">]</span><span class="token punctuation">,</span> <span class="token string">'i'</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token keyword">try</span> <span class="token punctuation">{</span>
+            <span class="token keyword">if</span> <span class="token punctuation">(</span>ip<span class="token punctuation">.</span><span class="token function">fromLong</span><span class="token punctuation">(</span>s<span class="token punctuation">.</span><span class="token function">replace</span><span class="token punctuation">(</span><span class="token regex">/[^\d]/g</span><span class="token punctuation">,</span><span class="token string">''</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">substr</span><span class="token punctuation">(</span><span class="token number">0</span><span class="token punctuation">,</span><span class="token number">10</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">match</span><span class="token punctuation">(</span>regex<span class="token punctuation">)</span><span class="token punctuation">)</span>
+                <span class="token keyword">return</span> <span class="token boolean">false</span>
+        <span class="token punctuation">}</span> <span class="token keyword">catch</span> <span class="token punctuation">(</span><span class="token class-name">e</span><span class="token punctuation">)</span> <span class="token punctuation">{</span><span class="token punctuation">}</span>
+        <span class="token keyword">if</span> <span class="token punctuation">(</span>s<span class="token punctuation">.</span><span class="token function">match</span><span class="token punctuation">(</span>regex<span class="token punctuation">)</span><span class="token punctuation">)</span>
+            <span class="token keyword">return</span> <span class="token boolean">false</span>
+    <span class="token punctuation">}</span>
+    <span class="token keyword">return</span> <span class="token boolean">true</span>
+<span class="token punctuation">}</span>
+</code></pre>
+<p>dnslookup函数就是去访问一个特定接口查询域名对应的ip，然后需要dns查询出的结果不是私有地址，且dns查询ip等于本机公网ip，端口不是80和8080<br>最后过一个正则，提交链接中不能有黑名单中的字符</p>
+<h3 id="DNS-rebinding"><a href="#DNS-rebinding" class="headerlink" title="DNS rebinding"></a>DNS rebinding</h3><p>学到的新操作<br>DNS重定向，用于ssrf的waf绕过，也能bypass同源策略</p>
+<h4 id="waf绕过"><a href="#waf绕过" class="headerlink" title="waf绕过"></a>waf绕过</h4><p>就本题中，进行DNS查询时，除了返回域名对应的ip，还会返回一个TTL，表明这条记录的有效时间，如果我们在check时域名对应的ip为符合要求的公网ip，而check结束后请求的ip却变回内网ip，就能进行绕过</p>
+<p>我们令TTL&#x3D;0，查询结果就变成一次性的，即可在check时得到的DNS记录在真实发送时无效，再查一次结果获得的是127.0.0.1完成利用</p>
+<h4 id="同源策略bypass"><a href="#同源策略bypass" class="headerlink" title="同源策略bypass"></a>同源策略bypass</h4><p>看bendawang师傅的博客<br><a target="_blank" rel="external nofollow noopener noreferrer" href="http://bendawang.site/2017/05/31/%E5%85%B3%E4%BA%8EDNS-rebinding%E7%9A%84%E6%80%BB%E7%BB%93/">关于DNS-rebinding的总结</a><br>思路就是钓鱼网站为<a target="_blank" rel="external nofollow noopener noreferrer" href="http://www.xxx.com/">www.xxx.com</a> ，其中有一个对<a target="_blank" rel="external nofollow noopener noreferrer" href="http://www.xxx.com/source">www.xxx.com/source</a> 的请求，再把这个请求转发出来。当用户访问<a target="_blank" rel="external nofollow noopener noreferrer" href="http://www.xxx.com/">www.xxx.com</a> 时，查询DNS获取一个正常的公网地址，而将TTL设为很短的时间，然后整一个setTimeout，在一段时间后请求<a target="_blank" rel="external nofollow noopener noreferrer" href="http://www.xxx.com/source">www.xxx.com/source</a> 的内容，但是此时DNS返回的<a target="_blank" rel="external nofollow noopener noreferrer" href="http://www.xxx.com/">www.xxx.com</a> 的ip地址却是127.0.0.1，这样子就能将用户本地source下的内容转发出来<br>但是浏览器觉得这只是<a target="_blank" rel="external nofollow noopener noreferrer" href="http://www.xxx.com/">www.xxx.com</a> 在操作自身域的资源，因此允许进行转发，并未违背同源策略，完成利用</p>
+<h4 id="DNS-rebinding实现"><a href="#DNS-rebinding实现" class="headerlink" title="DNS rebinding实现"></a>DNS rebinding实现</h4><p>1.设置两个域名相同的A记录，每次查询随机返回一个，撞大运（没有实践过，且国内域名TTL最短为十分钟，感觉需要奇怪的国外服务TTL可以调到0才有机会）<br>2.在线工具，可以实现DNS重绑定，不过也是撞大运 <a target="_blank" rel="external nofollow noopener noreferrer" href="https://lock.cmpxchg8b.com/rebinder.html">https://lock.cmpxchg8b.com/rebinder.html</a><br>3.自建DNS服务器，具体内容也是参考的bendawang师傅的博客</p>
+<h3 id="端口绕过"><a href="#端口绕过" class="headerlink" title="端口绕过"></a>端口绕过</h3><p>url.parse(s).port在不填端口号的时候解析出来是null<br>include比较是字符串比较，端口号用0080绕过即可</p>
+<h3 id="路由绕过"><a href="#路由绕过" class="headerlink" title="路由绕过"></a>路由绕过</h3><p>不会，感觉express路由不支持编码，Unicode url编码都试过了都不行，fuzz特殊字符的话直接爆炸<br>app.py里嵌套了两层中间件，但是用起来的感觉是只有一层，不知道是不是有什么trick</p>
+<pre class=" language-javascript"><code class="language-javascript">app<span class="token punctuation">.</span><span class="token function">use</span><span class="token punctuation">(</span>express<span class="token punctuation">.</span><span class="token function">urlencoded</span><span class="token punctuation">(</span><span class="token punctuation">{</span>extended<span class="token punctuation">:</span> <span class="token boolean">false</span><span class="token punctuation">}</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+app<span class="token punctuation">.</span><span class="token function">use</span><span class="token punctuation">(</span>express<span class="token punctuation">.</span><span class="token function">json</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+app<span class="token punctuation">.</span><span class="token function">use</span><span class="token punctuation">(</span>bodyParser<span class="token punctuation">.</span><span class="token function">urlencoded</span><span class="token punctuation">(</span><span class="token punctuation">{</span> extended<span class="token punctuation">:</span> <span class="token boolean">false</span> <span class="token punctuation">}</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+app<span class="token punctuation">.</span><span class="token function">use</span><span class="token punctuation">(</span>bodyParser<span class="token punctuation">.</span><span class="token function">json</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+</code></pre>
+<p>二次编码的结果是只解码了一次，request.get发出去的请求不会自己解码，路由收到url编码也不会解码，过不去呜呜<br>等wp了</p>
+<h4 id="update"><a href="#update" class="headerlink" title="update"></a>update</h4><p>问了下rmb神仙，他又把这个题秒了<br>request.get跟踪302，和python的requests.get差不多，总觉得以前好像做过python重定向的题，这次居然没想到，呜呜<br>只需要第一次查询ip解析到docker本身，第二次访问解析到我的vps，再在我的vps上放一个重定向就可以了，可以另开端口启动服务，也就不需要端口绕过了<br>重定向一开始我傻不拉几的用js实现，写一个windows.location….<br>后来发现并不对，js抓取这个内容并不能解析这个重定向，以前用这个重定向打通了好像是因为后台有一个bot用无头浏览器，可以模仿浏览器行为就重定向成功了<br>所以应该直接在请求头里面重定向，<code>&lt;?php Header(&quot;Location:http://127.0.0.1/flag&quot; ); ?&gt;</code><br>我太垃圾了呜呜</p>
+<h3 id="REMOTE-ADDR"><a href="#REMOTE-ADDR" class="headerlink" title="REMOTE_ADDR"></a>REMOTE_ADDR</h3><p>其实是一个非常愚蠢的问题。。。<br>昨天我一直在想为什么有<code>ip.isPrivate(dns) || dns != docker.ip</code>这么一个过滤要求dns查询的ip结果不是127.0.0.1且得等于自己的公网ip，我就很困惑。。既然已经是自己访问自己了，为什么要ban掉127.0.0.1却允许从公网访问自己，难道从公网自己访问自己REMOTE_ADDR就不是127.0.0.1吗</p>
+<p>答案还真是就会变，所以虽然docker是把80端口映射到了8010端口，但是通过公网ip加8010端口的访问的REMOTE_ADDR就是公网ip，所以需要本地访问80端口才能打通，呜呜，我太垃圾了</p>
+<p>因为请求非自身的ip肯定是要去问路由器的，就算是自己访问自己也需要跳到路由器上再跳回来，这样子访问的远端ip就变成了自己的公网ip(内网也一样)，而不是127.0.0.1<br>因此想remote_addr是127.0.0.1，就必须是直接显式的访问127.0.0.1，这样子才不会去走路由，直接访问自己</p>
+<h2 id="自建DNS"><a href="#自建DNS" class="headerlink" title="自建DNS"></a>自建DNS</h2><p>注册到systemctl，快速重启，稳定不需要撞大运(虽然话是这么说，但是用起来感觉好像还是是没有想象中百发百中的稳定性)<br>写一个mydns.service放到&#x2F;etc&#x2F;systemd&#x2F;system目录下，这个是Ubuntu的路径，网上找的大部分usr目录下的那个是centOS的</p>
+<pre><code>[Unit]
+Description=mydns
+
+[Service]
+Type=simple
+ExecStart=/root/dns_rebinding/dns_rebinding.py
+ExecReload=/root/dns_rebinding/dns_rebinding.py
+ExecStop=/bin/kill -s TERM $MAINPID
+
+[Install]
+WantedBy=multi-user.targetroot
+</code></pre>
+<p>写一个简单的服务功能就行，定义start restart 和 stop都执行什么命令就行<br>dns_rebinding.py就直接抄bendawang师傅博客里的脚本就行，python2运行<br>加内联注释<code>#!/usr/bin/env python2</code>改成755可执行<br>systemctl enable mydns.service<br>systemctl start mydns.service即可</p>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/ssrf/" rel="tag"># ssrf</a>
+              <a href="/tags/dns-rebinding/" rel="tag"># dns rebinding</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/%E5%9E%83%E5%9C%BE%E5%AD%A6%E6%A0%A1%E7%9A%84%E5%A5%87%E6%80%AA%E8%A7%84%E5%88%99.html" rel="prev" title="垃圾学校的奇怪网络规则">
+      <i class="fa fa-chevron-left"></i> 垃圾学校的奇怪网络规则
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/%5BXCTF%5D%E5%8D%8E%E4%B8%BA%E7%AC%AC%E4%B8%89%E5%9C%BA.html" rel="next" title="[XCTF]华为第三场">
+      [XCTF]华为第三场 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+    <div class="comments" id="valine-comments"></div>
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#XCTF-%E5%8D%8E%E4%B8%BA%E7%AC%AC%E4%BA%8C%E5%9C%BA"><span class="nav-number">1.</span> <span class="nav-text">[XCTF]华为第二场</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#babyphp"><span class="nav-number">1.1.</span> <span class="nav-text">babyphp</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BA%91%E5%AD%98%E5%82%A8"><span class="nav-number">1.2.</span> <span class="nav-text">云存储</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#DNS-rebinding"><span class="nav-number">1.2.1.</span> <span class="nav-text">DNS rebinding</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#waf%E7%BB%95%E8%BF%87"><span class="nav-number">1.2.1.1.</span> <span class="nav-text">waf绕过</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%90%8C%E6%BA%90%E7%AD%96%E7%95%A5bypass"><span class="nav-number">1.2.1.2.</span> <span class="nav-text">同源策略bypass</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#DNS-rebinding%E5%AE%9E%E7%8E%B0"><span class="nav-number">1.2.1.3.</span> <span class="nav-text">DNS rebinding实现</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%AB%AF%E5%8F%A3%E7%BB%95%E8%BF%87"><span class="nav-number">1.2.2.</span> <span class="nav-text">端口绕过</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%B7%AF%E7%94%B1%E7%BB%95%E8%BF%87"><span class="nav-number">1.2.3.</span> <span class="nav-text">路由绕过</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#update"><span class="nav-number">1.2.3.1.</span> <span class="nav-text">update</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#REMOTE-ADDR"><span class="nav-number">1.2.4.</span> <span class="nav-text">REMOTE_ADDR</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%87%AA%E5%BB%BADNS"><span class="nav-number">1.3.</span> <span class="nav-text">自建DNS</span></a></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Z3ratu1" src="https://q2.qlogo.cn/headimg_dl?dst_uin=1207039417&spec=160">
+  <p class="site-author-name" itemprop="name">Z3ratu1</p>
+  <div class="site-description" itemprop="description">与其感慨路难行，不如现在出发</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">145</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">5</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">86</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+  <div class="beian"><a href="http://www.beian.miit.gov.cn/" rel="external nofollow noopener noreferrer" target="_blank">湘ICP备2020021580号 </a>
+      <img src="/./images/beian.png" style="display: inline-block;">
+  </div>
+
+<div class="copyright">
+  
+  &copy; 2019 – 
+  <span itemprop="copyrightYear">2022</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Z3ratu1</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="external nofollow noopener noreferrer" target="_blank">Hexo</a> & <a href="https://pisces.theme-next.org/" class="theme-link" rel="external nofollow noopener noreferrer" target="_blank">NexT.Pisces</a> 强力驱动
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+
+<script>
+NexT.utils.loadComments(document.querySelector('#valine-comments'), () => {
+  NexT.utils.getScript('https://cdn.jsdelivr.net/npm/valine@1.4.14/dist/Valine.min.js', () => {
+    var GUEST = ['nick', 'mail', 'link'];
+    var guest = 'nick,mail,link';
+    guest = guest.split(',').filter(item => {
+      return GUEST.includes(item);
+    });
+    new Valine({
+      el         : '#valine-comments',
+      verify     : false,
+      notify     : false,
+      appId      : '7H8kg0XdWO8IbhOcu4K1JaAT-gzGzoHsz',
+      appKey     : 'wPKQjkbVtvPaRR7gh2yjfLSi',
+      placeholder: "Just go go",
+      avatar     : 'mm',
+      meta       : guest,
+      pageSize   : '10' || 10,
+      visitor    : true,
+      lang       : '' || 'zh-cn',
+      path       : location.pathname,
+      recordIP   : false,
+      serverURLs : ''
+    });
+  }, window.Valine);
+});
+</script>
+
+</body>
+</html>

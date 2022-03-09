@@ -1,0 +1,531 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 6.0.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"blog.z3ratu1.cn","root":"/","scheme":"Pisces","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"always","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":true},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+  </script>
+
+  <meta name="description" content="HTTPS代理原理摸了两天的鱼，今天晚上找了一晚上资料把这段补上HTTPS系列学习的根本原因都是因为最近在学习代理怎么用，然后对在代理下运行的HTTPS安全性产生了一定的困惑，加之以burp能明文抓取HTTPS包，更加困惑了 今天最后翻到了一个国外超级大哥文章的翻译，感觉是众多资料中讲的最清楚的了在一切开始之前，先回顾一下https链接建立到TLS握手之间的操作 正常的HTTPS链接建立过程再摸一">
+<meta property="og:type" content="article">
+<meta property="og:title" content="HTTPS代理原理">
+<meta property="og:url" content="https://blog.z3ratu1.cn/HTTPS%E4%BB%A3%E7%90%86%E5%8E%9F%E7%90%86.html">
+<meta property="og:site_name" content="Z3ratu1&#39;s blog">
+<meta property="og:description" content="HTTPS代理原理摸了两天的鱼，今天晚上找了一晚上资料把这段补上HTTPS系列学习的根本原因都是因为最近在学习代理怎么用，然后对在代理下运行的HTTPS安全性产生了一定的困惑，加之以burp能明文抓取HTTPS包，更加困惑了 今天最后翻到了一个国外超级大哥文章的翻译，感觉是众多资料中讲的最清楚的了在一切开始之前，先回顾一下https链接建立到TLS握手之间的操作 正常的HTTPS链接建立过程再摸一">
+<meta property="og:locale">
+<meta property="og:image" content="https://blog.z3ratu1.cn/images/HTTPS%E4%BB%A3%E7%90%86%E5%8E%9F%E7%90%86/https.png">
+<meta property="article:published_time" content="2020-11-22T12:58:38.000Z">
+<meta property="article:modified_time" content="2021-01-06T07:20:05.889Z">
+<meta property="article:author" content="Z3ratu1">
+<meta property="article:tag" content="https">
+<meta property="article:tag" content="proxy">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://blog.z3ratu1.cn/images/HTTPS%E4%BB%A3%E7%90%86%E5%8E%9F%E7%90%86/https.png">
+
+<link rel="canonical" href="https://blog.z3ratu1.cn/HTTPS%E4%BB%A3%E7%90%86%E5%8E%9F%E7%90%86.html">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-Hans'
+  };
+</script>
+
+  <title>HTTPS代理原理 | Z3ratu1's blog</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+<link rel="stylesheet" href="/css/prism-tomorrow.css" type="text/css"></head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">Z3ratu1's blog</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">Welcome</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>关于</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+        <li class="menu-item menu-item-links">
+
+    <a href="/links/" rel="section"><i class="fa fa-link fa-fw"></i>友链</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off" placeholder="搜索..." spellcheck="false" type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+  <a href="https://github.com/Z3ratu1" class="github-corner" title="Follow me on GitHub" aria-label="Follow me on GitHub" rel="external nofollow noopener noreferrer" target="_blank"><svg width="80" height="80" viewbox="0 0 250 250" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"/><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"/><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"/></svg></a>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
+    <link itemprop="mainEntityOfPage" href="https://blog.z3ratu1.cn/HTTPS%E4%BB%A3%E7%90%86%E5%8E%9F%E7%90%86.html">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="https://q2.qlogo.cn/headimg_dl?dst_uin=1207039417&spec=160">
+      <meta itemprop="name" content="Z3ratu1">
+      <meta itemprop="description" content="与其感慨路难行，不如现在出发">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Z3ratu1's blog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          HTTPS代理原理
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2020-11-22 20:58:38" itemprop="dateCreated datePublished" datetime="2020-11-22T20:58:38+08:00">2020-11-22</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2021-01-06 15:20:05" itemprop="dateModified" datetime="2021-01-06T15:20:05+08:00">2021-01-06</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E7%AC%94%E8%AE%B0/" itemprop="url" rel="index"><span itemprop="name">笔记</span></a>
+                </span>
+            </span>
+
+          
+            <span id="/HTTPS%E4%BB%A3%E7%90%86%E5%8E%9F%E7%90%86.html" class="post-meta-item leancloud_visitors" data-flag-title="HTTPS代理原理" title="阅读次数">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span class="leancloud-visitors-count"></span>
+            </span>
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="far fa-comment"></i>
+      </span>
+      <span class="post-meta-item-text">Valine：</span>
+    
+    <a title="valine" href="/HTTPS%E4%BB%A3%E7%90%86%E5%8E%9F%E7%90%86.html#valine-comments" itemprop="discussionUrl">
+      <span class="post-comments-count valine-comment-count" data-xid="/HTTPS%E4%BB%A3%E7%90%86%E5%8E%9F%E7%90%86.html" itemprop="commentCount"></span>
+    </a>
+  </span>
+  
+  
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h1 id="HTTPS代理原理"><a href="#HTTPS代理原理" class="headerlink" title="HTTPS代理原理"></a>HTTPS代理原理</h1><p>摸了两天的鱼，今天晚上找了一晚上资料把这段补上<br>HTTPS系列学习的根本原因都是因为最近在学习代理怎么用，然后对在代理下运行的HTTPS安全性产生了一定的困惑，加之以burp能明文抓取HTTPS包，更加困惑了</p>
+<p>今天最后翻到了一个国外超级大哥文章的翻译，感觉是众多资料中讲的最清楚的了<br>在一切开始之前，先回顾一下https链接建立到TLS握手之间的操作</p>
+<h2 id="正常的HTTPS链接建立过程"><a href="#正常的HTTPS链接建立过程" class="headerlink" title="正常的HTTPS链接建立过程"></a>正常的HTTPS链接建立过程</h2><p>再摸一个图出来<br><img src="/images/HTTPS%E4%BB%A3%E7%90%86%E5%8E%9F%E7%90%86/https.png" alt="HTTPS链接建立"><br>可以看到，大家还是老老实实先来一个TCP三次握手，先把TCP层面的链接建立起来，然后开始进行TLS的握手，client hello，server hello+证书，随机数验证blblbl，走上上篇文章讲到的HTTPS认证过程的老路，这里重复一次的意义就是引入这个TCP链接建立过程，方便后面讲</p>
+<p>然后我们来看代理的两大类别，转发代理和TLS终止代理</p>
+<h2 id="转发代理"><a href="#转发代理" class="headerlink" title="转发代理"></a>转发代理</h2><p>由于TLS在TCP层之上建立起了一个安全层，那么代理就需要在安全层之下来实现流量的转发</p>
+<h3 id="CONNECT请求"><a href="#CONNECT请求" class="headerlink" title="CONNECT请求"></a>CONNECT请求</h3><p>使用代理都会发送这个请求，用于告诉代理服务器在客户端和目标站点之间建立一条隧道，当代理服务器和目标站点TCP握手成功之后，就回复给客户端一个200 connection established，就算是开了一个通道<br>在这之后，转发代理就简单的进行流量的转发，服务器和客户端之间的TLS握手对代理服务器而言是加密过的，代理服务器并不能解析，只是做一个简单的转发，代理服务器感觉上就像是一跳特殊的路由一样<br>（之前愚蠢的思考了一下为什么CONNECT明文告诉代理请求某些域名怎么不会被ban，才想起来原来代理自己还要加一层vmss加密过gfw）<br>一般来说代理都是转发代理，毕竟代理也拿不到服务器的私钥，怎么解密加密流量呢</p>
+<p><strong>不过转发代理也是看得见HTTP流量的，所以大家还是小心一点哦</strong></p>
+<h2 id="TLS终止代理"><a href="#TLS终止代理" class="headerlink" title="TLS终止代理"></a>TLS终止代理</h2><p>也可以称为中间人代理，典型代表就是burp suite，这篇文章出现的原因一部分就是因为我一直在想burp为什么导入证书之后能抓HTTPS包</p>
+<p>显然，从名字上就可以看出，burp完成了一次中间人攻击，不过并不是偷了服务器的密钥，而是给我们签一个假证书<br>我们导入了一个burp的根证书，burp就以此为基础，通过我们CONNECT请求中请求的域名去来临时签一个假证书和客户端通信。也就是说，<strong>burp同时在客户端和服务器之间开启了两个HTTPS连接</strong>，TLS加密在burp这里就终止了，故它也成为TLS终止代理<br>我们和持有对应域名的假证书的burp进行通信，而burp由于持有假证书的私钥，当然能和我们的加解密来的有来有回，所以我们才能看见https的明文信息<br>burp代理一个HTTPS连接的过程是这样的：<br>1.和客户端建立TCP连接<br>2.客户端发送CONNECT请求<br>3.直接回一个200 established<br>4.客户端开始进行TLS握手，client hello<br>5.burp用假证书server hello，完成TLS握手<br>6.客户端开始请求目标站点（此时建立的就是和burp的https连接，burp完全看得见HTTPS内容）<br>7.burp临时和目标站点TCP握手<br>8.burp和目标站点完成TLS握手<br>9.开始数据传输</p>
+<p>这里有一个小细节在于burp不先和服务器TCP握手，一直要到客户端请求了数据才临时从头开始建立连接</p>
+<h3 id="SNI代理"><a href="#SNI代理" class="headerlink" title="SNI代理"></a>SNI代理</h3><p>Server Name Indication 服务器名称指示<br>SNI出现的原因是，客户端建立完TCP连接后，会先进行TLS握手，再发送HTTP请求，而实际上服务器只有在获取HTTP请求之后才知道客户端访问的是哪个域名，那么如果访问的服务器存在多个域名，而这些域名对应了多个证书，服务器就不知道该回哪一个证书了<br>所以为了解决这个问题，需要在TLS握手的client hello里面加一个SNI字段<br>如上是SNI内容<br>但是我没懂这个过程和代理有什么关系<br>SNI代理也是一种TLS阻断代理，这是已知结论<br>rmb神仙说是读SNI之后访问对应的目标网站<br>也有一说就是一个自建DNS一样的服务，把对应域名全部映射到SNI服务器上，SNI服务器再去转发流量<br>目测情形应该也是自签发假证书，和服务器开一个连接和客户端开一个连接，仅能代理https<br>没有特别懂这个代理的意义是什么</p>
+<h2 id="代理感知型客户端"><a href="#代理感知型客户端" class="headerlink" title="代理感知型客户端"></a>代理感知型客户端</h2><p>即proxy-aware clients，难道没有在一瞬间考虑过为什么浏览器会发一个CONNECT请求给代理服务器？我怎么知道我有没有在用代理？你还真说对了，像浏览器这类软件还真就知道自己有没有在用代理，在感知到自己在用代理的时候就会发CONNECT请求来告诉代理访问谁</p>
+<p>至此，一切都解释的通了，我又完全懂了（除了SNI）</p>
+<h2 id="参考文章"><a href="#参考文章" class="headerlink" title="参考文章"></a>参考文章</h2><p>全靠这篇看懂的好吧，一篇解决所有烦恼<br><a target="_blank" rel="external nofollow noopener noreferrer" href="https://www.anquanke.com/post/id/86168">HTTP(s)代理是如何工作的？</a><br>这篇讲SNI的没太看懂，上面这篇的最后也有提到SNI，并且认为这是一个TLS终止代理？<br><a target="_blank" rel="external nofollow noopener noreferrer" href="https://blog.ttionya.com/article-1851.html">SNI proxy</a></p>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/https/" rel="tag"># https</a>
+              <a href="/tags/proxy/" rel="tag"># proxy</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/HTTPS%E8%AF%81%E4%B9%A6%E5%90%8A%E9%94%80.html" rel="prev" title="HTTPS证书吊销">
+      <i class="fa fa-chevron-left"></i> HTTPS证书吊销
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/%5B%E7%A5%A5%E4%BA%91%E6%9D%AF2020%5D%E4%BA%91%E6%AF%94%E8%B5%9B%E8%AE%B0%E5%BD%95.html" rel="next" title="[祥云杯2020]云比赛记录">
+      [祥云杯2020]云比赛记录 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+    <div class="comments" id="valine-comments"></div>
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#HTTPS%E4%BB%A3%E7%90%86%E5%8E%9F%E7%90%86"><span class="nav-number">1.</span> <span class="nav-text">HTTPS代理原理</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%AD%A3%E5%B8%B8%E7%9A%84HTTPS%E9%93%BE%E6%8E%A5%E5%BB%BA%E7%AB%8B%E8%BF%87%E7%A8%8B"><span class="nav-number">1.1.</span> <span class="nav-text">正常的HTTPS链接建立过程</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%BD%AC%E5%8F%91%E4%BB%A3%E7%90%86"><span class="nav-number">1.2.</span> <span class="nav-text">转发代理</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#CONNECT%E8%AF%B7%E6%B1%82"><span class="nav-number">1.2.1.</span> <span class="nav-text">CONNECT请求</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#TLS%E7%BB%88%E6%AD%A2%E4%BB%A3%E7%90%86"><span class="nav-number">1.3.</span> <span class="nav-text">TLS终止代理</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#SNI%E4%BB%A3%E7%90%86"><span class="nav-number">1.3.1.</span> <span class="nav-text">SNI代理</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BB%A3%E7%90%86%E6%84%9F%E7%9F%A5%E5%9E%8B%E5%AE%A2%E6%88%B7%E7%AB%AF"><span class="nav-number">1.4.</span> <span class="nav-text">代理感知型客户端</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%8F%82%E8%80%83%E6%96%87%E7%AB%A0"><span class="nav-number">1.5.</span> <span class="nav-text">参考文章</span></a></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Z3ratu1" src="https://q2.qlogo.cn/headimg_dl?dst_uin=1207039417&spec=160">
+  <p class="site-author-name" itemprop="name">Z3ratu1</p>
+  <div class="site-description" itemprop="description">与其感慨路难行，不如现在出发</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">145</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">5</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">86</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+  <div class="beian"><a href="http://www.beian.miit.gov.cn/" rel="external nofollow noopener noreferrer" target="_blank">湘ICP备2020021580号 </a>
+      <img src="/./images/beian.png" style="display: inline-block;">
+  </div>
+
+<div class="copyright">
+  
+  &copy; 2019 – 
+  <span itemprop="copyrightYear">2022</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Z3ratu1</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="external nofollow noopener noreferrer" target="_blank">Hexo</a> & <a href="https://pisces.theme-next.org/" class="theme-link" rel="external nofollow noopener noreferrer" target="_blank">NexT.Pisces</a> 强力驱动
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+
+<script>
+NexT.utils.loadComments(document.querySelector('#valine-comments'), () => {
+  NexT.utils.getScript('https://cdn.jsdelivr.net/npm/valine@1.4.14/dist/Valine.min.js', () => {
+    var GUEST = ['nick', 'mail', 'link'];
+    var guest = 'nick,mail,link';
+    guest = guest.split(',').filter(item => {
+      return GUEST.includes(item);
+    });
+    new Valine({
+      el         : '#valine-comments',
+      verify     : false,
+      notify     : false,
+      appId      : '7H8kg0XdWO8IbhOcu4K1JaAT-gzGzoHsz',
+      appKey     : 'wPKQjkbVtvPaRR7gh2yjfLSi',
+      placeholder: "Just go go",
+      avatar     : 'mm',
+      meta       : guest,
+      pageSize   : '10' || 10,
+      visitor    : true,
+      lang       : '' || 'zh-cn',
+      path       : location.pathname,
+      recordIP   : false,
+      serverURLs : ''
+    });
+  }, window.Valine);
+});
+</script>
+
+</body>
+</html>

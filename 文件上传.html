@@ -1,0 +1,590 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 6.0.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"blog.z3ratu1.cn","root":"/","scheme":"Pisces","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"always","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":true},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+  </script>
+
+  <meta name="description" content="文件上传全文以upload-lab为例展开  关于上传的具体步骤首先在本地前端可能会经过一次js代码的检验，上传到服务器之后会先存在一个后缀为.tmp的临时文件，之后服务器会对上传的文件进行判断，最终使用move_uploaded_file函数将文件移动至标准路径，要注意使用该函数时路径由后台代码控制，最终储存的文件名不一定等于原文件名">
+<meta property="og:type" content="article">
+<meta property="og:title" content="文件上传">
+<meta property="og:url" content="https://blog.z3ratu1.cn/%E6%96%87%E4%BB%B6%E4%B8%8A%E4%BC%A0.html">
+<meta property="og:site_name" content="Z3ratu1&#39;s blog">
+<meta property="og:description" content="文件上传全文以upload-lab为例展开  关于上传的具体步骤首先在本地前端可能会经过一次js代码的检验，上传到服务器之后会先存在一个后缀为.tmp的临时文件，之后服务器会对上传的文件进行判断，最终使用move_uploaded_file函数将文件移动至标准路径，要注意使用该函数时路径由后台代码控制，最终储存的文件名不一定等于原文件名">
+<meta property="og:locale">
+<meta property="og:image" content="https://xzfile.aliyuncs.com/media/upload/picture/20180712092548-81b98800-8572-1.png">
+<meta property="article:published_time" content="2019-09-27T09:59:00.000Z">
+<meta property="article:modified_time" content="2020-07-12T08:33:48.515Z">
+<meta property="article:author" content="Z3ratu1">
+<meta property="article:tag" content="php">
+<meta property="article:tag" content="文件上传">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://xzfile.aliyuncs.com/media/upload/picture/20180712092548-81b98800-8572-1.png">
+
+<link rel="canonical" href="https://blog.z3ratu1.cn/%E6%96%87%E4%BB%B6%E4%B8%8A%E4%BC%A0.html">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-Hans'
+  };
+</script>
+
+  <title>文件上传 | Z3ratu1's blog</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+<link rel="stylesheet" href="/css/prism-tomorrow.css" type="text/css"></head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">Z3ratu1's blog</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">Welcome</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>关于</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+        <li class="menu-item menu-item-links">
+
+    <a href="/links/" rel="section"><i class="fa fa-link fa-fw"></i>友链</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off" placeholder="搜索..." spellcheck="false" type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+  <a href="https://github.com/Z3ratu1" class="github-corner" title="Follow me on GitHub" aria-label="Follow me on GitHub" rel="external nofollow noopener noreferrer" target="_blank"><svg width="80" height="80" viewbox="0 0 250 250" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"/><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"/><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"/></svg></a>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
+    <link itemprop="mainEntityOfPage" href="https://blog.z3ratu1.cn/%E6%96%87%E4%BB%B6%E4%B8%8A%E4%BC%A0.html">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="https://q2.qlogo.cn/headimg_dl?dst_uin=1207039417&spec=160">
+      <meta itemprop="name" content="Z3ratu1">
+      <meta itemprop="description" content="与其感慨路难行，不如现在出发">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Z3ratu1's blog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          文件上传
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2019-09-27 17:59:00" itemprop="dateCreated datePublished" datetime="2019-09-27T17:59:00+08:00">2019-09-27</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2020-07-12 16:33:48" itemprop="dateModified" datetime="2020-07-12T16:33:48+08:00">2020-07-12</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E7%AC%94%E8%AE%B0/" itemprop="url" rel="index"><span itemprop="name">笔记</span></a>
+                </span>
+            </span>
+
+          
+            <span id="/%E6%96%87%E4%BB%B6%E4%B8%8A%E4%BC%A0.html" class="post-meta-item leancloud_visitors" data-flag-title="文件上传" title="阅读次数">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span class="leancloud-visitors-count"></span>
+            </span>
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="far fa-comment"></i>
+      </span>
+      <span class="post-meta-item-text">Valine：</span>
+    
+    <a title="valine" href="/%E6%96%87%E4%BB%B6%E4%B8%8A%E4%BC%A0.html#valine-comments" itemprop="discussionUrl">
+      <span class="post-comments-count valine-comment-count" data-xid="/%E6%96%87%E4%BB%B6%E4%B8%8A%E4%BC%A0.html" itemprop="commentCount"></span>
+    </a>
+  </span>
+  
+  
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h1 id="文件上传"><a href="#文件上传" class="headerlink" title="文件上传"></a>文件上传</h1><p>全文以upload-lab为例展开</p>
+<p><img src="https://xzfile.aliyuncs.com/media/upload/picture/20180712092548-81b98800-8572-1.png" alt="upload-lab导图"></p>
+<h2 id="关于上传的具体步骤"><a href="#关于上传的具体步骤" class="headerlink" title="关于上传的具体步骤"></a>关于上传的具体步骤</h2><p>首先在本地前端可能会经过一次js代码的检验，上传到服务器之后会先存在一个后缀为<code>.tmp</code>的临时文件，之后服务器会对上传的文件进行判断，最终使用<code>move_uploaded_file</code>函数将文件移动至标准路径，要注意使用该函数时路径由后台代码控制，最终储存的文件名不一定等于原文件名</p>
+<h2 id="客户端的检验"><a href="#客户端的检验" class="headerlink" title="客户端的检验"></a>客户端的检验</h2><p>使用本地js代码进行判断，是非常弱的检验手段。<br>不仅可以在本地看见源码，还可以手动把源码直接修改掉，也可通过抓包修改的形式避开判断。</p>
+<h3 id="客户端的捣乱"><a href="#客户端的捣乱" class="headerlink" title="客户端的捣乱"></a>客户端的捣乱</h3><p>有的时候上传的那个按钮属性会被设置为disable，查下代码手动改一改才能开始上传</p>
+<h2 id="服务器端的检验"><a href="#服务器端的检验" class="headerlink" title="服务器端的检验"></a>服务器端的检验</h2><p>在服务器端进行检验，该过程发生在数据包发送以后</p>
+<h3 id="黑名单"><a href="#黑名单" class="headerlink" title="黑名单"></a>黑名单</h3><p>禁止带有特定后缀名的文件上传，如.php，.asp等等</p>
+<p>这里需要注意的是我们如果要直接访问我们上传的后门，其后缀必须得是php及其衍生格式才能被解析。<br>upload-labs中的后缀处理步骤为：</p>
+<ol>
+<li>去除文件名两端的空格</li>
+<li>去除后缀最后的.</li>
+<li>以最后一个点为标志位截取文件后缀</li>
+<li>转为小写</li>
+<li>去除后缀最后的::$DATA</li>
+<li>修剪两端空格</li>
+<li>将修剪后的文件名与黑名单进行对比</li>
+</ol>
+<h4 id="常见的PHP衍生格式"><a href="#常见的PHP衍生格式" class="headerlink" title="常见的PHP衍生格式"></a>常见的PHP衍生格式</h4><p>以upload-labs的第三关为例，这里过滤了.asp .aspx .php .jsp文件，我们可以使用PHP的衍生格式文件进行上传绕过。</p>
+<ul>
+<li>.php2</li>
+<li>.php3</li>
+<li>.php4</li>
+<li>.php5</li>
+<li>.php7</li>
+<li>.phtml</li>
+</ul>
+<h4 id="大小写后缀绕过"><a href="#大小写后缀绕过" class="headerlink" title="大小写后缀绕过"></a>大小写后缀绕过</h4><p>有的题目检测的不是很上心，大小写混搭即可绕过</p>
+<h4 id="增加空格绕过"><a href="#增加空格绕过" class="headerlink" title="增加空格绕过"></a>增加空格绕过</h4><p>有的检测是通过in_array函数实现的，并且是检测我们的后缀是否处于禁用列表之中，这时如果没有去除文件名后缀的空格，就可以完成绕过，如<code>.php    </code><br>注：upload-labs的第六关的显示源码和真正的源码不符，显示的源码中仍有trim函数，坑死我了</p>
+<h4 id="Windows特性绕过"><a href="#Windows特性绕过" class="headerlink" title="Windows特性绕过"></a>Windows特性绕过</h4><p>只有在服务器是Windows系统下才有用的操作</p>
+<h5 id="加-进行绕过"><a href="#加-进行绕过" class="headerlink" title="加.进行绕过"></a>加.进行绕过</h5><p>发生在没有对文件删除.的检测中，由于Windows的特性，会自动去除文件后缀名中最后的点，这样我们的加点后缀在检测中就是以<code>.php.</code>的形式进行检测，但上传之后.会被去除又变回<code>.php</code></p>
+<h5 id="加-DATA绕过检测"><a href="#加-DATA绕过检测" class="headerlink" title="加::$DATA绕过检测"></a>加::$DATA绕过检测</h5><p>php在window的时候如果文件名+”::$DATA”会把::$DATA之后的数据当成文件流处理,不会检测后缀名.且保持”::$DATA”之前的文件名，完成绕过</p>
+<h5 id="使用原文件名作为新文件名"><a href="#使用原文件名作为新文件名" class="headerlink" title="使用原文件名作为新文件名"></a>使用原文件名作为新文件名</h5><p>以upload-labs第九题为例<br>一般来说服务器会将检测后的文件名作为上传文件的文件名进行保存，但是某些情况下会将原文件名进行保存，这时我们就可以利用这点构造进行绕过<br>例:<code>webshell.php. .</code>，通过Windows服务器特性即可绕过检测并可被解析，但如果储存的是处理过的文件名，此处被截取到的文件后缀将为空。</p>
+<h4 id="被禁用后缀名替换为空"><a href="#被禁用后缀名替换为空" class="headerlink" title="被禁用后缀名替换为空"></a>被禁用后缀名替换为空</h4><p>同样的套路常见于SQL注入，双写绕过即可<br>例：<code>.phphpp</code></p>
+<h4 id="禁止-lt"><a href="#禁止-lt" class="headerlink" title="禁止&lt;?"></a>禁止&lt;?</h4><p>可以使用<script language="php">  xxxxx  </script>这样的标签来进行定义，等价于<?php xxxx ?><br>该标准已在php7中禁用</p>
+<h3 id="白名单"><a href="#白名单" class="headerlink" title="白名单"></a>白名单</h3><p>只允许上传某些文件，如.jpg，.png等等，这时如何使我们上传的后门被解析是一个重点问题</p>
+<h4 id="htaccess重定向"><a href="#htaccess重定向" class="headerlink" title=".htaccess重定向"></a>.htaccess重定向</h4><p>是Apache的配置文件，.htaccess文件规定了当前目录的应用规则，不同的目录下可以拥有不同的.htaccess文件规定不同的规则<br>这里用它将所有文件都解析为php文件就可以用上传后缀为.jpg的shell了<br>将所有文件解析为php的代码如下<br><code>SetHandler application/x-httpd-php</code><br>可后接文件后缀名使特定文件被解析为php<br>上传该内容的.htaccess文件即可以上传.jpg后缀的文件作为后门了<br>启用.htaccess文件需要在Apache配置中修改允许重写<br>.htaccess构成的后门：<a target="_blank" rel="external nofollow noopener noreferrer" href="http://www.dengb.com/aqgjrj/961456.html">http://www.dengb.com/aqgjrj/961456.html</a></p>
+<p>几个常见语句</p>
+<ul>
+<li>设置php变量 <code>php_value &lt;key&gt; &lt;val&gt;</code>  例如<code>php_value auto_append_file xxx.php</code> 该语句等价于在当前页面底端增加一句require(xxx.php)</li>
+<li>更改解析方式 <code>SetHandler application/x-httpd-php .ext</code>，AddType语句和SetHandler一个效果，该语句规定将后缀为.ext的文件解析为php文件</li>
+<li><code>php_flag engine off</code>，该语句命令当前目录下的所有文件都不可作为PHP脚本解析，当服务器存在该设置时可以考虑控制文件上传路径，使我们的shell放置在无.htaccess文件的地方</li>
+<li><code>php_flag display_errors on</code>字面意思，显示错误</li>
+<li><code>php_value zend.script_encoding “UTF-7″</code> 修改编码方式，要是我就用base64了</li>
+</ul>
+<h4 id="user-ini包含后门"><a href="#user-ini包含后门" class="headerlink" title=".user.ini包含后门"></a>.user.ini包含后门</h4><p>.user.ini文件中也有和htaccess一样的auto_append_file，并且相较于.htaccess，.user.ini存在于各种服务器之中，使用文件包含时，被包含的任何文件都会被解析为php文件，所以我们可以通过上传.user.ini文件再上传一个图片马，进行访问就可以进入后门了（当然需要一个正常的可访问php文件才能）<br>贴一个文章：<a target="_blank" rel="external nofollow noopener noreferrer" href="https://wooyun.js.org/drops/user.ini%E6%96%87%E4%BB%B6%E6%9E%84%E6%88%90%E7%9A%84PHP%E5%90%8E%E9%97%A8.html">https://wooyun.js.org/drops/user.ini%E6%96%87%E4%BB%B6%E6%9E%84%E6%88%90%E7%9A%84PHP%E5%90%8E%E9%97%A8.html</a></p>
+<h4 id="00截断"><a href="#00截断" class="headerlink" title="00截断"></a>00截断</h4><blockquote>
+<p>适用情形：截断条件：php版本小于5.3.4，php的magic_quotes_gpc为OFF状态<br>因为对PHP版本要求过老，基本没用</p>
+</blockquote>
+<p>在上传的时候，当文件系统读到【0x00】时，会认为文件已经结束。利用00截断就是利用程序员在写程序时对文件的上传路径过滤不严格，产生0x00上传截断漏洞。<br>出现在上传路径可控的情况下，以get方式传递时可直接使用%00进行绕过，会自动进行url解码，以post方式执行时，需要在十六进制中对数据进行修改为00</p>
+<h4 id="图片马绕过"><a href="#图片马绕过" class="headerlink" title="图片马绕过"></a>图片马绕过</h4><p>PHP存在一些判断文件类型的函数，通常就是看看文件头尾是不是符合图片的类型，这个时候我们可以把木马拼接在图片中，即可制造出一个图片马进行上传。<br>图片马是以.jpg形式上传的，使用就需要有文件包含，或是.htaccess，或者其他的解析漏洞。<br>图片马制作<code>copy 1.jpg /b + shell.php /a shell.jpg</code>，感觉直接在010editor里面拼也差不多<br>该方法可以绕过<code>getReailFileType</code>，<code>getimagesize</code>，<code>exif_imagetype</code>等函数检验</p>
+<h5 id="exif-imagetype-绕过"><a href="#exif-imagetype-绕过" class="headerlink" title="exif_imagetype()绕过"></a>exif_imagetype()绕过</h5><p>可以在文件开头增加<code>GIF89a</code>来绕过<br><code>#define width 20</code><br><code>#define height 10</code><br>如上两行是xbm格式图片的开头，在上传.htaccess或是php脚本文件时将这两行添加进去可绕过exif_imagetype，并在解析时被作为注释，不影响脚本正常解析</p>
+<h5 id="二次渲染绕过"><a href="#二次渲染绕过" class="headerlink" title="二次渲染绕过"></a>二次渲染绕过</h5><p>图片进行二次渲染之后可能会剔除我们之前拼接在图片中的脚本，并且对于.jpg，.png和.gif图片而言，处理二次渲染的方式并不一致</p>
+<ul>
+<li>.gif文件：.gif图片在进行二次渲染时存在二进制文件完全不变的部分，将代码插入该部分即可。</li>
+<li>.png文件：很复杂，要分析数据块，将代码写入PLTE数据块并重新计算crc值修改，也可使用大佬的脚本</li>
+<li>.jpg文件：使用大佬脚本进行填充，但部分jpg文件不存在可填充空间，所以需要多拿几张图片进行尝试<br>一篇写的很好的文章：<a target="_blank" rel="external nofollow noopener noreferrer" href="https://xz.aliyun.com/t/2657">https://xz.aliyun.com/t/2657</a> 脚本也贴在里面了</li>
+</ul>
+<h4 id="条件竞争"><a href="#条件竞争" class="headerlink" title="条件竞争"></a>条件竞争</h4><p>发生在逻辑漏洞中，有的系统先将上传的文件进行保存再进行安全性检验，对于不通过的再予以删除，如果我们高频率对上传的文件进行访问，就有可能在其被删除之前访问到它，以此完成条件竞争<br>重复发包我们可以使用bp的intruder模块，随便自己加一个参数发起进攻即可，同时在浏览器反复尝试对上传的文件进行访问即可（需要知道上传的文件储存路径，并且文件名不要有变化）</p>
+<h5 id="阻止文件改名"><a href="#阻止文件改名" class="headerlink" title="阻止文件改名"></a>阻止文件改名</h5><p>系统存在将上传的文件进行改名的操作，进行随机改名之后我们不知道被修改的文件名是什么，自然无法进行进一步的访问。如果也同条件竞争一样一直对服务器进行文件上传，就有机会访问到尚未未改名的文件（实测时发现最后竟然保留了一个未被改名的文件，不知道为什么）</p>
+<h4 id="检测文件属性"><a href="#检测文件属性" class="headerlink" title="检测文件属性"></a>检测文件属性</h4><p>检测内容为文件的content-type，即文件属性。注意此处的content-type位于数据包中post的数据部分，不属于包的头部参数。<br>可以将文件名直接修改为<code>.jpg</code>然后抓包修改后缀为<code>.php</code>，或将<code>.php</code>文件的content-type修改为图片的<code>image/jpeg</code>即可绕过检测</p>
+<h4 id="本地包含的文件上传"><a href="#本地包含的文件上传" class="headerlink" title="本地包含的文件上传"></a>本地包含的文件上传</h4><p>存在include等函数时，会将包含的文件当做PHP代码执行，所以如果有该函数，我们以此方式对上传的.jpg后缀文件进行访问也可正确解析。</p>
+<h5 id="被限定后缀的本地包含"><a href="#被限定后缀的本地包含" class="headerlink" title="被限定后缀的本地包含"></a>被限定后缀的本地包含</h5><p>后台向文件包含位置增加一个.php后缀<br>这时可以使用php的phar伪协议，phar伪协议可以读取压缩包里的内容，我们可以将shell.php压缩为shell.zip，修改后缀为shell.jpg上传之后以phar伪协议进行读取，<code>?file=phar://upload/shell.jpg/shell</code>，这里最后一个shell会因为被添加一个.php被读取出来</p>
+<h4 id="phar反序列化"><a href="#phar反序列化" class="headerlink" title="phar反序列化"></a>phar反序列化</h4><p>PHP新爆出的重大安全隐患，许多文件相关操作函数不经意间存在对phar文件的反序列化操作，使得我们精心设计的恶意数据将会得以导入</p>
+<p>这种类型的漏洞需要源码进行代码审计，对__call,__construct等魔法方法着重关注，并且注意齐是否存在对文件操作函数的调用<br>zsx巨佬的博客<a target="_blank" rel="external nofollow noopener noreferrer" href="https://blog.zsxsoft.com/post/38">https://blog.zsxsoft.com/post/38</a></p>
+<h5 id="能够触发phar反序列化的函数"><a href="#能够触发phar反序列化的函数" class="headerlink" title="能够触发phar反序列化的函数"></a>能够触发phar反序列化的函数</h5><pre class=" language-php"><code class="language-php">fileatime <span class="token operator">/</span> filectime <span class="token operator">/</span> filemtime
+stat <span class="token operator">/</span> fileinode <span class="token operator">/</span> fileowner <span class="token operator">/</span> filegroup <span class="token operator">/</span> fileperms
+file <span class="token operator">/</span> file_get_contents <span class="token operator">/</span> readfile <span class="token operator">/</span> fopen`
+file_exists <span class="token operator">/</span> is_dir <span class="token operator">/</span> is_executable <span class="token operator">/</span> is_file <span class="token operator">/</span> is_link <span class="token operator">/</span> is_readable <span class="token operator">/</span> is_writeable <span class="token operator">/</span> is_writable
+parse_ini_file
+unlink
+copy
+</code></pre>
+<p>这么多的函数都可以在传入参数为phar:&#x2F;&#x2F;协议时对包含的数据进行反序列化，再通过一系列魔法方法形成pop链，完成入侵<br>在构造数据时也要注意自己的数据是什么时候被构造或析构，数据的显示应该通过什么方法进行等等。</p>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/php/" rel="tag"># php</a>
+              <a href="/tags/%E6%96%87%E4%BB%B6%E4%B8%8A%E4%BC%A0/" rel="tag"># 文件上传</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/XSS.html" rel="prev" title="XSS">
+      <i class="fa fa-chevron-left"></i> XSS
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/bestphp's%20revenge.html" rel="next" title="LCTF bestphp's revenge">
+      LCTF bestphp's revenge <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+    <div class="comments" id="valine-comments"></div>
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E6%96%87%E4%BB%B6%E4%B8%8A%E4%BC%A0"><span class="nav-number">1.</span> <span class="nav-text">文件上传</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%85%B3%E4%BA%8E%E4%B8%8A%E4%BC%A0%E7%9A%84%E5%85%B7%E4%BD%93%E6%AD%A5%E9%AA%A4"><span class="nav-number">1.1.</span> <span class="nav-text">关于上传的具体步骤</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%AE%A2%E6%88%B7%E7%AB%AF%E7%9A%84%E6%A3%80%E9%AA%8C"><span class="nav-number">1.2.</span> <span class="nav-text">客户端的检验</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%AE%A2%E6%88%B7%E7%AB%AF%E7%9A%84%E6%8D%A3%E4%B9%B1"><span class="nav-number">1.2.1.</span> <span class="nav-text">客户端的捣乱</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%9C%8D%E5%8A%A1%E5%99%A8%E7%AB%AF%E7%9A%84%E6%A3%80%E9%AA%8C"><span class="nav-number">1.3.</span> <span class="nav-text">服务器端的检验</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E9%BB%91%E5%90%8D%E5%8D%95"><span class="nav-number">1.3.1.</span> <span class="nav-text">黑名单</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%B8%B8%E8%A7%81%E7%9A%84PHP%E8%A1%8D%E7%94%9F%E6%A0%BC%E5%BC%8F"><span class="nav-number">1.3.1.1.</span> <span class="nav-text">常见的PHP衍生格式</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%A4%A7%E5%B0%8F%E5%86%99%E5%90%8E%E7%BC%80%E7%BB%95%E8%BF%87"><span class="nav-number">1.3.1.2.</span> <span class="nav-text">大小写后缀绕过</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%A2%9E%E5%8A%A0%E7%A9%BA%E6%A0%BC%E7%BB%95%E8%BF%87"><span class="nav-number">1.3.1.3.</span> <span class="nav-text">增加空格绕过</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Windows%E7%89%B9%E6%80%A7%E7%BB%95%E8%BF%87"><span class="nav-number">1.3.1.4.</span> <span class="nav-text">Windows特性绕过</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#%E5%8A%A0-%E8%BF%9B%E8%A1%8C%E7%BB%95%E8%BF%87"><span class="nav-number">1.3.1.4.1.</span> <span class="nav-text">加.进行绕过</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#%E5%8A%A0-DATA%E7%BB%95%E8%BF%87%E6%A3%80%E6%B5%8B"><span class="nav-number">1.3.1.4.2.</span> <span class="nav-text">加::$DATA绕过检测</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#%E4%BD%BF%E7%94%A8%E5%8E%9F%E6%96%87%E4%BB%B6%E5%90%8D%E4%BD%9C%E4%B8%BA%E6%96%B0%E6%96%87%E4%BB%B6%E5%90%8D"><span class="nav-number">1.3.1.4.3.</span> <span class="nav-text">使用原文件名作为新文件名</span></a></li></ol></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E8%A2%AB%E7%A6%81%E7%94%A8%E5%90%8E%E7%BC%80%E5%90%8D%E6%9B%BF%E6%8D%A2%E4%B8%BA%E7%A9%BA"><span class="nav-number">1.3.1.5.</span> <span class="nav-text">被禁用后缀名替换为空</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E7%A6%81%E6%AD%A2-lt"><span class="nav-number">1.3.1.6.</span> <span class="nav-text">禁止&lt;?</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%99%BD%E5%90%8D%E5%8D%95"><span class="nav-number">1.3.2.</span> <span class="nav-text">白名单</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#htaccess%E9%87%8D%E5%AE%9A%E5%90%91"><span class="nav-number">1.3.2.1.</span> <span class="nav-text">.htaccess重定向</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#user-ini%E5%8C%85%E5%90%AB%E5%90%8E%E9%97%A8"><span class="nav-number">1.3.2.2.</span> <span class="nav-text">.user.ini包含后门</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#00%E6%88%AA%E6%96%AD"><span class="nav-number">1.3.2.3.</span> <span class="nav-text">00截断</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%9B%BE%E7%89%87%E9%A9%AC%E7%BB%95%E8%BF%87"><span class="nav-number">1.3.2.4.</span> <span class="nav-text">图片马绕过</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#exif-imagetype-%E7%BB%95%E8%BF%87"><span class="nav-number">1.3.2.4.1.</span> <span class="nav-text">exif_imagetype()绕过</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#%E4%BA%8C%E6%AC%A1%E6%B8%B2%E6%9F%93%E7%BB%95%E8%BF%87"><span class="nav-number">1.3.2.4.2.</span> <span class="nav-text">二次渲染绕过</span></a></li></ol></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E6%9D%A1%E4%BB%B6%E7%AB%9E%E4%BA%89"><span class="nav-number">1.3.2.5.</span> <span class="nav-text">条件竞争</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#%E9%98%BB%E6%AD%A2%E6%96%87%E4%BB%B6%E6%94%B9%E5%90%8D"><span class="nav-number">1.3.2.5.1.</span> <span class="nav-text">阻止文件改名</span></a></li></ol></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E6%A3%80%E6%B5%8B%E6%96%87%E4%BB%B6%E5%B1%9E%E6%80%A7"><span class="nav-number">1.3.2.6.</span> <span class="nav-text">检测文件属性</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E6%9C%AC%E5%9C%B0%E5%8C%85%E5%90%AB%E7%9A%84%E6%96%87%E4%BB%B6%E4%B8%8A%E4%BC%A0"><span class="nav-number">1.3.2.7.</span> <span class="nav-text">本地包含的文件上传</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#%E8%A2%AB%E9%99%90%E5%AE%9A%E5%90%8E%E7%BC%80%E7%9A%84%E6%9C%AC%E5%9C%B0%E5%8C%85%E5%90%AB"><span class="nav-number">1.3.2.7.1.</span> <span class="nav-text">被限定后缀的本地包含</span></a></li></ol></li><li class="nav-item nav-level-4"><a class="nav-link" href="#phar%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96"><span class="nav-number">1.3.2.8.</span> <span class="nav-text">phar反序列化</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#%E8%83%BD%E5%A4%9F%E8%A7%A6%E5%8F%91phar%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96%E7%9A%84%E5%87%BD%E6%95%B0"><span class="nav-number">1.3.2.8.1.</span> <span class="nav-text">能够触发phar反序列化的函数</span></a></li></ol></li></ol></li></ol></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Z3ratu1" src="https://q2.qlogo.cn/headimg_dl?dst_uin=1207039417&spec=160">
+  <p class="site-author-name" itemprop="name">Z3ratu1</p>
+  <div class="site-description" itemprop="description">与其感慨路难行，不如现在出发</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">145</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">5</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">86</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+  <div class="beian"><a href="http://www.beian.miit.gov.cn/" rel="external nofollow noopener noreferrer" target="_blank">湘ICP备2020021580号 </a>
+      <img src="/./images/beian.png" style="display: inline-block;">
+  </div>
+
+<div class="copyright">
+  
+  &copy; 2019 – 
+  <span itemprop="copyrightYear">2022</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Z3ratu1</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="external nofollow noopener noreferrer" target="_blank">Hexo</a> & <a href="https://pisces.theme-next.org/" class="theme-link" rel="external nofollow noopener noreferrer" target="_blank">NexT.Pisces</a> 强力驱动
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+
+<script>
+NexT.utils.loadComments(document.querySelector('#valine-comments'), () => {
+  NexT.utils.getScript('https://cdn.jsdelivr.net/npm/valine@1.4.14/dist/Valine.min.js', () => {
+    var GUEST = ['nick', 'mail', 'link'];
+    var guest = 'nick,mail,link';
+    guest = guest.split(',').filter(item => {
+      return GUEST.includes(item);
+    });
+    new Valine({
+      el         : '#valine-comments',
+      verify     : false,
+      notify     : false,
+      appId      : '7H8kg0XdWO8IbhOcu4K1JaAT-gzGzoHsz',
+      appKey     : 'wPKQjkbVtvPaRR7gh2yjfLSi',
+      placeholder: "Just go go",
+      avatar     : 'mm',
+      meta       : guest,
+      pageSize   : '10' || 10,
+      visitor    : true,
+      lang       : '' || 'zh-cn',
+      path       : location.pathname,
+      recordIP   : false,
+      serverURLs : ''
+    });
+  }, window.Valine);
+});
+</script>
+
+</body>
+</html>

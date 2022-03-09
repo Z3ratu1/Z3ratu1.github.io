@@ -1,0 +1,567 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 6.0.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"blog.z3ratu1.cn","root":"/","scheme":"Pisces","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"always","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":true},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+  </script>
+
+  <meta name="description" content="Switch自建加速终章短时间内不会再研究这个东西了，到最后感觉还是竹篮打水一场空。。。但是发现之前写的东西似乎有一点问题，订正一下然后最后总结一下这几天都干了什么奇怪的事情 2022.2.12 update写在前面套娃操作实际意义不大，起码我目前从未见识过所谓的UDP断流等情形，switch联机的P2P性质使得游戏体验在理论上由几个因素决定：1.NAT类型，NAT类型决定了联机进入房间的成功率，">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Switch自建加速终章">
+<meta property="og:url" content="https://blog.z3ratu1.cn/switch%E5%8A%A0%E9%80%9F%E6%9C%80%E5%90%8E%E4%B8%80%E7%89%88.html">
+<meta property="og:site_name" content="Z3ratu1&#39;s blog">
+<meta property="og:description" content="Switch自建加速终章短时间内不会再研究这个东西了，到最后感觉还是竹篮打水一场空。。。但是发现之前写的东西似乎有一点问题，订正一下然后最后总结一下这几天都干了什么奇怪的事情 2022.2.12 update写在前面套娃操作实际意义不大，起码我目前从未见识过所谓的UDP断流等情形，switch联机的P2P性质使得游戏体验在理论上由几个因素决定：1.NAT类型，NAT类型决定了联机进入房间的成功率，">
+<meta property="og:locale">
+<meta property="article:published_time" content="2021-03-18T11:58:01.000Z">
+<meta property="article:modified_time" content="2022-02-12T09:10:11.687Z">
+<meta property="article:author" content="Z3ratu1">
+<meta property="article:tag" content="Switch">
+<meta property="article:tag" content="Clash TUN">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="https://blog.z3ratu1.cn/switch%E5%8A%A0%E9%80%9F%E6%9C%80%E5%90%8E%E4%B8%80%E7%89%88.html">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-Hans'
+  };
+</script>
+
+  <title>Switch自建加速终章 | Z3ratu1's blog</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+<link rel="stylesheet" href="/css/prism-tomorrow.css" type="text/css"></head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">Z3ratu1's blog</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">Welcome</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>关于</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+        <li class="menu-item menu-item-links">
+
+    <a href="/links/" rel="section"><i class="fa fa-link fa-fw"></i>友链</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off" placeholder="搜索..." spellcheck="false" type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+  <a href="https://github.com/Z3ratu1" class="github-corner" title="Follow me on GitHub" aria-label="Follow me on GitHub" rel="external nofollow noopener noreferrer" target="_blank"><svg width="80" height="80" viewbox="0 0 250 250" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"/><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"/><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"/></svg></a>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
+    <link itemprop="mainEntityOfPage" href="https://blog.z3ratu1.cn/switch%E5%8A%A0%E9%80%9F%E6%9C%80%E5%90%8E%E4%B8%80%E7%89%88.html">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="https://q2.qlogo.cn/headimg_dl?dst_uin=1207039417&spec=160">
+      <meta itemprop="name" content="Z3ratu1">
+      <meta itemprop="description" content="与其感慨路难行，不如现在出发">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Z3ratu1's blog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          Switch自建加速终章
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2021-03-18 19:58:01" itemprop="dateCreated datePublished" datetime="2021-03-18T19:58:01+08:00">2021-03-18</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2022-02-12 17:10:11" itemprop="dateModified" datetime="2022-02-12T17:10:11+08:00">2022-02-12</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E6%9D%82%E9%A1%B9/" itemprop="url" rel="index"><span itemprop="name">杂项</span></a>
+                </span>
+            </span>
+
+          
+            <span id="/switch%E5%8A%A0%E9%80%9F%E6%9C%80%E5%90%8E%E4%B8%80%E7%89%88.html" class="post-meta-item leancloud_visitors" data-flag-title="Switch自建加速终章" title="阅读次数">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span class="leancloud-visitors-count"></span>
+            </span>
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="far fa-comment"></i>
+      </span>
+      <span class="post-meta-item-text">Valine：</span>
+    
+    <a title="valine" href="/switch%E5%8A%A0%E9%80%9F%E6%9C%80%E5%90%8E%E4%B8%80%E7%89%88.html#valine-comments" itemprop="discussionUrl">
+      <span class="post-comments-count valine-comment-count" data-xid="/switch%E5%8A%A0%E9%80%9F%E6%9C%80%E5%90%8E%E4%B8%80%E7%89%88.html" itemprop="commentCount"></span>
+    </a>
+  </span>
+  
+  
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h1 id="Switch自建加速终章"><a href="#Switch自建加速终章" class="headerlink" title="Switch自建加速终章"></a>Switch自建加速终章</h1><p>短时间内不会再研究这个东西了，到最后感觉还是竹篮打水一场空。。。但是发现之前写的东西似乎有一点问题，订正一下然后最后总结一下这几天都干了什么奇怪的事情</p>
+<h2 id="2022-2-12-update"><a href="#2022-2-12-update" class="headerlink" title="2022.2.12 update"></a>2022.2.12 update</h2><p>写在前面<br>套娃操作实际意义不大，起码我目前从未见识过所谓的UDP断流等情形，switch联机的P2P性质使得游戏体验在理论上由几个因素决定：1.NAT类型，NAT类型决定了联机进入房间的成功率，NAT到A只要丢包不严重你就是人上人；2.出口点之间的网络环境，比如你开个加速器飞去美国，然后国内裸连卡比就等于是从国内连你，还是卡，但是你们俩都飞美国或者都在国内，可能就很顺畅了。比如我和我大哥直接校园网畅快联机。。。3.网络链路质量，正常人一般使用的都是家用网络，总是能在网上看到说这个机房去程xx线路回程xx线路的。如果是很好的线路应该就不用考虑丢包延迟问题了，因此自建时服务器所使用的链路应该影响也很大。<br>还是推荐一下后来更新的较稳定方案<br>且该套娃方案可能由于工具本身的问题，会导致NAT类型的退化，不建议用于Switch P2P联机加速，反而可能对某些PC端CS类型游戏有效<br><a href="https://blog.z3ratu1.cn/Switch%E8%87%AA%E5%BB%BANAT%E4%BC%98%E5%8C%96%E6%8C%87%E5%8C%97.html">Switch自建NAT优化指北</a></p>
+<p>—————原文章内容分割线————–</p>
+<h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p><strong>想要获得直接的加速体验请直接出门左拐UU&#x2F;灵缇</strong>，本教程并不能保证获得更好的游戏体验，完全只是出于兴趣成功搭建起了一个奇怪的代理<br>复习一下之前说过的东西，因为任天堂不提供游戏服务器，无论是动森还是MH这些游戏，虽然说是房主当Server，但是实质上还是类似P2P，反正都是玩家之间互相联机，所以和绝大多数PC网游的加速流程有略微的区别。<br>NAT类型只决定两个玩家之间的网络可达性，当两个玩家之间达到了可达的最低要求成功联机之后，联机的体验取决于两个玩家之间网络链路的延时情况，服务质量，丢包情况等。主要的影响因素有UDP本身的不可靠性，互联网运营商对在网络拥塞时对UDP的断流（好像在南京没遇到过，晚上网络高峰也不怎么丢，但是我家里小县城好像有点严重），电信联通移动运营商之间互相卡脖子，出网误伤等。<br>自建服务器顶多使得NAT类型从垃圾校园网的C,D提升到B（能用就行）并不能太多的改善网络通路情况，并且真的好麻烦。。。网络垃圾学了好久才搞懂，如果是不怎么使用计算机的小白想搞定就更麻烦了，总的来说，完全不值得，我完全是出于一种奇怪的兴趣而在这个上面花费了这么多时间。</p>
+<p>最直接的解决方案，UU，灵缇一键搞定（<del>结一下这个月的广告费谢谢</del>），他们都是搭的专线并且软件订制稳定靠谱，自建时需要的服务器也是一笔开支，如果是就着机场的节点可能会由于机场自身的限制NAT-type变得更为拉跨，如果是自己买的vps地区和好友开的加速器节点位置诡异也会异常的尴尬<br>比如我其实是用阿里云的上海VPS加速，还没试过和各地联机效果（理论上应该是国内联机效果应该比较好，然后就算是好友开外国节点上海出网应该也还能用？）</p>
+<h2 id="正文"><a href="#正文" class="headerlink" title="正文"></a>正文</h2><h3 id="clash网关接管失败"><a href="#clash网关接管失败" class="headerlink" title="clash网关接管失败"></a>clash网关接管失败</h3><p>之前通过PC和Switch连入同一个WiFi，再将Switch手动把网关设置到PC，clash开启ServiceMode接管所有网卡流量，可以做到对Switch的全局流量接管转发UDP。<strong>但是</strong>，一个寒假回来忘记之前的操作是怎么做的了，现在Switch连接同一个WiFi设置网关为PC会报错DNS解析失败，连不上去。wireshark抓包完全没看到Switch和PC的通信，不知道是哪里出问题了呜呜。</p>
+<h3 id="超简易NAT-type提升方案"><a href="#超简易NAT-type提升方案" class="headerlink" title="超简易NAT-type提升方案"></a>超简易NAT-type提升方案</h3><p><strong>但是</strong>，clash经过几次更新似乎在某个版本修复了同时启动TUN模式和热点会导致出现网络回环原地爆炸的问题，现在可以在启动TUN模式的同时开一个热点，去网络适配器选项里面选中Clash网卡，选中”共享”选项，共享的网卡填开出来热点的那块网卡，Switch连热点同样能做到全局流量接管，在vps上配一个酸酸乳（后面优化要用），clash里面自己写个节点进去连上，NAT类型成功从校园网锁定的C或D提升至B（但是上下行流量速度并不怎么样，5M小水管是这样的，能用就行.jpg），用机场的节点NAT类型变成了F。。。所以还是自己的机子靠谱，机场不知道上了什么限制</p>
+<p>至此，NAT类型到B就起码拥有呼吸权了，接下来就想办法看看怎么优化一下流畅程度什么的？</p>
+<h3 id="why-SSR"><a href="#why-SSR" class="headerlink" title="why SSR?"></a>why SSR?</h3><p>理论上v2ray和Trojan都能套这个，出云巨佬和我说过这事但是那个时候的我什么都不懂嘻嘻，所以就没学，好像说v2怎么个反正就是不适用？要套就套Trojan，不过好像酸酸乳比较古老比较成熟，网上教程也一搜一把，并且也没钱买路由器刷固件搞Trojan，进入拉倒状态。本身机子就在国内，酸酸乳也不出墙，应该不会被封吧呜呜<br>然后就是这个用酸酸乳能减轻VPS本身位于国外时的出口干扰（虽然我的VPS在国内所以好像没什么意义。。。直接用Socks5好像也行）</p>
+<h3 id="udp2raw-udpspeeder"><a href="#udp2raw-udpspeeder" class="headerlink" title="udp2raw+udpspeeder"></a>udp2raw+udpspeeder</h3><p>理论上是用来防止运营商断流和改善UDP的不可靠性两个工具，配置起来也不难，就是不知道是不是真的有用<br>udp2raw将udp流量伪装成tcp流量，目的是阻止运营商断UDP的流，需要一个客户端一个服务端，客户端加密流量服务端解密流量，服务端出去的还不是UDP，只能说防的是地方运营商<del>但是配出来之后感觉并没有得到什么改善，可能南京这边比较靠谱</del><br>udpspeeder通过发送冗余流量降低丢包率，网络拥塞时丢失的包能够通过冗余包恢复，具体情况可以去GitHub上看作者写的解释。同样一个客户端一个服务端，客户端发冗余服务端解冗余，所以客户端和服务端需要进行套娃</p>
+<p>安装步骤简单的不行，都是编译好的二进制文件，所谓的开箱即用<br>套娃命令如下<br>服务端</p>
+<pre class=" language-shell"><code class="language-shell">./speederv2_amd64 -s -l127.0.0.1:port  -r127.0.0.1:ssr_port --mode 0 -f4:2 --timeout 1
+./udp2raw_amd64 -s -l0.0.0.0:server_port -r127.0.0.1:port -k "passwd" --raw-mode faketcp -a
+</code></pre>
+<p>客户端</p>
+<pre class=" language-shell"><code class="language-shell">speederv2.exe -c -l0.0.0.0:client_port -r127.0.0.1:port --mode 0 -f4:2 --timeout 1
+udp2raw_mp.exe -c -l127.0.0.1:port -rserverip:service_port -k "passwd" --raw-mode faketcp
+</code></pre>
+<p>因为两个工具都是同一个大哥写的，所以参数含义都一样<br>简要说一下参数<code>-s</code>标记自身为服务端，<code>-c</code>标记自身为客户端，<code>-l</code>提供一个监听的ip:port，<code>-r</code>把自己处理的数据转发到指定的ip:port<br>udpspeeder的<code>-f</code>参数指定冗余情况，4:2就是指每四个包冗余两个，冗余越多丢包率越低，10:5的冗余是一样的，但是消耗的CPU会多，但是4:2的话6个包发一次又有点频繁，总之就是自己看网络情况决定了，udp2raw的<code>-k</code>参数指定加密密钥，好像没有什么安全性要求。。。这两个参数客户端和服务端要一致</p>
+<p>再套一个端口映射服务，具体可以看文末参考链接</p>
+<h4 id="套娃过程"><a href="#套娃过程" class="headerlink" title="套娃过程"></a>套娃过程</h4><p>客户端启动SSR客户端（可以是clash，sstap之类能接管全流量且支持酸酸乳的任意软件），把代理设置为本地的<code>client_port</code>，udpspeeder监听<code>client_port</code>，把收到的酸酸乳加密流量变成冗余过的udp流量发到<code>port</code>，udp2raw监听的也就是<code>port</code>，所以冗余过的流量就传给了udp2raw，udp2raw再把伪造成tcp的流量发到远端vps的<code>server_port</code><br>vps上反过来，先是udp2raw接收到我们本地发过来的伪造tcp流量，解回udp之后转发到自己的<code>port</code>上，而udpspeeder监听本地的<code>port</code>，拿到还原回来的冗余流量，处理出来之后转发到本地的<code>ssr_port</code>，发到我们的酸酸乳服务端，酸酸乳服务端再解密转发出去完成代理<br>整个就是 酸酸乳客户端-&gt;udpspeeder客户端-&gt;udp2raw客户端-&gt;udp2raw服务端-&gt;udpspeeder服务端-&gt;酸酸乳服务端</p>
+<h4 id="小bug"><a href="#小bug" class="headerlink" title="小bug"></a>小bug</h4><p>udp2raw客户端跑不起来，报如下错，搜了一下，说是npcap没装（事实上我之前装nmap还是啥的时候就装了1.0版本的，后来换了一个1.2的重装一下就成了)</p>
+<pre class=" language-shell"><code class="language-shell">[INFO]avaliable deives(device name: ip address ; description):
+[FATAL]no matched device found for ip: [10.203.240.119]
+</code></pre>
+<p>使用套娃方式需要代理目的地位于本机，clash又会出现TUN模式下的流量回环，上行流量爆炸且CPU跑满只能任务管理器退掉</p>
+<h4 id="SSTap-test"><a href="#SSTap-test" class="headerlink" title="SSTap test"></a>SSTap test</h4><p>使用替代品SSTap做实验ing</p>
+<p>SSTap在选择全局流量转发时也会进入回环状态上行流量爆炸且CPU跑满，如果不开全局，随便选一个其他规则就能正常三重套娃，但是偶尔UDP转发不能过，有时候又能过，反复在本地重启套娃服务偶尔能成（未找到具体原因）</p>
+<p>感觉娃套起来之后好像也没见带宽变好。。。可能南京这块链路质量比较好？<br>还有一个奇怪的事情，SSTap并不能改善NAT类型，甚至恶化了，使用SSTap会导致NAT类型铁定为D，即使使用情况与clash完全一致。而clash会将NAT类型从C&#x2F;D提升至B。<br>原因未知，但SSTap+Udp2raw+udpspeeder本身就是设计用来为PC游戏进行加速的，服务器本身就是游戏公司的公网服务器，因此不需要考虑NAT类型（可能是这个原因），而Switch要将就着这些东西用就很拉跨了</p>
+<p>客户端服务端套娃服务先起，然后SSTap把酸酸乳服务器指向本地udpspeeder监听的端口就能完成套娃全套服务的实现了，就是完全没感受到套娃和不套的区别。。。</p>
+<h3 id="misc"><a href="#misc" class="headerlink" title="misc"></a>misc</h3><p>一些遇到的乱七八糟的问题</p>
+<p>需要先开TUN再开热点，在没有东西连进来的时候选择将TUN网卡的网络共享给热点网卡才能保证不出现逻辑错误产生回环</p>
+<p>似乎开热点的时候默认将出口网卡(我这里是WLAN)与其共享使之能正常上网，虽然在网络适配器里面不会直接显示出来，但是的确因为sstap修改了我的共享情况导致之后连接热点无IP分配而连不上，先让WiFi和热点共享一下再把clash和热点共享就又能恢复正常并全局接管了</p>
+<p>DNS解析失败问题，似乎是clash的奇怪设置，时好时坏，最后把配置改成了这样，又能行了，电脑开热点的好处是IP和DNS都可以自动获取，少了一个手动分配IP地址什么的，还蛮方便的</p>
+<pre class=" language-yaml"><code class="language-yaml"><span class="token key atrule">mixin</span><span class="token punctuation">:</span>
+  <span class="token key atrule">dns</span><span class="token punctuation">:</span>
+    <span class="token key atrule">enable</span><span class="token punctuation">:</span> <span class="token boolean important">true</span>
+    <span class="token key atrule">enhanced-mode</span><span class="token punctuation">:</span> redir<span class="token punctuation">-</span>host
+    <span class="token key atrule">nameserver</span><span class="token punctuation">:</span>
+      <span class="token punctuation">-</span> 8.8.8.8
+      <span class="token punctuation">-</span> 114.114.114.114
+  <span class="token key atrule">tun</span><span class="token punctuation">:</span>
+    <span class="token key atrule">enable</span><span class="token punctuation">:</span> <span class="token boolean important">true</span>
+    <span class="token key atrule">stack</span><span class="token punctuation">:</span> gvisor
+    <span class="token key atrule">dns-hijack</span><span class="token punctuation">:</span>
+      <span class="token punctuation">-</span> 198.18.0.2<span class="token punctuation">:</span><span class="token number">53</span>
+    <span class="token key atrule">macOS-auto-route</span><span class="token punctuation">:</span> <span class="token boolean important">true</span>
+    <span class="token key atrule">interface-name</span><span class="token punctuation">:</span> WLAN
+</code></pre>
+<h2 id="后记"><a href="#后记" class="headerlink" title="后记"></a>后记</h2><p>一开始是想做NAT穿透进行类似端口映射之类的，但是由于switch往外通信时的通信端口是不固定的，而常规的端口映射软件都是将内网一个固定的IP映射到公网上，计划不通。<br>还想过利用公网服务器做转发，利用阿里云商业网的链路可能稍微能提升一点网路质量，避开家用网络之类的，但是感觉南京这的网络整体也挺好的，转发也没什么用，倒是用Clash进行Socks转发NAT惊人的提升到了B类，原理未知<br>之后又看了奇怪的教程，想要进行UDP流量的优化，这种事情倒是网上一搜一把，很经典的UDP冗余额外校验和UDP伪装成TCP防止断流，可能在我老家小县城的运营商确实会做这些事情，但是还是只能说南京这边网络好像挺好的。。。<br>折腾到最后UDP加速套娃并不能带来太好的体验，甚至将NAT类型降级为D，主要原因还是PC游戏是有游戏公司的服务器，不是Switch这种玩家做服务器的实质上是P2P的模式，所以常用套路套在switch上并不适用。并且由于各种软件在本地环路上的处理，经常出现环路流量闭合自爆的情况，最后费时费力发现能用的也就是一开始的socks5转发能提升一个NAT类型，UDP优化在南京没什么用，回家之后不知道有没有意义。</p>
+<p>说到底，费时费力搞了差不多一个星期，最后也没什么意义嘛。解决了一堆乱七八糟的没什么意义的问题倒是真的<br>也许回去之后也会直接买个UU一把梭，享受专线直通尊贵服务呢？</p>
+<h2 id="参考链接"><a href="#参考链接" class="headerlink" title="参考链接"></a>参考链接</h2><p><a target="_blank" rel="external nofollow noopener noreferrer" href="https://www.moerats.com/archives/662/">UDPSpeeder+Udp2raw使用教程，并配合SSTap加速优化网络游戏</a><br><a target="_blank" rel="external nofollow noopener noreferrer" href="https://teddysun.com/489.html">一键安装最新内核并开启 BBR 脚本</a><br><a target="_blank" rel="external nofollow noopener noreferrer" href="https://github.com/wangyu-/UDPspeeder/wiki/%E6%8E%A8%E8%8D%90%E8%AE%BE%E7%BD%AE">UDPspeeder推荐设置</a><br><a target="_blank" rel="external nofollow noopener noreferrer" href="https://eller.tech/post/36">ShadowsocksR+UDPSpeeder+Udp2raw+KCP实现网游加速</a></p>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/Switch/" rel="tag"># Switch</a>
+              <a href="/tags/Clash-TUN/" rel="tag"># Clash TUN</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/Docker%20Escape.html" rel="prev" title="Docker escape">
+      <i class="fa fa-chevron-left"></i> Docker escape
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/MAR%20DASCTF2021.html" rel="next" title="MAR DASCTF2021">
+      MAR DASCTF2021 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+    <div class="comments" id="valine-comments"></div>
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#Switch%E8%87%AA%E5%BB%BA%E5%8A%A0%E9%80%9F%E7%BB%88%E7%AB%A0"><span class="nav-number">1.</span> <span class="nav-text">Switch自建加速终章</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#2022-2-12-update"><span class="nav-number">1.1.</span> <span class="nav-text">2022.2.12 update</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%89%8D%E8%A8%80"><span class="nav-number">1.2.</span> <span class="nav-text">前言</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%AD%A3%E6%96%87"><span class="nav-number">1.3.</span> <span class="nav-text">正文</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#clash%E7%BD%91%E5%85%B3%E6%8E%A5%E7%AE%A1%E5%A4%B1%E8%B4%A5"><span class="nav-number">1.3.1.</span> <span class="nav-text">clash网关接管失败</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%B6%85%E7%AE%80%E6%98%93NAT-type%E6%8F%90%E5%8D%87%E6%96%B9%E6%A1%88"><span class="nav-number">1.3.2.</span> <span class="nav-text">超简易NAT-type提升方案</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#why-SSR"><span class="nav-number">1.3.3.</span> <span class="nav-text">why SSR?</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#udp2raw-udpspeeder"><span class="nav-number">1.3.4.</span> <span class="nav-text">udp2raw+udpspeeder</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%A5%97%E5%A8%83%E8%BF%87%E7%A8%8B"><span class="nav-number">1.3.4.1.</span> <span class="nav-text">套娃过程</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%B0%8Fbug"><span class="nav-number">1.3.4.2.</span> <span class="nav-text">小bug</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#SSTap-test"><span class="nav-number">1.3.4.3.</span> <span class="nav-text">SSTap test</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#misc"><span class="nav-number">1.3.5.</span> <span class="nav-text">misc</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%90%8E%E8%AE%B0"><span class="nav-number">1.4.</span> <span class="nav-text">后记</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%8F%82%E8%80%83%E9%93%BE%E6%8E%A5"><span class="nav-number">1.5.</span> <span class="nav-text">参考链接</span></a></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Z3ratu1" src="https://q2.qlogo.cn/headimg_dl?dst_uin=1207039417&spec=160">
+  <p class="site-author-name" itemprop="name">Z3ratu1</p>
+  <div class="site-description" itemprop="description">与其感慨路难行，不如现在出发</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">145</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">5</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">86</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+  <div class="beian"><a href="http://www.beian.miit.gov.cn/" rel="external nofollow noopener noreferrer" target="_blank">湘ICP备2020021580号 </a>
+      <img src="/./images/beian.png" style="display: inline-block;">
+  </div>
+
+<div class="copyright">
+  
+  &copy; 2019 – 
+  <span itemprop="copyrightYear">2022</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Z3ratu1</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="external nofollow noopener noreferrer" target="_blank">Hexo</a> & <a href="https://pisces.theme-next.org/" class="theme-link" rel="external nofollow noopener noreferrer" target="_blank">NexT.Pisces</a> 强力驱动
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+
+<script>
+NexT.utils.loadComments(document.querySelector('#valine-comments'), () => {
+  NexT.utils.getScript('https://cdn.jsdelivr.net/npm/valine@1.4.14/dist/Valine.min.js', () => {
+    var GUEST = ['nick', 'mail', 'link'];
+    var guest = 'nick,mail,link';
+    guest = guest.split(',').filter(item => {
+      return GUEST.includes(item);
+    });
+    new Valine({
+      el         : '#valine-comments',
+      verify     : false,
+      notify     : false,
+      appId      : '7H8kg0XdWO8IbhOcu4K1JaAT-gzGzoHsz',
+      appKey     : 'wPKQjkbVtvPaRR7gh2yjfLSi',
+      placeholder: "Just go go",
+      avatar     : 'mm',
+      meta       : guest,
+      pageSize   : '10' || 10,
+      visitor    : true,
+      lang       : '' || 'zh-cn',
+      path       : location.pathname,
+      recordIP   : false,
+      serverURLs : ''
+    });
+  }, window.Valine);
+});
+</script>
+
+</body>
+</html>

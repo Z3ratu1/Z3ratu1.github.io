@@ -1,0 +1,546 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 6.0.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"blog.z3ratu1.cn","root":"/","scheme":"Pisces","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"always","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":true},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+  </script>
+
+  <meta name="description" content="windows下的奇妙文件名起因是看了看红明谷杯线下的一篇wp，然后又进行了递归式学习。从discuz RCE学到windows文件名格式 8dot3文件名格式也称为短文件名格式，在远古的DOS系统上，规定主文件名不能超过8个字符，后缀不能超过3个字符，这个格式就成为8dot3格式。windows向前兼容远古的MS-DOS，因此对于所有违背上述规定的文件名都会创建一个8dot3格式的短文件名，主文">
+<meta property="og:type" content="article">
+<meta property="og:title" content="windows下的奇妙文件名">
+<meta property="og:url" content="https://blog.z3ratu1.cn/windows%E4%B8%8B%E7%9A%84%E5%A5%87%E5%A6%99%E6%96%87%E4%BB%B6%E5%90%8D.html">
+<meta property="og:site_name" content="Z3ratu1&#39;s blog">
+<meta property="og:description" content="windows下的奇妙文件名起因是看了看红明谷杯线下的一篇wp，然后又进行了递归式学习。从discuz RCE学到windows文件名格式 8dot3文件名格式也称为短文件名格式，在远古的DOS系统上，规定主文件名不能超过8个字符，后缀不能超过3个字符，这个格式就成为8dot3格式。windows向前兼容远古的MS-DOS，因此对于所有违背上述规定的文件名都会创建一个8dot3格式的短文件名，主文">
+<meta property="og:locale">
+<meta property="article:published_time" content="2021-04-24T05:35:55.000Z">
+<meta property="article:modified_time" content="2021-09-28T12:08:06.332Z">
+<meta property="article:author" content="Z3ratu1">
+<meta property="article:tag" content="Windows">
+<meta property="article:tag" content="discuz">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="https://blog.z3ratu1.cn/windows%E4%B8%8B%E7%9A%84%E5%A5%87%E5%A6%99%E6%96%87%E4%BB%B6%E5%90%8D.html">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-Hans'
+  };
+</script>
+
+  <title>windows下的奇妙文件名 | Z3ratu1's blog</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+<link rel="stylesheet" href="/css/prism-tomorrow.css" type="text/css"></head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">Z3ratu1's blog</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">Welcome</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>关于</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+        <li class="menu-item menu-item-links">
+
+    <a href="/links/" rel="section"><i class="fa fa-link fa-fw"></i>友链</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off" placeholder="搜索..." spellcheck="false" type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+  <a href="https://github.com/Z3ratu1" class="github-corner" title="Follow me on GitHub" aria-label="Follow me on GitHub" rel="external nofollow noopener noreferrer" target="_blank"><svg width="80" height="80" viewbox="0 0 250 250" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"/><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"/><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"/></svg></a>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
+    <link itemprop="mainEntityOfPage" href="https://blog.z3ratu1.cn/windows%E4%B8%8B%E7%9A%84%E5%A5%87%E5%A6%99%E6%96%87%E4%BB%B6%E5%90%8D.html">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="https://q2.qlogo.cn/headimg_dl?dst_uin=1207039417&spec=160">
+      <meta itemprop="name" content="Z3ratu1">
+      <meta itemprop="description" content="与其感慨路难行，不如现在出发">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Z3ratu1's blog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          windows下的奇妙文件名
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2021-04-24 13:35:55" itemprop="dateCreated datePublished" datetime="2021-04-24T13:35:55+08:00">2021-04-24</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2021-09-28 20:08:06" itemprop="dateModified" datetime="2021-09-28T20:08:06+08:00">2021-09-28</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E7%AC%94%E8%AE%B0/" itemprop="url" rel="index"><span itemprop="name">笔记</span></a>
+                </span>
+            </span>
+
+          
+            <span id="/windows%E4%B8%8B%E7%9A%84%E5%A5%87%E5%A6%99%E6%96%87%E4%BB%B6%E5%90%8D.html" class="post-meta-item leancloud_visitors" data-flag-title="windows下的奇妙文件名" title="阅读次数">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span class="leancloud-visitors-count"></span>
+            </span>
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="far fa-comment"></i>
+      </span>
+      <span class="post-meta-item-text">Valine：</span>
+    
+    <a title="valine" href="/windows%E4%B8%8B%E7%9A%84%E5%A5%87%E5%A6%99%E6%96%87%E4%BB%B6%E5%90%8D.html#valine-comments" itemprop="discussionUrl">
+      <span class="post-comments-count valine-comment-count" data-xid="/windows%E4%B8%8B%E7%9A%84%E5%A5%87%E5%A6%99%E6%96%87%E4%BB%B6%E5%90%8D.html" itemprop="commentCount"></span>
+    </a>
+  </span>
+  
+  
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h1 id="windows下的奇妙文件名"><a href="#windows下的奇妙文件名" class="headerlink" title="windows下的奇妙文件名"></a>windows下的奇妙文件名</h1><p>起因是看了看红明谷杯线下的一篇wp，然后又进行了递归式学习。从discuz RCE学到windows文件名格式</p>
+<h2 id="8dot3文件名格式"><a href="#8dot3文件名格式" class="headerlink" title="8dot3文件名格式"></a>8dot3文件名格式</h2><p>也称为短文件名格式，在远古的DOS系统上，规定主文件名不能超过8个字符，后缀不能超过3个字符，这个格式就成为8dot3格式。windows向前兼容远古的MS-DOS，因此对于所有违背上述规定的文件名都会创建一个8dot3格式的短文件名，主文件名超过八位就截取前6位，然后接一个<code>~1</code>，如果存在前缀相同就数字递增，后缀超过三位就截取前三位，在cmd中直接敲<code>dir /x</code>就可以看到对应的短文件名</p>
+<pre><code>C:\Users\xxx\Desktop\test&gt;dir /x
+ 驱动器 C 中的卷是 Windows-SSD
+ 卷的序列号是 06C1-0E48
+
+ C:\Users\xxx\Desktop\test 的目录
+
+2021/04/24  15:23    &lt;DIR&gt;                       .
+2021/04/24  15:23    &lt;DIR&gt;                       ..
+2021/04/24  15:23                 0 123~1.TXT    123.txtttt
+2021/04/24  15:23                 0 123456~2.TXT 123456780.txt
+2021/04/24  15:22                 0 123456~1.TXT 123456789.txt
+               3 个文件              0 字节
+               2 个目录 12,907,061,248 可用字节
+</code></pre>
+<p>可以使用<code>fsutil 8dot3name set 1</code>关闭该8dot3文件格式的支持</p>
+<h2 id="winAPI的玄妙通配符"><a href="#winAPI的玄妙通配符" class="headerlink" title="winAPI的玄妙通配符"></a>winAPI的玄妙通配符</h2><p>windows系统在处理文件名的时候，<code>FindFirstFileExW()/FindFirstFile()</code>这两个API会对<code>&lt; &gt; &quot;</code>这三个字符做特殊处理，效果分别对应Linux下的通配符<code>* ? .</code>，只要当最终实现是用这个API的就会受到影响，比如参考文章中提到的<code>getimagesize()</code>函数<br>感觉大部分的文件操作都会用这个API实现，本地测了一下file_get_contents也能通配符获取数据，直接<code>file_get_contents(&quot;inde&lt;.html&quot;)</code>就行。和PHP版本没什么关系，也和web服务器类型没什么关系，只要windowsAPI没改就能通杀</p>
+<h3 id="update"><a href="#update" class="headerlink" title="update"></a>update</h3><p>后来又进行了测试，似乎通配符只能通配一个路径，比如一个目录名或一个文件名，当同时去匹配两个及以上的目录或文件名时将无法匹配，例如存在一个目录<code>C:/htdocs/index.php</code>，那么<code>C:/ht&lt;&lt;/index&lt;&lt;</code>是无法匹配到htdocs目录下的index.php的。且<code>&lt;</code>和<code>*</code>的功能并不完全相同，单个小于号似乎匹配到<code>.</code>就会停止匹配，比如<code>C:/htdocs/index.&lt;</code>能匹配上index.php，但<code>C:/htdocs/index&lt;</code>就不行，而<code>&lt;&lt;</code>就能进行任意匹配了，即使目标文件名存在多个点号<br>但是<code>C:/&lt;&lt;/index.php</code>也无法成功匹配，匹配时似乎至少得有一个字符存在，比如<code>C:/h&lt;&lt;/index.php</code>，但若直接存在<code>C:/index.php</code>的话则不需要任何字符也能用上述语句进行匹配</p>
+<p>同理，在有类似功能且参数可控的情况下，可以利用通配符进行快速的文件名猜解。</p>
+<h2 id="短文件名，通配符与windows的web服务"><a href="#短文件名，通配符与windows的web服务" class="headerlink" title="短文件名，通配符与windows的web服务"></a>短文件名，通配符与windows的web服务</h2><p>关系比较乱。。。并且我本地只有Apache和IIS环境，就只这两个进行验证了，网上找了个野生的Nginx但是由于是别人的站也就不好下手。。。。主要是参考文末的文章</p>
+<p><strong>当函数调用最后通过windowsAPI时均支持通配符，与使用的语言和webserver类型无关</strong></p>
+<h3 id="windows-IIS"><a href="#windows-IIS" class="headerlink" title="windows+IIS"></a>windows+IIS</h3><p><strong>支持短文件名猜解，通配符访问文件（不可访问文件夹）</strong><br><strong>不支持短文件名访问</strong><br>话说能猜解短文件名但是猜解出来又不能访问有什么用。。。。脑洞补全吗<br>也可以猜解出来再通配符访问吧，但是本地复现时是不能通配符访问的</p>
+<h4 id="IIS全版本短文件名猜解"><a href="#IIS全版本短文件名猜解" class="headerlink" title="IIS全版本短文件名猜解"></a>IIS全版本短文件名猜解</h4><p>远古洞，是IIS6配合.net的时候导致的短文件名猜解。猜解需求当然是目标存在短文件名，可以猜解出短文件名来。在这种情况下可以通过<code>*</code>通配单个字符，在猜测正确的情况下返回404，错误返回400<br>在后续的IIS版本上修了这个问题，但是当请求方法从GET变成OPTION或者TRACE之后，仍然会出现布尔结果，约等于全版本通杀<br>在远古的远古版本似乎还能进行短文件名访问，后来给修了</p>
+<h4 id="本地复现失败"><a href="#本地复现失败" class="headerlink" title="本地复现失败"></a>本地复现失败</h4><p><strong>本地Winserver12的IIS8.5+.NET 4.0测试，不支持通配符访问文件夹和文件</strong>，不知道是不是配置PHP环境后才行<br>支持OPTIONS方法猜解，猜测成功404，失败200，需要<code>*~1*</code>这么个格式，没有这个<code>~1</code>就无法猜解，并且不能使用已经猜测出的短文件目录名进行进一步的猜解<br>即我拥有<code>testguessfolder/ind33333x.html</code>这样子一个文件，可以猜测出文件夹短文件名为<code>TESTGU~1</code>，但在猜解文件名的时候，不能使用<code>TESTGU~1</code>作为文件夹名，而是得使用<code>testguessfolder</code>全名才能继续猜解ind33333x.html这个文件</p>
+<h3 id="windows-Apache"><a href="#windows-Apache" class="headerlink" title="windows+Apache"></a>windows+Apache</h3><p><strong>支持短文件名访问</strong>，目录和文件均可<br><strong>不支持通配符访问和短文件名猜解</strong>，本地环境加奇怪的字符会直接导致403，fuzz了一遍不给用的是一堆不可见字符和<code>&quot; * : &lt; &gt; |</code>，刚好包括我们的三个通配符和短文件名猜测时的星号，可能是Apache的过滤</p>
+<h3 id="windows-Nginx"><a href="#windows-Nginx" class="headerlink" title="windows+Nginx"></a>windows+Nginx</h3><p>对野生Nginx&#x2F;1.18.0的测试结果<br><strong>支持短文件名访问，通配符访问文件（不可访问文件夹）</strong>短文件名因为找不到能用的所以没有实测。。。。<br><strong>不支持短文件名猜解</strong></p>
+<h3 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h3><p>感觉返回来IIS变成最安全的了，虽然能进行短文件名猜解，但猜解出来了又不给访问，完整文件名靠脑洞补全<br>Apache次之，discuz的数据库备份就能被直接访问上，但是不能通配符访问文件名<br>Nginx比较危险，虽然不能短文件名猜解，但是既支持短文件名访问又支持通配符访问，并且这等于可以猜解完整文件名了，并且通配符访问本身就挺危险的吧。。。</p>
+<h2 id="小trick"><a href="#小trick" class="headerlink" title="小trick"></a>小trick</h2><p>判断服务器是Linux还是windows的最有效方法之一应该是文件名的大小写，找到一个有效文件改改大小写看看会不会404就知道平台类型了，触发报错或者偶尔看看响应头应该也能找到些什么？<br>windows默认是不分大小写的，创建一个a.txt和A.txt会导致文件名冲突，不过听说windows在某次更新后支持了对文件名的大小写区分，但是需要额外配置</p>
+<h2 id="discuz-RCE"><a href="#discuz-RCE" class="headerlink" title="discuz RCE"></a>discuz RCE</h2><p>红明谷杯那个线下事实上是个discuz的题，第一步是用到了windows下短文件名访问获取到了discuz的数据库备份获取到了UC_key然后各种操作RCE的，对discuz完全不熟，只能把各位神仙的文章记录一下了<br><a target="_blank" rel="external nofollow noopener noreferrer" href="https://paper.seebug.org/1197/">空指针-Base on windows Writeup – 最新版DZ3.4实战渗透</a><br><a target="_blank" rel="external nofollow noopener noreferrer" href="https://paper.seebug.org/1144/">这是一篇“不一样”的真实渗透测试案例分析文章</a>  这个挺有意思的就是太难了呜呜<br><a target="_blank" rel="external nofollow noopener noreferrer" href="https://guokeya.github.io/post/87yhVz7uW/">红明谷数据安全大赛线下赛Discuz题解</a></p>
+<h2 id="参考链接"><a href="#参考链接" class="headerlink" title="参考链接"></a>参考链接</h2><p><a target="_blank" rel="external nofollow noopener noreferrer" href="https://xz.aliyun.com/t/2004">PHP源码调试之Windows文件通配符分析</a><br><a target="_blank" rel="external nofollow noopener noreferrer" href="https://www.freebuf.com/articles/web/172561.html">IIS深入浅出之短文件漏洞知多少</a><br><a target="_blank" rel="external nofollow noopener noreferrer" href="https://gitee.com/Discuz/DiscuzX/issues/I10NG9">windows短文件名安全问题 数据库备份爆破</a><br><a target="_blank" rel="external nofollow noopener noreferrer" href="https://stackoverflow.com/questions/24190389/findfirstfile-undocumented-wildcard-or-bug">FindFirstFile undocumented wildcard or bug?</a><br><a target="_blank" rel="external nofollow noopener noreferrer" href="https://xz.aliyun.com/t/2318#toc-4">Windows下的”你画我猜” – 告别效率低下的目录扫描方法</a></p>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/Windows/" rel="tag"># Windows</a>
+              <a href="/tags/discuz/" rel="tag"># discuz</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/%E4%BB%8EByteCTF%E5%88%B0bypass_disable_function.html" rel="prev" title="从ByteCTF到bypass_disable_function">
+      <i class="fa fa-chevron-left"></i> 从ByteCTF到bypass_disable_function
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/%5B%E8%93%9D%E5%B8%BD%E6%9D%AF%5DOne_pointer_php.html" rel="next" title="[蓝帽杯]One_pointer_php">
+      [蓝帽杯]One_pointer_php <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+    <div class="comments" id="valine-comments"></div>
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#windows%E4%B8%8B%E7%9A%84%E5%A5%87%E5%A6%99%E6%96%87%E4%BB%B6%E5%90%8D"><span class="nav-number">1.</span> <span class="nav-text">windows下的奇妙文件名</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#8dot3%E6%96%87%E4%BB%B6%E5%90%8D%E6%A0%BC%E5%BC%8F"><span class="nav-number">1.1.</span> <span class="nav-text">8dot3文件名格式</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#winAPI%E7%9A%84%E7%8E%84%E5%A6%99%E9%80%9A%E9%85%8D%E7%AC%A6"><span class="nav-number">1.2.</span> <span class="nav-text">winAPI的玄妙通配符</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#update"><span class="nav-number">1.2.1.</span> <span class="nav-text">update</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%9F%AD%E6%96%87%E4%BB%B6%E5%90%8D%EF%BC%8C%E9%80%9A%E9%85%8D%E7%AC%A6%E4%B8%8Ewindows%E7%9A%84web%E6%9C%8D%E5%8A%A1"><span class="nav-number">1.3.</span> <span class="nav-text">短文件名，通配符与windows的web服务</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#windows-IIS"><span class="nav-number">1.3.1.</span> <span class="nav-text">windows+IIS</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#IIS%E5%85%A8%E7%89%88%E6%9C%AC%E7%9F%AD%E6%96%87%E4%BB%B6%E5%90%8D%E7%8C%9C%E8%A7%A3"><span class="nav-number">1.3.1.1.</span> <span class="nav-text">IIS全版本短文件名猜解</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E6%9C%AC%E5%9C%B0%E5%A4%8D%E7%8E%B0%E5%A4%B1%E8%B4%A5"><span class="nav-number">1.3.1.2.</span> <span class="nav-text">本地复现失败</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#windows-Apache"><span class="nav-number">1.3.2.</span> <span class="nav-text">windows+Apache</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#windows-Nginx"><span class="nav-number">1.3.3.</span> <span class="nav-text">windows+Nginx</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%80%BB%E7%BB%93"><span class="nav-number">1.3.4.</span> <span class="nav-text">总结</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%B0%8Ftrick"><span class="nav-number">1.4.</span> <span class="nav-text">小trick</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#discuz-RCE"><span class="nav-number">1.5.</span> <span class="nav-text">discuz RCE</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%8F%82%E8%80%83%E9%93%BE%E6%8E%A5"><span class="nav-number">1.6.</span> <span class="nav-text">参考链接</span></a></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Z3ratu1" src="https://q2.qlogo.cn/headimg_dl?dst_uin=1207039417&spec=160">
+  <p class="site-author-name" itemprop="name">Z3ratu1</p>
+  <div class="site-description" itemprop="description">与其感慨路难行，不如现在出发</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">145</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">5</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">86</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+  <div class="beian"><a href="http://www.beian.miit.gov.cn/" rel="external nofollow noopener noreferrer" target="_blank">湘ICP备2020021580号 </a>
+      <img src="/./images/beian.png" style="display: inline-block;">
+  </div>
+
+<div class="copyright">
+  
+  &copy; 2019 – 
+  <span itemprop="copyrightYear">2022</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Z3ratu1</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="external nofollow noopener noreferrer" target="_blank">Hexo</a> & <a href="https://pisces.theme-next.org/" class="theme-link" rel="external nofollow noopener noreferrer" target="_blank">NexT.Pisces</a> 强力驱动
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+
+<script>
+NexT.utils.loadComments(document.querySelector('#valine-comments'), () => {
+  NexT.utils.getScript('https://cdn.jsdelivr.net/npm/valine@1.4.14/dist/Valine.min.js', () => {
+    var GUEST = ['nick', 'mail', 'link'];
+    var guest = 'nick,mail,link';
+    guest = guest.split(',').filter(item => {
+      return GUEST.includes(item);
+    });
+    new Valine({
+      el         : '#valine-comments',
+      verify     : false,
+      notify     : false,
+      appId      : '7H8kg0XdWO8IbhOcu4K1JaAT-gzGzoHsz',
+      appKey     : 'wPKQjkbVtvPaRR7gh2yjfLSi',
+      placeholder: "Just go go",
+      avatar     : 'mm',
+      meta       : guest,
+      pageSize   : '10' || 10,
+      visitor    : true,
+      lang       : '' || 'zh-cn',
+      path       : location.pathname,
+      recordIP   : false,
+      serverURLs : ''
+    });
+  }, window.Valine);
+});
+</script>
+
+</body>
+</html>

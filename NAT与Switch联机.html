@@ -1,0 +1,552 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 6.0.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"blog.z3ratu1.cn","root":"/","scheme":"Pisces","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"always","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":true},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+  </script>
+
+  <meta name="description" content="NAT与Switch联机加速猛汉R试玩已经于今日上线，这不玩这不玩这不玩？盾斧的衣服好好看呜呜，我猜是影蜘蛛套，我吹爆由于穷逼没钱买加速器，所以试玩了两把太刀和盾斧之后就开始研究起了怎么用现有白嫖节点来优化Switch的联机体验，然后产生了这篇文章 Eshop加速就以我自己为例，使用香港节点直接做到600k&#x2F;s的下载速度，快速下载mhr，不要小看这个速度，任地狱的垃圾服务器下行带宽有限（">
+<meta property="og:type" content="article">
+<meta property="og:title" content="NAT与Switch联机加速">
+<meta property="og:url" content="https://blog.z3ratu1.cn/NAT%E4%B8%8ESwitch%E8%81%94%E6%9C%BA.html">
+<meta property="og:site_name" content="Z3ratu1&#39;s blog">
+<meta property="og:description" content="NAT与Switch联机加速猛汉R试玩已经于今日上线，这不玩这不玩这不玩？盾斧的衣服好好看呜呜，我猜是影蜘蛛套，我吹爆由于穷逼没钱买加速器，所以试玩了两把太刀和盾斧之后就开始研究起了怎么用现有白嫖节点来优化Switch的联机体验，然后产生了这篇文章 Eshop加速就以我自己为例，使用香港节点直接做到600k&#x2F;s的下载速度，快速下载mhr，不要小看这个速度，任地狱的垃圾服务器下行带宽有限（">
+<meta property="og:locale">
+<meta property="article:published_time" content="2021-01-08T09:35:59.000Z">
+<meta property="article:modified_time" content="2021-04-25T09:13:03.771Z">
+<meta property="article:author" content="Z3ratu1">
+<meta property="article:tag" content="NAT">
+<meta property="article:tag" content="Switch">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="https://blog.z3ratu1.cn/NAT%E4%B8%8ESwitch%E8%81%94%E6%9C%BA.html">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-Hans'
+  };
+</script>
+
+  <title>NAT与Switch联机加速 | Z3ratu1's blog</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+<link rel="stylesheet" href="/css/prism-tomorrow.css" type="text/css"></head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">Z3ratu1's blog</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">Welcome</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>关于</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+        <li class="menu-item menu-item-links">
+
+    <a href="/links/" rel="section"><i class="fa fa-link fa-fw"></i>友链</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off" placeholder="搜索..." spellcheck="false" type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+  <a href="https://github.com/Z3ratu1" class="github-corner" title="Follow me on GitHub" aria-label="Follow me on GitHub" rel="external nofollow noopener noreferrer" target="_blank"><svg width="80" height="80" viewbox="0 0 250 250" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"/><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"/><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"/></svg></a>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
+    <link itemprop="mainEntityOfPage" href="https://blog.z3ratu1.cn/NAT%E4%B8%8ESwitch%E8%81%94%E6%9C%BA.html">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="https://q2.qlogo.cn/headimg_dl?dst_uin=1207039417&spec=160">
+      <meta itemprop="name" content="Z3ratu1">
+      <meta itemprop="description" content="与其感慨路难行，不如现在出发">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Z3ratu1's blog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          NAT与Switch联机加速
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2021-01-08 17:35:59" itemprop="dateCreated datePublished" datetime="2021-01-08T17:35:59+08:00">2021-01-08</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2021-04-25 17:13:03" itemprop="dateModified" datetime="2021-04-25T17:13:03+08:00">2021-04-25</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E6%9D%82%E9%A1%B9/" itemprop="url" rel="index"><span itemprop="name">杂项</span></a>
+                </span>
+            </span>
+
+          
+            <span id="/NAT%E4%B8%8ESwitch%E8%81%94%E6%9C%BA.html" class="post-meta-item leancloud_visitors" data-flag-title="NAT与Switch联机加速" title="阅读次数">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span class="leancloud-visitors-count"></span>
+            </span>
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="far fa-comment"></i>
+      </span>
+      <span class="post-meta-item-text">Valine：</span>
+    
+    <a title="valine" href="/NAT%E4%B8%8ESwitch%E8%81%94%E6%9C%BA.html#valine-comments" itemprop="discussionUrl">
+      <span class="post-comments-count valine-comment-count" data-xid="/NAT%E4%B8%8ESwitch%E8%81%94%E6%9C%BA.html" itemprop="commentCount"></span>
+    </a>
+  </span>
+  
+  
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h1 id="NAT与Switch联机加速"><a href="#NAT与Switch联机加速" class="headerlink" title="NAT与Switch联机加速"></a>NAT与Switch联机加速</h1><p>猛汉R试玩已经于今日上线，这不玩这不玩这不玩？<br>盾斧的衣服好好看呜呜，我猜是影蜘蛛套，我吹爆<br>由于穷逼没钱买加速器，所以试玩了两把太刀和盾斧之后就开始研究起了怎么用现有白嫖节点来优化Switch的联机体验，然后产生了这篇文章</p>
+<h2 id="Eshop加速"><a href="#Eshop加速" class="headerlink" title="Eshop加速"></a>Eshop加速</h2><p>就以我自己为例，使用香港节点直接做到600k&#x2F;s的下载速度，快速下载mhr，不要小看这个速度，任地狱的垃圾服务器下行带宽有限（虽然用了一堆CDN，但是就这么点速度）就算是充钱买的加速器也就2m&#x2F;s多一点，对于白嫖党来说这已经很不错了</p>
+<p>我用的clash，直接勾选Allow LAN，允许局域网访问，然后让电脑和Switch在同一个WiFi下，配置switch的代理设置为电脑ip加7890端口即可，挑一个港服节点，进行快速港服eshop下载<br>（其实因为垃圾校园网需要认证switch没法连，我自己还是本机连校园网然后同时开热点让switch连电脑热点下的。。。。）</p>
+<h3 id="加速原理"><a href="#加速原理" class="headerlink" title="加速原理"></a>加速原理</h3><p>我不知道，我一直以为加速器下载加速肯定是有专线什么的带宽upup，所以下载速度快。但是我就单纯的设置一个代理也能提升速度，如下为猜测原因<br>1.境外服务器国内互联网不怎么常用，DNS或者路由查询慢(香港本身不算境外啊，不要搞反动！但是和国内互联网不是一个体系，所以按境外考虑)<br>2.国内网络边界审查流量拖慢访问速度，并且可能误伤正常流量导致大量丢包重传<br>3.可能是比较重要的一点，链路质量问题，国内存在各种各样运营商的各种各样的链路，CN2系列是我国下一代什么什么承载网，是国内最好的链路产品，然而90%以上的请求却仍然在拥堵的上个世纪搭建的电信骨干网中流动，丢包重传概率高，链路质量差。而如果使用阿里云等商业网络，可能会在各地存在专门的接入网络，加快连接速度。我们使用的节点可能也就是某个商业集团的vps，商用网当然优于家用网。而对于加速器而言，各地部署高速网络，使用BGP来帮助降低用户家宽到中转服务器的延时，并通过内网IPLC隧道一把梭，极致网速体验</p>
+<p>虽然不如加速器超级专线的网络速度，但是的确挂了个梯子之后也达到了一定的加速效果，我很开心</p>
+<h2 id="NAT"><a href="#NAT" class="headerlink" title="NAT"></a>NAT</h2><p>简单测试之后得出MHR的联机方式是CS，但是不是任地狱或者卡普空的官方服务器，是房主自己的机子当服务器(所以房主永远不卡)，和其他玩家进行通信，任地狱似乎没有那种中心服务器，switch上大部分游戏可能都是玩家主机做服务器或P2P，任地狱只提供STUN服务器来辅助大家进行互相找到。P2P的话，一个人炸了整个房就炸了<del>例如马造2，马车8？无把握</del>喷喷不知道是哪种，看了几个帖子可能是P2P？动森可能是岛主做服务器？<br>而IPv4地址很稀缺，所以我相信大家现在都是用NAT上网的</p>
+<p>这里就要提到NAT的几种类型了</p>
+<h3 id="Full-Cone-NAT"><a href="#Full-Cone-NAT" class="headerlink" title="Full Cone NAT"></a>Full Cone NAT</h3><p>完全圆锥型NAT，当你获得了一个ip:port映射之后，所有发向你映射的IP端口对的数据都会转发到你本地的对应端口，基本上就等于获得了一个公网IP端口对<br>对应任地狱的NAT类型A<br>直接拥有公网IP NAT类型也为A</p>
+<h3 id="Address-Restricted-Cone-NAT"><a href="#Address-Restricted-Cone-NAT" class="headerlink" title="Address Restricted Cone NAT"></a>Address Restricted Cone NAT</h3><p>地址限制圆锥形NAT，同样给一个映射，但只允许从数据发送的目的机器的回应报文返回，你没发过数据的人知道了你映射出来的IP端口也不能给你发消息<br>对应任地狱的NAT类型B</p>
+<h3 id="Port-Restricted-Cone-NAT"><a href="#Port-Restricted-Cone-NAT" class="headerlink" title="Port Restricted Cone NAT"></a>Port Restricted Cone NAT</h3><p>端口限制圆锥型NAT，相较上一个再增加一个端口限制，只允许自己发送过数据的对应机器的对应端口的回应报文返回<br>对应任地狱的NAT类型C</p>
+<h3 id="Symmetric-NAT"><a href="#Symmetric-NAT" class="headerlink" title="Symmetric NAT"></a>Symmetric NAT</h3><p>对称型NAT，贼玄幻的东西，限制先拉满，和端口限制圆锥型NAT的限制规则一致，又加了一个对每个不同的IP:Port发送的数据进行一个映射<br>就比如我同时向两个主机(或者同一主机的两个端口)发送数据，那么NAT就会对应这两个链接映射两个IP端口对<br>就是说每一个原宿IP端口对对应一条独一无二的映射关系，公用网络，校园网之类的基本上是这个类型<br>对应任地狱的NAT类型D</p>
+<h3 id="NAT-Type-F"><a href="#NAT-Type-F" class="headerlink" title="NAT Type F"></a>NAT Type F</h3><p>这已经不是NAT类型了，意思是Fail，你连不上网，你完全没机会联机</p>
+<h3 id="NAT类型与联机"><a href="#NAT类型与联机" class="headerlink" title="NAT类型与联机"></a>NAT类型与联机</h3><p>之前说了，mhr没有游戏服务器，或者说存在一个大厅服务器，让玩家们能互相找到对方，而实际上的游戏服务器是房主的switch，也就是以房主为中心的一个CS模式<br>接下来为对联机过程的推测，有待考证<br>存在一台游戏大厅服务器，简单的认为玩家A和B的switch全部连接到大厅服务器上，A创建一个房间，B加入这个房间，这个时候大厅服务器就分别把AB的IP端口告诉对方，然后让A和B进行连接。<br>而如何获取AB的IP端口，任地狱使用了STUN服务器，似乎用的是xxx.lp1.n.n.srv.nintendo.net这个域名，从clash中可以看到这个连接，获取到AB各自的NAT状态，且告诉对方各自NAT出来的的IP地址和端口(或者是直接发现超级牛逼的玩家暴露在公网中)在这个情况下ABC三种NAT类型并不影响联机<br>而D类型由于每个IP端口对应一个映射，导致用户A的switch和STUN连接得到的IP端口和实际去和用户B连接的IP端口组不一致，而其超级限制使得两方无法正常联机</p>
+<p>reddit上的一个帖子说到喷喷在NAT为C的时候就玩不了了，我其实不太能理解。。。</p>
+<h3 id="内网穿透"><a href="#内网穿透" class="headerlink" title="内网穿透"></a>内网穿透</h3><p>也就是NAT打洞，通过STUN服务器的辅助使得两个隐藏在NAT后的主机能互相通信</p>
+<h4 id="A为房主"><a href="#A为房主" class="headerlink" title="A为房主"></a>A为房主</h4><p>这时候A就约等于暴露在公网中，BCD类型均可直接向A发起请求，建立连接，而A通过建立的请求反向回复即可与BCD类型建立连接</p>
+<h4 id="B为房主"><a href="#B为房主" class="headerlink" title="B为房主"></a>B为房主</h4><p>B类型只接受其自身通信过的主机的数据，且显然若其他通信方NAT等级高于B，则可用之前的方法建立连接。若对端也为BC类型，则双方互相向对方IP:Port发送请求，完成NAT打洞。<br>若对端为D类型，则STUN服务器给予房主的IP:Port不是其对端与房主通信的IP:Port(一般来说IP不变，Port增长)，则房主到D的请求会被拒绝，但此时房主可接受来自D的通信，因此D可以抵达房主，房主再建立反向通信，双方完成NAT打洞。</p>
+<h4 id="C为房主"><a href="#C为房主" class="headerlink" title="C为房主"></a>C为房主</h4><p>只考虑对端为CD的情况，对端为C，则双方同上述情况，互相进行试探，在NAT上打洞完成通信建立。<br>对端为D时，C发给D的请求被丢弃，而打通的洞却只允许D特定端口的数据通过，而D类型在于服务器通信和与房主通信时端口不一致，无法完成打洞（但C可以通过对D进行端口猜测打洞，成功率不高）。C-D类型无法完成联机。</p>
+<h4 id="D为房主"><a href="#D为房主" class="headerlink" title="D为房主"></a>D为房主</h4><p>只考虑对端为D，比C还惨，双方猜测对方的IP:Port进行通信，撞中的概率比C-D应该高一个数量级，撞大运了就能通信上</p>
+<h4 id="NAT对联机影响"><a href="#NAT对联机影响" class="headerlink" title="NAT对联机影响"></a>NAT对联机影响</h4><p>NAT类型并不影响联机质量，只是越低等级的NAT导致建立连接的难度加大，但只要能建立连接，NAT就不在影响实际的联机情况，剩下的更多的是看网络的延迟，链路的通畅和丢包率的高低<br><strong>唯有C-D，D-D类型的网络无法互相联机，房主只要是AB两种类型任何NAT类型的人都能相互联机</strong></p>
+<p>推荐阅读<a target="_blank" rel="external nofollow noopener noreferrer" href="https://paper.seebug.org/1561/">NAT 原理以及 UDP 穿透</a>，配了图NAT穿透过程和NAT类型都说到挺清晰的，就是最后所谓的实现UDP NAT穿透就是任天堂现在的这个STUN服务，并不能做到我们想要的加速器效果</p>
+<h2 id="Something-else"><a href="#Something-else" class="headerlink" title="Something else"></a>Something else</h2><p>有大哥和我说联机模式取决于房主的NAT质量，当NAT类型为AB时，任天堂服务器只负责让大家找到对方，当任天堂发现房主处于一个内网且不支持端口映射（即类型为C及以下？)，将自己作为中介进行数据转发<br>掘金的帖子中动森的说法为网络类型不好也会让两方尝试进行连接，不过是连接时成功的难度变得高了一点<br>今天和开了加速器NAT类型为A的大姐联机抓包测试的结论是，我全程只与约等于拥有公网地址的A类NAT房主通信，而与其他两个同在一个房间的玩家并无通信流量（我连的垃圾校园网NAT类型为D，不过好像也不是很卡）<br>以后如果和网络质量较差的大哥联机时在做更新</p>
+<h3 id="联机流畅程度的决定因素"><a href="#联机流畅程度的决定因素" class="headerlink" title="联机流畅程度的决定因素"></a>联机流畅程度的决定因素</h3><p>以下为个人的不成熟意见<br>实际上影响连接质量的我觉得是与境外游戏服务器直接的不通畅，国内家用网络质量不佳，不同运营商之间提供的服务存在差异，以及地域网路条件导致的连接延迟（我和我大哥都在学校的时候联机就流畅的我从来没考虑过这个问题，各自回家之后就卡的连都连不上了）<br>游戏加速器本质上和一个代理服务器没什么太大的差别，不过加速器为游戏专门在各运营商处建立了专线，降低了报文在联通电信两大ISP之间切换的问题，同时也有专线直连海外，提升带宽，提供一路畅通的专线服务。加速器的服务器就是一个直接拥有公网IP的服务器，这一连上就直接等于最好的NAT类型A<br>而使用代理服务器代替游戏加速器也能提升一定的速度，是因为优化了GFW的过滤部分，因为连接境外服务器最大的问题可能就在于GFW的误伤导致的丢包重传，并且境外节点可能位于一些高速链路上，很多节点都是买的搬瓦工之类的机房，他们可能有一定的专线网络(不过肯定没有加速器一条龙服务来的顺畅)，而实际上物理距离导致的网络延迟并不是最严重的，并且代理服务器肯定也是自己有一个公网IP，也就意味着NAT类型应该也能提升到A</p>
+<p>如果mhr在CS的过程中并不向任地狱服务器发送信息，则可以尝试在国内架设一个服务器，商用网络也在一定程度上优于普通的家用网络，让所有人将那个国内服务器作为代理，就在国内解决问题<br>学习的时候偶然看到了类似的文章，看了下去发现是灵缇的开发者，下载了一个下来看了一眼，他们对动森等部分游戏就存在国内加速节点，估计用于就是纯玩家间网络的加速<br>而如果还需要像境外服务器提供额外数据的话，最好是每个人都连接到境外的加速器，走高速链路，应该能获取最佳体验</p>
+<h3 id="加速器的加速原理"><a href="#加速器的加速原理" class="headerlink" title="加速器的加速原理"></a>加速器的加速原理</h3><p>加速器分几种，下载加速的话就是简单高速链路代理，像吃鸡这种与国外游戏服务器加速的代理也是类似情况，都是通过走高速专线一把梭到底来提升游戏体验。<br>而switch的联机并不存在一个游戏服务器，优化的部分应当是玩家与玩家之间的联系性<br>如下为灵缇开发者对自己的加速器的描述</p>
+<blockquote>
+<p>如果一台设备直接拥有全球IP，那么它的NAT类型一定为A，因为没有任何中间防火墙的阻挠。我们的游戏加速服务器，就是NAT类型为A的全球服务器，通过端口流量转发对照，实现了这个提升。加速服务器在这个过程中起到两个作用，一个是代理，即Switch的网络数据由加速服务器帮忙转发，使NAT变为A，二是加速，加速器优化了这其中的网络链路，使之更快更流畅。</p>
+</blockquote>
+<p>也就是说switch联机的加速器是通过端口转发使得房主穿越NAT限制直接成为A类型（我感觉实现就是NAT转出来之后直接和公网IP加速器通信，然后公网IP加速器端口作为代理去和外界通信，而这个加速器不走任何防火墙，NAT类型就变成了A。事实上只要我们本身的防火墙不做限制，不是人人都是A类NAT么&#x3D; &#x3D;）然后就是我反复强调的网络链路，强力专线，高速直达了</p>
+<p>个人认为<strong>决定联机质量的是网络链路质量，而NAT只是影响玩家之间的可达性</strong>，两个C类NAT已经是联机的下限了，但我觉得如果他们之间的链路带宽够好，应该也会比两个在家用网上挤得要死的A类NAT联机更为顺畅</p>
+<h3 id="update"><a href="#update" class="headerlink" title="update"></a>update</h3><p>我太天真了。平常使用的代理确实能加速下载，他们都是HTTP代理，因为转发的是TCP流量，但是对于游戏加速可能并不实用，因为大部分的HTTP代理只代理TCP流量，而众多游戏似乎都是用UDP进行数据传输，就算Socks5支持UDP的转发，也需要看代理节点是否支持UDP转发，不然还是白给</p>
+<p>clash可以通过启动TAP或者TUN来进行全局代理，把所有流量全部劫持到自建的cfw-tap网卡上，再进行下一步的转发，能强行扭转一些不走代理的软件的流量（但是我switch直接指定了代理服务器应该不需要这步吧？）暂时不知道UDP无法转发是clash设置问题还是对端节点支持问题，若是对端节点不支持UDP转发，那我switch是不是应该直接没法联机才对？TCP从clash里可以看见和任天堂服务器仍存在通信，不过感觉是好友服务之类的，STUN也用的UDP协议，或者说clash遇到UDP的数据还是走的直连，所以联机无问题？</p>
+<p>有的机场好像也提供那种游戏节点，不知道是不是只有那种才提供UDP转发，剩下的只是普通的HTTP代理？</p>
+<p>不过如果只是要公网IP和商业网络路线的话，要不我到时候试试用我的阿里云上海vps试一下做个代理？</p>
+<p>挖坑，考完试还没忘就填一下。。。为什么别人考试都考完了我还在上课。。。</p>
+<h2 id="NAT和DHCP的区别"><a href="#NAT和DHCP的区别" class="headerlink" title="NAT和DHCP的区别"></a>NAT和DHCP的区别</h2><p>作为无关话题，思考时突然想到而进行的学习<br>NAT进行的是IP地址的转换，将内网地址转换为公网地址<br>DHCP进行的是IP的分配，给你先来个内网地址进行NAT(据说有的神仙DHCP也能分配一个公网地址)，那估计就没NAT的事情了</p>
+<h2 id="参考链接"><a href="#参考链接" class="headerlink" title="参考链接"></a>参考链接</h2><p>三天高强度学习switch联机。。。。期末要死了，不学了不学了<br><a target="_blank" rel="external nofollow noopener noreferrer" href="https://zh.wikipedia.org/wiki/%E7%BD%91%E7%BB%9C%E5%9C%B0%E5%9D%80%E8%BD%AC%E6%8D%A2">网络地址转换-维基百科</a><br><a target="_blank" rel="external nofollow noopener noreferrer" href="https://www.reddit.com/r/splatoon/comments/6rtgmg/nat_types_and_connection_problems_explained/?utm_source=amp&utm_medium=&utm_content=post_body">nat_types_and_connection_problems_explained</a><br><a target="_blank" rel="external nofollow noopener noreferrer" href="https://www.zhihu.com/question/66893227">NAT和DHCP的区别</a><br><a target="_blank" rel="external nofollow noopener noreferrer" href="https://www.wallmama.com/jsq/">网络游戏加速器原理</a><br><a target="_blank" rel="external nofollow noopener noreferrer" href="https://zhuanlan.zhihu.com/p/307898255">Switch 的 NAT类型硬核向趣味图解</a><br><a target="_blank" rel="external nofollow noopener noreferrer" href="https://zankyo.cc/2845/">Nintendo Switch：<del>联机加速方案的研究与折腾</del></a><br><a target="_blank" rel="external nofollow noopener noreferrer" href="https://www.zhihu.com/question/63279891">怎么用VPS搭建网游加速器（自己玩而已）？</a><br><a target="_blank" rel="external nofollow noopener noreferrer" href="https://juejin.cn/post/6844904159074861063">从动物森友会聊主机游戏联机机制</a><br><a target="_blank" rel="external nofollow noopener noreferrer" href="https://www.zhihu.com/question/66788297">很多游戏机(Switch&#x2F;3ds&#x2F;PS4)是否没有公网ip无法联机，原因是什么？</a><br><a target="_blank" rel="external nofollow noopener noreferrer" href="https://www.zhihu.com/question/20436734">udp协议怎么穿透Symmetric NAT？</a><br><a target="_blank" rel="external nofollow noopener noreferrer" href="https://paper.seebug.org/1561/">NAT 原理以及 UDP 穿透</a></p>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/NAT/" rel="tag"># NAT</a>
+              <a href="/tags/Switch/" rel="tag"># Switch</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/Java%E7%9A%84%E5%A5%87%E6%80%AA%E5%91%BD%E4%BB%A4%E6%89%A7%E8%A1%8C.html" rel="prev" title="Java的奇怪命令执行">
+      <i class="fa fa-chevron-left"></i> Java的奇怪命令执行
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/switch%E8%81%94%E6%9C%BA%E6%B7%B1%E7%A9%B6.html" rel="next" title="Switch联机加速研究">
+      Switch联机加速研究 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+    <div class="comments" id="valine-comments"></div>
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#NAT%E4%B8%8ESwitch%E8%81%94%E6%9C%BA%E5%8A%A0%E9%80%9F"><span class="nav-number">1.</span> <span class="nav-text">NAT与Switch联机加速</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#Eshop%E5%8A%A0%E9%80%9F"><span class="nav-number">1.1.</span> <span class="nav-text">Eshop加速</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%8A%A0%E9%80%9F%E5%8E%9F%E7%90%86"><span class="nav-number">1.1.1.</span> <span class="nav-text">加速原理</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#NAT"><span class="nav-number">1.2.</span> <span class="nav-text">NAT</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Full-Cone-NAT"><span class="nav-number">1.2.1.</span> <span class="nav-text">Full Cone NAT</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Address-Restricted-Cone-NAT"><span class="nav-number">1.2.2.</span> <span class="nav-text">Address Restricted Cone NAT</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Port-Restricted-Cone-NAT"><span class="nav-number">1.2.3.</span> <span class="nav-text">Port Restricted Cone NAT</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Symmetric-NAT"><span class="nav-number">1.2.4.</span> <span class="nav-text">Symmetric NAT</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#NAT-Type-F"><span class="nav-number">1.2.5.</span> <span class="nav-text">NAT Type F</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#NAT%E7%B1%BB%E5%9E%8B%E4%B8%8E%E8%81%94%E6%9C%BA"><span class="nav-number">1.2.6.</span> <span class="nav-text">NAT类型与联机</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%86%85%E7%BD%91%E7%A9%BF%E9%80%8F"><span class="nav-number">1.2.7.</span> <span class="nav-text">内网穿透</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#A%E4%B8%BA%E6%88%BF%E4%B8%BB"><span class="nav-number">1.2.7.1.</span> <span class="nav-text">A为房主</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#B%E4%B8%BA%E6%88%BF%E4%B8%BB"><span class="nav-number">1.2.7.2.</span> <span class="nav-text">B为房主</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#C%E4%B8%BA%E6%88%BF%E4%B8%BB"><span class="nav-number">1.2.7.3.</span> <span class="nav-text">C为房主</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#D%E4%B8%BA%E6%88%BF%E4%B8%BB"><span class="nav-number">1.2.7.4.</span> <span class="nav-text">D为房主</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#NAT%E5%AF%B9%E8%81%94%E6%9C%BA%E5%BD%B1%E5%93%8D"><span class="nav-number">1.2.7.5.</span> <span class="nav-text">NAT对联机影响</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Something-else"><span class="nav-number">1.3.</span> <span class="nav-text">Something else</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%81%94%E6%9C%BA%E6%B5%81%E7%95%85%E7%A8%8B%E5%BA%A6%E7%9A%84%E5%86%B3%E5%AE%9A%E5%9B%A0%E7%B4%A0"><span class="nav-number">1.3.1.</span> <span class="nav-text">联机流畅程度的决定因素</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%8A%A0%E9%80%9F%E5%99%A8%E7%9A%84%E5%8A%A0%E9%80%9F%E5%8E%9F%E7%90%86"><span class="nav-number">1.3.2.</span> <span class="nav-text">加速器的加速原理</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#update"><span class="nav-number">1.3.3.</span> <span class="nav-text">update</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#NAT%E5%92%8CDHCP%E7%9A%84%E5%8C%BA%E5%88%AB"><span class="nav-number">1.4.</span> <span class="nav-text">NAT和DHCP的区别</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%8F%82%E8%80%83%E9%93%BE%E6%8E%A5"><span class="nav-number">1.5.</span> <span class="nav-text">参考链接</span></a></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Z3ratu1" src="https://q2.qlogo.cn/headimg_dl?dst_uin=1207039417&spec=160">
+  <p class="site-author-name" itemprop="name">Z3ratu1</p>
+  <div class="site-description" itemprop="description">与其感慨路难行，不如现在出发</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">145</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">5</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">86</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+  <div class="beian"><a href="http://www.beian.miit.gov.cn/" rel="external nofollow noopener noreferrer" target="_blank">湘ICP备2020021580号 </a>
+      <img src="/./images/beian.png" style="display: inline-block;">
+  </div>
+
+<div class="copyright">
+  
+  &copy; 2019 – 
+  <span itemprop="copyrightYear">2022</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Z3ratu1</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="external nofollow noopener noreferrer" target="_blank">Hexo</a> & <a href="https://pisces.theme-next.org/" class="theme-link" rel="external nofollow noopener noreferrer" target="_blank">NexT.Pisces</a> 强力驱动
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+
+<script>
+NexT.utils.loadComments(document.querySelector('#valine-comments'), () => {
+  NexT.utils.getScript('https://cdn.jsdelivr.net/npm/valine@1.4.14/dist/Valine.min.js', () => {
+    var GUEST = ['nick', 'mail', 'link'];
+    var guest = 'nick,mail,link';
+    guest = guest.split(',').filter(item => {
+      return GUEST.includes(item);
+    });
+    new Valine({
+      el         : '#valine-comments',
+      verify     : false,
+      notify     : false,
+      appId      : '7H8kg0XdWO8IbhOcu4K1JaAT-gzGzoHsz',
+      appKey     : 'wPKQjkbVtvPaRR7gh2yjfLSi',
+      placeholder: "Just go go",
+      avatar     : 'mm',
+      meta       : guest,
+      pageSize   : '10' || 10,
+      visitor    : true,
+      lang       : '' || 'zh-cn',
+      path       : location.pathname,
+      recordIP   : false,
+      serverURLs : ''
+    });
+  }, window.Valine);
+});
+</script>
+
+</body>
+</html>

