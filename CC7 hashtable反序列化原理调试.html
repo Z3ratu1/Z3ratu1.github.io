@@ -27,11 +27,16 @@
 <meta property="og:site_name" content="Z3ratu1&#39;s blog">
 <meta property="og:description" content="CC7 hashtable反序列化原理调试本来只是对CC各链进行了简单性的写代码复习，就是大致的记忆了CC1-7的各个链触发方式和利用点，但对具体触发的流程并不甚熟悉。昨天闲的没事把templatesImpl和CC7的hashtable缝合了一下，发现payload在触发上存在着一定的问题，然后百思不得其解，然后究极debug还是发现不了问题所在，问了下rmb神仙他和我说是时候究极跟进实现了。于是">
 <meta property="og:locale">
+<meta property="og:image" content="https://blog.z3ratu1.cn/images/CC7hashtable%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96%E5%8E%9F%E7%90%86%E8%B0%83%E8%AF%95/image-20220312170030329.png">
+<meta property="og:image" content="https://blog.z3ratu1.cn/images/CC7hashtable%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96%E5%8E%9F%E7%90%86%E8%B0%83%E8%AF%95/image-20220312170153242.png">
+<meta property="og:image" content="https://blog.z3ratu1.cn/images/CC7hashtable%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96%E5%8E%9F%E7%90%86%E8%B0%83%E8%AF%95/image-20220312170308917.png">
+<meta property="og:image" content="https://blog.z3ratu1.cn/images/CC7hashtable%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96%E5%8E%9F%E7%90%86%E8%B0%83%E8%AF%95/image-20220312170344662.png">
 <meta property="article:published_time" content="2022-03-12T08:15:48.000Z">
-<meta property="article:modified_time" content="2022-03-12T09:39:26.994Z">
+<meta property="article:modified_time" content="2022-03-12T09:42:26.500Z">
 <meta property="article:author" content="Z3ratu1">
 <meta property="article:tag" content="Java">
 <meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://blog.z3ratu1.cn/images/CC7hashtable%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96%E5%8E%9F%E7%90%86%E8%B0%83%E8%AF%95/image-20220312170030329.png">
 
 <link rel="canonical" href="https://blog.z3ratu1.cn/CC7%20hashtable%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96%E5%8E%9F%E7%90%86%E8%B0%83%E8%AF%95.html">
 
@@ -224,7 +229,7 @@
               <span class="post-meta-item-text">发表于</span>
               
 
-              <time title="创建时间：2022-03-12 16:15:48 / 修改时间：17:39:26" itemprop="dateCreated datePublished" datetime="2022-03-12T16:15:48+08:00">2022-03-12</time>
+              <time title="创建时间：2022-03-12 16:15:48 / 修改时间：17:42:26" itemprop="dateCreated datePublished" datetime="2022-03-12T16:15:48+08:00">2022-03-12</time>
             </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -347,12 +352,12 @@
 <p>然后问了下甫舟，甫舟把他的缝合版发给了我，简单对比一下没有实质上的区别，但他的跑得起来，我的跑不起来。<br>但是当我把我的<code>final Transformer[] rubbish = new Transformer[]&#123;new ConstantTransformer(1)&#125;;</code>这句中的ConstantTransformer换成他的null之后就跑起来了。有点无法理解。。。</p>
 <h2 id="调试"><a href="#调试" class="headerlink" title="调试"></a>调试</h2><p>怎么说呢，今天一调试就调试出结果了。。。昨天调了几下却没看懂逻辑。。。可能是因为idea调试这里有点抽象吧</p>
 <p>在这里下一个断点</p>
-<p>![image-20220312170030329](&#x2F;images&#x2F;CC7 hashtable反序列化原理调试&#x2F;image-20220312170030329.png)<br>并在第二个put语句中step into。会非常奇怪的没有进入put函数而是进入了<code>AbstractMapDecorator</code></p>
-<p>![image-20220312170153242](&#x2F;images&#x2F;CC7 hashtable反序列化原理调试&#x2F;image-20220312170153242.png)</p>
+<p><img src="/images/CC7hashtable%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96%E5%8E%9F%E7%90%86%E8%B0%83%E8%AF%95/image-20220312170030329.png" alt="image-20220312170030329"><br>并在第二个put语句中step into。会非常奇怪的没有进入put函数而是进入了<code>AbstractMapDecorator</code></p>
+<p><img src="/images/CC7hashtable%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96%E5%8E%9F%E7%90%86%E8%B0%83%E8%AF%95/image-20220312170153242.png" alt="image-20220312170153242"></p>
 <p>我直接疑惑，当时就不知道什么情况了，如果继续step into就会进其他的函数，step forward直接回到主函数。根本不知道发生了什么，然后今天我看了一眼左边的调用栈，才发现怎么还有一层他没给我进去呢</p>
-<p>![image-20220312170308917](&#x2F;images&#x2F;CC7 hashtable反序列化原理调试&#x2F;image-20220312170308917.png)</p>
+<p><img src="/images/CC7hashtable%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96%E5%8E%9F%E7%90%86%E8%B0%83%E8%AF%95/image-20220312170308917.png" alt="image-20220312170308917"></p>
 <p>然后点调用栈进Hashtable的put函数，逻辑就很清楚了</p>
-<p>![image-20220312170344662](&#x2F;images&#x2F;CC7 hashtable反序列化原理调试&#x2F;image-20220312170344662.png)</p>
+<p><img src="/images/CC7hashtable%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96%E5%8E%9F%E7%90%86%E8%B0%83%E8%AF%95/image-20220312170344662.png" alt="image-20220312170344662"></p>
 <p>在put的时候会对hash值进行检验，如果hash相同则进入equal进行比对。这里的equal会调用map.equal，也就是lazyMap的equal，然后lazymap.get到lazymap的transform触发payload</p>
 <p>而这里我塞了一个ConstantTransformer返回1，因此最后在put时会认为哈希碰撞且值相同，不放入该entry。。。所以put无效，修补方案也很简单，只要让rubbish中transform的返回值和一开始lazyMap中put的值不一样就行了。当然，建议该ConstantTransformer，因为两个lazymap的值仍然需要一致，否则算出来的hashCode不一致，同样不会触发payload</p>
 <p>put时的操作也就是readObject时触发的操作，readObject时调用reconstitutionPut(那个词是重建的意思)，和put做的操作类似，会进行哈希比对，若哈希相同则用equal比对值，然后走上和put一致的道路<br>所以构造payload的时候要先塞rubbish再反射改掉，不然会打自己一下</p>
