@@ -28,7 +28,7 @@
 <meta property="og:description" content="Java Agent内存马–从入门到踩坑还是，再学点java。。。主要是就着上次复现看看java内存马的实现，然后就看到了其中一种的java agent注入（但实际使用的多的应该还是直接反射调函数加filter，agent的操作要先写一个agent jar包上去，麻烦太多）这个东西之前也见到过，两次，一次是burp破解，一次是cobalt strike破解那个时候的理解大概就是这个玩意能注入进程进">
 <meta property="og:locale">
 <meta property="article:published_time" content="2022-03-12T06:42:11.000Z">
-<meta property="article:modified_time" content="2022-03-12T06:42:32.989Z">
+<meta property="article:modified_time" content="2022-03-12T09:35:43.315Z">
 <meta property="article:author" content="Z3ratu1">
 <meta property="article:tag" content="Java">
 <meta name="twitter:card" content="summary">
@@ -224,7 +224,7 @@
               <span class="post-meta-item-text">发表于</span>
               
 
-              <time title="创建时间：2022-03-12 14:42:11 / 修改时间：14:42:32" itemprop="dateCreated datePublished" datetime="2022-03-12T14:42:11+08:00">2022-03-12</time>
+              <time title="创建时间：2022-03-12 14:42:11 / 修改时间：17:35:43" itemprop="dateCreated datePublished" datetime="2022-03-12T14:42:11+08:00">2022-03-12</time>
             </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -553,7 +553,7 @@ Agent-Class: org.z33.agenttest.AgentDemo
 </code></pre>
 <p>这里踩了一个究极大坑，后续另开文章细说</p>
 <p>照抄ha1师傅的agentmain和Transformer即可打通</p>
-<h2 id="踩坑"><a href="#踩坑" class="headerlink" title="踩坑"></a>踩坑</h2><p>果然要多动手，一动手就猜了一万个坑。。。纯看文章不动手就不会踩坑了</p>
+<h2 id="踩坑"><a href="#踩坑" class="headerlink" title="踩坑"></a>踩坑</h2><p>果然要多动手，一动手就踩了一万个坑。。。纯看文章不动手就不会踩坑了</p>
 <h3 id="启动时com-sun-tools-not-found"><a href="#启动时com-sun-tools-not-found" class="headerlink" title="启动时com.sun.tools not found"></a>启动时com.sun.tools not found</h3><p>最先踩的坑是maven引入不了<code>com.sun.tools</code>这个包（理论上来说com.sun不应该是属于究极自带的包吗。。。）然后通过谷歌解决</p>
 <pre class=" language-xml"><code class="language-xml"><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>dependency</span><span class="token punctuation">></span></span>
     <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>groupId</span><span class="token punctuation">></span></span>com.sun<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>groupId</span><span class="token punctuation">></span></span>
@@ -644,7 +644,10 @@ Agent-Class: org.z33.agenttest.AgentDemo
     <a href="/SUSCTF2022%20java%E5%A4%8D%E7%8E%B0.html" rel="prev" title="SUSCTF2022 java复现">
       <i class="fa fa-chevron-left"></i> SUSCTF2022 java复现
     </a></div>
-      <div class="post-nav-item"></div>
+      <div class="post-nav-item">
+    <a href="/CC7%20hashtable%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96%E5%8E%9F%E7%90%86%E8%B0%83%E8%AF%95.html" rel="next" title="CC7 hashtable反序列化原理调试">
+      CC7 hashtable反序列化原理调试 <i class="fa fa-chevron-right"></i>
+    </a></div>
     </div>
       </footer>
     
@@ -719,7 +722,7 @@ Agent-Class: org.z33.agenttest.AgentDemo
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">146</span>
+          <span class="site-state-item-count">147</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
