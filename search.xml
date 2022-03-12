@@ -16633,12 +16633,12 @@ docker0         8000.0242f067143f       no              veth382d563
 <p>然后问了下甫舟，甫舟把他的缝合版发给了我，简单对比一下没有实质上的区别，但他的跑得起来，我的跑不起来。<br>但是当我把我的<code>final Transformer[] rubbish = new Transformer[]&#123;new ConstantTransformer(1)&#125;;</code>这句中的ConstantTransformer换成他的null之后就跑起来了。有点无法理解。。。</p>
 <h2 id="调试"><a href="#调试" class="headerlink" title="调试"></a>调试</h2><p>怎么说呢，今天一调试就调试出结果了。。。昨天调了几下却没看懂逻辑。。。可能是因为idea调试这里有点抽象吧</p>
 <p>在这里下一个断点</p>
-<p>![&#x2F;images&#x2F;image-20220312170030329](CC7 hashtable反序列化原理调试&#x2F;image-20220312170030329.png)<br>并在第二个put语句中step into。会非常奇怪的没有进入put函数而是进入了<code>AbstractMapDecorator</code></p>
-<p>![&#x2F;images&#x2F;image-20220312170153242](CC7 hashtable反序列化原理调试&#x2F;image-20220312170153242.png)</p>
+<p>![image-20220312170030329](&#x2F;images&#x2F;CC7 hashtable反序列化原理调试&#x2F;image-20220312170030329.png)<br>并在第二个put语句中step into。会非常奇怪的没有进入put函数而是进入了<code>AbstractMapDecorator</code></p>
+<p>![image-20220312170153242](&#x2F;images&#x2F;CC7 hashtable反序列化原理调试&#x2F;image-20220312170153242.png)</p>
 <p>我直接疑惑，当时就不知道什么情况了，如果继续step into就会进其他的函数，step forward直接回到主函数。根本不知道发生了什么，然后今天我看了一眼左边的调用栈，才发现怎么还有一层他没给我进去呢</p>
-<p>![&#x2F;images&#x2F;image-20220312170308917](CC7 hashtable反序列化原理调试&#x2F;image-20220312170308917.png)</p>
+<p>![image-20220312170308917](&#x2F;images&#x2F;CC7 hashtable反序列化原理调试&#x2F;image-20220312170308917.png)</p>
 <p>然后点调用栈进Hashtable的put函数，逻辑就很清楚了</p>
-<p>![&#x2F;images&#x2F;image-20220312170344662](CC7 hashtable反序列化原理调试&#x2F;image-20220312170344662.png)</p>
+<p>![image-20220312170344662](&#x2F;images&#x2F;CC7 hashtable反序列化原理调试&#x2F;image-20220312170344662.png)</p>
 <p>在put的时候会对hash值进行检验，如果hash相同则进入equal进行比对。这里的equal会调用map.equal，也就是lazyMap的equal，然后lazymap.get到lazymap的transform触发payload</p>
 <p>而这里我塞了一个ConstantTransformer返回1，因此最后在put时会认为哈希碰撞且值相同，不放入该entry。。。所以put无效，修补方案也很简单，只要让rubbish中transform的返回值和一开始lazyMap中put的值不一样就行了。当然，建议该ConstantTransformer，因为两个lazymap的值仍然需要一致，否则算出来的hashCode不一致，同样不会触发payload</p>
 <p>put时的操作也就是readObject时触发的操作，readObject时调用reconstitutionPut(那个词是重建的意思)，和put做的操作类似，会进行哈希比对，若哈希相同则用equal比对值，然后走上和put一致的道路<br>所以构造payload的时候要先塞rubbish再反射改掉，不然会打自己一下</p>
