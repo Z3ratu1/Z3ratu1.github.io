@@ -196,6 +196,110 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
+    <link itemprop="mainEntityOfPage" href="https://blog.z3ratu1.cn/MAR%20DASCTF2021.html">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="https://q2.qlogo.cn/headimg_dl?dst_uin=1207039417&spec=160">
+      <meta itemprop="name" content="Z3ratu1">
+      <meta itemprop="description" content="与其感慨路难行，不如现在出发">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Z3ratu1's blog">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/MAR%20DASCTF2021.html" class="post-title-link" itemprop="url">MAR DASCTF2021</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2021-03-27 12:26:39" itemprop="dateCreated datePublished" datetime="2021-03-27T12:26:39+08:00">2021-03-27</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2021-04-03 19:47:18" itemprop="dateModified" datetime="2021-04-03T19:47:18+08:00">2021-04-03</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E5%88%B7%E9%A2%98%E8%AE%B0%E5%BD%95/" itemprop="url" rel="index"><span itemprop="name">刷题记录</span></a>
+                </span>
+            </span>
+
+          
+            <span id="/MAR%20DASCTF2021.html" class="post-meta-item leancloud_visitors" data-flag-title="MAR DASCTF2021" title="阅读次数">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span class="leancloud-visitors-count"></span>
+            </span>
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="far fa-comment"></i>
+      </span>
+      <span class="post-meta-item-text">Valine：</span>
+    
+    <a title="valine" href="/MAR%20DASCTF2021.html#valine-comments" itemprop="discussionUrl">
+      <span class="post-comments-count valine-comment-count" data-xid="/MAR%20DASCTF2021.html" itemprop="commentCount"></span>
+    </a>
+  </span>
+  
+  
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h1 id="MAR-DASCTF2021"><a href="#MAR-DASCTF2021" class="headerlink" title="MAR DASCTF2021"></a>MAR DASCTF2021</h1><p>平台好卡，环境时不时就访问不上了。卡到不想做题。。。感觉题目也有点莫名其妙的</p>
+<h2 id="baby-flask"><a href="#baby-flask" class="headerlink" title="baby_flask"></a>baby_flask</h2><p>很容易验证是SSTI，先fuzz一遍过滤的字符<code># &quot;&#39;.0123456789:[\_ config chr request pop</code>大概测出来这些，不给用引号数字点号右括号下划线和几个函数，访问属性可以用<code>attr()|attr()</code>这样子绕，不过下划线这些关键字符还是得想办法搞出来，并且没了数字chr和引号也不好凑字符串了<br>以前看到过”%c”%num这种方法进行格式化字符串来拼字符的，现在的问题就在于引号没得数字没得，凑不出来，看到这么文章上写了这么个东西<br><code>{%set pc = g|lower|list|first|urlencode|first%} 取得%</code><br>用set定义一堆变量开始慢慢拼，g是flask一个奇怪的模块，<code>g|lower|list|first</code>会获得一个字符<code>&lt;</code>，其URL编码为%3C，直接一波获得%c两个字符<br><code>{%set c = g|lower|list|first|urlencode|last|lower%} 取得c</code><br><code>{%set udl=(pc,c)|join%}</code><br>得到”%c”字符串，接下来就要想办法获取数字了，可以像上面的方法如法炮制url反复编码拿到数字，也可以用bool变量加加减减获得数字<code>{%set one=-(False-True)%}</code>，然后一路加法获得所有数字<br>最后通过<code>{%set a=udl%((nine|string, seven|string)|join|int) %}</code>这样子获得<br>最后的最后凑齐字母表再一个个join起来通过attr()形式命令执行</p>
+<h3 id="ps"><a href="#ps" class="headerlink" title="ps"></a>ps</h3>
+          <!--noindex-->
+            <div class="post-button">
+              <a class="btn" href="/MAR%20DASCTF2021.html#more" rel="contents">
+                阅读全文 &raquo;
+              </a>
+            </div>
+          <!--/noindex-->
+        
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
     <link itemprop="mainEntityOfPage" href="https://blog.z3ratu1.cn/switch%E5%8A%A0%E9%80%9F%E6%9C%80%E5%90%8E%E4%B8%80%E7%89%88.html">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -608,135 +712,6 @@
   
   
 
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
-    <link itemprop="mainEntityOfPage" href="https://blog.z3ratu1.cn/[UnionCTF2021]Cr0wnAir.html">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="https://q2.qlogo.cn/headimg_dl?dst_uin=1207039417&spec=160">
-      <meta itemprop="name" content="Z3ratu1">
-      <meta itemprop="description" content="与其感慨路难行，不如现在出发">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Z3ratu1's blog">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/%5BUnionCTF2021%5DCr0wnAir.html" class="post-title-link" itemprop="url">[UnionCTF2021]Cr0wnAir</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-              
-
-              <time title="创建时间：2021-02-23 21:27:52 / 修改时间：22:06:47" itemprop="dateCreated datePublished" datetime="2021-02-23T21:27:52+08:00">2021-02-23</time>
-            </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-folder"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/%E5%88%B7%E9%A2%98%E8%AE%B0%E5%BD%95/" itemprop="url" rel="index"><span itemprop="name">刷题记录</span></a>
-                </span>
-            </span>
-
-          
-            <span id="/%5BUnionCTF2021%5DCr0wnAir.html" class="post-meta-item leancloud_visitors" data-flag-title="[UnionCTF2021]Cr0wnAir" title="阅读次数">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-eye"></i>
-              </span>
-              <span class="post-meta-item-text">阅读次数：</span>
-              <span class="leancloud-visitors-count"></span>
-            </span>
-  
-  <span class="post-meta-item">
-    
-      <span class="post-meta-item-icon">
-        <i class="far fa-comment"></i>
-      </span>
-      <span class="post-meta-item-text">Valine：</span>
-    
-    <a title="valine" href="/%5BUnionCTF2021%5DCr0wnAir.html#valine-comments" itemprop="discussionUrl">
-      <span class="post-comments-count valine-comment-count" data-xid="/%5BUnionCTF2021%5DCr0wnAir.html" itemprop="commentCount"></span>
-    </a>
-  </span>
-  
-  
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <h1 id="UnionCTF2021-Cr0wnAir"><a href="#UnionCTF2021-Cr0wnAir" class="headerlink" title="[UnionCTF2021]Cr0wnAir"></a>[UnionCTF2021]Cr0wnAir</h1><p>最近天天被外国比赛暴打。。。。这次UnionCTF两个web，一个sqlite的union注入，零过滤，百度的payload都能打通，还有就是这个题，还蛮有意思的，后面这步利用感觉还比较实用，学习了</p>
-<h2 id="源码"><a href="#源码" class="headerlink" title="源码"></a>源码</h2><p>贴一部分</p>
-<pre class=" language-javascript"><code class="language-javascript">checkin<span class="token punctuation">.</span>js
-<span class="token keyword">const</span> pattern <span class="token operator">=</span> <span class="token punctuation">{</span>
-  firstName<span class="token punctuation">:</span> <span class="token regex">/^\w{1,30}$/</span><span class="token punctuation">,</span>
-  lastName<span class="token punctuation">:</span> <span class="token regex">/^\w{1,30}$/</span><span class="token punctuation">,</span>
-  passport<span class="token punctuation">:</span> <span class="token regex">/^[0-9]{9}$/</span><span class="token punctuation">,</span>
-  ffp<span class="token punctuation">:</span> <span class="token regex">/^(|CA[0-9]{8})$/</span><span class="token punctuation">,</span>
-  extras<span class="token punctuation">:</span> <span class="token punctuation">[</span>
-    <span class="token punctuation">{</span>sssr<span class="token punctuation">:</span> <span class="token regex">/^(BULK|UMNR|VGML)$/</span><span class="token punctuation">}</span><span class="token punctuation">,</span>
-  <span class="token punctuation">]</span><span class="token punctuation">,</span>
-<span class="token punctuation">}</span><span class="token punctuation">;</span>
-<span class="token keyword">function</span> <span class="token function">isSpecialCustomer</span><span class="token punctuation">(</span>passport<span class="token punctuation">,</span> frequentFlyerNumber<span class="token punctuation">)</span> <span class="token punctuation">{</span>
-  <span class="token keyword">return</span> <span class="token boolean">false</span><span class="token punctuation">;</span>
-<span class="token punctuation">}</span>
-
-<span class="token keyword">function</span> <span class="token function">createToken</span><span class="token punctuation">(</span>passport<span class="token punctuation">,</span> frequentFlyerNumber<span class="token punctuation">)</span> <span class="token punctuation">{</span>
-  <span class="token keyword">var</span> status <span class="token operator">=</span> <span class="token function">isSpecialCustomer</span><span class="token punctuation">(</span>passport<span class="token punctuation">,</span> frequentFlyerNumber<span class="token punctuation">)</span> <span class="token operator">?</span> <span class="token string">"gold"</span> <span class="token punctuation">:</span> <span class="token string">"bronze"</span><span class="token punctuation">;</span>
-  <span class="token keyword">var</span> body <span class="token operator">=</span> <span class="token punctuation">{</span><span class="token string">"status"</span><span class="token punctuation">:</span> status<span class="token punctuation">,</span> <span class="token string">"ffp"</span><span class="token punctuation">:</span> frequentFlyerNumber<span class="token punctuation">}</span><span class="token punctuation">;</span>
-  <span class="token keyword">return</span> jwt<span class="token punctuation">.</span><span class="token function">encode</span><span class="token punctuation">(</span>body<span class="token punctuation">,</span> config<span class="token punctuation">.</span>privkey<span class="token punctuation">,</span> <span class="token string">'RS256'</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-<span class="token punctuation">}</span>
-<span class="token operator">...</span><span class="token punctuation">.</span><span class="token punctuation">.</span>
-  <span class="token keyword">if</span> <span class="token punctuation">(</span>jpv<span class="token punctuation">.</span><span class="token function">validate</span><span class="token punctuation">(</span>data<span class="token punctuation">,</span> pattern<span class="token punctuation">,</span> <span class="token punctuation">{</span> debug<span class="token punctuation">:</span> <span class="token boolean">true</span><span class="token punctuation">,</span> mode<span class="token punctuation">:</span> <span class="token string">"strict"</span> <span class="token punctuation">}</span><span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
-    <span class="token keyword">if</span> <span class="token punctuation">(</span>data<span class="token punctuation">[</span><span class="token string">"firstName"</span><span class="token punctuation">]</span> <span class="token operator">==</span> <span class="token string">"Tony"</span> <span class="token operator">&amp;&amp;</span> data<span class="token punctuation">[</span><span class="token string">"lastName"</span><span class="token punctuation">]</span> <span class="token operator">==</span> <span class="token string">"Abbott"</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
-      <span class="token keyword">var</span> response <span class="token operator">=</span> <span class="token punctuation">{</span>msg<span class="token punctuation">:</span> <span class="token string">"You have successfully checked in! Please remember not to post your boarding pass on social media."</span><span class="token punctuation">}</span><span class="token punctuation">;</span>
-    <span class="token punctuation">}</span> <span class="token keyword">else</span> <span class="token keyword">if</span> <span class="token punctuation">(</span>data<span class="token punctuation">[</span><span class="token string">"ffp"</span><span class="token punctuation">]</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
-      <span class="token keyword">var</span> response <span class="token operator">=</span> <span class="token punctuation">{</span>msg<span class="token punctuation">:</span> <span class="token string">"You have successfully checked in. Thank you for being a Cr0wnAir frequent flyer."</span><span class="token punctuation">}</span><span class="token punctuation">;</span>
-      <span class="token keyword">for</span><span class="token punctuation">(</span>e <span class="token keyword">in</span> data<span class="token punctuation">[</span><span class="token string">"extras"</span><span class="token punctuation">]</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
-        <span class="token keyword">if</span> <span class="token punctuation">(</span>data<span class="token punctuation">[</span><span class="token string">"extras"</span><span class="token punctuation">]</span><span class="token punctuation">[</span>e<span class="token punctuation">]</span><span class="token punctuation">[</span><span class="token string">"sssr"</span><span class="token punctuation">]</span> <span class="token operator">&amp;&amp;</span> data<span class="token punctuation">[</span><span class="token string">"extras"</span><span class="token punctuation">]</span><span class="token punctuation">[</span>e<span class="token punctuation">]</span><span class="token punctuation">[</span><span class="token string">"sssr"</span><span class="token punctuation">]</span> <span class="token operator">===</span> <span class="token string">"FQTU"</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
-          <span class="token keyword">var</span> token <span class="token operator">=</span> <span class="token function">createToken</span><span class="token punctuation">(</span>data<span class="token punctuation">[</span><span class="token string">"passport"</span><span class="token punctuation">]</span><span class="token punctuation">,</span> data<span class="token punctuation">[</span><span class="token string">"ffp"</span><span class="token punctuation">]</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-          <span class="token keyword">var</span> response <span class="token operator">=</span> <span class="token punctuation">{</span>msg<span class="token punctuation">:</span> <span class="token string">"You have successfully checked in. Thank you for being a Cr0wnAir frequent flyer. Your loyalty has been rewarded and you have been marked for an upgrade, please visit the upgrades portal."</span><span class="token punctuation">,</span> <span class="token string">"token"</span><span class="token punctuation">:</span> token<span class="token punctuation">}</span><span class="token punctuation">;</span>
-        <span class="token punctuation">}</span>
-      <span class="token punctuation">}</span>
-</code></pre>
-          <!--noindex-->
-            <div class="post-button">
-              <a class="btn" href="/%5BUnionCTF2021%5DCr0wnAir.html#more" rel="contents">
-                阅读全文 &raquo;
-              </a>
-            </div>
-          <!--/noindex-->
-        
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
 
   
   <nav class="pagination">
@@ -807,7 +782,7 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">147</span>
+          <span class="site-state-item-count">148</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
