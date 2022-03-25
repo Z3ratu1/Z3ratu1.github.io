@@ -17224,4 +17224,595 @@ NETLOC <span class="token operator">=</span> f<span class="token string">'{HOST}
         <tag>wp</tag>
       </tags>
   </entry>
+  <entry>
+    <title>CodeQL坐牢记录</title>
+    <url>/CodeQL%E5%9D%90%E7%89%A2%E8%AE%B0%E5%BD%95.html</url>
+    <content><![CDATA[<h1 id="CodeQL坐牢记录"><a href="#CodeQL坐牢记录" class="headerlink" title="CodeQL坐牢记录"></a>CodeQL坐牢记录</h1><p>CodeQL，也就是Code query language，高级源码自动化审计语言，大概就是能把代码解析成数据库创建变量之间的联系，进行污点追踪和自动化漏洞挖掘之类的操作。</p>
+<p>为什么学是因为在不知道学什么的时候rmb神仙和我说学一下CodeQL吧。然后就踩了一万个坑（然后又突然不是特别闲了导致这个玩意一直没做完）</p>
+<p>虽然说codeql也已经出了几年了，相较于一两年前稀碎的文档和少有的资料相比还是好了很多，但实际上遇到问题也基本搜不到什么想要的内容。所以还是在一路狂踩坑。。。</p>
+<p><strong>血泪教训：这个玩意一定只适用于已知源码的情况</strong></p>
+<p><strong>完成之后的感想，想搞gadget寻找什么的别来这边，这个玩意的功能应该是在有一定思路之后污点追踪之类的，我就当坐了几天牢学习了一下新把戏，以及感觉更适合java以外的语言，总之就是非常坐牢</strong></p>
+<h2 id="环境配置"><a href="#环境配置" class="headerlink" title="环境配置"></a>环境配置</h2><p>理论上来说是非常简单的。去GitHub上下一个<a href="https://github.com/github/codeql-cli-binaries">codeql cli</a>的zip，然后解压一下添加PATH就行（想每次敲路径的也可以不加），简单的说就是有手就行.jpg</p>
+<p>然后再下一套<a href="https://github.com/github/codeql">依赖库</a>，这个随便塞哪都行，似乎接下来写的ql语句需要和这个东西在一个目录下？</p>
+<p>也可以直接下那个<a href="https://github.com/github/vscode-codeql-starter">starter仓库</a>，git clone的时候要递归下载就可以顺便把依赖下下来，也就可以就着在他给的例子文件夹里面写了</p>
+<p>依赖里面塞了对应的各个语言的解析工具，不在里面的就不被支持<br>比如世界上最好的垃圾语言PHP没有CodeQL支持。可能是因为太垃圾了吧</p>
+<p>然后接下来有两个选择，一个是装一个VS Code然后使用官方插件，一个是直接就着刚才下的zip直接命令行形式启动。就命令行凑合着用吧（其实专门下了个VSCode然后装插件，发现好像也没什么多的好处）</p>
+<h2 id="解释型语言数据库创建"><a href="#解释型语言数据库创建" class="headerlink" title="解释型语言数据库创建"></a>解释型语言数据库创建</h2><p>为什么要标明解释型语言呢，因为解释型语言有一个解释器就能跑，而编译型的编译要加一堆buff指定编译流程，需要在创建数据库的时候指定一下command选项进行编译<br>而我的C++和java全部交付与Visual Studio和IDEA，maven估计用的是IDEA自带的，我都不知道我机器上的C++编译器在哪，反正就VS一键编译运行了。。。所以暂且先试一下解释型语言。</p>
+<p>这个理论上来说只要把CodeQL装下来就能跑起来（只要你装了解释器）。但由于我的智力条件有限，在这里也被坑了半个下午。。。</p>
+<p>网上的教程多少有些抽象。也没有说明什么目录结构之类的，这个starter仓库，里面其实就是塞了两个例子，也没有实际的database。说到底还是要自己建一下</p>
+<p>命令为<code>codeql create database &lt;path&gt; --language=&lt;lang&gt; --source-root &lt;path&gt;</code><br>database的path填生成的db的位置，language处填需要分析的语言，source-root里塞想要被分析的文件<br>然后就连解释型型语言的数据库创建我都给踩了坑</p>
+<h3 id="autobuild-cmd超级报错"><a href="#autobuild-cmd超级报错" class="headerlink" title="autobuild.cmd超级报错"></a>autobuild.cmd超级报错</h3><p>似乎从来没有人在这里踩过坑，因此这个坑给我整麻了。</p>
+<pre><code>A fatal error occurred: Exit status 9009 from command: [D:\codeql\tools\win64\runner.exe, cmd.exe, /C, type, NUL, &amp;&amp;, D:\codeql\python\tools\autobuild.cmd]
+</code></pre>
+<p>光看这里完全看不懂发生了什么，那个runner.exe肯定是不能看发生了什么的，所以看一下这个autobuild.cmd。</p>
+<pre class=" language-cmd"><code class="language-cmd">@echo off
+
+rem Legacy environment variables for the autobuild infrastructure.
+set LGTM_SRC=%CD%
+set LGTM_WORKSPACE=%CODEQL_EXTRACTOR_PYTHON_SCRATCH_DIR%
+
+type NUL && python "%CODEQL_EXTRACTOR_PYTHON_ROOT%\tools\index.py"
+exit /b %ERRORLEVEL%
+</code></pre>
+<p>简单的来说看不懂，但是我看到最后一句调用了python，但是由于我装了python2和3，为了区别直接叫python2和python3，也就意味着这里没有python这个可执行文件，因此我直接把这里的python改成python3，然后出现了另一个究极报错</p>
+<pre><code>[2022-03-15 17:12:02] [build-stdout] Calling py -3 D:\codeql\python\tools\python_tracer.py -v -z all -c D:\projects\VSCodeProjects\CodeQLTest\db\working\trap_cache -p D:\projects\VSCodeProjects\CodeQLTest\db\working\venv\Lib -R D:\projects\VSCodeProjects\CodeQLTest
+[2022-03-15 17:12:02] [build-stderr] Installed Pythons found by py Launcher for Windows
+[2022-03-15 17:12:02] [build-stdout] Python 3 not found!
+[2022-03-15 17:12:02] [build-stderr] No Installed Pythons Found!
+[2022-03-15 17:12:02] [build-stderr] Requested Python version (3) not installed, use -0 for available pythons
+</code></pre>
+<p>简单的说就是找不到python。然后观察一下他调用了一个叫Py的东西，很怪，没听说过，然后百度一下，在Stack Overflow上找到了一个回答。说这个玩意在C:&#x2F;system下面，是通过注册表找python的，去注册表的这个位置找python路径<br><code>\HKEY_CURRENT_USER\SOFTWARE\Python\PythonCore\3.8\InstallPath</code><br>然后我注册表里写的是python.exe，把注册表值改成python3.exe或者把python3.exe复制一份叫python.exe都行</p>
+<p>本来说解释型语言不需要配更多环境进行编译，反而这个问题是因为解释型语言不需要指定编译命令导致找不到解释器出现的</p>
+<p>接下来就能正常的创建db了</p>
+<p>创建db的时候似乎是会把所有的依赖都过一遍，导致创建db的速度很慢，每次查询的时候也不知道干什么要进行一对操作，整个的效率并不是很高（并且vscode+插件会有一个java进程长期占用cpu，导致我的小风扇呼呼的响）</p>
+<h2 id="hello-world"><a href="#hello-world" class="headerlink" title="hello world"></a>hello world</h2><p>终于搞起来了。直接把starter仓库里queries python文件夹下面的example.ql改成<code>select &quot;hello world&quot;</code>，然后<code>codeql query run example.ql -d ..\databases\python\db\</code>指定数据库进行查询（这里数据库内容是什么都无所谓了，反正我就只hello world）。也可以装了插件的vscode直接右键run query。然后开始学语法吧</p>
+<p>这里有一个奇怪的地方，按照原理上来说，进行ql查询的时候，需要将ql文件写在对应的依赖库目录下。比如python的话就得写在<code>\ql\python\ql\examples</code>目录下，而如果就着他这个starter项目的话，直接写在他的<code>codeql-custom-queries-python</code>下也行。但是另开文件夹写的话就会出现import无效之类的问题。暂且不想理清楚什么情况，就着他的来吧</p>
+<p>看rmb神仙的博客里有提到可以在config里设置ql库的位置，不过我windows好像没有这个东西，看codeql插件也没有这个选项，就拉倒了</p>
+<blockquote>
+<p>在 $HOME&#x2F;.config&#x2F;codeql&#x2F;config 里面设置 ql repo 的路径, 这样才能被 import, 感觉现在这种手动配置好蛋痛 &#x3D;.&#x3D; 感觉跟自己编译 cpp 一样链接一堆库<br>而且文档 u1s1, 挺乱的, 不过刚被 github 收购, 可以理解, 希望之后能更方便一点.<br>–search-path &lt;path to ql repo&gt;<br>注意不要写成 –search-path&#x3D;&lt;path to ql repo&gt;, 不然识别不了… 坑了我好久</p>
+</blockquote>
+<p>然后就是ql文件同目录中应该得有一个qlpack.yml，类似于pom.xml，就是引入依赖用的，不过我反正没怎么成功，还是就着下下来的例子直接用吧。。</p>
+<pre><code>name: codeql/python-examples
+groups: 
+  - python
+  - examples
+dependencies:
+  codeql/python-all: &quot;*&quot;
+</code></pre>
+<h2 id="简易语法入门"><a href="#简易语法入门" class="headerlink" title="简易语法入门"></a>简易语法入门</h2><p>这个时候还是启动一下VSCode好了。。。因为插件能展示AST，从AST中边看边学比直接阅读魔幻文档要来的快一点。（理论上来说我写过php parser应该能比较快的理解ast吧。。。因为我的智力条件你也知道.jpg）操作流程应该就是先命令行开一个db，然后在VSCODE里指定那个db文件夹。然后就会多出来一个<code>[db source archive]</code>，内容就是把db文件夹下面的src.zip解包。从这里面选个文件然后从QL插件处点生成AST即可。</p>
+<p>然后边看ast边查文档吗。。。太艰难了<br>文档里面把函数叫做<code>Predicates</code>，然后就真的对着文档和AST和例子强行看</p>
+<p><a href="https://codeql.github.com/codeql-standard-libraries/">官方文档</a></p>
+<p>写了个破烂<br>语法规则就是先from定义变量，where设置条件，select选出结果，然后他也支持一些常用的关键字和函数，比如这里的instanceof，但究竟支持哪些呢。无从知晓，强行看文档和例子吧</p>
+<p>这里有一个很怪的点，他只告诉函数的描述和返回值，并没有说清楚具体表现，有一系列名为getAxxx的函数，这个函数的描述就是返回一个xxx，比如Constructor。那么是返回第一个呢，还是每调用一次就返回后面的一个？没说<br>在后面写java的时候，当我想判断某个类是不是有一个无参构造函数时，我就写了大概这样子的一个语句<code>getAConstructor().getNumOfParams()=0</code>，这时判断的到底是哪个构造函数呢？实际用起来感觉像个迭代器一样似乎是把每个构造函数都返回一遍并进行后续判断，那这个时候是用且逻辑还是或逻辑呢？也没说。。。使用起来感觉是或，但文档里似乎一个字也没提，太折磨了</p>
+<p>当然，实际上这个功能不应该用上述语句去完成，而应该定义一个Constructor变量c，然后c.getDeclaringType().hasQualifiedName(“javax”)之类的。。。</p>
+<p><strong>这个语言的编写思路不是先找到一个大的范围然后再向下搜索，而是应该把小的数据先搜索到再对比他是否属于那个大的目标。比如这里应该是先找到无参的public构造函数，再获取到这个函数所属的类是否属于javax。而不是对javax的类进行遍历，再搜索每个类下是否存在无参public构造函数</strong><br>这个教程文档很好的体现了这一点<br><a href="https://codeql.github.com/docs/codeql-language-guides/analyzing-data-flow-in-java/">analyzing-data-flow-in-java</a></p>
+<pre><code>import python
+ 
+from Function f
+where f.getStmt(0) instanceof Return
+select f.getName()
+</code></pre>
+<p>功能就是找到所有第一句就是return的函数</p>
+<p>以及不同语言下的数据结构并不完全互通，一开始的目的就是用codeql搞java，据说究极log4j就是用这个挖出来的。接下来试着搞一下java。</p>
+<h2 id="Java数据库建立和失败的尝试"><a href="#Java数据库建立和失败的尝试" class="headerlink" title="Java数据库建立和失败的尝试"></a>Java数据库建立和失败的尝试</h2><p>首先要配好编译环境。编译Java挺麻烦的，这里选择用mvn搞定。直接用IDEA捆绑的maven即可，找一下路径加入PATH里面即可<br><code>\IDEA 2021.3.2\plugins\maven\lib\maven3\bin\</code></p>
+<p>然后开始引入依赖快乐编译，发现编译出来的东西根本不能用。。。<br>可以通过查看db下的src.zip来确认当前数据库包含了多少代码，点开一看发现只携带了我自己写的几个Java文件，一万个引入的依赖都没有被打包进去（python的话import了的东西就自动引入了），然后简单搜索找到了这篇文章<br><a href="https://paper.seebug.org/1324/">使用 CodeQL 分析闭源 Java 程序</a></p>
+<blockquote>
+<p>CodeQL无法分析已经预先编译好jar包<br>CodeQL无法分析在运行时才被编译的jsp代码</p>
+</blockquote>
+<p>虽然我知道需要编译，但是jar包也需要重新编译多少有点折磨了。。呜呜，有源码的开源项目还能去GitHub上下源码，没源码的项目可能就得究极反编译jar了。。。然后就顺着这个文章反编译一下jar吧</p>
+<p>把idea下的decompiler抽出来<br><code>\IDEA 2021.3.2\plugins\java-decompiler\lib</code><br>然后用<code>java -cp java-decompiler.jar org.jetbrains.java.decompiler.main.decompiler.ConsoleDecompiler</code>跑起来，然后超级报错</p>
+<pre><code>Exception in thread &quot;main&quot; java.lang.UnsupportedClassVersionError: org/jetbrains/java/decompiler/main/decompiler/ConsoleDecompiler has been compiled by a more recent version of the Java Runtime (class file version 55.0), this version of the Java Runtime only recognizes class file versions up to 52.0
+</code></pre>
+<p>55.0是java11,52.0是java8，等于说我超级新8u311都不给用。<br>幸好我还装了个openjdk的java17，这下总不会有问题了吧</p>
+<p>反编译出来之后装模作样整一个maven项目格式的文件夹（就是套上<code>/src/main/java/</code>）把反编译的代码丢进去，然后搓一个pom.xml，进行编译建立数据库<br><code>codeql database create db --language=java --source-root source --command=&quot;mvn compile&quot;</code><br>终于建起来了。。。我是垃圾</p>
+<p>想做的操作是复现一下上次java2的找一个javax下的有Object作为成员的类能被fastjson反序列化的类。但是似乎并没有在网上找到javax的源码。。。然后问了下甫舟和我说在lib下的rt.jar中带了全部的javax。再次拉下来进行反编译，写一个pom再编译回去</p>
+<p>然后又出现了一些包不存在、反编译时类出错反编译不回来，出现了奇怪的依赖等问题，源码编译不通过就没法用了，计划大失败</p>
+<p>如rmb神仙所言，这个是用来审计源代码的，而不是字节码，在没有源码的情况下，不如使用一个叫做<code>gadgetinspator</code>的工具（没听说过，我为什么什么都不会），不要强行折磨自己进行坐牢。。。并且这个的主要作用也是污点追踪之类的操作，而不是我这种找某个符合条件的类<br>（说起来好像这种东西直接反射找会跟来得快。。。）<br>我直接知难而退，使用GitHub上的例子来进行学习</p>
+<h2 id="analyzing-data-flow-in-java"><a href="#analyzing-data-flow-in-java" class="headerlink" title="analyzing-data-flow-in-java"></a>analyzing-data-flow-in-java</h2><p><a href="https://codeql.github.com/docs/codeql-language-guides/analyzing-data-flow-in-java/">analyzing-data-flow-in-java</a><br>不得不说，这个教程带题目和答案还挺良心的，比那个抽象的要死的官方文档好一万倍</p>
+<h3 id="练习1"><a href="#练习1" class="headerlink" title="练习1"></a>练习1</h3><p>要求是找出以硬编码形式构造的java.net.URL类<br>使用局部数据追踪，就是追踪一个函数内的意思吧？<br>先上答案</p>
+<pre class=" language-sql"><code class="language-sql"><span class="token keyword">import</span> java
+<span class="token keyword">import</span> semmle<span class="token punctuation">.</span>code<span class="token punctuation">.</span>java<span class="token punctuation">.</span>dataflow<span class="token punctuation">.</span>DataFlow
+<span class="token keyword">import</span> semmle<span class="token punctuation">.</span>code<span class="token punctuation">.</span>java<span class="token punctuation">.</span>dataflow<span class="token punctuation">.</span>TaintTracking
+
+<span class="token keyword">from</span> Constructor netURL<span class="token punctuation">,</span> <span class="token keyword">Call</span> <span class="token keyword">call</span><span class="token punctuation">,</span> StringLiteral str
+<span class="token keyword">where</span> netURL<span class="token punctuation">.</span>getDeclaringType<span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">.</span>hasQualifiedName<span class="token punctuation">(</span><span class="token string">"java.net"</span><span class="token punctuation">,</span> <span class="token string">"URL"</span><span class="token punctuation">)</span> <span class="token operator">and</span>
+    <span class="token keyword">call</span><span class="token punctuation">.</span>getCallee<span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">=</span> netURL <span class="token operator">and</span>
+    DataFlow::localFlow<span class="token punctuation">(</span>DataFlow::exprNode<span class="token punctuation">(</span>str<span class="token punctuation">)</span><span class="token punctuation">,</span> DataFlow::exprNode<span class="token punctuation">(</span><span class="token keyword">call</span><span class="token punctuation">.</span>getArgument<span class="token punctuation">(</span><span class="token number">0</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
+<span class="token keyword">select</span> str
+</code></pre>
+<p>hasQualifiedName这个函数好像只能找完全限定名，所以说之前想找javax下的类可能得用indexof之类的操作了。<br>然后函数调用和函数定义是不一样的，因此需要分别定义Constructor作为定义，Call作为调用进行判断。<br>然后一个demo用于测试</p>
+<pre class=" language-java"><code class="language-java"><span class="token keyword">import</span> java<span class="token punctuation">.</span>net<span class="token punctuation">.</span>URL<span class="token punctuation">;</span>
+
+<span class="token keyword">class</span> <span class="token class-name">Demo</span><span class="token punctuation">{</span>
+    <span class="token keyword">public</span> <span class="token keyword">static</span> <span class="token keyword">void</span> <span class="token function">main</span><span class="token punctuation">(</span>String<span class="token punctuation">[</span><span class="token punctuation">]</span> args<span class="token punctuation">)</span> <span class="token keyword">throws</span> Exception <span class="token punctuation">{</span>
+        String a <span class="token operator">=</span> <span class="token string">"http"</span><span class="token punctuation">;</span>
+        String b <span class="token operator">=</span> <span class="token string">"www.z3ratu1.cn"</span><span class="token punctuation">;</span>
+        String c <span class="token operator">=</span> <span class="token string">"blog.z3ratu1.cn"</span><span class="token punctuation">;</span>
+        String d <span class="token operator">=</span> a<span class="token operator">+</span>b<span class="token punctuation">;</span>
+        String e <span class="token operator">=</span> b<span class="token punctuation">;</span>
+        String f <span class="token operator">=</span> b<span class="token operator">+</span><span class="token string">":8080"</span><span class="token punctuation">;</span>
+        URL url <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">URL</span><span class="token punctuation">(</span>c<span class="token punctuation">)</span><span class="token punctuation">;</span>
+        URL url2 <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">URL</span><span class="token punctuation">(</span>d<span class="token punctuation">)</span><span class="token punctuation">;</span>
+        URL url3 <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">URL</span><span class="token punctuation">(</span>e<span class="token punctuation">)</span><span class="token punctuation">;</span>
+        URL url4 <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">URL</span><span class="token punctuation">(</span>f<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+<span class="token punctuation">}</span>
+</code></pre>
+<p>（new URL的时候可能抛出一个exception，vscode一开始没提示我编译还没过。。。）<br>数据跟踪有两种形式，一种是Dataflow，一种是TaintTracking<br>前者就是数据流，后者是污点追踪。DataFlow::localFlow方法可以将指定的两个节点作为数据流关联起来，其是DataFlow::localFlowStep的递归版本。TaintTracking继承自Dataflow，其localTaint方法能进行污点追踪。就是DataFlow只认为<code>var b=a</code>这种直接等于的赋值纳入范围，而TaintTracking则会将<code>var c =a+b</code>也同样纳入追踪，同样也有localTaintStep，仅追踪单步</p>
+<p>简单测试一下四个方法的查询结果（这个玩意跑的真的慢，就这么个文件查一次也要十几秒，建立数据库感觉也得个半分钟）</p>
+<table>
+<thead>
+<tr>
+<th>函数</th>
+<th>对应字符串所在的变量</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>localFlow</td>
+<td>b c</td>
+</tr>
+<tr>
+<td>localFlowStep</td>
+<td>c</td>
+</tr>
+<tr>
+<td>localTaint</td>
+<td>a b c “:8080”</td>
+</tr>
+<tr>
+<td>localTaintStep</td>
+<td>c</td>
+</tr>
+</tbody></table>
+<p>从这个结果上来说就大致能理解这两个数据追踪方法的原理了，所以基本上都是用污点追踪嗷</p>
+<h3 id="练习2"><a href="#练习2" class="headerlink" title="练习2"></a>练习2</h3><blockquote>
+<p>Write a query that finds all hard-coded strings used to create a java.net.URL, using global data flow</p>
+</blockquote>
+<p>使用全局数据追踪模块追踪java.net.URL中使用的硬编码字符串，重写他的类来实现，我看大部分的人也都是用的这个进行污点追踪<br>先看答案再反向分析</p>
+<pre class=" language-sql"><code class="language-sql"><span class="token keyword">import</span> semmle<span class="token punctuation">.</span>code<span class="token punctuation">.</span>java<span class="token punctuation">.</span>dataflow<span class="token punctuation">.</span>DataFlow
+
+class Configuration extends DataFlow::Configuration {
+  Configuration<span class="token punctuation">(</span><span class="token punctuation">)</span> {
+    this <span class="token operator">=</span> <span class="token string">"LiteralToURL Configuration"</span>
+  }
+
+  override predicate isSource<span class="token punctuation">(</span>DataFlow::Node source<span class="token punctuation">)</span> {
+    source<span class="token punctuation">.</span>asExpr<span class="token punctuation">(</span><span class="token punctuation">)</span> instanceof StringLiteral
+  }
+
+  override predicate isSink<span class="token punctuation">(</span>DataFlow::Node sink<span class="token punctuation">)</span> {
+    <span class="token keyword">exists</span><span class="token punctuation">(</span><span class="token keyword">Call</span> <span class="token keyword">call</span> <span class="token operator">|</span>
+      sink<span class="token punctuation">.</span>asExpr<span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">=</span> <span class="token keyword">call</span><span class="token punctuation">.</span>getArgument<span class="token punctuation">(</span><span class="token number">0</span><span class="token punctuation">)</span> <span class="token operator">and</span>
+      <span class="token keyword">call</span><span class="token punctuation">.</span>getCallee<span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token punctuation">(</span>Constructor<span class="token punctuation">)</span><span class="token punctuation">.</span>getDeclaringType<span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">.</span>hasQualifiedName<span class="token punctuation">(</span><span class="token string">"java.net"</span><span class="token punctuation">,</span> <span class="token string">"URL"</span><span class="token punctuation">)</span>
+    <span class="token punctuation">)</span>
+  }
+}
+
+<span class="token keyword">from</span> DataFlow::Node src<span class="token punctuation">,</span> DataFlow::Node sink<span class="token punctuation">,</span> Configuration config
+<span class="token keyword">where</span> config<span class="token punctuation">.</span>hasFlow<span class="token punctuation">(</span>src<span class="token punctuation">,</span> sink<span class="token punctuation">)</span>
+<span class="token keyword">select</span> src<span class="token punctuation">,</span> <span class="token string">"This string constructs a URL $@."</span><span class="token punctuation">,</span> sink<span class="token punctuation">,</span> <span class="token string">"here"</span>
+</code></pre>
+<p>这里用了个新操作，exists，简单学习一下<br><a href="https://codeql.github.com/docs/ql-language-reference/expressions/#aggregations">expressions</a><br><a href="https://codeql.github.com/docs/ql-language-reference/formulas/#explicit-quantifiers">formulas</a><br>其实不看文档也能猜出来大概是怎么回事，竖线前面定义一个变量，竖线后面就是该变量需要满足的条件<br>这里就是要求目标node是java.net.URL的构造函数的第一个参数</p>
+<p>写一个Demo</p>
+<pre class=" language-java"><code class="language-java"><span class="token keyword">import</span> java<span class="token punctuation">.</span>net<span class="token punctuation">.</span>URL<span class="token punctuation">;</span>
+
+<span class="token keyword">class</span> <span class="token class-name">Demo</span><span class="token punctuation">{</span>
+    <span class="token keyword">private</span> <span class="token keyword">static</span> String <span class="token function">getURL</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">{</span>
+        <span class="token keyword">return</span> <span class="token string">"blog.z3ratu1.cn"</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+
+    <span class="token keyword">private</span> <span class="token keyword">static</span> String <span class="token function">echo</span><span class="token punctuation">(</span>String s<span class="token punctuation">)</span><span class="token punctuation">{</span>
+        <span class="token keyword">return</span> s<span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+
+    <span class="token keyword">private</span> <span class="token keyword">static</span> String <span class="token function">echoWithPadding</span><span class="token punctuation">(</span>String s<span class="token punctuation">)</span><span class="token punctuation">{</span>
+        <span class="token keyword">return</span> s<span class="token operator">+</span><span class="token string">":8080"</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+
+    <span class="token keyword">public</span> <span class="token keyword">static</span> <span class="token keyword">void</span> <span class="token function">main</span><span class="token punctuation">(</span>String<span class="token punctuation">[</span><span class="token punctuation">]</span> args<span class="token punctuation">)</span> <span class="token keyword">throws</span> Exception <span class="token punctuation">{</span>
+        String a <span class="token operator">=</span> <span class="token string">"www.z3ratu1.cn"</span><span class="token punctuation">;</span>
+        String b <span class="token operator">=</span> <span class="token string">"test.z3ratu1.cn"</span><span class="token punctuation">;</span>
+        String c <span class="token operator">=</span> <span class="token function">echo</span><span class="token punctuation">(</span>b<span class="token punctuation">)</span><span class="token punctuation">;</span>
+        String d <span class="token operator">=</span> <span class="token function">echoWithPadding</span><span class="token punctuation">(</span>b<span class="token punctuation">)</span><span class="token punctuation">;</span>
+        String e <span class="token operator">=</span> <span class="token function">getURL</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        URL url <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">URL</span><span class="token punctuation">(</span>a<span class="token punctuation">)</span><span class="token punctuation">;</span>
+        URL url2 <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">URL</span><span class="token punctuation">(</span>c<span class="token punctuation">)</span><span class="token punctuation">;</span>
+        URL url3 <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">URL</span><span class="token punctuation">(</span>d<span class="token punctuation">)</span><span class="token punctuation">;</span>
+        URL url4 <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">URL</span><span class="token punctuation">(</span>e<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+<span class="token punctuation">}</span>
+</code></pre>
+<p>具体的跟踪过程应该是封装在了Dataflow类里了，也就是把跨函数的直接相等类的操作全部获取到了，三个<code>z3ratu1.cn</code>全部被追踪到。换成污点追踪的类再try一下，直接把继承类换成<code>TaintTracking</code>即可，也把<code>:8080</code>给追踪上了</p>
+<h3 id="练习3"><a href="#练习3" class="headerlink" title="练习3"></a>练习3</h3><blockquote>
+<p>Write a class that represents flow sources from java.lang.System.getenv(..).</p>
+</blockquote>
+<p>有点抽象的问题，就是把跟着对象从java.net.URL换成了java.lang.System.getenv吧？不过也没说是字符串了。考虑着把构造函数的判断改成getQualifiedName直接判定函数权限定名。看了答案之后再次不知所云。。。</p>
+<pre class=" language-sql"><code class="language-sql"><span class="token keyword">import</span> java
+
+class GetenvSource extends MethodAccess {
+  GetenvSource<span class="token punctuation">(</span><span class="token punctuation">)</span> {
+    <span class="token keyword">exists</span><span class="token punctuation">(</span>Method m <span class="token operator">|</span> m <span class="token operator">=</span> this<span class="token punctuation">.</span>getMethod<span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">|</span>
+      m<span class="token punctuation">.</span>hasName<span class="token punctuation">(</span><span class="token string">"getenv"</span><span class="token punctuation">)</span> <span class="token operator">and</span>
+      m<span class="token punctuation">.</span>getDeclaringType<span class="token punctuation">(</span><span class="token punctuation">)</span> instanceof TypeSystem
+    <span class="token punctuation">)</span>
+  }
+}
+</code></pre>
+<p>exist中除了第一个竖线外剩下的竖线都表示and，但是这个MethodAccess是个什么类。。。然后TypeSystem又是什么。。。看一眼文档。居然直接把这个类封装成了一个单独的类。。。<br><a href="https://codeql.github.com/codeql-standard-libraries/java/semmle/code/java/JDK.qll/type.JDK$TypeSystem.html">Class TypeSystem</a></p>
+<p>太抽象了，MethodAccess的描述是</p>
+<blockquote>
+<p>A method access is an invocation of a method with a list of arguments.</p>
+</blockquote>
+<p>这不是和Call差不多，然后这个类继承自Call类，那么Call的描述又是什么呢</p>
+<blockquote>
+<p>Any call to a callable.<br>This includes method calls, constructor and super constructor invocations, and constructors invoked through class instantiation.</p>
+</blockquote>
+<p>意思是构造函数不算MethodAccess咯？<br>虽然很抽象，但是这个类应该能捕捉到getenv这个函数调用，以及我的读题有一点问题</p>
+<h3 id="练习4"><a href="#练习4" class="headerlink" title="练习4"></a>练习4</h3><blockquote>
+<p>Using the answers from 2 and 3, write a query which finds all global data flows from getenv to java.net.URL.</p>
+</blockquote>
+<p>缝合一下，就把2的instanceof那里改一下就行，然后3中的类需要改成继承Dataflow</p>
+<p>写一个样例</p>
+<pre class=" language-java"><code class="language-java"><span class="token keyword">import</span> java<span class="token punctuation">.</span>net<span class="token punctuation">.</span>URL<span class="token punctuation">;</span>
+<span class="token keyword">import</span> java<span class="token punctuation">.</span>lang<span class="token punctuation">.</span>System<span class="token punctuation">;</span>
+
+<span class="token keyword">class</span> <span class="token class-name">Demo</span><span class="token punctuation">{</span>
+    <span class="token keyword">private</span> <span class="token keyword">static</span> String <span class="token function">getEnv</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">{</span>
+        <span class="token keyword">return</span> System<span class="token punctuation">.</span><span class="token function">getenv</span><span class="token punctuation">(</span><span class="token string">"aaa"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+
+    <span class="token keyword">private</span> <span class="token keyword">static</span> String <span class="token function">getEnvFullName</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">{</span>
+        <span class="token keyword">return</span> java<span class="token punctuation">.</span>lang<span class="token punctuation">.</span>System<span class="token punctuation">.</span><span class="token function">getenv</span><span class="token punctuation">(</span><span class="token string">"bbb"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+
+    <span class="token keyword">private</span> <span class="token keyword">static</span> String <span class="token function">getEnvWithPadding</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">{</span>
+        <span class="token keyword">return</span> System<span class="token punctuation">.</span><span class="token function">getenv</span><span class="token punctuation">(</span><span class="token string">"ccc"</span><span class="token punctuation">)</span><span class="token operator">+</span><span class="token string">"ccc"</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+
+
+    <span class="token keyword">public</span> <span class="token keyword">static</span> <span class="token keyword">void</span> <span class="token function">main</span><span class="token punctuation">(</span>String<span class="token punctuation">[</span><span class="token punctuation">]</span> args<span class="token punctuation">)</span> <span class="token keyword">throws</span> Exception <span class="token punctuation">{</span>
+        URL url <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">URL</span><span class="token punctuation">(</span>System<span class="token punctuation">.</span><span class="token function">getenv</span><span class="token punctuation">(</span><span class="token string">"ddd"</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        URL url2 <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">URL</span><span class="token punctuation">(</span><span class="token function">getEnv</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        URL url3 <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">URL</span><span class="token punctuation">(</span><span class="token function">getEnvFullName</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        URL url4 <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">URL</span><span class="token punctuation">(</span><span class="token function">getEnvWithPadding</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+<span class="token punctuation">}</span>
+</code></pre>
+<p>能够追踪到padding外的所有getenv。然后加了padding的必然是用污点追踪实现<br>把继承的类改成污点追踪后找到所有getenv</p>
+<h2 id="CodeQL-and-Chill"><a href="#CodeQL-and-Chill" class="headerlink" title="CodeQL and Chill"></a>CodeQL and Chill</h2><p>GitHub上codeql ctf第四题，java题<br><a href="https://securitylab.github.com/ctf/codeql-and-chill/">GitHub Security Lab CTF 4: CodeQL and Chill - The Java Edition</a><br>大意就是用户输入会触发模板注入可以打EL表达式，需要找到这条利用链。直接从GitHub上下载压缩包导入数据库即可（我直接从压缩包导入的数据库用不了，select “hello”都会报一个没头没脑的什么tuple错误，解压之后再导入似乎就能用了，然后那个导入导入了我四五分钟。。。）</p>
+<p>然后随便进行个查询也要半分钟。。。刚好边查边写了</p>
+<h3 id="Step-1-Data-flow-and-taint-tracking-analysis"><a href="#Step-1-Data-flow-and-taint-tracking-analysis" class="headerlink" title="Step 1: Data flow and taint tracking analysis"></a>Step 1: Data flow and taint tracking analysis</h3><h4 id="Step-1-1-Sources"><a href="#Step-1-1-Sources" class="headerlink" title="Step 1.1: Sources"></a>Step 1.1: Sources</h4><p>污点追踪对source进行定义。继承一个TaintTracking::Configuration类，重写isSource方法即可，写了个破烂，然后跑起来一条都查不出来。。。</p>
+<pre class=" language-sql"><code class="language-sql">    override predicate isSource<span class="token punctuation">(</span>DataFlow::Node source<span class="token punctuation">)</span> {
+        <span class="token keyword">exists</span><span class="token punctuation">(</span>MethodAccess ma<span class="token punctuation">,</span> Method m<span class="token punctuation">,</span> Interface i <span class="token operator">|</span> ma<span class="token punctuation">.</span>getMethod<span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">.</span>overridesOrInstantiates<span class="token operator">*</span><span class="token punctuation">(</span>m<span class="token punctuation">)</span> <span class="token operator">and</span> 
+        i<span class="token punctuation">.</span>hasQualifiedName<span class="token punctuation">(</span><span class="token string">"javax.validation"</span><span class="token punctuation">,</span> <span class="token string">"ConstraintValidator"</span><span class="token punctuation">)</span> <span class="token operator">and</span>
+        m<span class="token punctuation">.</span>hasName<span class="token punctuation">(</span><span class="token string">"isValid"</span><span class="token punctuation">)</span> <span class="token operator">and</span> m<span class="token punctuation">.</span>getDeclaringType<span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">=</span> i <span class="token operator">and</span> 
+        source<span class="token punctuation">.</span>asExpr<span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">=</span> ma
+        <span class="token punctuation">)</span>
+    }
+</code></pre>
+<p>实际上好像是不能这么查？看了一眼答案，答案是查的函数形参，为什么呢。魔改一下变成这样。能得出和答案一致的结果，但是答案的话是通过定义了一系列类来实现的</p>
+<pre class=" language-sql"><code class="language-sql">    override predicate isSource<span class="token punctuation">(</span>DataFlow::Node source<span class="token punctuation">)</span> {
+        <span class="token keyword">exists</span><span class="token punctuation">(</span>Method m<span class="token punctuation">,</span> Method isValid <span class="token operator">|</span> m<span class="token punctuation">.</span>overridesOrInstantiates<span class="token operator">*</span><span class="token punctuation">(</span>isValid<span class="token punctuation">)</span> <span class="token operator">and</span> 
+        isValid<span class="token punctuation">.</span>hasQualifiedName<span class="token punctuation">(</span><span class="token string">"javax.validation"</span><span class="token punctuation">,</span> <span class="token string">"ConstraintValidator"</span><span class="token punctuation">,</span> <span class="token string">"isValid"</span><span class="token punctuation">)</span> <span class="token operator">and</span> 
+        source<span class="token punctuation">.</span>asParameter<span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">=</span> m<span class="token punctuation">.</span>getParameter<span class="token punctuation">(</span><span class="token number">0</span><span class="token punctuation">)</span> <span class="token operator">and</span>
+        m<span class="token punctuation">.</span>fromSource<span class="token punctuation">(</span><span class="token punctuation">)</span>
+        <span class="token punctuation">)</span>
+    }
+</code></pre>
+<p>学习一下java继承的判断，也都是通过写新的类来实现的。。。<br><a href="https://codeql.github.com/docs/codeql-language-guides/types-in-java/#example-finding-mismatched-contains-checks">types-in-java</a></p>
+<p>解构到类里面去，一层层的写也能一层层的debug，是一个良好的开发思路。</p>
+<blockquote>
+<p>Hints:</p>
+</blockquote>
+<ul>
+<li>Make sure you catch only the implementations of methods defined in the ConstraintValidator interface.</li>
+<li>There is a convenient class RemoteFlowSource that tells you when a particular data flow node is obtained from remote user input.</li>
+<li>Pay attention to get only results that pertain to the project source code.</li>
+</ul>
+<p>第一点通过递归调用<code>overridesOrInstantiates</code>确认是否继承或重写对应函数<br>第二点不知道怎么用<br>第三点他的表述非常的奇怪，除了项目源码外这个数据库还需要分析哪呢？附带了jdk的代码？解决方案是加一个m.fromSource()，但实际上加了查出来的结果也没变（当做一个习惯记着吗？）</p>
+<h4 id="Step-1-2-Sink"><a href="#Step-1-2-Sink" class="headerlink" title="Step 1.2: Sink"></a>Step 1.2: Sink</h4><p>sinks是ConstraintValidatorContext.buildConstraintViolationWithTemplate的第一个实参。这里有点怪？source是函数的形参，而sink是函数的实参。理论上来说都是实参的话我会好理解一点，为什么一个形参一个实参呢？</p>
+<p>依葫芦画瓢的写一个即可，也能得到描述上所说的五个结果</p>
+<pre class=" language-sql"><code class="language-sql">    override predicate isSink<span class="token punctuation">(</span>DataFlow::Node sink<span class="token punctuation">)</span> {
+        <span class="token keyword">exists</span><span class="token punctuation">(</span>MethodAccess ma<span class="token punctuation">,</span> Method buildConstraintViolationWithTemplate<span class="token operator">|</span> ma<span class="token punctuation">.</span>getMethod<span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">.</span>overridesOrInstantiates<span class="token operator">*</span><span class="token punctuation">(</span>buildConstraintViolationWithTemplate<span class="token punctuation">)</span> <span class="token operator">and</span> 
+        buildConstraintViolationWithTemplate<span class="token punctuation">.</span>hasQualifiedName<span class="token punctuation">(</span><span class="token string">"javax.validation"</span><span class="token punctuation">,</span> <span class="token string">"ConstraintValidatorContext"</span><span class="token punctuation">,</span> <span class="token string">"buildConstraintViolationWithTemplate"</span><span class="token punctuation">)</span> <span class="token operator">and</span> 
+        sink<span class="token punctuation">.</span>asExpr<span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">=</span> ma<span class="token punctuation">.</span>getArgument<span class="token punctuation">(</span><span class="token number">0</span><span class="token punctuation">)</span>
+       <span class="token punctuation">)</span>
+    }
+</code></pre>
+<h4 id="Step-1-3-TaintTracking-configuration"><a href="#Step-1-3-TaintTracking-configuration" class="headerlink" title="Step 1.3: TaintTracking configuration"></a>Step 1.3: TaintTracking configuration</h4><p>写一个TaintTracking::Configuration类把isSource和isSink缝合进去，跑一下<br>然后跑不出结果来。。。。然后继续看文档，然后发现他在耍我</p>
+<blockquote>
+<p>Run your query using the command <code>CodeQL: Run Query</code> (either in the Command Palette or the right-click menu). It should give you … <strong>0 results</strong>! Ok, this is disappointing! But don’t give up just now.</p>
+</blockquote>
+<h4 id="Step-1-4-Partial-Flow-to-the-rescue"><a href="#Step-1-4-Partial-Flow-to-the-rescue" class="headerlink" title="Step 1.4: Partial Flow to the rescue"></a>Step 1.4: Partial Flow to the rescue</h4><p>使用了全新的技术DataFlow::PartialPathGraph，需要重新import一下，并且和DataFlow::PathGraph还是互相冲突的，只能import一个。需要临时互相替换</p>
+<p>由于步骤1.3中未能直接从source走到sink，故引入Partial Flow从source展示从source往下走的情况，用于调试。可以在config类中重写explorationLimit方法来限制步长，样例给的步长是10（感觉太大了）步长缩到5我的笔记本也有点吃不消。。。cpu没耗多少，倒是内存吃了四五个G。。。缩到3总算能在短时间内跑下来，4就已经四五分钟跑不出结果了。。。</p>
+<p>根据1.3中的提示，目标位于<code>SchedulingConstraintSetValidator.java</code>，所以限制一下node位置，抄的答案（说起来这应该是已知漏洞反向复现时写查询语句的方式，而不是反向搜索漏洞，或者说我知道了这里有一个可能的漏洞然后现在编写查询语句找他是否会和用户输入关联起来？）</p>
+<pre class=" language-sql"><code class="language-sql"><span class="token keyword">from</span> MyTaintTrackingConfig cfg<span class="token punctuation">,</span> DataFlow::PartialPathNode source<span class="token punctuation">,</span> DataFlow::PartialPathNode sink
+<span class="token keyword">where</span>
+  cfg<span class="token punctuation">.</span>hasPartialFlow<span class="token punctuation">(</span>source<span class="token punctuation">,</span> sink<span class="token punctuation">,</span> _<span class="token punctuation">)</span> <span class="token operator">and</span>
+  source<span class="token punctuation">.</span>getNode<span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">.</span>getLocation<span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">.</span>getFile<span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">.</span>getBaseName<span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">=</span> <span class="token string">"SchedulingConstraintValidator.java"</span>
+<span class="token keyword">select</span> sink<span class="token punctuation">,</span> source<span class="token punctuation">,</span> sink<span class="token punctuation">,</span> <span class="token string">"Partial flow from unsanitized user data"</span>
+</code></pre>
+<p>简单的看了下步长3的情况，发现有的地方都已经进了jdk的自带类里面去了。但是未能debug出问题在哪，也许可以以步长为3的终点重新为起点继续前进，就等于从这个点继续步长为3的搜索了。但是我的笔记本性能估计只能走三步，基本上没法调试了。。。他的默认步长是10估计就很好调试了吧</p>
+<p>hint中有提到要读一下hasPartialFlow的文档，没有看到什么有意义的东西。是我没找到文档的位置吗</p>
+<h4 id="Step-1-5-Identifying-a-missing-taint-step"><a href="#Step-1-5-Identifying-a-missing-taint-step" class="headerlink" title="Step 1.5: Identifying a missing taint step"></a>Step 1.5: Identifying a missing taint step</h4><p>直接告诉我codeQL没有将getter方法纳入到污点追踪的传递过程中，因此需要将getter方法连接起来</p>
+<h4 id="Step-1-6-Adding-additional-taint-steps"><a href="#Step-1-6-Adding-additional-taint-steps" class="headerlink" title="Step 1.6: Adding additional taint steps"></a>Step 1.6: Adding additional taint steps</h4><p>继承一个TaintTracking::AdditionalTaintStep类并实现step方法来把断掉的连接续上<br>看了下这篇文章<a href="https://blog.jus4fun.xyz/article/115/">善用isAdditionalTaintStep和isSanitizer</a><br>我之前一直没有特别理解Call的getQualifier方法，虽然大概猜出来了可能是指调用该函数的对象。就比如<code>obj.func(arg)</code>这样子一个操作，call对象拿到的应该是这个调用的操作整体，然后getQualifier获取到obj，getMethod获取到func的定义，getCallee获取到当前函数调用。大致如此，英语水平有限对着他那个qualifier的描述看了半天看不懂</p>
+<p><strong>写到这的时候发现这个破烂往C盘写缓存写了5个G差点把我C盘写爆</strong>，应该是1.4的污点追踪究极递归搞的。然后关了重启缓存清空之后一次查询又要两分钟组织数据库。。。越发觉得不好用了呢？</p>
+<p>写下一个Step类</p>
+<pre class=" language-sql"><code class="language-sql">class KeySetTaintStep extends TaintTracking::AdditionalTaintStep{
+  override predicate step<span class="token punctuation">(</span>DataFlow::Node <span class="token number">f</span><span class="token punctuation">,</span> DataFlow::Node t<span class="token punctuation">)</span>{
+    <span class="token keyword">exists</span><span class="token punctuation">(</span>MethodAccess ma <span class="token operator">|</span> ma<span class="token punctuation">.</span>getMethod<span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">.</span>getName<span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">=</span> <span class="token string">"keySet"</span> <span class="token operator">and</span> 
+    ma<span class="token punctuation">.</span>getMethod<span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">.</span>getDeclaringType<span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">.</span>getSourceDeclaration<span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">.</span>hasQualifiedName<span class="token punctuation">(</span><span class="token string">"java.util"</span><span class="token punctuation">,</span> <span class="token string">"Map"</span><span class="token punctuation">)</span> <span class="token operator">and</span>
+    <span class="token number">f</span><span class="token punctuation">.</span>asExpr<span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">=</span> ma<span class="token punctuation">.</span>getQualifier<span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">and</span> 
+    t<span class="token punctuation">.</span>asExpr<span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">=</span> ma
+    <span class="token punctuation">)</span>
+  }
+}
+</code></pre>
+<p>如上所说，这个step将污点从obj转移到obj.keySet()这个调用的结果，过程一开始理解了半天。。。<br>但实际上我在一开始就感觉他能够将污点传递到keySet调用那去。。。？<br>语句如下</p>
+<pre class=" language-java"><code class="language-java">value<span class="token punctuation">.</span><span class="token function">keySet</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">stream</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">map</span><span class="token punctuation">(</span>String<span class="token operator">:</span><span class="token operator">:</span>toLowerCase<span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">collect</span><span class="token punctuation">(</span>Collectors<span class="token punctuation">.</span><span class="token function">toSet</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
+</code></pre>
+<p>从三步跟进的情况来看，应该能跟进到value.keySet().stream()这里啊？还是说我没看懂他这个跟进的输出是什么</p>
+<p>这里还踩了一个坑<br>一开始ma的判断条件为</p>
+<pre class=" language-sql"><code class="language-sql">ma<span class="token punctuation">.</span>getMethod<span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">.</span>hasQualifiedName<span class="token punctuation">(</span><span class="token string">"java.util"</span><span class="token punctuation">,</span> <span class="token string">"Map"</span><span class="token punctuation">,</span> <span class="token string">"keySet"</span><span class="token punctuation">)</span>
+</code></pre>
+<p>感觉就一步到位了，然而这样子查不出来任何一个结果。。。并且我一开始还没发现，后来测试的时候才发现的，因为对TaintTracking::AdditionalTaintStep的quick evaluation是对全部step都搜索出来。直接看是看不懂的，后来对着答案的类单独对类计算，结果发现我自己写的语句当类计算时查不出结果来。。。以及文档的这个getSourceDeclaration方法完全看不懂在说什么</p>
+<p>但是开头的config的source和sink也是这么写的却能查出答案来。。。</p>
+<p><strong>又一个教训，判断条件写成类单独调试不会有坏处</strong></p>
+<h4 id="Step-1-7-Adding-taint-steps-through-a-constructor"><a href="#Step-1-7-Adding-taint-steps-through-a-constructor" class="headerlink" title="Step 1.7: Adding taint steps through a constructor"></a>Step 1.7: Adding taint steps through a constructor</h4><p>不知道这么写对不对</p>
+<pre class=" language-sql"><code class="language-sql"><span class="token comment" spellcheck="true">// x -> HashSet(x)</span>
+class HashSetTaintStep extends TaintTracking::AdditionalTaintStep {
+  override predicate step<span class="token punctuation">(</span>DataFlow::Node <span class="token number">f</span><span class="token punctuation">,</span> DataFlow::Node t<span class="token punctuation">)</span> {
+    <span class="token keyword">exists</span><span class="token punctuation">(</span>ConstructorCall <span class="token keyword">call</span> <span class="token operator">|</span> <span class="token keyword">call</span><span class="token punctuation">.</span>getConstructor<span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">.</span>hasQualifiedName<span class="token punctuation">(</span><span class="token string">"java.util"</span><span class="token punctuation">,</span> <span class="token string">"HashSet"</span><span class="token punctuation">,</span> <span class="token string">"HashSet"</span><span class="token punctuation">)</span> <span class="token operator">and</span>
+      <span class="token number">f</span><span class="token punctuation">.</span>asExpr<span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">=</span> <span class="token keyword">call</span><span class="token punctuation">.</span>getAnArgument<span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">and</span>
+      t<span class="token punctuation">.</span>asExpr<span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">=</span> <span class="token keyword">call</span>
+    <span class="token punctuation">)</span>
+  }
+}
+</code></pre>
+<p>trick<br>在寻找函数的时候感觉都要考虑一下继承，那么就使用如下的通用模板较为合适</p>
+<pre class=" language-sql"><code class="language-sql">ma<span class="token punctuation">.</span>getMethod<span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">.</span>getName<span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">=</span> <span class="token string">"stream"</span> <span class="token operator">and</span>
+ma<span class="token punctuation">.</span>getMethod<span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">.</span>getDeclaringType<span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">.</span>getASourceSupertype<span class="token operator">+</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">.</span>hasQualifiedName<span class="token punctuation">(</span><span class="token string">"java.util"</span><span class="token punctuation">,</span> <span class="token string">"Collection"</span><span class="token punctuation">)</span>
+</code></pre>
+<p>但这个操作在上述hashmap时失效了，暂时不知道原因是什么。。。</p>
+<h4 id="Step-1-8-Finish-line-for-our-first-issue"><a href="#Step-1-8-Finish-line-for-our-first-issue" class="headerlink" title="Step 1.8: Finish line for our first issue"></a>Step 1.8: Finish line for our first issue</h4><p>写了一大堆连接</p>
+<pre class=" language-sql"><code class="language-sql"><span class="token comment" spellcheck="true">// x -> x.keySet()</span>
+class KeySetTaintStep extends TaintTracking::AdditionalTaintStep{
+  override predicate step<span class="token punctuation">(</span>DataFlow::Node <span class="token number">f</span><span class="token punctuation">,</span> DataFlow::Node t<span class="token punctuation">)</span>{
+    <span class="token keyword">exists</span><span class="token punctuation">(</span>MethodAccess ma <span class="token operator">|</span> ma<span class="token punctuation">.</span>getMethod<span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">.</span>getName<span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">=</span> <span class="token string">"keySet"</span> <span class="token operator">and</span> 
+    ma<span class="token punctuation">.</span>getMethod<span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">.</span>getDeclaringType<span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">.</span>getSourceDeclaration<span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">.</span>hasQualifiedName<span class="token punctuation">(</span><span class="token string">"java.util"</span><span class="token punctuation">,</span> <span class="token string">"Map"</span><span class="token punctuation">)</span> <span class="token operator">and</span>
+    <span class="token number">f</span><span class="token punctuation">.</span>asExpr<span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">=</span> ma<span class="token punctuation">.</span>getQualifier<span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">and</span> 
+    t<span class="token punctuation">.</span>asExpr<span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">=</span> ma
+    <span class="token punctuation">)</span>
+  }
+}
+
+
+
+<span class="token comment" spellcheck="true">// x -> x.getXXX()</span>
+class GetterTaintStep extends TaintTracking::AdditionalTaintStep{
+  override predicate step<span class="token punctuation">(</span>DataFlow::Node <span class="token number">f</span><span class="token punctuation">,</span> DataFlow::Node t<span class="token punctuation">)</span>{
+    <span class="token keyword">exists</span><span class="token punctuation">(</span>MethodAccess ma <span class="token operator">|</span> ma<span class="token punctuation">.</span>getMethod<span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">.</span>getName<span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">.</span>indexOf<span class="token punctuation">(</span><span class="token string">"get"</span><span class="token punctuation">)</span> <span class="token operator">=</span> <span class="token number">0</span> <span class="token operator">and</span>
+     <span class="token number">f</span><span class="token punctuation">.</span>asExpr<span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">=</span> ma<span class="token punctuation">.</span>getQualifier<span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">and</span>
+     t<span class="token punctuation">.</span>asExpr<span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">=</span> ma
+    <span class="token punctuation">)</span>
+  }
+}
+
+
+<span class="token comment" spellcheck="true">// x -> HashSet(x)</span>
+class HashSetTaintStep extends TaintTracking::AdditionalTaintStep {
+  override predicate step<span class="token punctuation">(</span>DataFlow::Node <span class="token number">f</span><span class="token punctuation">,</span> DataFlow::Node t<span class="token punctuation">)</span> {
+    <span class="token keyword">exists</span><span class="token punctuation">(</span>ConstructorCall <span class="token keyword">call</span> <span class="token operator">|</span> <span class="token keyword">call</span><span class="token punctuation">.</span>getConstructedType<span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">.</span>getSourceDeclaration<span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">.</span>hasQualifiedName<span class="token punctuation">(</span><span class="token string">"java.util"</span><span class="token punctuation">,</span> <span class="token string">"HashSet"</span><span class="token punctuation">)</span> <span class="token operator">and</span>
+      <span class="token number">f</span><span class="token punctuation">.</span>asExpr<span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">=</span> <span class="token keyword">call</span><span class="token punctuation">.</span>getAnArgument<span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">and</span>
+      t<span class="token punctuation">.</span>asExpr<span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">=</span> <span class="token keyword">call</span>
+    <span class="token punctuation">)</span>
+  }
+}
+
+<span class="token comment" spellcheck="true">// x -> y.RetainAll(x)</span>
+class CollectionRetainAllTaintStep extends TaintTracking::AdditionalTaintStep {
+  override predicate step<span class="token punctuation">(</span>DataFlow::Node <span class="token number">f</span><span class="token punctuation">,</span> DataFlow::Node t<span class="token punctuation">)</span> {
+    <span class="token keyword">exists</span><span class="token punctuation">(</span>MethodAccess ma <span class="token operator">|</span> ma<span class="token punctuation">.</span>getMethod<span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">.</span>getDeclaringType<span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">.</span>getASourceSupertype<span class="token operator">+</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">.</span>hasQualifiedName<span class="token punctuation">(</span><span class="token string">"java.util"</span><span class="token punctuation">,</span> <span class="token string">"Collection"</span><span class="token punctuation">)</span> <span class="token operator">and</span>
+      <span class="token number">f</span><span class="token punctuation">.</span>asExpr<span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">=</span> ma<span class="token punctuation">.</span>getAnArgument<span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">and</span>
+      t<span class="token punctuation">.</span>asExpr<span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">=</span> ma<span class="token punctuation">.</span>getQualifier<span class="token punctuation">(</span><span class="token punctuation">)</span>
+    <span class="token punctuation">)</span>
+  }
+}
+</code></pre>
+<p>实际上就是从完成了这个函数的从source到sink。。。突然感觉有点迷。主要是debug那段不会搞跳过了就没怎么理解</p>
+<pre class=" language-java"><code class="language-java">    <span class="token annotation punctuation">@Override</span>
+    <span class="token keyword">public</span> <span class="token keyword">boolean</span> <span class="token function">isValid</span><span class="token punctuation">(</span>Container container<span class="token punctuation">,</span> ConstraintValidatorContext context<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token keyword">if</span> <span class="token punctuation">(</span>container <span class="token operator">==</span> null<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+            <span class="token keyword">return</span> <span class="token boolean">true</span><span class="token punctuation">;</span>
+        <span class="token punctuation">}</span>
+        Set<span class="token operator">&lt;</span>String<span class="token operator">></span> common <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">HashSet</span><span class="token operator">&lt;</span><span class="token operator">></span><span class="token punctuation">(</span>container<span class="token punctuation">.</span><span class="token function">getSoftConstraints</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">keySet</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        common<span class="token punctuation">.</span><span class="token function">retainAll</span><span class="token punctuation">(</span>container<span class="token punctuation">.</span><span class="token function">getHardConstraints</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">keySet</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+        <span class="token keyword">if</span> <span class="token punctuation">(</span>common<span class="token punctuation">.</span><span class="token function">isEmpty</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+            <span class="token keyword">return</span> <span class="token boolean">true</span><span class="token punctuation">;</span>
+        <span class="token punctuation">}</span>
+
+        context<span class="token punctuation">.</span><span class="token function">buildConstraintViolationWithTemplate</span><span class="token punctuation">(</span>
+                <span class="token string">"Soft and hard constraints not unique. Shared constraints: "</span> <span class="token operator">+</span> common
+        <span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">addConstraintViolation</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">disableDefaultConstraintViolation</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token keyword">return</span> <span class="token boolean">false</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+</code></pre>
+<p>其实也就是连上了这里面的两句。。。</p>
+<h3 id="Step-2-Second-Issue"><a href="#Step-2-Second-Issue" class="headerlink" title="Step 2: Second Issue"></a>Step 2: Second Issue</h3><p>刚才找出来的链是在<code>SchedulingConstraintSetValidator.java</code>，而在<code>SchedulingConstraintValidator.java</code>中也存在类似的调用，补上对应的连接类</p>
+<blockquote>
+<p><strong>Tip</strong>: We don’t like duplicate code. ;-)</p>
+</blockquote>
+<p>意思就是写之前的全局类进行连接咯？</p>
+<pre class=" language-java"><code class="language-java">    <span class="token annotation punctuation">@Override</span>
+    <span class="token keyword">public</span> <span class="token keyword">boolean</span> <span class="token function">isValid</span><span class="token punctuation">(</span>Map<span class="token operator">&lt;</span>String<span class="token punctuation">,</span> String<span class="token operator">></span> value<span class="token punctuation">,</span> ConstraintValidatorContext context<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        Set<span class="token operator">&lt;</span>String<span class="token operator">></span> namesInLowerCase <span class="token operator">=</span> value<span class="token punctuation">.</span><span class="token function">keySet</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">stream</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">map</span><span class="token punctuation">(</span>String<span class="token operator">:</span><span class="token operator">:</span>toLowerCase<span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">collect</span><span class="token punctuation">(</span>Collectors<span class="token punctuation">.</span><span class="token function">toSet</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        HashSet<span class="token operator">&lt;</span>String<span class="token operator">></span> unknown <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">HashSet</span><span class="token operator">&lt;</span><span class="token operator">></span><span class="token punctuation">(</span>namesInLowerCase<span class="token punctuation">)</span><span class="token punctuation">;</span>
+        unknown<span class="token punctuation">.</span><span class="token function">removeAll</span><span class="token punctuation">(</span>JobConstraints<span class="token punctuation">.</span>CONSTRAINT_NAMES<span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token keyword">if</span> <span class="token punctuation">(</span>unknown<span class="token punctuation">.</span><span class="token function">isEmpty</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+            <span class="token keyword">return</span> <span class="token boolean">true</span><span class="token punctuation">;</span>
+        <span class="token punctuation">}</span>
+        context<span class="token punctuation">.</span><span class="token function">buildConstraintViolationWithTemplate</span><span class="token punctuation">(</span><span class="token string">"Unrecognized constraints "</span> <span class="token operator">+</span> unknown<span class="token punctuation">)</span>
+                <span class="token punctuation">.</span><span class="token function">addConstraintViolation</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">disableDefaultConstraintViolation</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token keyword">return</span> <span class="token boolean">false</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+</code></pre>
+<p>他的函数长这样，那么就是把stream，map，collect函数连一下就行了吧<br>补充如下代码</p>
+<pre class=" language-java"><code class="language-java"><span class="token comment" spellcheck="true">// x -> x.stream()</span>
+<span class="token keyword">class</span> <span class="token class-name">CollectionStreamTaintStep</span> <span class="token keyword">extends</span> <span class="token class-name">TaintTracking</span><span class="token operator">:</span><span class="token operator">:</span>AdditionalTaintStep <span class="token punctuation">{</span>
+  override predicate <span class="token function">step</span><span class="token punctuation">(</span>DataFlow<span class="token operator">:</span><span class="token operator">:</span>Node f<span class="token punctuation">,</span> DataFlow<span class="token operator">:</span><span class="token operator">:</span>Node t<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token function">exists</span><span class="token punctuation">(</span> MethodAccess ma<span class="token operator">|</span> ma<span class="token punctuation">.</span><span class="token function">getMethod</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">getName</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">=</span> <span class="token string">"stream"</span> and
+    ma<span class="token punctuation">.</span><span class="token function">getMethod</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">getDeclaringType</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">.</span>getASourceSupertype<span class="token operator">+</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">hasQualifiedName</span><span class="token punctuation">(</span><span class="token string">"java.util"</span><span class="token punctuation">,</span> <span class="token string">"Collection"</span><span class="token punctuation">)</span> and
+    f<span class="token punctuation">.</span><span class="token function">asExpr</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">=</span> ma<span class="token punctuation">.</span><span class="token function">getQualifier</span><span class="token punctuation">(</span><span class="token punctuation">)</span> and 
+    t<span class="token punctuation">.</span><span class="token function">asExpr</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">=</span> ma<span class="token punctuation">)</span>
+  <span class="token punctuation">}</span>
+<span class="token punctuation">}</span>
+
+
+<span class="token comment" spellcheck="true">// x -> x.map()</span>
+<span class="token keyword">class</span> <span class="token class-name">MapTaintStep</span> <span class="token keyword">extends</span> <span class="token class-name">TaintTracking</span><span class="token operator">:</span><span class="token operator">:</span>AdditionalTaintStep <span class="token punctuation">{</span>
+  override predicate <span class="token function">step</span><span class="token punctuation">(</span>DataFlow<span class="token operator">:</span><span class="token operator">:</span>Node f<span class="token punctuation">,</span> DataFlow<span class="token operator">:</span><span class="token operator">:</span>Node t<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token function">exists</span><span class="token punctuation">(</span>MethodAccess ma <span class="token operator">|</span> ma<span class="token punctuation">.</span><span class="token function">getMethod</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">getName</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">=</span> <span class="token string">"map"</span> and
+    ma<span class="token punctuation">.</span><span class="token function">getMethod</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">getDeclaringType</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">.</span>getASourceSupertype<span class="token operator">+</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">hasQualifiedName</span><span class="token punctuation">(</span><span class="token string">"java.util.stream"</span><span class="token punctuation">,</span> <span class="token string">"Stream"</span><span class="token punctuation">)</span> and
+    f<span class="token punctuation">.</span><span class="token function">asExpr</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">=</span> ma<span class="token punctuation">.</span><span class="token function">getQualifier</span><span class="token punctuation">(</span><span class="token punctuation">)</span> and
+    t<span class="token punctuation">.</span><span class="token function">asExpr</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">=</span> ma <span class="token punctuation">)</span>
+  <span class="token punctuation">}</span>
+<span class="token punctuation">}</span>
+
+<span class="token comment" spellcheck="true">// x -> x.collect()</span>
+<span class="token keyword">class</span> <span class="token class-name">CollectTaintStep</span> <span class="token keyword">extends</span> <span class="token class-name">TaintTracking</span><span class="token operator">:</span><span class="token operator">:</span>AdditionalTaintStep <span class="token punctuation">{</span>
+  override predicate <span class="token function">step</span><span class="token punctuation">(</span>DataFlow<span class="token operator">:</span><span class="token operator">:</span>Node f<span class="token punctuation">,</span> DataFlow<span class="token operator">:</span><span class="token operator">:</span>Node t<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token function">exists</span><span class="token punctuation">(</span>MethodAccess ma <span class="token operator">|</span>  ma<span class="token punctuation">.</span><span class="token function">getMethod</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">getName</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">=</span> <span class="token string">"collect"</span> and
+    ma<span class="token punctuation">.</span><span class="token function">getMethod</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">getDeclaringType</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">.</span>getASourceSupertype<span class="token operator">+</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">hasQualifiedName</span><span class="token punctuation">(</span><span class="token string">"java.util.stream"</span><span class="token punctuation">,</span> <span class="token string">"Stream"</span><span class="token punctuation">)</span> and
+    f<span class="token punctuation">.</span><span class="token function">asExpr</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">=</span> ma<span class="token punctuation">.</span><span class="token function">getQualifier</span><span class="token punctuation">(</span><span class="token punctuation">)</span> and
+    t<span class="token punctuation">.</span><span class="token function">asExpr</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">=</span> ma <span class="token punctuation">)</span>
+  <span class="token punctuation">}</span>
+<span class="token punctuation">}</span>
+</code></pre>
+<p>看了一眼答案，答案还是用的更为优雅的定义类的写法。。。下次一定改，然后hint中的减少重复代码就是因为map和collect这两个函数都是<code>java.util.stream.Stream</code>这个类的，所以再把这个类抽出来写一遍</p>
+<p><code>f.asExpr() = ma.getQualifier() and t.asExpr() = ma</code><br>写最后一个函数的时候忘了这两句经典操作。。。导致查询除了问题可能进入了死循环，我当时还在想怎么这就十分钟都跑不出结果了。。。</p>
+<h3 id="Step-3-Errors-and-Exceptions"><a href="#Step-3-Errors-and-Exceptions" class="headerlink" title="Step 3: Errors and Exceptions"></a>Step 3: Errors and Exceptions</h3><p>思路是因为这个模板渲染渲染的是报错，因此可能会有类似try catch的操作进行污点传递，需要使用额外的代码进行传递</p>
+<pre class=" language-java"><code class="language-java"><span class="token keyword">try</span> <span class="token punctuation">{</span>
+    <span class="token function">parse</span><span class="token punctuation">(</span>tainted<span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span> <span class="token keyword">catch</span> <span class="token punctuation">(</span><span class="token class-name">Exception</span> e<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token function">sink</span><span class="token punctuation">(</span>e<span class="token punctuation">.</span><span class="token function">getMessage</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
+<span class="token punctuation">}</span>
+</code></pre>
+<p>这段直接学习答案的例子了，思路比较清晰</p>
+<pre class=" language-java"><code class="language-java"><span class="token keyword">class</span> <span class="token class-name">ExceptionTaintStep</span> <span class="token keyword">extends</span> <span class="token class-name">TaintTracking</span><span class="token operator">:</span><span class="token operator">:</span>AdditionalTaintStep <span class="token punctuation">{</span>
+  override predicate <span class="token function">step</span><span class="token punctuation">(</span>DataFlow<span class="token operator">:</span><span class="token operator">:</span>Node n1<span class="token punctuation">,</span> DataFlow<span class="token operator">:</span><span class="token operator">:</span>Node n2<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token function">exists</span><span class="token punctuation">(</span>Call call<span class="token punctuation">,</span> TryStmt <span class="token keyword">try</span><span class="token punctuation">,</span> CatchClause <span class="token keyword">catch</span><span class="token punctuation">,</span> MethodAccess getMessageCall <span class="token operator">|</span>
+      <span class="token comment" spellcheck="true">// the call is within the `try` block, which has a corresponding `catch` clause</span>
+      call<span class="token punctuation">.</span><span class="token function">getEnclosingStmt</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">.</span>getEnclosingStmt<span class="token operator">*</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">=</span> <span class="token keyword">try</span><span class="token punctuation">.</span><span class="token function">getBlock</span><span class="token punctuation">(</span><span class="token punctuation">)</span> and
+      <span class="token keyword">try</span><span class="token punctuation">.</span><span class="token function">getACatchClause</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">=</span> <span class="token keyword">catch</span> and
+      <span class="token comment" spellcheck="true">// the `catch` clause is likely to catch an exception thrown by the call</span>
+      <span class="token punctuation">(</span>
+        <span class="token keyword">catch</span><span class="token punctuation">.</span><span class="token function">getACaughtType</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">.</span>getASupertype<span class="token operator">*</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">=</span> call<span class="token punctuation">.</span><span class="token function">getCallee</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">getAThrownExceptionType</span><span class="token punctuation">(</span><span class="token punctuation">)</span> or
+        <span class="token keyword">catch</span><span class="token punctuation">.</span><span class="token function">getACaughtType</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">.</span>getASupertype<span class="token operator">*</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token keyword">instanceof</span> <span class="token class-name">TypeRuntimeException</span>
+      <span class="token punctuation">)</span> and
+      <span class="token comment" spellcheck="true">// the exception message is read by `getMessageCall` within the `catch` block</span>
+      <span class="token keyword">catch</span><span class="token punctuation">.</span><span class="token function">getVariable</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">getAnAccess</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">=</span> getMessageCall<span class="token punctuation">.</span><span class="token function">getQualifier</span><span class="token punctuation">(</span><span class="token punctuation">)</span> and
+      getMessageCall<span class="token punctuation">.</span><span class="token function">getMethod</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">getName</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">regexpMatch</span><span class="token punctuation">(</span><span class="token string">"get(Localized)?Message|toString"</span><span class="token punctuation">)</span> and
+      <span class="token comment" spellcheck="true">// taint flows from any argument of the call to a place where the exception message is accessed</span>
+      n1<span class="token punctuation">.</span><span class="token function">asExpr</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">=</span> call<span class="token punctuation">.</span><span class="token function">getAnArgument</span><span class="token punctuation">(</span><span class="token punctuation">)</span> and
+      n2<span class="token punctuation">.</span><span class="token function">asExpr</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">=</span> getMessageCall
+    <span class="token punctuation">)</span>
+  <span class="token punctuation">}</span>
+<span class="token punctuation">}</span>
+</code></pre>
+<p>这里就两个地方没有很理解，一个是<code>call.getEnclosingStmt().getEnclosingStmt*()</code>，感觉可以直接+表示一次以上递归。没有很理解，然后就是函数名这里的正则<code>get(Localized)?Message|toString</code>，是java的错误处理函数命名规范吗？</p>
+<p>那段对catch接受的错误与call抛出的错误的类型判断倒是一个很精彩的思路</p>
+<h3 id="Step-4-Exploit-and-remediation"><a href="#Step-4-Exploit-and-remediation" class="headerlink" title="Step 4: Exploit and remediation"></a>Step 4: Exploit and remediation</h3><h4 id="Step-4-1-PoC"><a href="#Step-4-1-PoC" class="headerlink" title="Step 4.1: PoC"></a>Step 4.1: PoC</h4><p>怎么就快进到write a poc了。。。我还没找到用户输入在哪呢。再回头看一下用户输入追踪环节。是Step1.1的Bonus环节</p>
+<h4 id="Step-1-1-Bonus"><a href="#Step-1-1-Bonus" class="headerlink" title="Step 1.1 Bonus"></a>Step 1.1 Bonus</h4><p>答案的类和各种函数定义的顺序还有点乱，理不清楚，看起来略微不适，并且语法都变了好多，不太看得懂了。。。</p>
+<p>import了一个TaintTracking2并定义了一个新的Config</p>
+<pre class=" language-java"><code class="language-java">  <span class="token keyword">class</span> <span class="token class-name">UserInputToValidatedFieldConfig</span> <span class="token keyword">extends</span> <span class="token class-name">TaintTracking2</span><span class="token operator">:</span><span class="token operator">:</span>Configuration <span class="token punctuation">{</span>
+    <span class="token function">UserInputToValidatedFieldConfig</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span> <span class="token keyword">this</span> <span class="token operator">=</span> <span class="token string">"UserInputToValidatedFieldConfig"</span> <span class="token punctuation">}</span>
+
+    override predicate <span class="token function">isSource</span><span class="token punctuation">(</span>DataFlow2<span class="token operator">:</span><span class="token operator">:</span>Node source<span class="token punctuation">)</span> <span class="token punctuation">{</span> source <span class="token keyword">instanceof</span> <span class="token class-name">RemoteFlowSource</span> <span class="token punctuation">}</span>
+
+    override predicate <span class="token function">isSink</span><span class="token punctuation">(</span>DataFlow2<span class="token operator">:</span><span class="token operator">:</span>Node sink<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+      sink<span class="token punctuation">.</span><span class="token function">asExpr</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">=</span> <span class="token function">any</span><span class="token punctuation">(</span>Field field<span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">getAnAssignedValue</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+    <span class="token punctuation">}</span>
+  <span class="token punctuation">}</span>
+</code></pre>
+<p>source是<code>RemoteFlowSource</code>，这个是codeql内置的类，表示远端的资源，然后sink就是一个赋值语句。这段很好理解</p>
+<p>接下来的整体都比较玄幻，比较难再整合成一个语句了，尽可能的整合然后eval一下看看都是写什么东西</p>
+<pre class=" language-java"><code class="language-java"><span class="token keyword">class</span> <span class="token class-name">ConstraintAnnotation</span> <span class="token keyword">extends</span> <span class="token class-name">Annotation</span> <span class="token punctuation">{</span>
+  <span class="token function">ConstraintAnnotation</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span> <span class="token keyword">this</span><span class="token punctuation">.</span><span class="token function">getType</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">hasQualifiedName</span><span class="token punctuation">(</span><span class="token string">"javax.validation"</span><span class="token punctuation">,</span> <span class="token string">"Constraint"</span><span class="token punctuation">)</span> <span class="token punctuation">}</span>
+
+  <span class="token comment" spellcheck="true">/** Holds if this constraint is validated by the class `validatorType`. */</span>
+  predicate <span class="token function">isValidatedBy</span><span class="token punctuation">(</span>RefType validatorType<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    validatorType <span class="token operator">=</span>
+      <span class="token keyword">this</span><span class="token punctuation">.</span><span class="token function">getValue</span><span class="token punctuation">(</span><span class="token string">"validatedBy"</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token punctuation">(</span>ArrayInit<span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">getAnInit</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token punctuation">(</span>TypeLiteral<span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">getTypeName</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">getType</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+  <span class="token punctuation">}</span>
+<span class="token punctuation">}</span>
+</code></pre>
+<p>这个类寻找对应名称的注解，并提供一个函数寻找该注解中validatedBy属性对应的值（但是我并看不懂后面这堆操作在干什么。。。）</p>
+<p>然后接下来定义了一个函数，但是实际上这个函数后面使用的时候第二个和第三个参数没有用？</p>
+<pre class=" language-sql"><code class="language-sql">  <span class="token comment" spellcheck="true">/**
+   * Holds if `validatedElement` is annotated with a validation constraint defined by `constraintType`,
+   * which in turn is annotated with `constraintAnnotation` and validated by `validatorType`.
+   */</span>
+  predicate validatedConstraint<span class="token punctuation">(</span>
+    Annotatable validatedElement<span class="token punctuation">,</span> RefType constraintType<span class="token punctuation">,</span> ConstraintAnnotation constraintAnnotation<span class="token punctuation">,</span>
+    RefType validatorType
+  <span class="token punctuation">)</span> {
+    validatedElement<span class="token punctuation">.</span>getAnAnnotation<span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">.</span>getType<span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">=</span> constraintType <span class="token operator">and</span>
+    constraintType<span class="token punctuation">.</span>getAnAnnotation<span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">=</span> constraintAnnotation <span class="token operator">and</span>
+    constraintAnnotation<span class="token punctuation">.</span>isValidatedBy<span class="token punctuation">(</span>validatorType<span class="token punctuation">)</span>
+  }
+</code></pre>
+<p>实际调用的时候是这样子的<code>validatedConstraint(validatedField, _, _, validatorType)</code><br>下划线表示any，也就是任意值，这个玩意的称呼似乎被称为don’t care var。意思是无用？那我能不能把这个函数之间缩成这样子的</p>
+<pre class=" language-sql"><code class="language-sql">predicate validatedConstraint<span class="token punctuation">(</span>Annotatable validatedElement<span class="token punctuation">,</span> RefType validatorType<span class="token punctuation">)</span> {
+  validatedElement<span class="token punctuation">.</span>getAnAnnotation<span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">.</span>getType<span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">.</span>getAnAnnotation<span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token punctuation">(</span>ConstraintAnnotation<span class="token punctuation">)</span><span class="token punctuation">.</span>isValidatedBy<span class="token punctuation">(</span>validatorType<span class="token punctuation">)</span>
+}
+</code></pre>
+<p>验证了一下确实可以，但这会导致结果有些跳脱，更加让人看不懂。使用原函数的quick eval就能看出该函数的思路，功能是寻找一个可被注解的对象，其注解的注解继承自<code>javax.validation.Constraint</code>类，寻找其isValidateBy值，该对象即会被isValidateBy指定类的isValid函数进行检验</p>
+<p>然后写一个复杂函数</p>
+<pre class=" language-java"><code class="language-java">predicate <span class="token function">validatesUserControlledBeanProperty</span><span class="token punctuation">(</span>
+  Method isValidMethod<span class="token punctuation">,</span> Field validatedField<span class="token punctuation">,</span> RefType validatorType<span class="token punctuation">,</span>
+  RemoteFlowSource remoteInput
+<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+  <span class="token comment" spellcheck="true">// This `isValid` method is used to validate a field, or the field's class.</span>
+  isValidMethod<span class="token punctuation">.</span>overridesOrInstantiates<span class="token operator">*</span><span class="token punctuation">(</span><span class="token function">any</span><span class="token punctuation">(</span>Method t <span class="token operator">|</span> t<span class="token punctuation">.</span><span class="token function">hasQualifiedName</span><span class="token punctuation">(</span><span class="token string">"javax.validation"</span><span class="token punctuation">,</span> <span class="token string">"ConstraintValidator"</span><span class="token punctuation">,</span> <span class="token string">"isValid"</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">)</span> and
+  validatorType <span class="token operator">=</span> isValidMethod<span class="token punctuation">.</span><span class="token function">getDeclaringType</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token function">and</span>
+  <span class="token punctuation">(</span>
+    <span class="token function">validatedConstraint</span><span class="token punctuation">(</span>validatedField<span class="token punctuation">,</span> validatorType<span class="token punctuation">)</span> or
+    <span class="token function">validatedConstraint</span><span class="token punctuation">(</span>validatedField<span class="token punctuation">.</span><span class="token function">getDeclaringType</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">,</span>validatorType<span class="token punctuation">)</span>
+  <span class="token punctuation">)</span> and
+  <span class="token comment" spellcheck="true">// The value of the field is obtained from user input.</span>
+  <span class="token function">any</span><span class="token punctuation">(</span>UserInputToValidatedFieldConfig config<span class="token punctuation">)</span>
+      <span class="token punctuation">.</span><span class="token function">hasFlow</span><span class="token punctuation">(</span>remoteInput<span class="token punctuation">,</span> DataFlow<span class="token operator">:</span><span class="token operator">:</span><span class="token function">exprNode</span><span class="token punctuation">(</span>validatedField<span class="token punctuation">.</span><span class="token function">getAnAssignedValue</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
+<span class="token punctuation">}</span>
+</code></pre>
+<p>先找到符合要求的isValid函数，然后获取其对应类，然后寻找被该类注解的对象，最后将用户输入和被对应类注解的对象关联起来（要我说这个部分已经超出我的能力范围了。。。）</p>
+<p>最后定义一个类，扩展DataFlow的Node类</p>
+<pre class=" language-java"><code class="language-java"><span class="token keyword">class</span> <span class="token class-name">BeanValidationSource</span> <span class="token keyword">extends</span> <span class="token class-name">DataFlow</span><span class="token operator">:</span><span class="token operator">:</span>Node <span class="token punctuation">{</span>
+  <span class="token function">BeanValidationSource</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token function">exists</span><span class="token punctuation">(</span>Method isValidMethod <span class="token operator">|</span>
+      <span class="token comment" spellcheck="true">// This source is the first parameter of the `isValid` method</span>
+      isValidMethod<span class="token punctuation">.</span>overridesOrInstantiates<span class="token operator">*</span><span class="token punctuation">(</span><span class="token function">any</span><span class="token punctuation">(</span>Method t <span class="token operator">|</span> t<span class="token punctuation">.</span><span class="token function">hasQualifiedName</span><span class="token punctuation">(</span><span class="token string">"javax.validation"</span><span class="token punctuation">,</span> <span class="token string">"ConstraintValidator"</span><span class="token punctuation">,</span> <span class="token string">"isValid"</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">)</span> and
+      <span class="token keyword">this</span><span class="token punctuation">.</span><span class="token function">asParameter</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">=</span> isValidMethod<span class="token punctuation">.</span><span class="token function">getParameter</span><span class="token punctuation">(</span><span class="token number">0</span><span class="token punctuation">)</span> and
+      <span class="token comment" spellcheck="true">// which must be present in the source code</span>
+      isValidMethod<span class="token punctuation">.</span><span class="token function">fromSource</span><span class="token punctuation">(</span><span class="token punctuation">)</span> and
+      <span class="token comment" spellcheck="true">// and must be used to validate user-controlled data</span>
+      <span class="token function">validatesUserControlledBeanProperty</span><span class="token punctuation">(</span>isValidMethod<span class="token punctuation">,</span> _<span class="token punctuation">,</span> _<span class="token punctuation">,</span> _<span class="token punctuation">)</span>
+    <span class="token punctuation">)</span>
+  <span class="token punctuation">}</span>
+<span class="token punctuation">}</span>
+</code></pre>
+<p>简单魔改了一下，然后这里最后调用validatesUserControlledBeanProperty时还是使用了这个下划线参数，感觉，学到了一个全新的技巧。函数用来定位某个东西的时候可以多声明几个辅助变量，然后最后到调用的时候用下划线参数直接不管就行</p>
+<p>这个函数倒是很好看懂了，就是寻找到一个有用户输入的isValid方法，然后这个类表示有用户输入的isValid方法的第一个参数</p>
+<p>可以用这个类替代我们一开始的isSource中写的那些判断条件，把原来只是简单的找isValid的第一个参数，变成了有用户输入的isValid的第一个参数。。。。（我还以为是从输入点到触发点，这样子我还是没有特别懂输入点在哪。不过可以quick eval validatesUserControlledBeanProperty这个函数，它的validatedField应该就是用户输入处</p>
+<p>我不管我不管搞完了，不坐牢了</p>
+<p><strong>个人意见，这个东西写java是真折磨，首先需要完成源代码的编译，这就已经能砍掉一堆项目了，然后还由于java的各种特性各种继承各种注解，得考虑一万个东西，或者说我感觉这个是在已经有一定的漏洞思路之后去寻找的。像这个项目后期的用户输入到sink，注解那段我完全就没能理解，简单看了下代码才知道怎么回事。对于我来说这个过程更像是一个已知漏洞存在然后去验证的过程，而不是一个从零开始挖掘的过程</strong></p>
+<p>以及感觉没有这种奇怪的挖掘需求。。。最近的需求都是找java gadget之类的东西，只是寻找一个存在特定方法特定属性的类之类的，而不是一个完整的过程。这把就当做了几天牢简单的尝试了一下新科技吧。。。</p>
+]]></content>
+      <categories>
+        <category>笔记</category>
+      </categories>
+      <tags>
+        <tag>codeql</tag>
+      </tags>
+  </entry>
 </search>
