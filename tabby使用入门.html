@@ -1,0 +1,560 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 6.0.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"blog.z3ratu1.cn","root":"/","scheme":"Pisces","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"always","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":true},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+  </script>
+
+  <meta name="description" content="tabby使用入门在坐完了CodeQL的牢之后，尝试使用另一个高级一点的工具 整体的使用难度并不是很高，主要是顺便把windows上的一些乱七八糟的java环境相关的事情重新理了一遍。把一些垃圾文件清理掉了 （用了半天感觉windows跑java不行） 说起来搜这个tabby的时候搜到了另一个叫tabby的终端，看了一下挺好看的就替换掉了非常不行的cmder和git bash（唯一缺点是启动需要个">
+<meta property="og:type" content="article">
+<meta property="og:title" content="tabby使用入门">
+<meta property="og:url" content="https://blog.z3ratu1.cn/tabby%E4%BD%BF%E7%94%A8%E5%85%A5%E9%97%A8.html">
+<meta property="og:site_name" content="Z3ratu1&#39;s blog">
+<meta property="og:description" content="tabby使用入门在坐完了CodeQL的牢之后，尝试使用另一个高级一点的工具 整体的使用难度并不是很高，主要是顺便把windows上的一些乱七八糟的java环境相关的事情重新理了一遍。把一些垃圾文件清理掉了 （用了半天感觉windows跑java不行） 说起来搜这个tabby的时候搜到了另一个叫tabby的终端，看了一下挺好看的就替换掉了非常不行的cmder和git bash（唯一缺点是启动需要个">
+<meta property="og:locale">
+<meta property="og:image" content="https://blog.z3ratu1.cn/images/tabby%E4%BD%BF%E7%94%A8%E5%85%A5%E9%97%A8/image-20220331214639131.png">
+<meta property="article:published_time" content="2022-03-30T07:20:15.000Z">
+<meta property="article:modified_time" content="2022-03-31T14:08:58.010Z">
+<meta property="article:author" content="Z3ratu1">
+<meta property="article:tag" content="Java">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://blog.z3ratu1.cn/images/tabby%E4%BD%BF%E7%94%A8%E5%85%A5%E9%97%A8/image-20220331214639131.png">
+
+<link rel="canonical" href="https://blog.z3ratu1.cn/tabby%E4%BD%BF%E7%94%A8%E5%85%A5%E9%97%A8.html">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-Hans'
+  };
+</script>
+
+  <title>tabby使用入门 | Z3ratu1's blog</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+<link rel="stylesheet" href="/css/prism-tomorrow.css" type="text/css"></head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">Z3ratu1's blog</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">Welcome</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>关于</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+        <li class="menu-item menu-item-links">
+
+    <a href="/links/" rel="section"><i class="fa fa-link fa-fw"></i>友链</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off" placeholder="搜索..." spellcheck="false" type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+  <a href="https://github.com/Z3ratu1" class="github-corner" title="Follow me on GitHub" aria-label="Follow me on GitHub" rel="external nofollow noopener noreferrer" target="_blank"><svg width="80" height="80" viewbox="0 0 250 250" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"/><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"/><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"/></svg></a>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
+    <link itemprop="mainEntityOfPage" href="https://blog.z3ratu1.cn/tabby%E4%BD%BF%E7%94%A8%E5%85%A5%E9%97%A8.html">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="https://q2.qlogo.cn/headimg_dl?dst_uin=1207039417&spec=160">
+      <meta itemprop="name" content="Z3ratu1">
+      <meta itemprop="description" content="与其感慨路难行，不如现在出发">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Z3ratu1's blog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          tabby使用入门
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2022-03-30 15:20:15" itemprop="dateCreated datePublished" datetime="2022-03-30T15:20:15+08:00">2022-03-30</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2022-03-31 22:08:58" itemprop="dateModified" datetime="2022-03-31T22:08:58+08:00">2022-03-31</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E7%AC%94%E8%AE%B0/" itemprop="url" rel="index"><span itemprop="name">笔记</span></a>
+                </span>
+            </span>
+
+          
+            <span id="/tabby%E4%BD%BF%E7%94%A8%E5%85%A5%E9%97%A8.html" class="post-meta-item leancloud_visitors" data-flag-title="tabby使用入门" title="阅读次数">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span class="leancloud-visitors-count"></span>
+            </span>
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="far fa-comment"></i>
+      </span>
+      <span class="post-meta-item-text">Valine：</span>
+    
+    <a title="valine" href="/tabby%E4%BD%BF%E7%94%A8%E5%85%A5%E9%97%A8.html#valine-comments" itemprop="discussionUrl">
+      <span class="post-comments-count valine-comment-count" data-xid="/tabby%E4%BD%BF%E7%94%A8%E5%85%A5%E9%97%A8.html" itemprop="commentCount"></span>
+    </a>
+  </span>
+  
+  
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h1 id="tabby使用入门"><a href="#tabby使用入门" class="headerlink" title="tabby使用入门"></a>tabby使用入门</h1><p>在坐完了CodeQL的牢之后，尝试使用另一个高级一点的工具</p>
+<p>整体的使用难度并不是很高，主要是顺便把windows上的一些乱七八糟的java环境相关的事情重新理了一遍。把一些垃圾文件清理掉了</p>
+<p>（用了半天感觉windows跑java不行）</p>
+<p>说起来搜这个tabby的时候搜到了另一个叫tabby的终端，看了一下挺好看的就替换掉了非常不行的cmder和git bash（唯一缺点是启动需要个两三秒）。然后就出现了用tabby在命令行跑tabby的操作</p>
+<h2 id="java相关环境配置"><a href="#java相关环境配置" class="headerlink" title="java相关环境配置"></a>java相关环境配置</h2><p>挺简单的，去下个neo4j Desktop，然后记得把发的垃圾邮件退订。一路安装就行了，desktop非常的图形化，比较友好</p>
+<p>然后apoc的插件似乎也不需要手动安装，在plugins那一栏可以直接自动安装。就是不知道为什么简单的装了个插件建了个数据库就用掉了我5G的硬盘呢？</p>
+<p>然后neo4j的话因为我下的新版，所以需要Oracle java11。又临时去Oracle下了个。之后对整个电脑的java环境进行了一个检查</p>
+<p>无非也就是些注册表和环境变量的检查。现在java早就已经不使用什么远古java home这种手动配置方案了，会在安装时直接在系统的PATH里给你塞一个环境变量，还要置顶。。。<br>一般来说是这个路径<code>C:\Program Files\Common Files\Oracle\Java\javapath</code>，然而这个路径实际上是一个软链接，软链接到这个目录下的一个java_target_xxx。。。。这个目录里面塞了一个java一个javac和一个javaw？那为什么不直接连接到java安装目录的bin下？<br>简单改造，把这个目录删了直接环境变量设到java安装目录。。希望不会出大问题</p>
+<p>然后还有一个遗留问题。我的burp是远古时期的某个印度破解版。只兼容jdk8，如果我把整体调整到11他是跑不起来的。并且还不支持openjdk，只能用Oracle的。</p>
+<p>但是我神奇的发现修改环境变量并不会导致双击打开jar包的jdk更改，然后感觉应该是注册表，搜了一下，果然是注册表中的javaw.exe决定了这个操作。这样子就能在环境变量是java11的情况下继续用我的远古burp了。。。（还是找个时间升级一下好了）</p>
+<h2 id="编译tabby"><a href="#编译tabby" class="headerlink" title="编译tabby"></a>编译tabby</h2><p>tabby只支持jdk8，所以不要用jdk11<br>编译配置都写好了，用的是gradle，应该是类似于maven的东西。但是我默认的jdk8u311在运行的时候会报一个非常奇怪的错误</p>
+<pre><code>Java home is different.
+Expecting: &#39;D:\Java\jdk\jdk1.8.0_311&#39; but was: &#39;D:\Java\jdk\jdk1.8.0_311\jre&#39;.
+
+Please configure the JDK to match the expected one.
+</code></pre>
+<p>谷歌的话处理方案多种多样，但简单的看了几眼都和我的情况不一样<br>最后在某个不起眼的角落发现了一个低赞回答</p>
+<pre><code>IntelliJ broke when I copied tools.jar to a jre/lib, attempting to make hot attach work.
+</code></pre>
+<p>说起来我之前因为某个不知名的原因好像真的做过这个操作。。。然后把jre下面的tools.jar删掉就可以了。。。</p>
+<p>以及IDEA默认的maven和gradle的目录都在用户的家目录下。并且不知道为什么gradle那个目录上来就直接3G，看了下有一个cache目录就2G。。。不知道都在干些什么，硬盘真有点吃紧了<br>尤其是我的C盘已经有点不堪重负了。全部转移到D盘，并且对项目的配置进行修改。这里也很坑，修改只对当前项目有效，也就是之前的项目全部得单独配置。。。最坑的还不是这里，新开项目仍然是按照家目录的默认配置，需要从<code>File-&gt;New Project Setup-&gt;Seting For New Projects</code>处再额外修改才能确保未来不被坑</p>
+<p>这里有一个新的坑。GitHub上的release的代码事实上是有点旧的，一些在已经关闭的issue中修复的问题实际上是在最新的release之后，我就说我怎么自己编译的还跑不通。。。</p>
+<p>然后直接从主页拉最新的代码进行编译<br>然后刚好撞上tabby更新将命令行参数更改到配置文件参数，但是实际上的help页面还是对应的命令行版本，且有一个isJDKOnly选项不能正常用的小bug。。。以及isSaveOnly选项给去掉了，跑完直接往数据库里写。搞得我一开始莫名其妙了半天然后自己看了下代码发现有问题再魔改了一下源码。不过这样子就可以直接在IDEA里面改配置文件直接运行spring app，不像原来一样需要打一个jar包命令行运行。</p>
+<p>打jar包命令行运行的话需要把jar包和rules和config目录放在同一级，否则也会出现找不到文件之类的错误</p>
+<p>然后不要高估自己的小笔记本的性能。。。。<br>今天试了一下单跑一个isJDKOnly，数据库倒是在几分钟内写完了，但是将数据库导入log4j花了一个小时都没完成。。。并且CPU占用一直100%，感觉要烧了。。。</p>
+<p>被迫中断。然后从jdk里面选了个最大的rt.jar进行分析。倒是在十几分钟内把分析+导入数据库给完成了。然后就可以开始尝试写语句了</p>
+<h2 id="neo4j简单入门"><a href="#neo4j简单入门" class="headerlink" title="neo4j简单入门"></a>neo4j简单入门</h2><p>上来会直接有一个提示命令可以查看数据库的基本逻辑关系。这对接下来的查询有很大的帮助<br><code>CALL db.schema.visualization()</code></p>
+<p>得到这样子的一幅图</p>
+<p><img src="/images/tabby%E4%BD%BF%E7%94%A8%E5%85%A5%E9%97%A8/image-20220331214639131.png" alt="image-20220331214639131"></p>
+<p>圈表示节点，线表示路径且有方向</p>
+<p>目标是复现上次HFCTF的二次反序列化类，找到一个调用了readObject方法的get开头的方法</p>
+<p>上次写过codeql之后感觉用起来上手就更快了<br>使用<code>match</code>语句定义变量，<code>where</code>语句添加约束，<code>return</code>语句返回结果。函数什么的暂时不学</p>
+<p>使用括号来表示节点，<code>-[]-&gt;</code>表示路径关系<br>然后可以从图中看出类与类直接的关系是继承，方法与方法直接的关系是调用，别名问了下甫舟，就是只继承重写之类的操作。然后类中包含方法（实际上后面测试发现也有类包含类，应该是指在类中定义的类，而不是成员变量。tabby似乎并不能对类与成员变量之间的关系进行分析）</p>
+<p>那么先写一个雏形出来</p>
+<pre><code>match (source:Method)-[:CALL|ALIAS]-&gt;(sink:Method)
+where source.NAME =~ &quot;get.+&quot; and sink.NAME=&quot;readObject&quot;
+return * limit 10
+</code></pre>
+<p>其实这个语句就直接查出来结果了。。。。<br><code>=~</code>表示使用正则匹配，Method是有一个IS_GETTER属性的，然而get开头的方法并不等价于他就是getter，所以用正则直接匹配get开头的方法。说起来当初调试Hessain的时候就发现他的反序列化理论上是只调用getter但实际上没有很调通发生了什么但就是调用了这个不是getter的getObject。。。</p>
+<p>然后为了保险和练习起见加一些buff</p>
+<pre><code>match (source:Method)-[:CALL|ALIAS*..3]-&gt;(sink:Method)
+match (c:Class&#123;IS_SERIALIZABLE:TRUE, IS_INTERFACE:FALSE&#125;)-[:HAS]-&gt;(source)
+where source.NAME =~ &quot;get.+&quot; and sink.NAME=&quot;readObject&quot; and source.PARAMETER_SIZE=0
+return * limit 10
+</code></pre>
+<p>结果也不会有什么区别，不过条件拉的更满就更加的稳妥嘛<br>这里唯一需要记忆的语法就是<code>*..n</code>，猜也能猜出来是重复步长的意思</p>
+<p>用起来上手还挺快的，没有codeql那么折磨，也可能是因为整体关系较为简单的缘故，所以精细程度什么的也就不如codeql精细了。所以这里就算找到了这个函数，也没发编写语句查看一下这个传入readObject的参数是否易失之类的。</p>
+<p>还有上次susctf的那个寻找一个可序列化且存在一个成员变量为Object类型的类也没法实现</p>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/Java/" rel="tag"># Java</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/LINECTF2022wp.html" rel="prev" title="LINECTF2022wp">
+      <i class="fa fa-chevron-left"></i> LINECTF2022wp
+    </a></div>
+      <div class="post-nav-item"></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+    <div class="comments" id="valine-comments"></div>
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#tabby%E4%BD%BF%E7%94%A8%E5%85%A5%E9%97%A8"><span class="nav-number">1.</span> <span class="nav-text">tabby使用入门</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#java%E7%9B%B8%E5%85%B3%E7%8E%AF%E5%A2%83%E9%85%8D%E7%BD%AE"><span class="nav-number">1.1.</span> <span class="nav-text">java相关环境配置</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%BC%96%E8%AF%91tabby"><span class="nav-number">1.2.</span> <span class="nav-text">编译tabby</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#neo4j%E7%AE%80%E5%8D%95%E5%85%A5%E9%97%A8"><span class="nav-number">1.3.</span> <span class="nav-text">neo4j简单入门</span></a></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Z3ratu1" src="https://q2.qlogo.cn/headimg_dl?dst_uin=1207039417&spec=160">
+  <p class="site-author-name" itemprop="name">Z3ratu1</p>
+  <div class="site-description" itemprop="description">与其感慨路难行，不如现在出发</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">152</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">5</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">86</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+  <div class="beian"><a href="http://www.beian.miit.gov.cn/" rel="external nofollow noopener noreferrer" target="_blank">湘ICP备2020021580号 </a>
+      <img src="/./images/beian.png" style="display: inline-block;">
+  </div>
+
+<div class="copyright">
+  
+  &copy; 2019 – 
+  <span itemprop="copyrightYear">2022</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Z3ratu1</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="external nofollow noopener noreferrer" target="_blank">Hexo</a> & <a href="https://pisces.theme-next.org/" class="theme-link" rel="external nofollow noopener noreferrer" target="_blank">NexT.Pisces</a> 强力驱动
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+
+<script>
+NexT.utils.loadComments(document.querySelector('#valine-comments'), () => {
+  NexT.utils.getScript('https://cdn.jsdelivr.net/npm/valine@1.4.14/dist/Valine.min.js', () => {
+    var GUEST = ['nick', 'mail', 'link'];
+    var guest = 'nick,mail,link';
+    guest = guest.split(',').filter(item => {
+      return GUEST.includes(item);
+    });
+    new Valine({
+      el         : '#valine-comments',
+      verify     : false,
+      notify     : false,
+      appId      : '7H8kg0XdWO8IbhOcu4K1JaAT-gzGzoHsz',
+      appKey     : 'wPKQjkbVtvPaRR7gh2yjfLSi',
+      placeholder: "Just go go",
+      avatar     : 'mm',
+      meta       : guest,
+      pageSize   : '10' || 10,
+      visitor    : true,
+      lang       : '' || 'zh-cn',
+      path       : location.pathname,
+      recordIP   : false,
+      serverURLs : ''
+    });
+  }, window.Valine);
+});
+</script>
+
+</body>
+</html>
