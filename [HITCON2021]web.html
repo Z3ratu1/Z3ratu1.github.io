@@ -27,12 +27,14 @@
 <meta property="og:site_name" content="Z3ratu1&#39;s blog">
 <meta property="og:description" content="[HITCON2021]web科恩究极联队katzebin出动，在坐了两天牢后顺利偷学神仙思路web都是台湾神仙Orange出的题，有的题目有些迷之脑洞，有的题目又比较的有意思，但总而言之，我都不会嘻嘻 One-bit-man可以修改WordPress中源码的一个bit来制造RCE目前的想法就是可能有什么危险的配置项，直接把0变成1之类的，但是简单搜索了一下好像并没有搜到什么有用的数据 看wp完成">
 <meta property="og:locale">
+<meta property="og:image" content="https://blog.z3ratu1.cn/images/%5BHITCON2021%5Dweb/image-20211209175555759.png">
 <meta property="article:published_time" content="2021-12-05T06:16:17.000Z">
-<meta property="article:modified_time" content="2021-12-09T10:04:31.456Z">
+<meta property="article:modified_time" content="2022-04-07T07:20:21.821Z">
 <meta property="article:author" content="Z3ratu1">
 <meta property="article:tag" content="wp">
 <meta property="article:tag" content="gopher">
 <meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://blog.z3ratu1.cn/images/%5BHITCON2021%5Dweb/image-20211209175555759.png">
 
 <link rel="canonical" href="https://blog.z3ratu1.cn/[HITCON2021]web.html">
 
@@ -231,7 +233,7 @@
                   <i class="far fa-calendar-check"></i>
                 </span>
                 <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2021-12-09 18:04:31" itemprop="dateModified" datetime="2021-12-09T18:04:31+08:00">2021-12-09</time>
+                <time title="修改时间：2022-04-07 15:20:21" itemprop="dateModified" datetime="2022-04-07T15:20:21+08:00">2022-04-07</time>
               </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -381,11 +383,287 @@ apt <span class="token function">install</span> geoip-dev -y <span class="token 
 </code></pre>
 <h2 id="Vulpixelize"><a href="#Vulpixelize" class="headerlink" title="Vulpixelize"></a>Vulpixelize</h2><p>这个题不是很难，我都还没来得及思考，吃了个饭回来就已经被神仙们秒杀了</p>
 <p>功能也很简单</p>
-<p>&#96;&#96;&#96;python</p>
-<h1 id="coding-UTF-8"><a href="#coding-UTF-8" class="headerlink" title="coding: UTF-8"></a>coding: UTF-8</h1><p>import io, os, sys, uuid</p>
-<p>from subprocess import run, PIPE<br>from hashlib import md5</p>
-<p>from PIL import Image<br>from selenium import webdriver, common<br>from flask import Flask, render_template, request</p>
-<p>secret &#x3D; run([‘&#x2F;read_secret’], stdout&#x3D;PIPE).stdout<br>FLAG   &#x3D; ‘hitcon</p>
+<pre class=" language-python"><code class="language-python"><span class="token comment" spellcheck="true"># coding: UTF-8</span>
+<span class="token keyword">import</span> io<span class="token punctuation">,</span> os<span class="token punctuation">,</span> sys<span class="token punctuation">,</span> uuid
+
+<span class="token keyword">from</span> subprocess <span class="token keyword">import</span> run<span class="token punctuation">,</span> PIPE
+<span class="token keyword">from</span> hashlib <span class="token keyword">import</span> md5
+
+<span class="token keyword">from</span> PIL <span class="token keyword">import</span> Image
+<span class="token keyword">from</span> selenium <span class="token keyword">import</span> webdriver<span class="token punctuation">,</span> common
+<span class="token keyword">from</span> flask <span class="token keyword">import</span> Flask<span class="token punctuation">,</span> render_template<span class="token punctuation">,</span> request
+
+secret <span class="token operator">=</span> run<span class="token punctuation">(</span><span class="token punctuation">[</span><span class="token string">'/read_secret'</span><span class="token punctuation">]</span><span class="token punctuation">,</span> stdout<span class="token operator">=</span>PIPE<span class="token punctuation">)</span><span class="token punctuation">.</span>stdout
+FLAG   <span class="token operator">=</span> <span class="token string">'hitcon{%s}'</span> <span class="token operator">%</span> <span class="token string">'-'</span><span class="token punctuation">.</span>join<span class="token punctuation">(</span>md5<span class="token punctuation">(</span>secret<span class="token punctuation">)</span><span class="token punctuation">.</span>hexdigest<span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
+<span class="token keyword">def</span> <span class="token function">init_chrome</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
+    options <span class="token operator">=</span> webdriver<span class="token punctuation">.</span>ChromeOptions<span class="token punctuation">(</span><span class="token punctuation">)</span>
+    options<span class="token punctuation">.</span>add_argument<span class="token punctuation">(</span><span class="token string">'--headless'</span><span class="token punctuation">)</span>
+    options<span class="token punctuation">.</span>add_argument<span class="token punctuation">(</span><span class="token string">'--disable-gpu'</span><span class="token punctuation">)</span>
+    options<span class="token punctuation">.</span>add_argument<span class="token punctuation">(</span><span class="token string">'--disable-dev-shm-usage'</span><span class="token punctuation">)</span>
+    options<span class="token punctuation">.</span>add_argument<span class="token punctuation">(</span><span class="token string">'--window-size=1920x1080'</span><span class="token punctuation">)</span>
+    options<span class="token punctuation">.</span>add_experimental_option<span class="token punctuation">(</span><span class="token string">"prefs"</span><span class="token punctuation">,</span> <span class="token punctuation">{</span>
+        <span class="token string">'download.prompt_for_download'</span><span class="token punctuation">:</span> <span class="token boolean">True</span><span class="token punctuation">,</span>
+        <span class="token string">'download.default_directory'</span><span class="token punctuation">:</span> <span class="token string">'/dev/null'</span>
+    <span class="token punctuation">}</span><span class="token punctuation">)</span>
+
+    driver <span class="token operator">=</span> webdriver<span class="token punctuation">.</span>Chrome<span class="token punctuation">(</span>options<span class="token operator">=</span>options<span class="token punctuation">)</span>
+    driver<span class="token punctuation">.</span>set_page_load_timeout<span class="token punctuation">(</span><span class="token number">5</span><span class="token punctuation">)</span>
+    driver<span class="token punctuation">.</span>set_script_timeout<span class="token punctuation">(</span><span class="token number">5</span><span class="token punctuation">)</span>
+
+    <span class="token keyword">return</span> driver
+
+<span class="token keyword">def</span> <span class="token function">message</span><span class="token punctuation">(</span>msg<span class="token punctuation">)</span><span class="token punctuation">:</span>
+    <span class="token keyword">return</span> render_template<span class="token punctuation">(</span><span class="token string">'index.html'</span><span class="token punctuation">,</span> msg<span class="token operator">=</span>msg<span class="token punctuation">)</span>
+
+<span class="token comment" spellcheck="true">### initialize ###</span>
+driver <span class="token operator">=</span> init_chrome<span class="token punctuation">(</span><span class="token punctuation">)</span>
+app <span class="token operator">=</span> Flask<span class="token punctuation">(</span>__name__<span class="token punctuation">)</span>
+<span class="token comment" spellcheck="true">### initialize ###</span>
+
+
+@app<span class="token punctuation">.</span>route<span class="token punctuation">(</span><span class="token string">'/flag'</span><span class="token punctuation">)</span>
+<span class="token keyword">def</span> <span class="token function">flag</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
+    <span class="token keyword">if</span> request<span class="token punctuation">.</span>remote_addr <span class="token operator">==</span> <span class="token string">'127.0.0.1'</span><span class="token punctuation">:</span>
+        <span class="token keyword">return</span> message<span class="token punctuation">(</span>FLAG<span class="token punctuation">)</span>
+    <span class="token keyword">return</span> message<span class="token punctuation">(</span><span class="token string">"allow only from local"</span><span class="token punctuation">)</span>
+    
+@app<span class="token punctuation">.</span>route<span class="token punctuation">(</span><span class="token string">'/'</span><span class="token punctuation">,</span> methods<span class="token operator">=</span><span class="token punctuation">[</span><span class="token string">'GET'</span><span class="token punctuation">]</span><span class="token punctuation">)</span>
+<span class="token keyword">def</span> <span class="token function">index</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
+    <span class="token keyword">return</span> render_template<span class="token punctuation">(</span><span class="token string">'index.html'</span><span class="token punctuation">)</span>
+
+@app<span class="token punctuation">.</span>route<span class="token punctuation">(</span><span class="token string">'/submit'</span><span class="token punctuation">,</span> methods<span class="token operator">=</span><span class="token punctuation">[</span><span class="token string">'GET'</span><span class="token punctuation">]</span><span class="token punctuation">)</span>
+<span class="token keyword">def</span> <span class="token function">submit</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
+    path <span class="token operator">=</span> <span class="token string">'static/images/%s.png'</span> <span class="token operator">%</span> uuid<span class="token punctuation">.</span>uuid4<span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">.</span>hex
+    url  <span class="token operator">=</span> request<span class="token punctuation">.</span>args<span class="token punctuation">.</span>get<span class="token punctuation">(</span><span class="token string">'url'</span><span class="token punctuation">)</span>
+    <span class="token keyword">if</span> url<span class="token punctuation">:</span>
+        <span class="token comment" spellcheck="true"># secrity check</span>
+        <span class="token keyword">if</span> <span class="token operator">not</span> url<span class="token punctuation">.</span>startswith<span class="token punctuation">(</span><span class="token string">'http://'</span><span class="token punctuation">)</span> <span class="token operator">and</span> <span class="token operator">not</span> url<span class="token punctuation">.</span>startswith<span class="token punctuation">(</span><span class="token string">'https://'</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
+            <span class="token keyword">return</span> message<span class="token punctuation">(</span>msg<span class="token operator">=</span><span class="token string">'malformed url'</span><span class="token punctuation">)</span>
+
+        <span class="token comment" spellcheck="true"># access url</span>
+        <span class="token keyword">try</span><span class="token punctuation">:</span>
+            driver<span class="token punctuation">.</span>get<span class="token punctuation">(</span>url<span class="token punctuation">)</span>
+            data <span class="token operator">=</span> driver<span class="token punctuation">.</span>get_screenshot_as_png<span class="token punctuation">(</span><span class="token punctuation">)</span>
+        <span class="token keyword">except</span> common<span class="token punctuation">.</span>exceptions<span class="token punctuation">.</span>WebDriverException <span class="token keyword">as</span> e<span class="token punctuation">:</span>
+            <span class="token keyword">return</span> message<span class="token punctuation">(</span>msg<span class="token operator">=</span>str<span class="token punctuation">(</span>e<span class="token punctuation">)</span><span class="token punctuation">)</span>
+
+        <span class="token comment" spellcheck="true"># save result</span>
+        img <span class="token operator">=</span> Image<span class="token punctuation">.</span>open<span class="token punctuation">(</span>io<span class="token punctuation">.</span>BytesIO<span class="token punctuation">(</span>data<span class="token punctuation">)</span><span class="token punctuation">)</span>
+        img <span class="token operator">=</span> img<span class="token punctuation">.</span>resize<span class="token punctuation">(</span><span class="token punctuation">(</span><span class="token number">64</span><span class="token punctuation">,</span><span class="token number">64</span><span class="token punctuation">)</span><span class="token punctuation">,</span> resample<span class="token operator">=</span>Image<span class="token punctuation">.</span>BILINEAR<span class="token punctuation">)</span>
+        img <span class="token operator">=</span> img<span class="token punctuation">.</span>resize<span class="token punctuation">(</span><span class="token punctuation">(</span><span class="token number">1920</span><span class="token punctuation">,</span><span class="token number">1080</span><span class="token punctuation">)</span><span class="token punctuation">,</span> Image<span class="token punctuation">.</span>NEAREST<span class="token punctuation">)</span>
+        img<span class="token punctuation">.</span>save<span class="token punctuation">(</span>path<span class="token punctuation">)</span>
+
+        <span class="token keyword">return</span> message<span class="token punctuation">(</span>msg<span class="token operator">=</span>path<span class="token punctuation">)</span>
+    <span class="token keyword">else</span><span class="token punctuation">:</span>
+        <span class="token keyword">return</span> message<span class="token punctuation">(</span>msg<span class="token operator">=</span><span class="token string">"url not found :("</span><span class="token punctuation">)</span>
+
+<span class="token keyword">if</span> __name__ <span class="token operator">==</span> <span class="token string">'__main__'</span><span class="token punctuation">:</span>
+    app<span class="token punctuation">.</span>run<span class="token punctuation">(</span><span class="token string">'0.0.0.0'</span><span class="token punctuation">,</span> <span class="token number">8000</span><span class="token punctuation">)</span>
+</code></pre>
+<p>就是允许你去访问一个页面，然后把那个页面截图下来，压缩到64x64的究极马赛克之后再扩大到一个正常图片，本地访问flag路由会返回flag，为了防止非预期flag是经典400然后有一个setUID readflag读取的<br>神仙们的思路是，在自己的vps上写一个iframe包含127.0.0.1的flag，然后把iframe超级放大，放大到字符变成64x64的马赛克也能看出来写的是什么，这样就能直接拿到flag</p>
+<p>我也尝试着写了一下，不过由于我垃圾的前端技术，第一天晚上没写出来。。。</p>
+<h3 id="构造iframe"><a href="#构造iframe" class="headerlink" title="构造iframe"></a>构造iframe</h3><p>首先很容易就能百度到一个叫<code>transform: scale();</code>的方法，用来等比例缩放iframe，但是这个方法有一个毛病，似乎是以iframe的中心为原点进行缩放的。。。flag的位置在窗口偏上的位置，这样子会导致放置flag的位置直接位于窗口之外。。并且滚动旁边的进度条也没法滚动到对应位置</p>
+<p>然后就搜到了这个属性<code>transform-origin: 0 0;</code>，指定操作的原点，我直接指定为左上角，这样子是以左上角开始进行缩放的，整个iframe就都在屏幕显示范围内了<br><a target="_blank" rel="external nofollow noopener noreferrer" href="https://developer.mozilla.org/zh-CN/docs/Web/CSS/transform-origin">transform-origin</a><br><del>这里不得不说MDN的这个文档的效果做的比什么w3c、菜鸟教程好多了</del></p>
+<p>但bot并不会拖动进度条到flag处再截图，并且放大的倍率要在超级马赛克下也能看懂文字，就一次只能获取到几位，还需要调整iframe的位置，让flag打开时就能被看见<br>于是稍微学习了一下CSS，一个HTML元素不仅仅只是一个元素，他除了自身的content，还由padding，border和margin组成，border就是元素的边界了，padding就是让元素是否直接和border紧靠，可以用padding让content和border有些距离<br>margin就是用来定义元素和元素之间的位置的，定义为正就是远离，定义为负就是重叠，我直接把margin-top和margin-left调成负数，把整个iframe往左上方移动，调节到这个数的时候刚好打开就能看到flag</p>
+<pre class=" language-html"><code class="language-html"><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>html</span><span class="token punctuation">></span></span>
+<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>head</span><span class="token punctuation">></span></span>
+    <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>style</span><span class="token punctuation">></span></span><span class="token style language-css">
+        <span class="token selector">iframe </span><span class="token punctuation">{</span>
+            <span class="token property">height</span><span class="token punctuation">:</span> <span class="token number">4000</span>px<span class="token punctuation">;</span>
+            <span class="token property">width</span><span class="token punctuation">:</span> <span class="token number">2000</span>px<span class="token punctuation">;</span>
+            <span class="token property">transform</span><span class="token punctuation">:</span> <span class="token function">scale</span><span class="token punctuation">(</span><span class="token number">13</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+            <span class="token property">transform-origin</span><span class="token punctuation">:</span> <span class="token number">0</span> <span class="token number">0</span><span class="token punctuation">;</span>
+            <span class="token property">margin-top</span><span class="token punctuation">:</span>-<span class="token number">3000</span>px<span class="token punctuation">;</span>
+            <span class="token property">margin-left</span><span class="token punctuation">:</span> -<span class="token number">6000</span>px<span class="token punctuation">;</span>
+        <span class="token punctuation">}</span>
+    </span><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>style</span><span class="token punctuation">></span></span>
+<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>head</span><span class="token punctuation">></span></span>
+<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>body</span><span class="token style-attr language-css"><span class="token attr-name"> <span class="token attr-name">style</span></span><span class="token punctuation">="</span><span class="token attr-value"><span class="token property">height</span><span class="token punctuation">:</span> <span class="token number">5000</span>px<span class="token punctuation">;</span> <span class="token property">width</span><span class="token punctuation">:</span> <span class="token number">1000</span>px</span><span class="token punctuation">"</span></span><span class="token punctuation">></span></span>
+<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>iframe</span> <span class="token attr-name">src</span><span class="token attr-value"><span class="token punctuation">=</span><span class="token punctuation">"</span>http://127.0.0.1:8000/flag<span class="token punctuation">"</span></span><span class="token punctuation">></span></span><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>iframe</span><span class="token punctuation">></span></span>
+<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>body</span><span class="token punctuation">></span></span>
+<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>html</span><span class="token punctuation">></span></span>
+</code></pre>
+<p><code>hitcon&#123;114161e9f94c73e497a75d466c6337f4&#125;</code><br>还要手动加<code>-</code></p>
+<h3 id="各种非预期"><a href="#各种非预期" class="headerlink" title="各种非预期"></a>各种非预期</h3><p>比赛结束开始看wp<br>放大iframe也算是非预期，还有一个非预期是dns rebinding<br>原理以前也学过，就是先把域名指向vps，再把域名指向127.0.0.1，但在浏览器看来域名是一样的，这样子就可以绕过同源策略，进行跨域读（这么说来只要进行钓鱼不就是任意跨域读了吗）</p>
+<p>虽说由于同源策略，不携带cookie的话拿不到什么有意义的信息，但是如果目标站点是经典前后端分离+localstorage存凭证auth头发送呢？就能做到任意跨域读了</p>
+<p>rebinding的核心在于将域名查询结果的ttl设置到0，也就是一次性，这样子在子页面内嵌入一个请求会导致接下来的请求需要重新查询域名，但实际利用似乎并不是非常方便，即使将ttl设定至0，浏览器本身会保存一个分钟级的域名缓存，加上各级DNS服务器可能会对查询结果进行缓存，所以实际上的利用成功率较低，可能需要反复尝试才能成功</p>
+<p>所以说虽然究极跨域但是利用成功率也不高啊</p>
+<p>以及我看大家外带数据用的都是<code>navigator.sendBeacon()</code>而不是fetch，学一手新的外带方法</p>
+<h3 id="预期"><a href="#预期" class="headerlink" title="预期"></a>预期</h3><p>利用的是Chrome的一个feature，text fragment，在url锚点（井号）后添加如下格式的内容<br><code>#:~:text=[prefix-,]textStart[,textEnd][,-suffix]</code><br>用户在访问对应链接时会被导航到匹配的文本处并对该文本进行高亮<br>可以直接Chrome划一段文字右键点击<code>复制指向突出内容的链接</code>来看看长什么样（但是Chrome生产出来的内容似乎比较复杂）</p>
+<p>那就是一个经典盲注环节了，令url为<code>http://127.0.0.1:8000/flag#:~:text=hitcon&#123;</code>然后开始逐位猜解，猜解正确，则64x64的超级马赛克上会出现一行高亮的像素，否则不出现</p>
+<p>但是这个东西。。怎么自动化呢，有点折磨人啊？感觉可能一次梭一位，把所有图片按照提交的字母命名存下来然后手看比较快。。python大师的话整个什么定位像素点看颜色也许也不是不行</p>
+<p>看到了国外神仙的解决方案，把未匹配的图片下下来算个md5，然后有高亮的md5就和原始的不一样来做到自动化</p>
+<p>文档<br><a target="_blank" rel="external nofollow noopener noreferrer" href="https://wicg.github.io/scroll-to-text-fragment/">Text Fragments</a></p>
+<h2 id="Metamon-Verse"><a href="#Metamon-Verse" class="headerlink" title="Metamon-Verse"></a>Metamon-Verse</h2><p>gopher打NFS，比N1的gopher打mssql还离谱。。。这个东西我都没见过，临时学习ing</p>
+<p>NFS全称network file system，感觉就是个分布式的硬盘，允许网络共享的一个文件系统，让用户可以挂载远程机器上的文件系统</p>
+<p>题目起了个简单flask服务，提供pycurl服务，可以读取url内容保存到指定目录下</p>
+<pre class=" language-python"><code class="language-python"><span class="token comment" spellcheck="true"># coding: UTF-8</span>
+<span class="token keyword">import</span> os<span class="token punctuation">,</span> sys
+<span class="token keyword">from</span> hashlib <span class="token keyword">import</span> md5
+<span class="token keyword">from</span> functools <span class="token keyword">import</span> wraps
+<span class="token keyword">from</span> flask <span class="token keyword">import</span> Flask<span class="token punctuation">,</span> render_template<span class="token punctuation">,</span> request
+
+<span class="token keyword">import</span> pycurl
+<span class="token keyword">import</span> certifi
+
+PORT <span class="token operator">=</span> <span class="token number">80</span>
+
+<span class="token keyword">def</span> <span class="token function">login_required</span><span class="token punctuation">(</span>f<span class="token punctuation">)</span><span class="token punctuation">:</span>
+    @wraps<span class="token punctuation">(</span>f<span class="token punctuation">)</span>
+    <span class="token keyword">def</span> <span class="token function">wrapped_view</span><span class="token punctuation">(</span><span class="token operator">**</span>kwargs<span class="token punctuation">)</span><span class="token punctuation">:</span>
+        <span class="token keyword">def</span> <span class="token function">check_auth</span><span class="token punctuation">(</span>username<span class="token punctuation">,</span> password<span class="token punctuation">)</span><span class="token punctuation">:</span>
+            <span class="token keyword">return</span> username <span class="token operator">==</span> <span class="token string">'ctf'</span> <span class="token operator">and</span> password <span class="token operator">==</span> os<span class="token punctuation">.</span>environ<span class="token punctuation">[</span><span class="token string">'CTF_PASSWD'</span><span class="token punctuation">]</span>
+        auth <span class="token operator">=</span> request<span class="token punctuation">.</span>authorization
+        <span class="token keyword">if</span> <span class="token operator">not</span> <span class="token punctuation">(</span>auth <span class="token operator">and</span> check_auth<span class="token punctuation">(</span>auth<span class="token punctuation">.</span>username<span class="token punctuation">,</span> auth<span class="token punctuation">.</span>password<span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
+            <span class="token keyword">return</span> <span class="token punctuation">(</span><span class="token string">'Unauthorized'</span><span class="token punctuation">,</span> <span class="token number">401</span><span class="token punctuation">,</span> <span class="token punctuation">{</span>
+                <span class="token string">'WWW-Authenticate'</span><span class="token punctuation">:</span> <span class="token string">'Basic realm="Login Required"'</span>
+            <span class="token punctuation">}</span><span class="token punctuation">)</span>
+
+        <span class="token keyword">return</span> f<span class="token punctuation">(</span><span class="token operator">**</span>kwargs<span class="token punctuation">)</span>
+
+    <span class="token keyword">return</span> wrapped_view
+
+app <span class="token operator">=</span> Flask<span class="token punctuation">(</span>__name__<span class="token punctuation">)</span>
+app<span class="token punctuation">.</span>config<span class="token punctuation">[</span><span class="token string">'TEMPLATES_AUTO_RELOAD'</span><span class="token punctuation">]</span> <span class="token operator">=</span> <span class="token boolean">True</span>
+
+@app<span class="token punctuation">.</span>route<span class="token punctuation">(</span><span class="token string">'/'</span><span class="token punctuation">,</span> methods<span class="token operator">=</span><span class="token punctuation">[</span><span class="token string">'GET'</span><span class="token punctuation">]</span><span class="token punctuation">)</span>
+@login_required
+<span class="token keyword">def</span> <span class="token function">index</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
+    <span class="token keyword">return</span> render_template<span class="token punctuation">(</span><span class="token string">'index.html'</span><span class="token punctuation">)</span>
+
+@app<span class="token punctuation">.</span>route<span class="token punctuation">(</span><span class="token string">'/'</span><span class="token punctuation">,</span> methods<span class="token operator">=</span><span class="token punctuation">[</span><span class="token string">'POST'</span><span class="token punctuation">]</span><span class="token punctuation">)</span>
+@login_required
+<span class="token keyword">def</span> <span class="token function">submit</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
+    url <span class="token operator">=</span> request<span class="token punctuation">.</span>form<span class="token punctuation">.</span>get<span class="token punctuation">(</span><span class="token string">'url'</span><span class="token punctuation">)</span>
+    <span class="token keyword">if</span> <span class="token operator">not</span> url<span class="token punctuation">:</span>
+        <span class="token keyword">return</span> render_template<span class="token punctuation">(</span><span class="token string">'index.html'</span><span class="token punctuation">,</span> msg<span class="token operator">=</span><span class="token string">'empty url'</span><span class="token punctuation">)</span>
+
+    opt_name<span class="token punctuation">,</span> opt_value <span class="token operator">=</span> None<span class="token punctuation">,</span> None
+    <span class="token keyword">for</span> key<span class="token punctuation">,</span> value <span class="token keyword">in</span> request<span class="token punctuation">.</span>form<span class="token punctuation">.</span>items<span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
+        <span class="token keyword">if</span> key<span class="token punctuation">.</span>startswith<span class="token punctuation">(</span><span class="token string">'CURLOPT_'</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
+            name <span class="token operator">=</span> key<span class="token punctuation">.</span>split<span class="token punctuation">(</span><span class="token string">'_'</span><span class="token punctuation">,</span> <span class="token number">1</span><span class="token punctuation">)</span><span class="token punctuation">[</span><span class="token number">1</span><span class="token punctuation">]</span><span class="token punctuation">.</span>upper<span class="token punctuation">(</span><span class="token punctuation">)</span>
+            <span class="token keyword">try</span><span class="token punctuation">:</span>
+                opt_name  <span class="token operator">=</span> getattr<span class="token punctuation">(</span>pycurl<span class="token punctuation">,</span> name<span class="token punctuation">)</span>
+                opt_name  <span class="token operator">=</span> int<span class="token punctuation">(</span>opt_name<span class="token punctuation">)</span>
+                opt_value <span class="token operator">=</span> int<span class="token punctuation">(</span>value<span class="token punctuation">)</span>
+            <span class="token keyword">except</span> <span class="token punctuation">(</span>AttributeError<span class="token punctuation">,</span> ValueError<span class="token punctuation">,</span> TypeError<span class="token punctuation">)</span><span class="token punctuation">:</span>
+                <span class="token keyword">break</span>
+
+            <span class="token keyword">break</span>
+
+    name <span class="token operator">=</span> md5<span class="token punctuation">(</span>request<span class="token punctuation">.</span>remote_addr<span class="token punctuation">.</span>encode<span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">+</span> url<span class="token punctuation">.</span>encode<span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">.</span>hexdigest<span class="token punctuation">(</span><span class="token punctuation">)</span>
+    filename <span class="token operator">=</span> <span class="token string">'static/images/%s.jpg'</span> <span class="token operator">%</span> name
+    <span class="token keyword">with</span> open<span class="token punctuation">(</span>filename<span class="token punctuation">,</span> <span class="token string">'wb+'</span><span class="token punctuation">)</span> <span class="token keyword">as</span> fp<span class="token punctuation">:</span>
+        c <span class="token operator">=</span> pycurl<span class="token punctuation">.</span>Curl<span class="token punctuation">(</span><span class="token punctuation">)</span>
+        c<span class="token punctuation">.</span>setopt<span class="token punctuation">(</span>c<span class="token punctuation">.</span>URL<span class="token punctuation">,</span> url<span class="token punctuation">)</span>
+        c<span class="token punctuation">.</span>setopt<span class="token punctuation">(</span>c<span class="token punctuation">.</span>WRITEDATA<span class="token punctuation">,</span> fp<span class="token punctuation">)</span>
+        c<span class="token punctuation">.</span>setopt<span class="token punctuation">(</span>c<span class="token punctuation">.</span>CAINFO<span class="token punctuation">,</span> certifi<span class="token punctuation">.</span>where<span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
+
+        <span class="token keyword">if</span> opt_name <span class="token operator">and</span> opt_value<span class="token punctuation">:</span>
+            c<span class="token punctuation">.</span>setopt<span class="token punctuation">(</span>opt_name<span class="token punctuation">,</span> opt_value<span class="token punctuation">)</span>
+        
+        <span class="token keyword">try</span><span class="token punctuation">:</span>
+            c<span class="token punctuation">.</span>perform<span class="token punctuation">(</span><span class="token punctuation">)</span>
+            c<span class="token punctuation">.</span>close<span class="token punctuation">(</span><span class="token punctuation">)</span>
+            msg <span class="token operator">=</span> filename
+        <span class="token keyword">except</span> pycurl<span class="token punctuation">.</span>error <span class="token keyword">as</span> e<span class="token punctuation">:</span>
+            msg <span class="token operator">=</span> str<span class="token punctuation">(</span>e<span class="token punctuation">)</span>
+        
+    <span class="token keyword">return</span> render_template<span class="token punctuation">(</span><span class="token string">'index.html'</span><span class="token punctuation">,</span> msg<span class="token operator">=</span>msg<span class="token punctuation">)</span>
+
+<span class="token keyword">if</span> __name__ <span class="token operator">==</span> <span class="token string">'__main__'</span><span class="token punctuation">:</span>
+    <span class="token keyword">if</span> <span class="token string">'debug'</span> <span class="token keyword">in</span> sys<span class="token punctuation">.</span>argv<span class="token punctuation">:</span>
+        app<span class="token punctuation">.</span>debug <span class="token operator">=</span> <span class="token boolean">True</span>
+        PORT <span class="token operator">=</span> <span class="token number">8000</span>
+
+    app<span class="token punctuation">.</span>run<span class="token punctuation">(</span><span class="token string">'0.0.0.0'</span><span class="token punctuation">,</span> PORT<span class="token punctuation">)</span>
+</code></pre>
+<p>这里设置了<code>app.config[&#39;TEMPLATES_AUTO_RELOAD&#39;] = True</code>，在模板更新后会更新渲染新的模板文件<br>然后Dockerfile里面用apt装了一个nfs-common，在entrypoint.sh里面挂载了nfs的文件目录</p>
+<pre class=" language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># service</span>
+<span class="token function">mkdir</span> /data
+<span class="token function">ln</span> -s /data/ /app/static/images
+<span class="token function">mount</span> -t nfs nfs.server:/data /data -o nolock
+</code></pre>
+<p>我们存文件的images目录实际上是data目录的软链接，而data目录实际上又是挂载的nfs远程文件系统，也就意味着我们写下的文件实际上都是写到了nfs文件系统中</p>
+<p>后续的hint中给出了nfs.server的搭建过程</p>
+<pre class=" language-bash"><code class="language-bash">$ apt <span class="token function">install</span> -y nfs-kernel-server nfs-common rpcbind
+$ <span class="token function">cat</span> /etc/export
+/data    172.16.0.0/12<span class="token punctuation">(</span>rw,sync<span class="token punctuation">)</span>
+$ <span class="token function">mkdir</span> /data
+$ <span class="token function">chown</span> nobody.nogroup /data
+$ <span class="token function">service</span> nfs-kernel-server start
+</code></pre>
+<p>这样子的话，这个环境是只给出了一个APP的源码，实际上还启动了一个nfs的容器（后来发现不是NFS容器，是直接宿主机启动NFS服务），设置了exports的规则使docker网段内的所有主机均可访问该目录<br>（然后可以读&#x2F;etc&#x2F;hosts找到nfs.server的地址，或者。。。直接访问nfs.server这个名字。。。）上次学到的知识点</p>
+<h3 id="思路"><a href="#思路" class="headerlink" title="思路"></a>思路</h3><p>我觉得能提出这个攻击思路就很不错了。。。curl支持gopher协议，支持gopher协议就等于能发送任意tcp数据包<br>通过gopher协议和nfs.server进行通信，因为nfs.server就是一个文件系统，直接在nfs.server上创建一个软链接，名字就是我们可以写入的xxx.jpg，软链接到&#x2F;template&#x2F;index.html，再进行一次访问，将我们的payload写入xxx.jpg，实际上就是写入了模板，模板可控，打模板渲染ssti</p>
+<p>但是问题在于，mssql那个题还有一个曾经的参考链接，这个nfs可是啥也没有，又是一个从零开始的手搓流量</p>
+<h3 id="socket2gopher代理"><a href="#socket2gopher代理" class="headerlink" title="socket2gopher代理"></a>socket2gopher代理</h3><p>这里观察到了神仙们非常骚的流量操作。<br>首先是在本地虚拟机中搭建docker环境，然后写下一个简易代理，大致操作就是开一个socket链接，把收到的byte全部url编码之后改成gopher形式的payload发给APP，这样子APP就等于是发出去了原生的tcp数据，与nfs server容器进行交互，然后直接起一个NFS客户端，连接简易代理监听的端口，然后在本地虚拟机中开wireshark听流量debug（如果这个简易代理打通了本地，理论上也能打通远程）</p>
+<p>但是这里有一个很大的问题，gopher的缺陷在于他发一次流量就是一个完整的tcp链接，也就是说如果nfs协议在通信过程中需要来回交互的话，gopher应该是打不通的。</p>
+<p>NFS有三个正式版本，v2 v3 v4，v2过于古老，但为了兼容性仍然存在，v3理论上是最为广泛使用的协议，v4新版协议和v2&#x2F;3存在较大差异</p>
+<p>并没有找到很多关于协议细节的内容。。。但是从互联网上的文章来看，v4由于弃用了portmap等功能，能够更好的进行防火墙的穿透，在通信协议上变得更为复杂，需要在一次tcp连接中进行多次交互，理论上不符合gopher一把梭的原则</p>
+<p>好消息是，NFS server一般来说同时支持上述三个协议，使用的协议类型可在连接发起时进行协商，也就意味着就算对方是最新版本的NFS server，也能够使用老版本的协议进行攻击</p>
+<p>问了问rmb神仙有没有协议沟通细节，然后直接给我丢了个RFC让我去搜。。。我爬了<br><strong>- update RFC NB！看RFC真的有用</strong></p>
+<h3 id="测试环境搭建"><a href="#测试环境搭建" class="headerlink" title="测试环境搭建"></a>测试环境搭建</h3><p>尝试搭建环境然后wireshark硬看交互<br>然后踩了一晚上的坑。。。。<br>docker使用的是命名空间隔离，在一定程度上还是依赖于宿主机的内核，比如NFS就属于内核模块，所以你在docker里面apt install了nfs在宿主机里面没装还是跑不起来，但在宿主机里面装了也不意味着在docker里面就能跑的起来，会一直显示<code>/proc/fs/nfs/exports</code>这个文件permission denied，那我再给docker加一个<code>privileged</code>吧，还是跑不起来。。。谷歌并搜不到什么类似信息，自闭ing<br>然后去搜了一个已经打包好的nfs的docker，发现在文档里面写着启动的时候是把需要用nfs共享的文件夹直接从host中挂载进docker，然后再用docker共享出去，同时提及了我之前踩的宿主机需要安装对应内核模块和docker需要<code>privileged</code>权限运行的坑。。。<br>看来挂载操作也不是完全隔离的，起码nfs可能只能在宿主机上跑起来了。。。也不是不行，反正是虚拟机，快照一拍随便玩。。。在虚拟机上搭nfs，然后docker随便开个客户端连接吧</p>
+<p>接下来理论上是不会踩坑的，但是我还是踩了，还是一个大家都没见过的坑<br>直接看orange公布的源码看他是怎么搭建环境的，也就是在host上搭NFS服务，然后启动docker<br><a target="_blank" rel="external nofollow noopener noreferrer" href="https://github.com/orangetw/My-CTF-Web-Challenges/blob/master/hitcon-ctf-2021/Metamon-Verse/Makefile">orangetw&#x2F;My-CTF-Web-Challenges&#x2F;hitcon-ctf-2021&#x2F;Metamon-Verse&#x2F;Makefile</a><br>这里有一个比较技巧性的参数<code>--add-host=nfs.server:host-gateway</code>，add-host这个参数就是用于直接添加一个主机名到ip的映射，就像docker-compose里面的主机名一样，host-gateway就是和docker位于同一网段的host的ip地址。然后要<code>--privileged</code>给与挂载权限</p>
+<p>docker的默认网段应该是docker0对应的网段，我的机器上是<code>172.17.0.0/24</code>，所以配置如下<code>/etc/exports</code>文件</p>
+<pre><code>/data    172.17.0.0/24(rw,sync)
+</code></pre>
+<p>创建data目录创建用来提供挂载，chown为<code>nouser.nogroup</code>，开放权限</p>
+<p>理论上这个时候进docker用<code>mount -t nfs nfs.server:/data /data -o nolock</code>就万无一失了，然而这里我踩了一个究极大坑</p>
+<p>其实看过师傅们做题时的讨论就会知道，NFS有一个非常脑溢血的设定，他认为连接发起方使用的端口号若小于1024，则认为其是一个安全的连接，否则认为其是不安全连接，拒绝进行操作，client会得到一个<code>Operation not permitted</code>，进wireshark抓流量就是看到一个<code>NFS4ERR_PERM</code></p>
+<p>然后，我专门wireshark看了我的端口，均小于1024，但仍然报错<br>rmb神仙的建议是查看privileged是否真的给到了，然后我随便挂载了一个目录，非常成功，甚至可以进行docker逃逸<br>rmb神仙的第二个建议是使用strace跟踪系统调用，看哪个系统调用出现了问题，简直就是屠龙之术。。。这谁看得懂，我急速爬<br>疯狂百度最后找到了NFS输出详细log的方法，NFS属于内核模块，所以输出都是在<code>/var/log/messages</code>，但默认输出的粒度太粗了，根本没有详细信息，使用rpcdebug可以让其输出详细信息。<br><code>rpcdebug -m nfsd all</code>启动，<code>rpcdebug -m nfsd -c all</code>关闭<br>然后我就看到了极其困惑的报错</p>
+<pre><code>nfsd: request from insecure port 172.17.0.2, port=757!
+</code></pre>
+<p>小于1024你也insecure？真有你的，怎么办呢，搜了一下，把export里面再加一个insecure选项就行了。终于连上了。。。。</p>
+<h3 id="V3协议观察"><a href="#V3协议观察" class="headerlink" title="V3协议观察"></a>V3协议观察</h3><p>wireshark进行观察，在-o中添加vers&#x3D;3指定使用v3版本的协议进行沟通，整个的通讯过程大致如下</p>
+<ol>
+<li>与111端口的portmap通信，查找NFS服务端口，得到2049（这种东西不应该是熟知端口之类的东西吗，还要查）</li>
+<li>客户端向NFS发起了一个NULL CALL，NFS回了一个NULL REPLY（我猜是在验证是否这个端口上有一个NFS服务）<strong>该步骤可省略</strong></li>
+<li>客户端继续与portmap通信，查找MOUNT服务端口，得到33936，进行UDP通信</li>
+<li>客户端与MOUNT进行通信，取得挂载目录的file handler（这个handler用于后续和NFS通信）</li>
+<li>客户端与NFS通信，开始对文件系统进行操作，操作也就是client这边发一个XXX CALL，server那边就回一个XXX REPLY，整个连接是一个长连接，还会持续发心跳包来keep alive</li>
+<li>当umount文件系统时，先与MOUNT服务进行通信，umount掉目录，然后和NFS的TCP连接断开</li>
+</ol>
+<p>似乎在v3协议中，似乎不需要考虑过多的交互过程，因为整体操作只有如上几步，可以简化为：<br>查询portmap拿到mount port，连接mount port拿到file handler，使用file handler访问文件系统</p>
+<p>这种一次连接就交互一次的做法较为简单，也符合gopher一次连接只能发送一个请求的特点，也是官方的预期解，具体脚本参考文末链接</p>
+<h3 id="V4协议观察"><a href="#V4协议观察" class="headerlink" title="V4协议观察"></a>V4协议观察</h3><p>比V3要麻烦一点？去除了portmap找MOUNT服务端口和找NFS服务端口环节，直接和NFS的熟知端口2049通信，并且在通信过程中确定file handler（就不需要找MOUNT服务要了）<br>并且能够一次请求调用多个方法，行诶，大致步骤如下</p>
+<ol>
+<li>和3类似，进行NULL CALL调用，应该是用来验证是否运行了NFS服务，<strong>非必须</strong></li>
+<li>协商clientID，调用SETCLIENTID方法，协商出来一个ID，然后还要再SETCLIENTID_CONFIRM，暂不知道这个ID能干嘛<blockquote>
+<p>看完RFC后发现这个CILENTID用于对文件进行LOCK操作，应该就是指读写锁和异步之类的？<strong>该步骤非必须</strong></p>
+</blockquote>
+</li>
+<li>然后就是各种方法的调用，常见的就是PUTFH，GETATTR几个方法，PUTFH是将输入的file handler设定为当前操作上下文的file handler，GETATTR就是获取属性，还有LOOKUP，OPEN，GETFH之类的操作，对应不同的对文件系统的操作吧</li>
+<li>直到umount断开连接</li>
+</ol>
+<p>V4和V3之间有一个明显的差距，就观察的情况而言，V4需要在一个tcp连接中完成获取file handler和操作file handler的操作，相较于V3从MOUNT处拿到file handler再和NFS交互操作file handler，似乎无法在gopher中一次性打通？</p>
+<p>要不，再看一眼RFC？<br><a target="_blank" rel="external nofollow noopener noreferrer" href="https://www.rfc-editor.org/rfc/rfc3010.html">NFSv4 RFC</a><br>看了一半RFC顺便听了科恩的讲解环节，我又完全懂了</p>
+<h3 id="题解-非预期"><a href="#题解-非预期" class="headerlink" title="题解(非预期?)"></a>题解(非预期?)</h3><p>科恩的师傅还提到了在实际利用时的困难，因为NFS协议是keep alive的长连接，还会用心跳包一直续连接，那么gopher一个包发过去之后连接不会断开，这样子也就拿不到结果，所以设置的CURL_OPTION一开始为timeout，自动断开就能拿到结果。后续发现，只要在标准协议的包后面加一些不符合协议的脏数据就能报错断开连接了</p>
+<p>所以CURL OPTION是用于解决第二个问题，NFS傻逼协议设计上的端口号大小。NFS本身可能是一个非常老的协议，所以不知道他为什么会觉得使用1024以内端口号的用户比较靠谱，并在进行操作时拒绝源端口大于1024的连接的请求，通过<code>CURLOPT_LOCALPORT</code>可以指定发起请求时的源端口，这样就能过这个愚蠢的安全监测（环境搭建时也提到过，而我的本地环境啥端口都显示insecure。。。）</p>
+<p>现在的问题在于file handler的获取需要进行交互，而gopher的tcp流是不支持交互的。<br>直接看流量也可以看到，v4版本的协议支持一个请求进行多个操作，于是我们看到这几个操作<br><code>PUTROOTFH</code>，这个操作不需要参数，效果是将挂载目录的根目录的file handler放入当前操作上下文(current file handler)，V4协议中的操作基本都是围绕着cfh进行的</p>
+<blockquote>
+<p>Replaces the current filehandle with the filehandle that represents the root of the server’s name space.  From this filehandle a LOOKUP operation can locate any other filehandle on the server.</p>
+</blockquote>
+<p>这里也有一个小坑，除去PUTROOTFH外，还有一个PUTFH方法，这个方法需要一个参数FH，然后把cfh设置为传入的FH，因为我们没有数据，所以无法获取到FH，只能调用PUTROOTFH将根目录放入cfh。但这里并不是将挂载点的根目录（也就是<code>/data</code>）放入cfh，而是将server的根目录放入cfh，而实际上共享出来的文件夹只有&#x2F;data，虽然<code>From this filehandle a LOOKUP operation can locate any other filehandle on the server.</code>，但只有被共享出来的文件夹才能被访问，剩下的都是permission denied。。。我一开始因为是直接能到&#x2F;data目录的file handler放进cfh，所以对接下来的lookup操作感到困惑</p>
+<p>这里提到可以用<code>LOOKUP</code>来定位任意其他的file handler，文档提到LOOKUP<br>这个方法接受一个参数path，然后在cfh下寻找改path，并将cfh替换为寻找到的fh，而这个path直接是一个string，设置为<code>/data</code>即可</p>
+<p>把上述两个方法结合起来，就可以在不知道任何file handler的情况下将任意file handler放入cfh了</p>
+<p>最后使用CREATE方法创建一个non-regular file，也就是我们的软链接文件，这个方法接受两个参数，文件名和文件类型</p>
+<blockquote>
+<p>The CREATE operation creates a non-regular file object in a directory with a given name.  The OPEN procedure MUST be used to create a regular file.</p>
+</blockquote>
+<p>大致意思就是说创建普通文件用OPEN方法，特殊文件用CREATE，应该是指在cfh下创建文件吧</p>
+<p>至于之前的协商CLIENTID，看了一下说明，还真没什么用，只是用于后续如果要对文件进行读写锁的话，需要用这个ID进行表示，所以还真能一个包打通，tql</p>
+<blockquote>
+<p>The SETCLIENTID operation introduces the ability of the client to notify the server of its intention to use a particular client identifier and verifier pair.  Upon successful completion the server will return a clientid which is used in subsequent file locking requests and a confirmation verifier.  The client will use the SETCLIENTID_CONFIRM operation to return the verifier to the server.  At that point, the client may use the clientid in subsequent operations that require an nfs_lockowner.</p>
+</blockquote>
+<p>至于怎么搓流量，明天再说（</p>
+<p>流量搓完了，确实不需要CLIENTID，并且NFS的协议整个数据结构非常简单，一个请求调用多个方法只需要在标明调用的方法数量，然后把之前的流量复制粘贴出来拼起来重放即可</p>
+<p>然后还和做出这道题的师傅交流了一下，提到了CREATE时能不能直接带上路径，这样子就能少一步lookup，直接在PUTROOTFH后CREATE，但实际测试时SERVER回了一个报错，内容是NFS4_BADNAME，NFS4的RFC里面居然没有这个报错？可能是之前老版本定义的这里不重复了？然后我也有点想躺平了，暂时认为不允许文件名出现斜杠吧，所以还是得先lookup到对应目录下，毕竟create也写了是在那个目录下创建文件嘛</p>
+<p>包结构就长这样，非常简单，RPC的身份认证，似乎因为这里的设置为来自该网段的机器均运行，所以并不需要多虑，而NFS协议本身的内容就只要简单的把方法名和数据堆积起来就可以了<br><img src="/images/%5BHITCON2021%5Dweb/image-20211209175555759.png" alt="image-20211209175555759"></p>
+<p>顺便贴一下搓的流量？</p>
+<pre><code>80000098a75822c90000000000000002000186a300000004000000010000000100000020000000000000000c6639653130616164393535650000000000000000000000000000000000000000000000000000000000000003000000180000000f000000046461746100000006000000050000000b2f6574632f70617373776400000000046c696e6b00000002000000000000000200000004000001ff
+</code></pre>
+<p>实现了创建一个&#x2F;data&#x2F;link软链接，链接到&#x2F;etc&#x2F;passwd</p>
+<h3 id="预期解"><a href="#预期解" class="headerlink" title="预期解"></a>预期解</h3><p>orange和一些国外神仙给出的wp，都是利用V3协议分别交互获取file handler和写入软链接的，这样子能更清楚的进行操作，以及可以使用玄幻的socket2gopher proxy，orange则是自己手搓协议数据包，wp分别如下，同理，CURL OPT选择的是local port，而不是超时退出，因此都在数据包的末尾增加了垃圾数据以主动断开连接<br><a target="_blank" rel="external nofollow noopener noreferrer" href="https://gist.github.com/orangetw/6d34ff98a6332bc0523b35ea952a790d">orangetw&#x2F;exp-metamon-verse.py</a><br><a target="_blank" rel="external nofollow noopener noreferrer" href="https://r0.haxors.org/posts?id=27">HITCON CTF 2021 Metamon-Verse Writeup</a></p>
 
     </div>
 
@@ -471,7 +749,7 @@ apt <span class="token function">install</span> geoip-dev -y <span class="token 
 
       <!--noindex-->
       <div class="post-toc-wrap sidebar-panel">
-          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#HITCON2021-web"><span class="nav-number">1.</span> <span class="nav-text">[HITCON2021]web</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#One-bit-man"><span class="nav-number">1.1.</span> <span class="nav-text">One-bit-man</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#W3rmup-PHP"><span class="nav-number">1.2.</span> <span class="nav-text">W3rmup PHP</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%8F%82%E6%95%B0%E9%80%83%E9%80%B8"><span class="nav-number">1.2.1.</span> <span class="nav-text">参数逃逸</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#yaml%E9%80%83%E9%80%B8"><span class="nav-number">1.2.2.</span> <span class="nav-text">yaml逃逸</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#yaml%E7%9A%84%E7%8E%84%E5%A6%99%E8%A7%A3%E6%9E%90"><span class="nav-number">1.2.3.</span> <span class="nav-text">yaml的玄妙解析</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%85%B3%E4%BA%8E%E7%8E%AF%E5%A2%83%E6%90%AD%E5%BB%BA%E7%9A%84%E5%9D%91"><span class="nav-number">1.2.4.</span> <span class="nav-text">关于环境搭建的坑</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Vulpixelize"><span class="nav-number">1.3.</span> <span class="nav-text">Vulpixelize</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#coding-UTF-8"><span class="nav-number">2.</span> <span class="nav-text">coding: UTF-8</span></a></li></ol></div>
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#HITCON2021-web"><span class="nav-number">1.</span> <span class="nav-text">[HITCON2021]web</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#One-bit-man"><span class="nav-number">1.1.</span> <span class="nav-text">One-bit-man</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#W3rmup-PHP"><span class="nav-number">1.2.</span> <span class="nav-text">W3rmup PHP</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%8F%82%E6%95%B0%E9%80%83%E9%80%B8"><span class="nav-number">1.2.1.</span> <span class="nav-text">参数逃逸</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#yaml%E9%80%83%E9%80%B8"><span class="nav-number">1.2.2.</span> <span class="nav-text">yaml逃逸</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#yaml%E7%9A%84%E7%8E%84%E5%A6%99%E8%A7%A3%E6%9E%90"><span class="nav-number">1.2.3.</span> <span class="nav-text">yaml的玄妙解析</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%85%B3%E4%BA%8E%E7%8E%AF%E5%A2%83%E6%90%AD%E5%BB%BA%E7%9A%84%E5%9D%91"><span class="nav-number">1.2.4.</span> <span class="nav-text">关于环境搭建的坑</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Vulpixelize"><span class="nav-number">1.3.</span> <span class="nav-text">Vulpixelize</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%9E%84%E9%80%A0iframe"><span class="nav-number">1.3.1.</span> <span class="nav-text">构造iframe</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%90%84%E7%A7%8D%E9%9D%9E%E9%A2%84%E6%9C%9F"><span class="nav-number">1.3.2.</span> <span class="nav-text">各种非预期</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E9%A2%84%E6%9C%9F"><span class="nav-number">1.3.3.</span> <span class="nav-text">预期</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Metamon-Verse"><span class="nav-number">1.4.</span> <span class="nav-text">Metamon-Verse</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%80%9D%E8%B7%AF"><span class="nav-number">1.4.1.</span> <span class="nav-text">思路</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#socket2gopher%E4%BB%A3%E7%90%86"><span class="nav-number">1.4.2.</span> <span class="nav-text">socket2gopher代理</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%B5%8B%E8%AF%95%E7%8E%AF%E5%A2%83%E6%90%AD%E5%BB%BA"><span class="nav-number">1.4.3.</span> <span class="nav-text">测试环境搭建</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#V3%E5%8D%8F%E8%AE%AE%E8%A7%82%E5%AF%9F"><span class="nav-number">1.4.4.</span> <span class="nav-text">V3协议观察</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#V4%E5%8D%8F%E8%AE%AE%E8%A7%82%E5%AF%9F"><span class="nav-number">1.4.5.</span> <span class="nav-text">V4协议观察</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E9%A2%98%E8%A7%A3-%E9%9D%9E%E9%A2%84%E6%9C%9F"><span class="nav-number">1.4.6.</span> <span class="nav-text">题解(非预期?)</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E9%A2%84%E6%9C%9F%E8%A7%A3"><span class="nav-number">1.4.7.</span> <span class="nav-text">预期解</span></a></li></ol></li></ol></li></ol></div>
       </div>
       <!--/noindex-->
 
