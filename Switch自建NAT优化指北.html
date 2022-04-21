@@ -34,7 +34,7 @@
 <meta property="og:image" content="https://blog.z3ratu1.cn/images/Switch%E8%87%AA%E5%BB%BANAT%E4%BC%98%E5%8C%96%E6%8C%87%E5%8C%97/B.jpg">
 <meta property="og:image" content="https://blog.z3ratu1.cn/images/Switch%E8%87%AA%E5%BB%BANAT%E4%BC%98%E5%8C%96%E6%8C%87%E5%8C%97/A.jpg">
 <meta property="article:published_time" content="2021-04-09T08:26:17.000Z">
-<meta property="article:modified_time" content="2022-02-12T08:18:07.831Z">
+<meta property="article:modified_time" content="2022-04-21T12:03:06.249Z">
 <meta property="article:author" content="Z3ratu1">
 <meta property="article:tag" content="NAT">
 <meta property="article:tag" content="Switch">
@@ -239,7 +239,7 @@
                   <i class="far fa-calendar-check"></i>
                 </span>
                 <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2022-02-12 16:18:07" itemprop="dateModified" datetime="2022-02-12T16:18:07+08:00">2022-02-12</time>
+                <time title="修改时间：2022-04-21 20:03:06" itemprop="dateModified" datetime="2022-04-21T20:03:06+08:00">2022-04-21</time>
               </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -288,9 +288,9 @@
 <p>本文仅提供NAT类型优化方案，不一定能提升速度和联机质量，<strong>有说不清楚的地方可能在之前几篇相关文章中提到过了</strong></p>
 <p>目前的方案已经亲测可用了，（应该）不会出现之前的问题了吧。。。<br>之前的一些研究。。。<br><a href="https://blog.z3ratu1.cn/tags/Switch/">tag Switch</a></p>
 <h2 id="Clash流量接管"><a href="#Clash流量接管" class="headerlink" title="Clash流量接管"></a>Clash流量接管</h2><p>之前提到过，switch的代理设置只对TCP流量进行代理，就是Eshop下载和看新闻之类的功能，游戏大多使用的是UDP流量，所以不能仅通过Switch自带的代理设置加速游戏，场面上大部分的游戏都是UDP通信的，所以很多游戏加速器都是通过网络层接管流量进行代理<br>使用Clash for windows进行网络层的流量接管，照着百度配Service mode，新建一个Clash网卡开启TUN模式全局接管流量，具体表现形式为QQ登录地点变得诡异等</p>
-<p>Clash流量接管有两种方式，都需要Clash启动Service mode。<br><del>一种是设置Switch和PC连接同一WiFi，把Switch的网关设置为PC，但是这个方案在后来使用的时候Switch一直报DNS解析失败，明明一开始还能用的。后来也忘了当初配置是咋调的了。。。。</del>（2022.2.12 update 现在越想越觉得这个方案的离谱，忘了他吧）<br>第二种是PC再开一个热点，Switch直接连接热点，在网络适配器设置那把Clash的虚拟网卡和热点网卡进行共享，同样能接管Switch流量，但缺点在于switch联机的时候最好是代理全局，这样子TUN会把不仅是switch，以及PC上的全部流量进行代理。麻</p>
+<p>Clash流量接管有两种方式，都需要Clash启动Service mode。<br><del>一种是设置Switch和PC连接同一WiFi，把Switch的网关设置为PC，但是这个方案在后来使用的时候Switch一直报DNS解析失败，开启PC路由转发之后clash内存跑满CPU跑满也不能用。后来也忘了当初配置是咋调的了。。。。</del>（就是一个旁路由方案，产生记忆紊乱？作者提到了windows下clash无法作为网关使用。。。直接放弃该方案）<br><a target="_blank" rel="external nofollow noopener noreferrer" href="https://github.com/Fndroid/clash_for_windows_pkg/issues/1865">clash windows tun模式 作为网关 没有转发其他设备的请求 #1865</a><br>第二种是PC再开一个热点，Switch直接连接热点，在网络适配器设置那把Clash的虚拟网卡和热点网卡进行共享，同样能接管Switch流量，但缺点在于switch联机的时候最好是代理全局，这样子TUN会把不仅是switch，以及PC上的全部流量进行代理。麻</p>
 <h3 id="2022-2-12-update"><a href="#2022-2-12-update" class="headerlink" title="2022.2.12 update"></a>2022.2.12 update</h3><p>发现了优雅的解决方案<br>由于上述两种方案均需要clash启动service mode，即通过新建TUN设备的方式接管整台机器的流量。要么就规则难写，要么把QQ之类的代理了也很尴尬。<br>用GitHub上的这个项目，看到这里的时候我才真正理解了UU等加速器的实际实现原理以及我所需要的是什么样的一个解决方案。</p>
-<p>说到底，我需要的是能够代理switch的流量，而switch本身不支持设置代理UDP流量。因此需要通过网关的方式来强行获取到switch的流量并进行转发。因此路由器刷固件是最优方案，而这里的临时方案使用PC来代替路由器，就会出现规则难写或者奇怪的网络问题崩盘等问题。</p>
+<p>说到底，我需要的是能够代理switch的流量，而switch本身不支持设置代理UDP流量。因此需要通过网关的方式来强行获取到switch的流量并进行转发。因此路由器刷固件是最优方案，而这里的临时方案使用PC来代替路由器，就会出现规则难写或者奇怪的网络问题崩盘或是PC流量全局被代理等问题。</p>
 <p>而实际上UU等加速器要求你填一个网关，实际上应该是通过ARP欺骗的方式来把流量拐过来，再监听网卡把对应IP发来的流量按照代理规则进行转发。而不是直接把网关填PC让PC充当路由再配合全局代理把网络搞炸。。。</p>
 <p>那么，这个解决方案不需要进行全局的代理，使用GitHub的这个项目即可，原理如上所述<br>所需工具 clash + <a target="_blank" rel="external nofollow noopener noreferrer" href="https://github.com/zhxie/pcap2socks">pcap2socks</a><br>不熟练的用户可以配套使用其GUI图形界面，启用图形界面可以通过clash的UWP loopback功能，在<code>桌面应用web查看器</code>那栏勾上保存即可</p>
 <p>使用图形界面的时候有一个测速和测延迟功能，会导致其一直向代理服务器发udp数据包，抓包研究的时候就很不方便，直接命令行启动也行<br><code>.\pcap2socks -s 172.24.2.102 -p 172.24.1.102 -d 127.0.0.1:7890 -i 网卡名</code></p>
@@ -302,7 +302,7 @@
 <h2 id="NAT类型提升"><a href="#NAT类型提升" class="headerlink" title="NAT类型提升"></a>NAT类型提升</h2><p>在自己的VPS上搭一个酸酸服务端（因为酸酸开销小，虽然理论上来说安全性不是很靠谱？），具体过程百度，自己写一个Clash规则添加VPS上去，Clash开全局代理<br>使用pcap2socks也可实现NAT类型改善<br>至于联机质量么。还是看你的机器用的线路以及和你联机的人的情况</p>
 <p>一开始连校园网的垃圾网络<br><img src="/images/Switch%E8%87%AA%E5%BB%BANAT%E4%BC%98%E5%8C%96%E6%8C%87%E5%8C%97/D.jpg" alt="D.jpg"><br>接上自己的小水管NAT类型就变成B了，如图<br><img src="/images/Switch%E8%87%AA%E5%BB%BANAT%E4%BC%98%E5%8C%96%E6%8C%87%E5%8C%97/B.jpg" alt="B.jpg"><br>一开始还纳闷过公网VPS的NAT应该直接是A才对，后来思考了一下发现是阿里云自带的防火墙的问题，再把端口全开就能把NAT类型提升至A，如图<br><img src="/images/Switch%E8%87%AA%E5%BB%BANAT%E4%BC%98%E5%8C%96%E6%8C%87%E5%8C%97/A.jpg" alt="A.jpg"><br>但是网络速度并没有什么太大的提升。。。</p>
 <p>这里我一直想研究一下能不能区别Switch流量和PC的流量，毕竟开全局总是不怎么好。阿里云小水管的带宽也很有限，PC分一下感觉会亏很多，并且还会导致很多软件表现奇怪，比如QQ的香港登录。。。要不就得把PC上的东西都关掉（我现在就是这么做的）</p>
-<p><strong>但是使用强有力的pcap2socks就不用考虑流量分流了，不开全局，优雅，我爱</strong><br>接下来这一小节也可忽略</p>
+<p><strong>但是使用强有力的pcap2socks就不用考虑流量分流了，不开全局，优雅，我爱</strong><br>接下来的文章内容可忽略</p>
 <h3 id="代理流量分流"><a href="#代理流量分流" class="headerlink" title="代理流量分流"></a>代理流量分流</h3><p>Clash是可以运行在路由器上的，所以规则也提供了<code>SRC-IP-CIDR</code>这种类型的规则，我身处的校园网网段是直接一个大的<code>10.0.0.0/8</code>，而开热点是在一个<code>192.168.137.0/24</code>，那么能不能设置一个SRC-IP-CIDR？<br>wireshark启动，抓包，分别抓了WiFi网卡和热点网卡的流量，发现热点网卡上确实显示的是192网段对外部发出了请求，而WiFi网卡上则把这个请求一样是当做本机的请求发出了，显示的是本机10网段上发出的。也就是PC开热点并不能让自己成为一个路由器，而是再进行一层NAT。NAT出来之后还是认为是PC本身发出去，不能通过源IP的形式进行判断</p>
 <p>同理，指定进程代理和指定目的地址或目的端口代理也不行。如果Windows的热点是一个单独的进程还好说，目前没找到。Switch通信时的IP因为是P2P类似的模型，不能确认，同样端口也是高位端口随机抽取，所以目的端口也不行。</p>
 <h3 id="评论区某不知名大哥的建议"><a href="#评论区某不知名大哥的建议" class="headerlink" title="评论区某不知名大哥的建议"></a>评论区某不知名大哥的建议</h3><p>使用小米随身WiFi时，小米随身WiFi有专门的软件，经过小米WiFi的流量会全部经过这个软件，就可以用proxifier，netch这类的工具直接进行软件的流量代理，做到定向的流量接管，买一个十几块钱，但是还是懒的搞。并且作用也就是将全局代理替换到了固定代理，用处不一定大</p>
