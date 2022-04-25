@@ -18833,4 +18833,278 @@ f <span class="token operator">=</span> fun<span class="token punctuation">(</sp
         <tag>wp</tag>
       </tags>
   </entry>
+  <entry>
+    <title>pwnhub2022春季赛 wp</title>
+    <url>/pwnhub2022%E6%98%A5%E5%AD%A3%E8%B5%9B%20wp.html</url>
+    <content><![CDATA[<h1 id="pwnhub2022春季赛-wp"><a href="#pwnhub2022春季赛-wp" class="headerlink" title="pwnhub2022春季赛 wp"></a>pwnhub2022春季赛 wp</h1><p>菜捏，本来还说努努力恰个钱，结果大家都是套皮究极联队。搞了两天经典纪念品，taxi了</p>
+<p>几个人小作坊式的恰钱计划还是打不过联队捏。好烦哦<br>题目整体难度不是很大。但是那个传奇实在是有点技术盲区<br>最后除了null究极碾压全场之外，剩下几个队都只差一点点。多出一个题就恰饱饱了呜呜。据说null还去mrctf大杀四方，人多就是好啊呜呜</p>
+<h2 id="web"><a href="#web" class="headerlink" title="web"></a>web</h2><h3 id="ezpdf"><a href="#ezpdf" class="headerlink" title="ezpdf"></a>ezpdf</h3><p>pdfbox+log4j2<br>jdk版本8u181随便打jndi<br>百度搜索可得，复制粘贴打通<br><a href="https://github.com/eelyvy/log4jshell-pdf">https://github.com/eelyvy/log4jshell-pdf</a><br>按照说明把&#x2F;size后面的数字改成payload，marshal开一个ldap refer server一键打通</p>
+<p>第一天搜索能力有限想着自己找，用tabby之类的，结果tabby究极出bug，现在找原因。。</p>
+<h3 id="esay-cms"><a href="#esay-cms" class="headerlink" title="esay cms"></a>esay cms</h3><p>mysql处rouge mysql读文件，读文件后发现testtool存在直接的反序列化点，反序列化的结果会直接带上()动态执行，故可以通过动态调用数组的方式来调用类方法，审计代码发现route类的getView方法可以通过改变route类的class值来实现任意php文件包含，而环境里存在pearcmd，故直接包含pearcmd写一个shell，再包含这个shel即可</p>
+<pre class=" language-php"><code class="language-php"><span class="token delimiter">&lt;?php</span>
+<span class="token keyword">class</span> <span class="token class-name">route</span>
+<span class="token punctuation">{</span>
+    <span class="token keyword">protected</span> <span class="token variable">$toolVar</span> <span class="token operator">=</span> <span class="token string">'123'</span><span class="token punctuation">;</span>
+
+    <span class="token keyword">protected</span> <span class="token variable">$mode</span> <span class="token operator">=</span> <span class="token string">'index'</span><span class="token punctuation">;</span>
+    <span class="token shell-comment comment">#protected $class = </span><span class="token string">'../../../../../../../../../usr/local/lib/php/pearcmd'</span><span class="token punctuation">;</span>
+    <span class="token shell-comment comment">#protected $class = </span><span class="token string">'../../../../../../../../../var/www/html/index'</span><span class="token punctuation">;</span>
+    <span class="token keyword">protected</span> <span class="token variable">$class</span> <span class="token operator">=</span> <span class="token string">'../../../../../../../../../tmp/shell'</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
+<span class="token variable">$a</span> <span class="token operator">=</span> <span class="token keyword">array</span><span class="token punctuation">(</span><span class="token keyword">new</span> <span class="token class-name">route</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">,</span><span class="token string">'getView'</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token keyword">echo</span> <span class="token function">urlencode</span><span class="token punctuation">(</span><span class="token function">serialize</span><span class="token punctuation">(</span><span class="token variable">$a</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+</code></pre>
+<p>rmb神仙用go写的rouge mysql好稳的捏</p>
+<h3 id="baby-flask"><a href="#baby-flask" class="headerlink" title="baby flask"></a>baby flask</h3><p>显然的ssti点，但是由于缓存的存在即使复写模板也不会再次渲染。简单debug找到cache定义，LRUcache默认容量400<br>写个破烂一直访问create创建500个模板然后前面一百个任意ssti<br>复制粘贴一个payload打通</p>
+<p>简单的说，web的题都挺水的。。。</p>
+<p>然后我全知全能lgw秒杀接下来的绝大多数题目，由于汇总了wp就一起贴一下</p>
+<h2 id="re"><a href="#re" class="headerlink" title="re"></a>re</h2><h3 id="letsgo"><a href="#letsgo" class="headerlink" title="letsgo"></a>letsgo</h3><pre class=" language-python"><code class="language-python">res <span class="token operator">=</span> <span class="token punctuation">[</span><span class="token number">0x07</span><span class="token punctuation">,</span><span class="token number">0x0A</span><span class="token punctuation">,</span><span class="token number">0x14</span><span class="token punctuation">,</span><span class="token number">0x55</span><span class="token punctuation">,</span><span class="token number">0x1C</span><span class="token punctuation">,</span><span class="token number">0x51</span><span class="token punctuation">,</span><span class="token number">0x57</span><span class="token punctuation">,</span><span class="token number">0x5C</span><span class="token punctuation">,</span><span class="token number">0x10</span><span class="token punctuation">,</span><span class="token number">0x02</span><span class="token punctuation">,</span><span class="token number">0x02</span><span class="token punctuation">,</span><span class="token number">0x4F</span><span class="token punctuation">,</span><span class="token number">0x51</span><span class="token punctuation">,</span><span class="token number">0x18</span><span class="token punctuation">,</span>
+       <span class="token number">0x03</span><span class="token punctuation">,</span><span class="token number">0x04</span><span class="token punctuation">,</span><span class="token number">0x05</span><span class="token punctuation">,</span><span class="token number">0x4D</span><span class="token punctuation">,</span><span class="token number">0x1A</span><span class="token punctuation">,</span><span class="token number">0x19</span><span class="token punctuation">,</span><span class="token number">0x51</span><span class="token punctuation">,</span><span class="token number">0x4E</span><span class="token punctuation">,</span><span class="token number">0x53</span><span class="token punctuation">,</span><span class="token number">0x01</span><span class="token punctuation">,</span><span class="token number">0x09</span><span class="token punctuation">,</span><span class="token number">0x0D</span><span class="token punctuation">,</span><span class="token number">0x43</span><span class="token punctuation">,</span><span class="token number">0x00</span><span class="token punctuation">,</span>
+       <span class="token number">0x4F</span><span class="token punctuation">,</span><span class="token number">0x52</span><span class="token punctuation">,</span><span class="token number">0x5A</span><span class="token punctuation">,</span><span class="token number">0x5C</span><span class="token punctuation">,</span><span class="token number">0x40</span><span class="token punctuation">,</span><span class="token number">0x02</span><span class="token punctuation">,</span><span class="token number">0x01</span><span class="token punctuation">,</span><span class="token number">0x4B</span><span class="token punctuation">,</span><span class="token number">0x52</span><span class="token punctuation">,</span><span class="token number">0x03</span><span class="token punctuation">,</span><span class="token number">0x4C</span><span class="token punctuation">,</span><span class="token number">0x1B</span><span class="token punctuation">,</span><span class="token number">0x52</span><span class="token punctuation">,</span><span class="token number">0x50</span><span class="token punctuation">]</span>
+
+flag <span class="token operator">=</span> <span class="token punctuation">[</span><span class="token punctuation">]</span>
+
+i <span class="token operator">=</span> <span class="token number">0</span>
+<span class="token keyword">while</span> i <span class="token operator">&lt;</span> <span class="token number">0x2A</span><span class="token punctuation">:</span>
+    res<span class="token punctuation">[</span>i<span class="token operator">+</span><span class="token number">2</span><span class="token punctuation">]</span> <span class="token operator">=</span> res<span class="token punctuation">[</span>i<span class="token operator">+</span><span class="token number">2</span><span class="token punctuation">]</span> <span class="token operator">^</span> res<span class="token punctuation">[</span>i<span class="token operator">+</span><span class="token number">1</span><span class="token punctuation">]</span>
+    res<span class="token punctuation">[</span>i<span class="token operator">+</span><span class="token number">1</span><span class="token punctuation">]</span> <span class="token operator">=</span> res<span class="token punctuation">[</span>i<span class="token punctuation">]</span> <span class="token operator">^</span> res<span class="token punctuation">[</span>i<span class="token operator">+</span><span class="token number">1</span><span class="token punctuation">]</span><span class="token operator">^</span>res<span class="token punctuation">[</span>i<span class="token operator">+</span><span class="token number">2</span><span class="token punctuation">]</span>
+    res<span class="token punctuation">[</span>i<span class="token punctuation">]</span> <span class="token operator">=</span> res<span class="token punctuation">[</span>i<span class="token punctuation">]</span> <span class="token operator">^</span> res<span class="token punctuation">[</span>i<span class="token operator">+</span><span class="token number">2</span><span class="token punctuation">]</span>
+    i <span class="token operator">=</span> i <span class="token operator">+</span> <span class="token number">3</span>
+
+<span class="token keyword">for</span> i <span class="token keyword">in</span> res<span class="token punctuation">:</span>
+    <span class="token keyword">print</span><span class="token punctuation">(</span>chr<span class="token punctuation">(</span><span class="token number">0x7f</span><span class="token operator">-</span>i<span class="token punctuation">)</span><span class="token punctuation">,</span>end<span class="token operator">=</span><span class="token string">''</span><span class="token punctuation">)</span>
+<span class="token comment" spellcheck="true">#flag{2d830225-d367-47c0-851b-b9ec765ba0f4}</span>
+</code></pre>
+<h2 id="misc"><a href="#misc" class="headerlink" title="misc"></a>misc</h2><h3 id="眼神得好"><a href="#眼神得好" class="headerlink" title="眼神得好"></a>眼神得好</h3><pre class=" language-python"><code class="language-python"><span class="token keyword">import</span> cv2
+<span class="token keyword">import</span> numpy <span class="token keyword">as</span> np
+<span class="token keyword">from</span> PIL <span class="token keyword">import</span> Image
+
+
+img<span class="token operator">=</span>cv2<span class="token punctuation">.</span>imread<span class="token punctuation">(</span><span class="token string">'out.bmp'</span><span class="token punctuation">)</span>
+img2<span class="token operator">=</span>img<span class="token punctuation">[</span><span class="token punctuation">:</span><span class="token punctuation">,</span><span class="token number">4</span><span class="token punctuation">:</span><span class="token punctuation">]</span><span class="token operator">^</span>img<span class="token punctuation">[</span><span class="token punctuation">:</span><span class="token punctuation">,</span><span class="token punctuation">:</span><span class="token operator">-</span><span class="token number">4</span><span class="token punctuation">]</span><span class="token operator">></span><span class="token number">0</span>
+Image<span class="token punctuation">.</span>fromarray<span class="token punctuation">(</span>img2<span class="token punctuation">[</span><span class="token punctuation">:</span><span class="token punctuation">,</span><span class="token punctuation">:</span><span class="token punctuation">,</span><span class="token number">0</span><span class="token punctuation">]</span><span class="token punctuation">)</span><span class="token punctuation">.</span>save<span class="token punctuation">(</span><span class="token string">'out1.bmp'</span><span class="token punctuation">)</span>
+<span class="token comment" spellcheck="true">#flag{nice_pwnhub}</span>
+</code></pre>
+<h2 id="crypto"><a href="#crypto" class="headerlink" title="crypto"></a>crypto</h2><h3 id="esrsa"><a href="#esrsa" class="headerlink" title="esrsa"></a>esrsa</h3><pre class=" language-python"><code class="language-python"><span class="token keyword">from</span> Crypto<span class="token punctuation">.</span>Util<span class="token punctuation">.</span>number <span class="token keyword">import</span> <span class="token operator">*</span>
+
+x<span class="token punctuation">,</span>y<span class="token operator">=</span><span class="token punctuation">(</span><span class="token number">338555080220637081961629108201515088631648910827927160728143665306856840891283037339677849661861227903908933145477264046446986150577658634798201036502060805774599658207669111688439996110692201008037849119605962378316457201998475046620515963725786423440494993922281942396227626532022005579340476627086260000576524772862121364339849726687865874619472513654142054490221489754144358483093331358263771080584662872680106076787261957704707055652825959314984924849600101</span><span class="token punctuation">,</span> <span class="token number">936859805496385391559236776246883920797971062581544240268575675825570737296851006237870839271568976317212531276234406232945021531066674291887782791534409966305833225084692612867437424551505174720475931132798839349207246806850341280754752239303350596733681932273450149927797735966407187594725231158980098119489003450563623494155562513634618466910170109518754662675054081897025489520391417883488720972781393802142478712026232107041683271177224983497203599032383279</span><span class="token punctuation">)</span>
+n<span class="token operator">=</span><span class="token number">988000511804778695813521569460767024014375863209856154754147082419975777208656083311740358048468580712106204105426217752071608551112269505247365548210006567296850568411531004204795967810292432041395592133501302461324005142940183488044983348152371980166614840414803124031222965874472013554869981954785271467321919039144942853506143787908194930700818770224752026306092706366253640515130802157497666497193713819097381223915943111321812676982912146706199692543488639</span>
+e<span class="token operator">=</span><span class="token number">0x10001</span>
+
+F<span class="token punctuation">.</span><span class="token operator">&lt;</span>q<span class="token operator">>=</span>Zmod<span class="token punctuation">(</span>n<span class="token punctuation">)</span><span class="token punctuation">[</span><span class="token punctuation">]</span>
+f<span class="token operator">=</span><span class="token punctuation">(</span><span class="token number">1</span><span class="token operator">+</span><span class="token number">2</span><span class="token operator">*</span>x<span class="token punctuation">)</span><span class="token operator">*</span>q<span class="token operator">+</span><span class="token punctuation">(</span><span class="token number">2</span><span class="token operator">*</span><span class="token punctuation">(</span>x<span class="token operator">**</span><span class="token number">3</span><span class="token operator">-</span>y<span class="token operator">**</span><span class="token number">2</span><span class="token punctuation">)</span><span class="token operator">-</span><span class="token number">1</span><span class="token punctuation">)</span>
+q<span class="token operator">=</span>int<span class="token punctuation">(</span>f<span class="token punctuation">.</span>monic<span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">.</span>small_roots<span class="token punctuation">(</span>beta<span class="token operator">=</span><span class="token number">0.5</span><span class="token punctuation">,</span>X<span class="token operator">=</span><span class="token number">2</span><span class="token operator">**</span><span class="token number">512</span><span class="token punctuation">)</span><span class="token punctuation">[</span><span class="token number">0</span><span class="token punctuation">]</span><span class="token punctuation">)</span>
+p<span class="token operator">=</span>n<span class="token operator">//</span>q
+E<span class="token operator">=</span>EllipticCurve<span class="token punctuation">(</span>GF<span class="token punctuation">(</span>q<span class="token punctuation">)</span><span class="token punctuation">,</span> <span class="token punctuation">[</span>p<span class="token operator">+</span>q<span class="token punctuation">,</span> p<span class="token operator">**</span><span class="token number">2</span><span class="token operator">+</span><span class="token punctuation">(</span>q<span class="token number">-1</span><span class="token punctuation">)</span><span class="token operator">//</span><span class="token number">2</span><span class="token punctuation">]</span><span class="token punctuation">)</span>
+phi<span class="token operator">=</span>E<span class="token punctuation">.</span>order<span class="token punctuation">(</span><span class="token punctuation">)</span>
+G<span class="token operator">=</span>E<span class="token punctuation">(</span>x<span class="token punctuation">,</span>y<span class="token punctuation">)</span><span class="token operator">*</span>inverse_mod<span class="token punctuation">(</span>e<span class="token punctuation">,</span>phi<span class="token punctuation">)</span>
+flag<span class="token operator">=</span>long_to_bytes<span class="token punctuation">(</span>int<span class="token punctuation">(</span>G<span class="token punctuation">.</span>xy<span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">[</span><span class="token number">0</span><span class="token punctuation">]</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">[</span><span class="token punctuation">:</span><span class="token operator">-</span><span class="token number">20</span><span class="token punctuation">]</span><span class="token punctuation">.</span>decode<span class="token punctuation">(</span><span class="token punctuation">)</span>
+<span class="token keyword">print</span><span class="token punctuation">(</span>flag<span class="token punctuation">)</span>
+</code></pre>
+<h3 id="rootrsa"><a href="#rootrsa" class="headerlink" title="rootrsa"></a>rootrsa</h3><p>直接在Zmod(n)上对c连续四次开方即可</p>
+<h2 id="ppc"><a href="#ppc" class="headerlink" title="ppc"></a>ppc</h2><h3 id="baby-line"><a href="#baby-line" class="headerlink" title="baby line"></a>baby line</h3><pre class=" language-C"><code class="language-C">#include<stdio.h>
+int main()
+{
+    int t,m,n,k,c;
+    scanf("%d",&t);
+    while(t--){
+        scanf("%d%d%d",&m,&n,&k);
+        int a[m];
+        for(int i=0;i<m;i++){
+            a[i]=0;
+            for(int j=0;j<n;j++){
+                scanf("%d",&c);
+                a[i]+=c;
+            }
+        }
+        for(int i=0;i<k;i++){
+            c=0;
+            for(int j=0;j<m;j++){
+                c=a[j]<a[c]?j:c;
+            }
+            printf("%d",c);
+            if(i<k-1)printf(" ");
+            a[c]=n+1;
+        }
+        if(t)printf("\n");
+    }
+    return 0;
+}
+</code></pre>
+<h3 id="hilbert"><a href="#hilbert" class="headerlink" title="hilbert"></a>hilbert</h3><pre class=" language-C"><code class="language-C">#include<stdio.h>
+
+int t1[7]={0,2,4,1,3,6,5};
+int t2[7]={0,3,1,4,2,6,5};
+
+int f(int n,int x,int y){
+    //printf("%d %d %d\n",n,x,y);
+    if(x==1&&y==1)return 0;
+    if(x==(1<<n)&&y==1)return -1;
+    if(x==1&&y==(1<<(n-1)))return n%2?5:3;
+    if(x==1&&y==(1<<(n-1))+1)return n%2?1:5;
+    if(x==(1<<(n-1))&&y==(1<<(n-1))+1)return n%2?6:3;
+    if(x==(1<<n)&&y==(1<<(n-1))+1)return n%2?2:5;
+    if(x==(1<<(n-1))+1&&y==(1<<(n-1))+1)return n%2?6:4;
+    if(x==(1<<n)&&y==(1<<(n-1)))return n%2?5:4;
+    if(x<=(1<<(n-1))&&y<=(1<<(n-1)))return t1[f(n-1,(1<<(n-1))+1-y,x)];
+    if(x>(1<<(n-1))&&y<=(1<<(n-1)))return t2[f(n-1,y,(1<<n)+1-x)];
+    return f(n-1,(x-1)%(1<<(n-1))+1,(y-1)%(1<<(n-1))+1);
+}
+
+int main()
+{
+    int n,x,y,t;
+    scanf("%d%d%d",&n,&x,&y);
+    while(1){
+        t=f(n,x,y);
+        if(scanf("%d%d%d",&n,&x,&y)<0){
+            printf("%d",t);
+            break;
+        }
+        else printf("%d\n",t);
+    }
+    return 0;
+}
+</code></pre>
+<h2 id="gaming"><a href="#gaming" class="headerlink" title="gaming"></a>gaming</h2><h3 id="是兄弟就来砍我"><a href="#是兄弟就来砍我" class="headerlink" title="是兄弟就来砍我"></a>是兄弟就来砍我</h3><p>创号登录公告区即可获取flag</p>
+<h3 id="初入门径"><a href="#初入门径" class="headerlink" title="初入门径"></a>初入门径</h3><p>看到别人在打boss然后上去蹭拿到了flag之书01<br>描述即为flag</p>
+<h3 id="擂台决斗"><a href="#擂台决斗" class="headerlink" title="擂台决斗"></a>擂台决斗</h3><p>不知道怎么搞捏，最后这个题看了一晚上没出，然后最后时刻就看大伙藏的flag掏出来大杀四方喜提纪念品了。无语捏<br>因为抓包没有抓到什么流量，感觉整个flash游戏基本上都是前端在操作，然后去研究swf，似乎逻辑都在这个里面，那么flag物品的描述应该也在这里面，然后就没有然后了，下了swf解包器对着swf文件一个个看，结果一无所获。钱钱离我而去</p>
+<h2 id="other"><a href="#other" class="headerlink" title="other"></a>other</h2><h3 id="签到"><a href="#签到" class="headerlink" title="签到"></a>签到</h3><p>扫二维码拿到flag</p>
+<h3 id="words-check"><a href="#words-check" class="headerlink" title="words check"></a>words check</h3><pre class=" language-python"><code class="language-python"><span class="token keyword">import</span> requests
+<span class="token keyword">import</span> hashlib
+<span class="token keyword">import</span> urllib
+<span class="token keyword">import</span> base64
+<span class="token keyword">import</span> time
+<span class="token keyword">import</span> json
+
+<span class="token keyword">from</span> tencentcloud<span class="token punctuation">.</span>common <span class="token keyword">import</span> credential
+<span class="token keyword">from</span> tencentcloud<span class="token punctuation">.</span>common<span class="token punctuation">.</span>profile<span class="token punctuation">.</span>client_profile <span class="token keyword">import</span> ClientProfile
+<span class="token keyword">from</span> tencentcloud<span class="token punctuation">.</span>common<span class="token punctuation">.</span>profile<span class="token punctuation">.</span>http_profile <span class="token keyword">import</span> HttpProfile
+<span class="token keyword">from</span> tencentcloud<span class="token punctuation">.</span>common<span class="token punctuation">.</span>exception<span class="token punctuation">.</span>tencent_cloud_sdk_exception <span class="token keyword">import</span> TencentCloudSDKException
+<span class="token keyword">from</span> tencentcloud<span class="token punctuation">.</span>ocr<span class="token punctuation">.</span>v20181119 <span class="token keyword">import</span> ocr_client<span class="token punctuation">,</span> models
+
+secret_id <span class="token operator">=</span> <span class="token string">"AKIDd4E7jAJJyLUMyJxMWP1NTKtkMhkWYGDv"</span>
+secret_key <span class="token operator">=</span> <span class="token string">"avzlJdgRw97qHRO5Vf6HBn8E2ZnEQKwH"</span>
+<span class="token keyword">def</span> <span class="token function">ocr</span><span class="token punctuation">(</span>data<span class="token punctuation">)</span><span class="token punctuation">:</span>
+    params <span class="token operator">=</span> <span class="token string">'{"ImageBase64":"'</span> <span class="token operator">+</span> data <span class="token operator">+</span> <span class="token string">'"}'</span>
+    cred <span class="token operator">=</span> credential<span class="token punctuation">.</span>Credential<span class="token punctuation">(</span>secret_id<span class="token punctuation">,</span> secret_key<span class="token punctuation">)</span>
+    httpProfile <span class="token operator">=</span> HttpProfile<span class="token punctuation">(</span><span class="token punctuation">)</span>
+    httpProfile<span class="token punctuation">.</span>endpoint <span class="token operator">=</span> <span class="token string">"ocr.tencentcloudapi.com"</span>
+
+    clientProfile <span class="token operator">=</span> ClientProfile<span class="token punctuation">(</span><span class="token punctuation">)</span>
+    clientProfile<span class="token punctuation">.</span>httpProfile <span class="token operator">=</span> httpProfile
+
+    client <span class="token operator">=</span> ocr_client<span class="token punctuation">.</span>OcrClient<span class="token punctuation">(</span>cred<span class="token punctuation">,</span> <span class="token string">"ap-guangzhou"</span><span class="token punctuation">,</span> clientProfile<span class="token punctuation">)</span>
+
+    req <span class="token operator">=</span> models<span class="token punctuation">.</span>GeneralBasicOCRRequest<span class="token punctuation">(</span><span class="token punctuation">)</span>
+    req<span class="token punctuation">.</span>from_json_string<span class="token punctuation">(</span>params<span class="token punctuation">)</span>
+    resp <span class="token operator">=</span> client<span class="token punctuation">.</span>GeneralBasicOCR<span class="token punctuation">(</span>req<span class="token punctuation">)</span>
+    <span class="token keyword">return</span> resp<span class="token punctuation">.</span>TextDetections<span class="token punctuation">[</span><span class="token number">0</span><span class="token punctuation">]</span><span class="token punctuation">.</span>DetectedText
+
+url<span class="token operator">=</span><span class="token string">'http://47.97.127.1:26432'</span>
+token<span class="token operator">=</span>requests<span class="token punctuation">.</span>get<span class="token punctuation">(</span>url<span class="token operator">+</span><span class="token string">'/getToken'</span><span class="token punctuation">)</span><span class="token punctuation">.</span>json<span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">[</span><span class="token string">'data'</span><span class="token punctuation">]</span><span class="token punctuation">[</span><span class="token string">'token'</span><span class="token punctuation">]</span>
+words<span class="token operator">=</span>requests<span class="token punctuation">.</span>get<span class="token punctuation">(</span>url<span class="token operator">+</span><span class="token string">'/getViolWords'</span><span class="token punctuation">)</span><span class="token punctuation">.</span>json<span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">[</span><span class="token string">'data'</span><span class="token punctuation">]</span><span class="token punctuation">[</span><span class="token string">'violWords'</span><span class="token punctuation">]</span>
+<span class="token keyword">for</span> i <span class="token keyword">in</span> range<span class="token punctuation">(</span><span class="token number">50</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
+    res<span class="token operator">=</span>requests<span class="token punctuation">.</span>post<span class="token punctuation">(</span>url<span class="token operator">+</span><span class="token string">'/getPic'</span><span class="token punctuation">,</span>json<span class="token operator">=</span><span class="token punctuation">{</span><span class="token string">'token'</span><span class="token punctuation">:</span>token<span class="token punctuation">}</span><span class="token punctuation">)</span><span class="token punctuation">.</span>json<span class="token punctuation">(</span><span class="token punctuation">)</span>
+    data<span class="token operator">=</span>res<span class="token punctuation">[</span><span class="token string">'data'</span><span class="token punctuation">]</span><span class="token punctuation">[</span><span class="token string">'words'</span><span class="token punctuation">]</span><span class="token punctuation">[</span><span class="token string">'w1'</span><span class="token punctuation">]</span>
+    sentence<span class="token operator">=</span>ocr<span class="token punctuation">(</span>data<span class="token punctuation">)</span>
+    f<span class="token operator">=</span>any<span class="token punctuation">(</span><span class="token punctuation">(</span>word <span class="token keyword">in</span> sentence<span class="token punctuation">)</span> <span class="token keyword">for</span> word <span class="token keyword">in</span> words<span class="token punctuation">)</span><span class="token operator">==</span><span class="token boolean">False</span>
+    res<span class="token operator">=</span>requests<span class="token punctuation">.</span>post<span class="token punctuation">(</span>url<span class="token operator">+</span><span class="token string">'/submits'</span><span class="token punctuation">,</span>json<span class="token operator">=</span><span class="token punctuation">{</span><span class="token string">'token'</span><span class="token punctuation">:</span>token<span class="token punctuation">,</span><span class="token string">'answer'</span><span class="token punctuation">:</span>f<span class="token punctuation">}</span><span class="token punctuation">)</span><span class="token punctuation">.</span>json<span class="token punctuation">(</span><span class="token punctuation">)</span>
+    <span class="token keyword">print</span><span class="token punctuation">(</span>i<span class="token punctuation">,</span>res<span class="token punctuation">)</span>
+res<span class="token operator">=</span>requests<span class="token punctuation">.</span>post<span class="token punctuation">(</span>url<span class="token operator">+</span><span class="token string">'/getFlag'</span><span class="token punctuation">,</span>json<span class="token operator">=</span><span class="token punctuation">{</span><span class="token string">'token'</span><span class="token punctuation">:</span>token<span class="token punctuation">}</span><span class="token punctuation">)</span><span class="token punctuation">.</span>json<span class="token punctuation">(</span><span class="token punctuation">)</span>
+<span class="token keyword">print</span><span class="token punctuation">(</span>res<span class="token punctuation">)</span>
+
+</code></pre>
+<h3 id="medium-black-ocr"><a href="#medium-black-ocr" class="headerlink" title="medium black ocr"></a>medium black ocr</h3><pre class=" language-python"><code class="language-python"><span class="token keyword">from</span> PIL <span class="token keyword">import</span> Image<span class="token punctuation">,</span>ImageDraw<span class="token punctuation">,</span>ImageFont
+<span class="token keyword">import</span> numpy <span class="token keyword">as</span> np
+<span class="token keyword">import</span> pytesseract
+<span class="token keyword">import</span> requests
+<span class="token keyword">import</span> string
+<span class="token keyword">import</span> base64
+<span class="token keyword">import</span> io
+
+FONT_SIZE <span class="token operator">=</span> <span class="token number">30</span>
+TEXT_LENGTH <span class="token operator">=</span> <span class="token number">10</span>
+FIG_SHAPE <span class="token operator">=</span> <span class="token punctuation">(</span>FONT_SIZE <span class="token operator">*</span> TEXT_LENGTH <span class="token operator">//</span> <span class="token number">2</span> <span class="token operator">+</span> <span class="token number">20</span><span class="token punctuation">,</span> FONT_SIZE <span class="token operator">+</span> <span class="token number">8</span><span class="token punctuation">)</span>
+
+<span class="token keyword">def</span> <span class="token function">array2b64</span><span class="token punctuation">(</span>np_array<span class="token punctuation">)</span><span class="token punctuation">:</span>
+    buffer <span class="token operator">=</span> np_array<span class="token punctuation">.</span>tobytes<span class="token punctuation">(</span><span class="token punctuation">)</span>
+    <span class="token keyword">return</span> base64<span class="token punctuation">.</span>b64encode<span class="token punctuation">(</span>buffer<span class="token punctuation">)</span>
+
+<span class="token keyword">def</span> <span class="token function">b642array</span><span class="token punctuation">(</span>bb64_buffer<span class="token punctuation">,</span> reshape<span class="token operator">=</span><span class="token punctuation">(</span>FIG_SHAPE<span class="token punctuation">[</span><span class="token number">1</span><span class="token punctuation">]</span><span class="token punctuation">,</span> FIG_SHAPE<span class="token punctuation">[</span><span class="token number">0</span><span class="token punctuation">]</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
+    <span class="token keyword">try</span><span class="token punctuation">:</span>
+        x <span class="token operator">=</span> np<span class="token punctuation">.</span>frombuffer<span class="token punctuation">(</span>base64<span class="token punctuation">.</span>b64decode<span class="token punctuation">(</span>bb64_buffer<span class="token punctuation">)</span><span class="token punctuation">,</span> dtype<span class="token operator">=</span>np<span class="token punctuation">.</span>float32<span class="token punctuation">)</span>
+        x <span class="token operator">=</span> x<span class="token punctuation">.</span>copy<span class="token punctuation">(</span><span class="token punctuation">)</span>  <span class="token comment" spellcheck="true"># frombuffer的数据不可写</span>
+        x <span class="token operator">*=</span> <span class="token number">255</span>
+        x <span class="token operator">=</span> x<span class="token punctuation">.</span>astype<span class="token punctuation">(</span>np<span class="token punctuation">.</span>uint8<span class="token punctuation">)</span>
+        x <span class="token operator">=</span> x<span class="token punctuation">.</span>reshape<span class="token punctuation">(</span>reshape<span class="token punctuation">)</span>
+        <span class="token keyword">return</span> x
+    <span class="token keyword">except</span> Exception <span class="token keyword">as</span> e<span class="token punctuation">:</span>
+        <span class="token keyword">print</span><span class="token punctuation">(</span>e<span class="token punctuation">)</span>
+        <span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string">"No Hack ! BAD BUFFER"</span><span class="token punctuation">)</span>
+        <span class="token keyword">return</span> <span class="token boolean">False</span>
+
+<span class="token keyword">def</span> <span class="token function">generate_fig</span><span class="token punctuation">(</span>text_raw<span class="token punctuation">,</span> font_size<span class="token operator">=</span>FONT_SIZE<span class="token punctuation">)</span><span class="token punctuation">:</span>
+    s <span class="token operator">=</span> io<span class="token punctuation">.</span>BytesIO<span class="token punctuation">(</span><span class="token punctuation">)</span>
+    im <span class="token operator">=</span> Image<span class="token punctuation">.</span>new<span class="token punctuation">(</span><span class="token string">"L"</span><span class="token punctuation">,</span> FIG_SHAPE<span class="token punctuation">,</span> <span class="token number">255</span><span class="token punctuation">)</span>
+    dr <span class="token operator">=</span> ImageDraw<span class="token punctuation">.</span>Draw<span class="token punctuation">(</span>im<span class="token punctuation">)</span>
+    font <span class="token operator">=</span> ImageFont<span class="token punctuation">.</span>truetype<span class="token punctuation">(</span><span class="token string">"ubuntu.ttf"</span><span class="token punctuation">,</span> font_size<span class="token punctuation">)</span>
+    dr<span class="token punctuation">.</span>text<span class="token punctuation">(</span><span class="token punctuation">(</span><span class="token number">0</span><span class="token punctuation">,</span> <span class="token number">0</span><span class="token punctuation">)</span><span class="token punctuation">,</span> text_raw<span class="token punctuation">,</span> font<span class="token operator">=</span>font<span class="token punctuation">,</span> fill<span class="token operator">=</span><span class="token string">"#000000"</span><span class="token punctuation">)</span>
+    im<span class="token punctuation">.</span>save<span class="token punctuation">(</span>s<span class="token punctuation">,</span> <span class="token string">'png'</span><span class="token punctuation">)</span>
+    <span class="token keyword">return</span> Image<span class="token punctuation">.</span>open<span class="token punctuation">(</span>s<span class="token punctuation">)</span>
+
+<span class="token keyword">def</span> <span class="token function">_predict</span><span class="token punctuation">(</span>x<span class="token punctuation">)</span><span class="token punctuation">:</span>
+    <span class="token triple-quoted-string string">"""
+    use py tesseract to predict image
+    :param x:
+    :return:
+    """</span>
+    x <span class="token operator">=</span> Image<span class="token punctuation">.</span>fromarray<span class="token punctuation">(</span>x<span class="token punctuation">,</span> mode<span class="token operator">=</span><span class="token string">'L'</span><span class="token punctuation">)</span>
+    <span class="token keyword">if</span> <span class="token operator">not</span> <span class="token punctuation">(</span>x<span class="token punctuation">.</span>size <span class="token operator">==</span> FIG_SHAPE <span class="token operator">and</span> x<span class="token punctuation">.</span>mode <span class="token operator">==</span> <span class="token string">'L'</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
+        <span class="token keyword">return</span> <span class="token string">"img format error"</span>
+    <span class="token keyword">try</span><span class="token punctuation">:</span>
+        result <span class="token operator">=</span> pytesseract<span class="token punctuation">.</span>image_to_string<span class="token punctuation">(</span>x<span class="token punctuation">,</span> config<span class="token operator">=</span><span class="token string">" tessedit_char_whitelist=abcdefghijklmnopqrstuvwxyz "</span><span class="token punctuation">)</span>
+        result <span class="token operator">=</span> result<span class="token punctuation">.</span>strip<span class="token punctuation">(</span><span class="token punctuation">)</span>
+        result <span class="token operator">=</span> result<span class="token punctuation">.</span>replace<span class="token punctuation">(</span><span class="token string">"\n"</span><span class="token punctuation">,</span> <span class="token string">""</span><span class="token punctuation">)</span>
+        result <span class="token operator">=</span> result<span class="token punctuation">.</span>replace<span class="token punctuation">(</span><span class="token string">"\x0c"</span><span class="token punctuation">,</span> <span class="token string">""</span><span class="token punctuation">)</span>
+        <span class="token keyword">return</span> result
+    <span class="token keyword">except</span> Exception <span class="token keyword">as</span> e<span class="token punctuation">:</span>
+        <span class="token keyword">print</span><span class="token punctuation">(</span>e<span class="token punctuation">)</span>
+        <span class="token keyword">return</span> <span class="token string">""</span>
+
+imgs<span class="token operator">=</span><span class="token punctuation">{</span><span class="token punctuation">}</span>
+<span class="token keyword">for</span> c <span class="token keyword">in</span> string<span class="token punctuation">.</span>ascii_lowercase<span class="token punctuation">:</span>
+    imgs<span class="token punctuation">[</span>c<span class="token punctuation">]</span><span class="token operator">=</span>np<span class="token punctuation">.</span>array<span class="token punctuation">(</span>generate_fig<span class="token punctuation">(</span>c<span class="token operator">*</span><span class="token number">10</span><span class="token punctuation">)</span><span class="token punctuation">,</span>dtype<span class="token operator">=</span>np<span class="token punctuation">.</span>float32<span class="token punctuation">)</span><span class="token punctuation">[</span><span class="token punctuation">:</span><span class="token punctuation">,</span><span class="token punctuation">:</span><span class="token number">15</span><span class="token punctuation">]</span>
+
+url<span class="token operator">=</span><span class="token string">'http://47.97.127.1:26857'</span>
+br<span class="token operator">=</span>requests<span class="token punctuation">.</span>Session<span class="token punctuation">(</span><span class="token punctuation">)</span>
+<span class="token keyword">for</span> k <span class="token keyword">in</span> range<span class="token punctuation">(</span><span class="token number">100</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
+    res<span class="token operator">=</span>br<span class="token punctuation">.</span>get<span class="token punctuation">(</span>url<span class="token operator">+</span><span class="token string">'/start'</span><span class="token punctuation">)</span><span class="token punctuation">.</span>text
+    origin<span class="token operator">=</span>res<span class="token punctuation">[</span>res<span class="token punctuation">.</span>find<span class="token punctuation">(</span><span class="token string">' `'</span><span class="token punctuation">)</span><span class="token operator">+</span><span class="token number">2</span><span class="token punctuation">:</span>res<span class="token punctuation">.</span>find<span class="token punctuation">(</span><span class="token string">'` '</span><span class="token punctuation">)</span><span class="token punctuation">]</span>
+    target<span class="token operator">=</span>res<span class="token punctuation">[</span>res<span class="token punctuation">.</span>find<span class="token punctuation">(</span><span class="token string">'as `'</span><span class="token punctuation">)</span><span class="token operator">+</span><span class="token number">4</span><span class="token punctuation">:</span>res<span class="token punctuation">.</span>find<span class="token punctuation">(</span><span class="token string">'`.'</span><span class="token punctuation">)</span><span class="token punctuation">]</span>
+    img<span class="token operator">=</span>np<span class="token punctuation">.</span>array<span class="token punctuation">(</span>generate_fig<span class="token punctuation">(</span>origin<span class="token punctuation">)</span><span class="token punctuation">,</span>np<span class="token punctuation">.</span>float32<span class="token punctuation">)</span>
+    ms<span class="token operator">=</span><span class="token punctuation">[</span><span class="token punctuation">]</span>
+    <span class="token keyword">for</span> i <span class="token keyword">in</span> range<span class="token punctuation">(</span><span class="token number">10</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
+        <span class="token keyword">if</span> origin<span class="token punctuation">[</span>i<span class="token punctuation">]</span><span class="token operator">==</span>target<span class="token punctuation">[</span>i<span class="token punctuation">]</span><span class="token punctuation">:</span>
+            ms<span class="token punctuation">.</span>append<span class="token punctuation">(</span>imgs<span class="token punctuation">[</span>origin<span class="token punctuation">[</span>i<span class="token punctuation">]</span><span class="token punctuation">]</span><span class="token punctuation">)</span>
+        <span class="token keyword">else</span><span class="token punctuation">:</span>
+            ms<span class="token punctuation">.</span>append<span class="token punctuation">(</span>imgs<span class="token punctuation">[</span>origin<span class="token punctuation">[</span>i<span class="token punctuation">]</span><span class="token punctuation">]</span><span class="token operator">*</span><span class="token number">0.5</span><span class="token operator">+</span>imgs<span class="token punctuation">[</span>target<span class="token punctuation">[</span>i<span class="token punctuation">]</span><span class="token punctuation">]</span><span class="token operator">*</span><span class="token number">0.5</span><span class="token punctuation">)</span>
+    ms<span class="token punctuation">.</span>append<span class="token punctuation">(</span>np<span class="token punctuation">.</span>ones<span class="token punctuation">(</span><span class="token punctuation">[</span><span class="token number">38</span><span class="token punctuation">,</span><span class="token number">20</span><span class="token punctuation">]</span><span class="token punctuation">,</span>dtype<span class="token operator">=</span>np<span class="token punctuation">.</span>float32<span class="token punctuation">)</span><span class="token operator">*</span><span class="token number">255</span><span class="token punctuation">)</span>
+    img2<span class="token operator">=</span>np<span class="token punctuation">.</span>hstack<span class="token punctuation">(</span>ms<span class="token punctuation">)</span>
+
+    res<span class="token operator">=</span>br<span class="token punctuation">.</span>post<span class="token punctuation">(</span>url<span class="token operator">+</span><span class="token string">'/predict'</span><span class="token punctuation">,</span><span class="token punctuation">{</span><span class="token string">'b64_image'</span><span class="token punctuation">:</span>array2b64<span class="token punctuation">(</span>img2<span class="token operator">*</span><span class="token number">255</span><span class="token punctuation">)</span><span class="token punctuation">}</span><span class="token punctuation">)</span><span class="token punctuation">.</span>text
+    <span class="token keyword">print</span><span class="token punctuation">(</span>k<span class="token punctuation">,</span>origin<span class="token punctuation">,</span>target<span class="token punctuation">,</span>res<span class="token punctuation">)</span>
+    <span class="token keyword">if</span> res<span class="token operator">==</span>target<span class="token punctuation">:</span>
+        res<span class="token operator">=</span>br<span class="token punctuation">.</span>post<span class="token punctuation">(</span>url<span class="token operator">+</span><span class="token string">'/get_flag'</span><span class="token punctuation">,</span><span class="token punctuation">{</span><span class="token string">'b64_image'</span><span class="token punctuation">:</span>array2b64<span class="token punctuation">(</span>img2<span class="token operator">*</span><span class="token number">255</span><span class="token punctuation">)</span><span class="token punctuation">}</span><span class="token punctuation">)</span><span class="token punctuation">.</span>text
+        <span class="token keyword">print</span><span class="token punctuation">(</span>res<span class="token punctuation">)</span>
+        <span class="token keyword">break</span>
+</code></pre>
+]]></content>
+      <categories>
+        <category>刷题记录</category>
+      </categories>
+      <tags>
+        <tag>wp</tag>
+      </tags>
+  </entry>
 </search>

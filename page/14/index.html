@@ -196,6 +196,111 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
+    <link itemprop="mainEntityOfPage" href="https://blog.z3ratu1.cn/Java%E7%9A%84%E5%A5%87%E6%80%AA%E5%91%BD%E4%BB%A4%E6%89%A7%E8%A1%8C.html">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="https://q2.qlogo.cn/headimg_dl?dst_uin=1207039417&spec=160">
+      <meta itemprop="name" content="Z3ratu1">
+      <meta itemprop="description" content="与其感慨路难行，不如现在出发">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Z3ratu1's blog">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/Java%E7%9A%84%E5%A5%87%E6%80%AA%E5%91%BD%E4%BB%A4%E6%89%A7%E8%A1%8C.html" class="post-title-link" itemprop="url">Java的奇怪命令执行</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2021-01-06 14:57:25" itemprop="dateCreated datePublished" datetime="2021-01-06T14:57:25+08:00">2021-01-06</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2021-04-13 19:43:23" itemprop="dateModified" datetime="2021-04-13T19:43:23+08:00">2021-04-13</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E7%AC%94%E8%AE%B0/" itemprop="url" rel="index"><span itemprop="name">笔记</span></a>
+                </span>
+            </span>
+
+          
+            <span id="/Java%E7%9A%84%E5%A5%87%E6%80%AA%E5%91%BD%E4%BB%A4%E6%89%A7%E8%A1%8C.html" class="post-meta-item leancloud_visitors" data-flag-title="Java的奇怪命令执行" title="阅读次数">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span class="leancloud-visitors-count"></span>
+            </span>
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="far fa-comment"></i>
+      </span>
+      <span class="post-meta-item-text">Valine：</span>
+    
+    <a title="valine" href="/Java%E7%9A%84%E5%A5%87%E6%80%AA%E5%91%BD%E4%BB%A4%E6%89%A7%E8%A1%8C.html#valine-comments" itemprop="discussionUrl">
+      <span class="post-comments-count valine-comment-count" data-xid="/Java%E7%9A%84%E5%A5%87%E6%80%AA%E5%91%BD%E4%BB%A4%E6%89%A7%E8%A1%8C.html" itemprop="commentCount"></span>
+    </a>
+  </span>
+  
+  
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h1 id="Java的奇怪命令执行"><a href="#Java的奇怪命令执行" class="headerlink" title="Java的奇怪命令执行"></a>Java的奇怪命令执行</h1><p>最近在打工，做的java CVE复现，用ysoserialize产生一个Java.Runtime.exec的payload命令执行，发现出现了一定的问题</p>
+<p>由于没有回显，因此需要想办法验证命令执行的情况，能执行一些简单的命令，比如touch文件，或者curl出来，确实能成功，但是想写shell的时候就遇到了奇怪的问题，没有回显也不知道哪报错，最后通过百度发现问题的根源在于Java.Runtime.exec的诡异实现</p>
+<p>也当头一次试着跟进超级多的java类看Java实现，记录一下一切都是怎么回事</p>
+<h2 id="Runtime-getRuntime-exec-cmd"><a href="#Runtime-getRuntime-exec-cmd" class="headerlink" title="Runtime.getRuntime().exec(cmd)"></a>Runtime.getRuntime().exec(cmd)</h2>
+          <!--noindex-->
+            <div class="post-button">
+              <a class="btn" href="/Java%E7%9A%84%E5%A5%87%E6%80%AA%E5%91%BD%E4%BB%A4%E6%89%A7%E8%A1%8C.html#more" rel="contents">
+                阅读全文 &raquo;
+              </a>
+            </div>
+          <!--/noindex-->
+        
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
     <link itemprop="mainEntityOfPage" href="https://blog.z3ratu1.cn/CCPC%E8%A2%AB%E6%97%A5.html">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -658,110 +763,6 @@
   
   
 
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
-    <link itemprop="mainEntityOfPage" href="https://blog.z3ratu1.cn/[XCTF]%E5%8D%8E%E4%B8%BA%E7%AC%AC%E4%B8%80%E5%9C%BA.html">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="https://q2.qlogo.cn/headimg_dl?dst_uin=1207039417&spec=160">
-      <meta itemprop="name" content="Z3ratu1">
-      <meta itemprop="description" content="与其感慨路难行，不如现在出发">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Z3ratu1's blog">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/%5BXCTF%5D%E5%8D%8E%E4%B8%BA%E7%AC%AC%E4%B8%80%E5%9C%BA.html" class="post-title-link" itemprop="url">[XCTF]华为第一场</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2020-12-20 13:05:30" itemprop="dateCreated datePublished" datetime="2020-12-20T13:05:30+08:00">2020-12-20</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="far fa-calendar-check"></i>
-                </span>
-                <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2020-12-22 20:51:51" itemprop="dateModified" datetime="2020-12-22T20:51:51+08:00">2020-12-22</time>
-              </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-folder"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/%E5%88%B7%E9%A2%98%E8%AE%B0%E5%BD%95/" itemprop="url" rel="index"><span itemprop="name">刷题记录</span></a>
-                </span>
-            </span>
-
-          
-            <span id="/%5BXCTF%5D%E5%8D%8E%E4%B8%BA%E7%AC%AC%E4%B8%80%E5%9C%BA.html" class="post-meta-item leancloud_visitors" data-flag-title="[XCTF]华为第一场" title="阅读次数">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-eye"></i>
-              </span>
-              <span class="post-meta-item-text">阅读次数：</span>
-              <span class="leancloud-visitors-count"></span>
-            </span>
-  
-  <span class="post-meta-item">
-    
-      <span class="post-meta-item-icon">
-        <i class="far fa-comment"></i>
-      </span>
-      <span class="post-meta-item-text">Valine：</span>
-    
-    <a title="valine" href="/%5BXCTF%5D%E5%8D%8E%E4%B8%BA%E7%AC%AC%E4%B8%80%E5%9C%BA.html#valine-comments" itemprop="discussionUrl">
-      <span class="post-comments-count valine-comment-count" data-xid="/%5BXCTF%5D%E5%8D%8E%E4%B8%BA%E7%AC%AC%E4%B8%80%E5%9C%BA.html" itemprop="commentCount"></span>
-    </a>
-  </span>
-  
-  
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <h1 id="XCTF-华为第一场"><a href="#XCTF-华为第一场" class="headerlink" title="[XCTF]华为第一场"></a>[XCTF]华为第一场</h1><p>等我下午吃完饭去看题的时候，web差不多已经被师傅ak了，开始开心看题划水</p>
-<h2 id="webshell-1"><a href="#webshell-1" class="headerlink" title="webshell_1"></a>webshell_1</h2><p>文件上传功能，传上去之后会发现后缀自动变jsp，需要传一个jsp的shell上去，但是好像有一定的过滤，完全不会jsp，网上搜的两个马都不能用，等会再说<br>一开始好像队友直接传了个网上的马就打通了，但是后来写wp复现的时候又打不通了<br>最后先上传了个读文件看了看waf，结果来了这么一句<code> URLConnection connection = new URL(&quot;http://hids.normalbe.com:8765/upload/jsp&quot;).openConnection();</code>意思是waf还是在线找的接口？<br>然后重新构造打过去了（但是我还是不会）</p>
-<h2 id="mine1-1"><a href="#mine1-1" class="headerlink" title="mine1_1"></a>mine1_1</h2>
-          <!--noindex-->
-            <div class="post-button">
-              <a class="btn" href="/%5BXCTF%5D%E5%8D%8E%E4%B8%BA%E7%AC%AC%E4%B8%80%E5%9C%BA.html#more" rel="contents">
-                阅读全文 &raquo;
-              </a>
-            </div>
-          <!--/noindex-->
-        
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
 
   
   <nav class="pagination">
@@ -832,7 +833,7 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">154</span>
+          <span class="site-state-item-count">155</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
