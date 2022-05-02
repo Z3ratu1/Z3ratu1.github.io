@@ -196,6 +196,140 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
+    <link itemprop="mainEntityOfPage" href="https://blog.z3ratu1.cn/[%E5%AE%89%E6%B4%B5%E6%9D%AF%202019]easy_web.html">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="https://q2.qlogo.cn/headimg_dl?dst_uin=1207039417&spec=160">
+      <meta itemprop="name" content="Z3ratu1">
+      <meta itemprop="description" content="与其感慨路难行，不如现在出发">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Z3ratu1's blog">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/%5B%E5%AE%89%E6%B4%B5%E6%9D%AF%202019%5Deasy_web.html" class="post-title-link" itemprop="url">[安洵杯 2019]easy_web</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2020-02-17 17:45:00" itemprop="dateCreated datePublished" datetime="2020-02-17T17:45:00+08:00">2020-02-17</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2020-07-12 16:33:48" itemprop="dateModified" datetime="2020-07-12T16:33:48+08:00">2020-07-12</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E5%88%B7%E9%A2%98%E8%AE%B0%E5%BD%95/" itemprop="url" rel="index"><span itemprop="name">刷题记录</span></a>
+                </span>
+            </span>
+
+          
+            <span id="/%5B%E5%AE%89%E6%B4%B5%E6%9D%AF%202019%5Deasy_web.html" class="post-meta-item leancloud_visitors" data-flag-title="[安洵杯 2019]easy_web" title="阅读次数">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span class="leancloud-visitors-count"></span>
+            </span>
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="far fa-comment"></i>
+      </span>
+      <span class="post-meta-item-text">Valine：</span>
+    
+    <a title="valine" href="/%5B%E5%AE%89%E6%B4%B5%E6%9D%AF%202019%5Deasy_web.html#valine-comments" itemprop="discussionUrl">
+      <span class="post-comments-count valine-comment-count" data-xid="/%5B%E5%AE%89%E6%B4%B5%E6%9D%AF%202019%5Deasy_web.html" itemprop="commentCount"></span>
+    </a>
+  </span>
+  
+  
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h1 id="安洵杯-2019-easy-web"><a href="#安洵杯-2019-easy-web" class="headerlink" title="[安洵杯 2019]easy_web"></a>[安洵杯 2019]easy_web</h1><p>刷题记录</p>
+<p>题目第一层那个文件名两次base64加密一次十六进制转ascii，真的有点毒，我用的在线解码还出问题了。。。过了就可以拿到index.php的源码</p>
+<pre class=" language-php"><code class="language-php"><span class="token delimiter">&lt;?php</span>
+<span class="token function">error_reporting</span><span class="token punctuation">(</span><span class="token constant">E_ALL</span> <span class="token operator">||</span> <span class="token operator">~</span> <span class="token constant">E_NOTICE</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token function">header</span><span class="token punctuation">(</span><span class="token string">'content-type:text/html;charset=utf-8'</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token variable">$cmd</span> <span class="token operator">=</span> <span class="token variable">$_GET</span><span class="token punctuation">[</span><span class="token string">'cmd'</span><span class="token punctuation">]</span><span class="token punctuation">;</span>
+<span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token operator">!</span><span class="token function">isset</span><span class="token punctuation">(</span><span class="token variable">$_GET</span><span class="token punctuation">[</span><span class="token string">'img'</span><span class="token punctuation">]</span><span class="token punctuation">)</span> <span class="token operator">||</span> <span class="token operator">!</span><span class="token function">isset</span><span class="token punctuation">(</span><span class="token variable">$_GET</span><span class="token punctuation">[</span><span class="token string">'cmd'</span><span class="token punctuation">]</span><span class="token punctuation">)</span><span class="token punctuation">)</span> 
+    <span class="token function">header</span><span class="token punctuation">(</span><span class="token string">'Refresh:0;url=./index.php?img=TXpVek5UTTFNbVUzTURabE5qYz0&amp;cmd='</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token variable">$file</span> <span class="token operator">=</span> <span class="token function">hex2bin</span><span class="token punctuation">(</span><span class="token function">base64_decode</span><span class="token punctuation">(</span><span class="token function">base64_decode</span><span class="token punctuation">(</span><span class="token variable">$_GET</span><span class="token punctuation">[</span><span class="token string">'img'</span><span class="token punctuation">]</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+<span class="token variable">$file</span> <span class="token operator">=</span> <span class="token function">preg_replace</span><span class="token punctuation">(</span><span class="token string">"/[^a-zA-Z0-9.]+/"</span><span class="token punctuation">,</span> <span class="token string">""</span><span class="token punctuation">,</span> <span class="token variable">$file</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token function">preg_match</span><span class="token punctuation">(</span><span class="token string">"/flag/i"</span><span class="token punctuation">,</span> <span class="token variable">$file</span><span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token keyword">echo</span> <span class="token string">'&lt;img src ="./ctf3.jpeg">'</span><span class="token punctuation">;</span>
+    <span class="token keyword">die</span><span class="token punctuation">(</span><span class="token string">"xixi～ no flag"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span> <span class="token keyword">else</span> <span class="token punctuation">{</span>
+    <span class="token variable">$txt</span> <span class="token operator">=</span> <span class="token function">base64_encode</span><span class="token punctuation">(</span><span class="token function">file_get_contents</span><span class="token punctuation">(</span><span class="token variable">$file</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token keyword">echo</span> <span class="token string">"&lt;img src='data:image/gif;base64,"</span> <span class="token punctuation">.</span> <span class="token variable">$txt</span> <span class="token punctuation">.</span> <span class="token string">"'>&lt;/img>"</span><span class="token punctuation">;</span>
+    <span class="token keyword">echo</span> <span class="token string">"&lt;br>"</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
+<span class="token keyword">echo</span> <span class="token variable">$cmd</span><span class="token punctuation">;</span>
+<span class="token keyword">echo</span> <span class="token string">"&lt;br>"</span><span class="token punctuation">;</span>
+<span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token function">preg_match</span><span class="token punctuation">(</span><span class="token string">"/ls|bash|tac|nl|more|less|head|wget|tail|vi|cat|od|grep|sed|bzmore|bzless|pcre|paste|diff|file|echo|sh|\'|\"|\`|;|,|\*|\?|\\|\\\\|\n|\t|\r|\xA0|\{|\}|\(|\)|\&amp;[^\d]|@|\||\\$|\[|\]|{|}|\(|\)|-|&lt;|>/i"</span><span class="token punctuation">,</span> <span class="token variable">$cmd</span><span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token keyword">echo</span><span class="token punctuation">(</span><span class="token string">"forbid ~"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token keyword">echo</span> <span class="token string">"&lt;br>"</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span> <span class="token keyword">else</span> <span class="token punctuation">{</span>
+    <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token punctuation">(</span>string<span class="token punctuation">)</span><span class="token variable">$_POST</span><span class="token punctuation">[</span><span class="token string">'a'</span><span class="token punctuation">]</span> <span class="token operator">!==</span> <span class="token punctuation">(</span>string<span class="token punctuation">)</span><span class="token variable">$_POST</span><span class="token punctuation">[</span><span class="token string">'b'</span><span class="token punctuation">]</span> <span class="token operator">&amp;&amp;</span> <span class="token function">md5</span><span class="token punctuation">(</span><span class="token variable">$_POST</span><span class="token punctuation">[</span><span class="token string">'a'</span><span class="token punctuation">]</span><span class="token punctuation">)</span> <span class="token operator">===</span> <span class="token function">md5</span><span class="token punctuation">(</span><span class="token variable">$_POST</span><span class="token punctuation">[</span><span class="token string">'b'</span><span class="token punctuation">]</span><span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token keyword">echo</span> `<span class="token variable">$cmd</span>`<span class="token punctuation">;</span>
+    <span class="token punctuation">}</span> <span class="token keyword">else</span> <span class="token punctuation">{</span>
+        <span class="token keyword">echo</span> <span class="token punctuation">(</span><span class="token string">"md5 is funny ~"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+<span class="token punctuation">}</span>
+</code></pre>
+<p>说白了就是不让直接获取flag，强类型md5过了之后可以过一个超级过滤来执行命令</p>
+          <!--noindex-->
+            <div class="post-button">
+              <a class="btn" href="/%5B%E5%AE%89%E6%B4%B5%E6%9D%AF%202019%5Deasy_web.html#more" rel="contents">
+                阅读全文 &raquo;
+              </a>
+            </div>
+          <!--/noindex-->
+        
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
     <link itemprop="mainEntityOfPage" href="https://blog.z3ratu1.cn/%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96%E6%BC%8F%E6%B4%9E.html">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -632,131 +766,10 @@
   
   
 
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
-    <link itemprop="mainEntityOfPage" href="https://blog.z3ratu1.cn/decade%20wp.html">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="https://q2.qlogo.cn/headimg_dl?dst_uin=1207039417&spec=160">
-      <meta itemprop="name" content="Z3ratu1">
-      <meta itemprop="description" content="与其感慨路难行，不如现在出发">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Z3ratu1's blog">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/decade%20wp.html" class="post-title-link" itemprop="url">decade wp</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2019-11-10 22:53:00" itemprop="dateCreated datePublished" datetime="2019-11-10T22:53:00+08:00">2019-11-10</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="far fa-calendar-check"></i>
-                </span>
-                <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2020-07-12 16:33:48" itemprop="dateModified" datetime="2020-07-12T16:33:48+08:00">2020-07-12</time>
-              </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-folder"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/%E5%88%B7%E9%A2%98%E8%AE%B0%E5%BD%95/" itemprop="url" rel="index"><span itemprop="name">刷题记录</span></a>
-                </span>
-            </span>
-
-          
-            <span id="/decade%20wp.html" class="post-meta-item leancloud_visitors" data-flag-title="decade wp" title="阅读次数">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-eye"></i>
-              </span>
-              <span class="post-meta-item-text">阅读次数：</span>
-              <span class="leancloud-visitors-count"></span>
-            </span>
-  
-  <span class="post-meta-item">
-    
-      <span class="post-meta-item-icon">
-        <i class="far fa-comment"></i>
-      </span>
-      <span class="post-meta-item-text">Valine：</span>
-    
-    <a title="valine" href="/decade%20wp.html#valine-comments" itemprop="discussionUrl">
-      <span class="post-comments-count valine-comment-count" data-xid="/decade%20wp.html" itemprop="commentCount"></span>
-    </a>
-  </span>
-  
-  
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <h1 id="decade-wp"><a href="#decade-wp" class="headerlink" title="decade wp"></a>decade wp</h1><p>复现复现，是一道bytectf修改了的题，加了几个过滤</p>
-<h2 id="无参数函数的命令执行"><a href="#无参数函数的命令执行" class="headerlink" title="无参数函数的命令执行"></a>无参数函数的命令执行</h2><pre class=" language-php"><code class="language-php"><span class="token delimiter">&lt;?php</span>
-<span class="token function">highlight_file</span><span class="token punctuation">(</span><span class="token constant">__FILE__</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-<span class="token variable">$code</span> <span class="token operator">=</span> <span class="token variable">$_GET</span><span class="token punctuation">[</span><span class="token string">'code'</span><span class="token punctuation">]</span><span class="token punctuation">;</span>
-<span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token operator">!</span><span class="token function">empty</span><span class="token punctuation">(</span><span class="token variable">$code</span><span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
-        <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token string">';'</span> <span class="token operator">===</span> <span class="token function">preg_replace</span><span class="token punctuation">(</span><span class="token string">'/[a-z]+\((?R)?\)/'</span><span class="token punctuation">,</span> <span class="token keyword">NULL</span><span class="token punctuation">,</span> <span class="token variable">$code</span><span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
-            <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token function">preg_match</span><span class="token punctuation">(</span><span class="token string">'/readfile|if|time|local|sqrt|et|na|nt|strlen|info|path|rand|dec|bin|hex|oct|pi|exp|log/i'</span><span class="token punctuation">,</span> <span class="token variable">$code</span><span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
-                    <span class="token keyword">echo</span> <span class="token string">'bye~'</span><span class="token punctuation">;</span>
-                <span class="token punctuation">}</span> <span class="token keyword">else</span> <span class="token punctuation">{</span>
-                    <span class="token function">eval</span><span class="token punctuation">(</span><span class="token variable">$code</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-                <span class="token punctuation">}</span>
-            <span class="token punctuation">}</span>
-        <span class="token keyword">else</span> <span class="token punctuation">{</span>
-            <span class="token keyword">echo</span> <span class="token string">"No way!!!"</span><span class="token punctuation">;</span>
-        <span class="token punctuation">}</span>
-<span class="token punctuation">}</span><span class="token keyword">else</span> <span class="token punctuation">{</span>
-        <span class="token keyword">echo</span> <span class="token string">"No way!!!"</span><span class="token punctuation">;</span>
-    <span class="token punctuation">}</span>
-</code></pre>
-<p>贴一下源码</p>
-          <!--noindex-->
-            <div class="post-button">
-              <a class="btn" href="/decade%20wp.html#more" rel="contents">
-                阅读全文 &raquo;
-              </a>
-            </div>
-          <!--/noindex-->
-        
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
 
   
   <nav class="pagination">
-    <a class="extend prev" rel="prev" href="/page/29/"><i class="fa fa-angle-left" aria-label="上一页"></i></a><a class="page-number" href="/">1</a><span class="space">&hellip;</span><a class="page-number" href="/page/27/">27</a><a class="page-number" href="/page/28/">28</a><a class="page-number" href="/page/29/">29</a><span class="page-number current">30</span><a class="page-number" href="/page/31/">31</a><a class="extend next" rel="next" href="/page/31/"><i class="fa fa-angle-right" aria-label="下一页"></i></a>
+    <a class="extend prev" rel="prev" href="/page/29/"><i class="fa fa-angle-left" aria-label="上一页"></i></a><a class="page-number" href="/">1</a><span class="space">&hellip;</span><a class="page-number" href="/page/27/">27</a><a class="page-number" href="/page/28/">28</a><a class="page-number" href="/page/29/">29</a><span class="page-number current">30</span><a class="page-number" href="/page/31/">31</a><a class="page-number" href="/page/32/">32</a><a class="extend next" rel="next" href="/page/31/"><i class="fa fa-angle-right" aria-label="下一页"></i></a>
   </nav>
 
 
@@ -823,7 +836,7 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">155</span>
+          <span class="site-state-item-count">156</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>

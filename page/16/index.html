@@ -196,6 +196,106 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
+    <link itemprop="mainEntityOfPage" href="https://blog.z3ratu1.cn/[N1CTF2020]DockerManager.html">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="https://q2.qlogo.cn/headimg_dl?dst_uin=1207039417&spec=160">
+      <meta itemprop="name" content="Z3ratu1">
+      <meta itemprop="description" content="与其感慨路难行，不如现在出发">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Z3ratu1's blog">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/%5BN1CTF2020%5DDockerManager.html" class="post-title-link" itemprop="url">[N1CTF2020]DockerManager</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+              
+
+              <time title="创建时间：2020-12-01 17:23:02 / 修改时间：17:23:45" itemprop="dateCreated datePublished" datetime="2020-12-01T17:23:02+08:00">2020-12-01</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E5%88%B7%E9%A2%98%E8%AE%B0%E5%BD%95/" itemprop="url" rel="index"><span itemprop="name">刷题记录</span></a>
+                </span>
+            </span>
+
+          
+            <span id="/%5BN1CTF2020%5DDockerManager.html" class="post-meta-item leancloud_visitors" data-flag-title="[N1CTF2020]DockerManager" title="阅读次数">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span class="leancloud-visitors-count"></span>
+            </span>
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="far fa-comment"></i>
+      </span>
+      <span class="post-meta-item-text">Valine：</span>
+    
+    <a title="valine" href="/%5BN1CTF2020%5DDockerManager.html#valine-comments" itemprop="discussionUrl">
+      <span class="post-comments-count valine-comment-count" data-xid="/%5BN1CTF2020%5DDockerManager.html" itemprop="commentCount"></span>
+    </a>
+  </span>
+  
+  
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h1 id="N1CTF2020-DockerManager"><a href="#N1CTF2020-DockerManager" class="headerlink" title="[N1CTF2020]DockerManager"></a>[N1CTF2020]DockerManager</h1><p>一万年没刷buu的题，今天看到群里赵总丢了这个题的wp，粗略看了下感觉有点意思，就立即进行一个buu的复现。。。。</p>
+<h2 id="题解"><a href="#题解" class="headerlink" title="题解"></a>题解</h2><p>题目给了附件，包括Dockerfile，里面有一句<code>chmod 777 /var/www/html/img/</code><br>img目录可写<br>看源码，index.php锤子用没有，view.php写了一个curl的exec<br>接受了一大堆参数，host在拼了一堆乱七八糟的东西之后过了一个escapeshellarg()，</p>
+<pre class=" language-php"><code class="language-php"><span class="token variable">$host_addr</span> <span class="token punctuation">.</span><span class="token operator">=</span> <span class="token variable">$mode</span> <span class="token punctuation">.</span> <span class="token string">'?all=true'</span><span class="token punctuation">;</span>
+<span class="token variable">$host_addr</span> <span class="token operator">=</span> <span class="token function">escapeshellarg</span><span class="token punctuation">(</span><span class="token variable">$host_addr</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+</code></pre>
+          <!--noindex-->
+            <div class="post-button">
+              <a class="btn" href="/%5BN1CTF2020%5DDockerManager.html#more" rel="contents">
+                阅读全文 &raquo;
+              </a>
+            </div>
+          <!--/noindex-->
+        
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
     <link itemprop="mainEntityOfPage" href="https://blog.z3ratu1.cn/Java%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96%E5%85%A5%E9%97%A8.html">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -608,108 +708,10 @@
   
   
 
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
-    <link itemprop="mainEntityOfPage" href="https://blog.z3ratu1.cn/HTTPS%20Mixed%20content.html">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="https://q2.qlogo.cn/headimg_dl?dst_uin=1207039417&spec=160">
-      <meta itemprop="name" content="Z3ratu1">
-      <meta itemprop="description" content="与其感慨路难行，不如现在出发">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Z3ratu1's blog">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/HTTPS%20Mixed%20content.html" class="post-title-link" itemprop="url">HTTPS Mixed content</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-              
-
-              <time title="创建时间：2020-11-19 20:10:50 / 修改时间：20:12:01" itemprop="dateCreated datePublished" datetime="2020-11-19T20:10:50+08:00">2020-11-19</time>
-            </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-folder"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/%E7%AC%94%E8%AE%B0/" itemprop="url" rel="index"><span itemprop="name">笔记</span></a>
-                </span>
-            </span>
-
-          
-            <span id="/HTTPS%20Mixed%20content.html" class="post-meta-item leancloud_visitors" data-flag-title="HTTPS Mixed content" title="阅读次数">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-eye"></i>
-              </span>
-              <span class="post-meta-item-text">阅读次数：</span>
-              <span class="leancloud-visitors-count"></span>
-            </span>
-  
-  <span class="post-meta-item">
-    
-      <span class="post-meta-item-icon">
-        <i class="far fa-comment"></i>
-      </span>
-      <span class="post-meta-item-text">Valine：</span>
-    
-    <a title="valine" href="/HTTPS%20Mixed%20content.html#valine-comments" itemprop="discussionUrl">
-      <span class="post-comments-count valine-comment-count" data-xid="/HTTPS%20Mixed%20content.html" itemprop="commentCount"></span>
-    </a>
-  </span>
-  
-  
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <h1 id="HTTPS-Mixed-content"><a href="#HTTPS-Mixed-content" class="headerlink" title="HTTPS Mixed content"></a>HTTPS Mixed content</h1><p>起因还是最近把博客迁到国内，往常用的Chrome，看自己的Gitpage是有小锁的，心血来潮用Edge试了试自己新注册域名的https，结果居然和我说不安全？让学长用Safari帮忙试了下也显示不安全，就很气，然后进行了一通学习<br>毕竟Chrome作为”世界上最安全的浏览器”，别人报不安全他报安全就应该是很离谱的事情</p>
-<h2 id="Mixed-Content"><a href="#Mixed-Content" class="headerlink" title="Mixed Content"></a>Mixed Content</h2><p>查看成因，Edge的警告是证书没问题但是图片可能存在诱骗，后来发现是拉自己QQ头像的那个链接写的是HTTP，而这种在HTTPS中引入HTTP资源的情况就被称为Mixed Content<br>这显然可能引发奇怪的安全问题，如果在HTTPS中引入了HTTP内容，结果这个HTTP内容被中间人攻击或者DNS污染之类的控制了就很致命，在这样的界面上如果还报安全，那就害人了</p>
-<h2 id="Chrome对https的提升"><a href="#Chrome对https的提升" class="headerlink" title="Chrome对https的提升"></a>Chrome对https的提升</h2>
-          <!--noindex-->
-            <div class="post-button">
-              <a class="btn" href="/HTTPS%20Mixed%20content.html#more" rel="contents">
-                阅读全文 &raquo;
-              </a>
-            </div>
-          <!--/noindex-->
-        
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
 
   
   <nav class="pagination">
-    <a class="extend prev" rel="prev" href="/page/15/"><i class="fa fa-angle-left" aria-label="上一页"></i></a><a class="page-number" href="/">1</a><span class="space">&hellip;</span><a class="page-number" href="/page/13/">13</a><a class="page-number" href="/page/14/">14</a><a class="page-number" href="/page/15/">15</a><span class="page-number current">16</span><a class="page-number" href="/page/17/">17</a><a class="page-number" href="/page/18/">18</a><a class="page-number" href="/page/19/">19</a><span class="space">&hellip;</span><a class="page-number" href="/page/31/">31</a><a class="extend next" rel="next" href="/page/17/"><i class="fa fa-angle-right" aria-label="下一页"></i></a>
+    <a class="extend prev" rel="prev" href="/page/15/"><i class="fa fa-angle-left" aria-label="上一页"></i></a><a class="page-number" href="/">1</a><span class="space">&hellip;</span><a class="page-number" href="/page/13/">13</a><a class="page-number" href="/page/14/">14</a><a class="page-number" href="/page/15/">15</a><span class="page-number current">16</span><a class="page-number" href="/page/17/">17</a><a class="page-number" href="/page/18/">18</a><a class="page-number" href="/page/19/">19</a><span class="space">&hellip;</span><a class="page-number" href="/page/32/">32</a><a class="extend next" rel="next" href="/page/17/"><i class="fa fa-angle-right" aria-label="下一页"></i></a>
   </nav>
 
 
@@ -776,7 +778,7 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">155</span>
+          <span class="site-state-item-count">156</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>

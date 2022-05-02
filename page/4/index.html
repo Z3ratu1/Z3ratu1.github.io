@@ -196,6 +196,271 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
+    <link itemprop="mainEntityOfPage" href="https://blog.z3ratu1.cn/[RWCTF2021]wp.html">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="https://q2.qlogo.cn/headimg_dl?dst_uin=1207039417&spec=160">
+      <meta itemprop="name" content="Z3ratu1">
+      <meta itemprop="description" content="与其感慨路难行，不如现在出发">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Z3ratu1's blog">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/%5BRWCTF2021%5Dwp.html" class="post-title-link" itemprop="url">[RWCTF2021]wp</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2022-01-24 14:18:11" itemprop="dateCreated datePublished" datetime="2022-01-24T14:18:11+08:00">2022-01-24</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2022-02-04 17:53:26" itemprop="dateModified" datetime="2022-02-04T17:53:26+08:00">2022-02-04</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E5%88%B7%E9%A2%98%E8%AE%B0%E5%BD%95/" itemprop="url" rel="index"><span itemprop="name">刷题记录</span></a>
+                </span>
+            </span>
+
+          
+            <span id="/%5BRWCTF2021%5Dwp.html" class="post-meta-item leancloud_visitors" data-flag-title="[RWCTF2021]wp" title="阅读次数">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span class="leancloud-visitors-count"></span>
+            </span>
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="far fa-comment"></i>
+      </span>
+      <span class="post-meta-item-text">Valine：</span>
+    
+    <a title="valine" href="/%5BRWCTF2021%5Dwp.html#valine-comments" itemprop="discussionUrl">
+      <span class="post-comments-count valine-comment-count" data-xid="/%5BRWCTF2021%5Dwp.html" itemprop="commentCount"></span>
+    </a>
+  </span>
+  
+  
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h1 id="RWCTF2021-wp"><a href="#RWCTF2021-wp" class="headerlink" title="[RWCTF2021]wp"></a>[RWCTF2021]wp</h1><p>好像也一个题不会来着，其实算是个复现吧。。。<br>以及寒假+过年摸了好久的鱼。。。</p>
+<h2 id="Hack-into-Skynet"><a href="#Hack-into-Skynet" class="headerlink" title="Hack into Skynet"></a>Hack into Skynet</h2><p>最多解的web，是一个加了一个迷之AI的pgsql注入</p>
+<pre class=" language-python"><code class="language-python"><span class="token comment" spellcheck="true">#!/usr/bin/env python3</span>
+
+<span class="token keyword">import</span> flask
+<span class="token keyword">import</span> psycopg2
+<span class="token keyword">import</span> datetime
+<span class="token keyword">import</span> hashlib
+<span class="token keyword">from</span> skynet <span class="token keyword">import</span> Skynet
+
+app <span class="token operator">=</span> flask<span class="token punctuation">.</span>Flask<span class="token punctuation">(</span>__name__<span class="token punctuation">,</span> static_url_path<span class="token operator">=</span><span class="token string">''</span><span class="token punctuation">)</span>
+skynet <span class="token operator">=</span> Skynet<span class="token punctuation">(</span><span class="token punctuation">)</span>
+
+<span class="token keyword">def</span> <span class="token function">skynet_detect</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
+    req <span class="token operator">=</span> <span class="token punctuation">{</span>
+        <span class="token string">'method'</span><span class="token punctuation">:</span> flask<span class="token punctuation">.</span>request<span class="token punctuation">.</span>method<span class="token punctuation">,</span>
+        <span class="token string">'path'</span><span class="token punctuation">:</span> flask<span class="token punctuation">.</span>request<span class="token punctuation">.</span>full_path<span class="token punctuation">,</span>
+        <span class="token string">'host'</span><span class="token punctuation">:</span> flask<span class="token punctuation">.</span>request<span class="token punctuation">.</span>headers<span class="token punctuation">.</span>get<span class="token punctuation">(</span><span class="token string">'host'</span><span class="token punctuation">)</span><span class="token punctuation">,</span>
+        <span class="token string">'content_type'</span><span class="token punctuation">:</span> flask<span class="token punctuation">.</span>request<span class="token punctuation">.</span>headers<span class="token punctuation">.</span>get<span class="token punctuation">(</span><span class="token string">'content-type'</span><span class="token punctuation">)</span><span class="token punctuation">,</span>
+        <span class="token string">'useragent'</span><span class="token punctuation">:</span> flask<span class="token punctuation">.</span>request<span class="token punctuation">.</span>headers<span class="token punctuation">.</span>get<span class="token punctuation">(</span><span class="token string">'user-agent'</span><span class="token punctuation">)</span><span class="token punctuation">,</span>
+        <span class="token string">'referer'</span><span class="token punctuation">:</span> flask<span class="token punctuation">.</span>request<span class="token punctuation">.</span>headers<span class="token punctuation">.</span>get<span class="token punctuation">(</span><span class="token string">'referer'</span><span class="token punctuation">)</span><span class="token punctuation">,</span>
+        <span class="token string">'cookie'</span><span class="token punctuation">:</span> flask<span class="token punctuation">.</span>request<span class="token punctuation">.</span>headers<span class="token punctuation">.</span>get<span class="token punctuation">(</span><span class="token string">'cookie'</span><span class="token punctuation">)</span><span class="token punctuation">,</span>
+        <span class="token string">'body'</span><span class="token punctuation">:</span> str<span class="token punctuation">(</span>flask<span class="token punctuation">.</span>request<span class="token punctuation">.</span>get_data<span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">,</span>
+    <span class="token punctuation">}</span>
+    _<span class="token punctuation">,</span> result <span class="token operator">=</span> skynet<span class="token punctuation">.</span>classify<span class="token punctuation">(</span>req<span class="token punctuation">)</span>
+    <span class="token keyword">return</span> result <span class="token operator">and</span> result<span class="token punctuation">[</span><span class="token string">'attack'</span><span class="token punctuation">]</span>
+
+@app<span class="token punctuation">.</span>route<span class="token punctuation">(</span><span class="token string">'/static/&lt;path:path>'</span><span class="token punctuation">)</span>
+<span class="token keyword">def</span> <span class="token function">static_files</span><span class="token punctuation">(</span>path<span class="token punctuation">)</span><span class="token punctuation">:</span>
+    <span class="token keyword">return</span> flask<span class="token punctuation">.</span>send_from_directory<span class="token punctuation">(</span><span class="token string">'static'</span><span class="token punctuation">,</span> path<span class="token punctuation">)</span>
+
+@app<span class="token punctuation">.</span>route<span class="token punctuation">(</span><span class="token string">'/'</span><span class="token punctuation">,</span> methods<span class="token operator">=</span><span class="token punctuation">[</span><span class="token string">'GET'</span><span class="token punctuation">,</span> <span class="token string">'POST'</span><span class="token punctuation">]</span><span class="token punctuation">)</span>
+<span class="token keyword">def</span> <span class="token function">do_query</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
+    <span class="token keyword">if</span> skynet_detect<span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
+        <span class="token keyword">return</span> flask<span class="token punctuation">.</span>abort<span class="token punctuation">(</span><span class="token number">403</span><span class="token punctuation">)</span>
+
+    <span class="token keyword">if</span> <span class="token operator">not</span> query_login_state<span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
+        response <span class="token operator">=</span> flask<span class="token punctuation">.</span>make_response<span class="token punctuation">(</span><span class="token string">'No login, redirecting'</span><span class="token punctuation">,</span> <span class="token number">302</span><span class="token punctuation">)</span>
+        response<span class="token punctuation">.</span>location <span class="token operator">=</span> flask<span class="token punctuation">.</span>escape<span class="token punctuation">(</span><span class="token string">'/login'</span><span class="token punctuation">)</span>
+        <span class="token keyword">return</span> response
+
+    <span class="token keyword">if</span> flask<span class="token punctuation">.</span>request<span class="token punctuation">.</span>method <span class="token operator">==</span> <span class="token string">'GET'</span><span class="token punctuation">:</span>
+        <span class="token keyword">return</span> flask<span class="token punctuation">.</span>send_from_directory<span class="token punctuation">(</span><span class="token string">''</span><span class="token punctuation">,</span> <span class="token string">'index.html'</span><span class="token punctuation">)</span>
+    <span class="token keyword">elif</span> flask<span class="token punctuation">.</span>request<span class="token punctuation">.</span>method <span class="token operator">==</span> <span class="token string">'POST'</span><span class="token punctuation">:</span>
+        kt <span class="token operator">=</span> query_kill_time<span class="token punctuation">(</span><span class="token punctuation">)</span>
+        <span class="token keyword">if</span> kt<span class="token punctuation">:</span>
+            result <span class="token operator">=</span> kt 
+        <span class="token keyword">else</span><span class="token punctuation">:</span>
+            result <span class="token operator">=</span> <span class="token string">''</span>
+        <span class="token keyword">return</span> flask<span class="token punctuation">.</span>render_template<span class="token punctuation">(</span><span class="token string">'index.html'</span><span class="token punctuation">,</span> result<span class="token operator">=</span>result<span class="token punctuation">)</span>
+    <span class="token keyword">else</span><span class="token punctuation">:</span>
+        <span class="token keyword">return</span> flask<span class="token punctuation">.</span>abort<span class="token punctuation">(</span><span class="token number">400</span><span class="token punctuation">)</span>
+
+@app<span class="token punctuation">.</span>route<span class="token punctuation">(</span><span class="token string">'/login'</span><span class="token punctuation">,</span> methods<span class="token operator">=</span><span class="token punctuation">[</span><span class="token string">'GET'</span><span class="token punctuation">,</span> <span class="token string">'POST'</span><span class="token punctuation">]</span><span class="token punctuation">)</span>
+<span class="token keyword">def</span> <span class="token function">do_login</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
+    <span class="token keyword">if</span> skynet_detect<span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
+        <span class="token keyword">return</span> flask<span class="token punctuation">.</span>abort<span class="token punctuation">(</span><span class="token number">403</span><span class="token punctuation">)</span>
+
+    <span class="token keyword">if</span> flask<span class="token punctuation">.</span>request<span class="token punctuation">.</span>method <span class="token operator">==</span> <span class="token string">'GET'</span><span class="token punctuation">:</span>
+        <span class="token keyword">return</span> flask<span class="token punctuation">.</span>send_from_directory<span class="token punctuation">(</span><span class="token string">'static'</span><span class="token punctuation">,</span> <span class="token string">'login.html'</span><span class="token punctuation">)</span>
+    <span class="token keyword">elif</span> flask<span class="token punctuation">.</span>request<span class="token punctuation">.</span>method <span class="token operator">==</span> <span class="token string">'POST'</span><span class="token punctuation">:</span>
+        <span class="token keyword">if</span> <span class="token operator">not</span> query_login_attempt<span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
+            <span class="token keyword">return</span> flask<span class="token punctuation">.</span>send_from_directory<span class="token punctuation">(</span><span class="token string">'static'</span><span class="token punctuation">,</span> <span class="token string">'login.html'</span><span class="token punctuation">)</span>
+        <span class="token keyword">else</span><span class="token punctuation">:</span>
+            session <span class="token operator">=</span> create_session<span class="token punctuation">(</span><span class="token punctuation">)</span>
+            response <span class="token operator">=</span> flask<span class="token punctuation">.</span>make_response<span class="token punctuation">(</span><span class="token string">'Login success'</span><span class="token punctuation">,</span> <span class="token number">302</span><span class="token punctuation">)</span>
+            response<span class="token punctuation">.</span>set_cookie<span class="token punctuation">(</span><span class="token string">'SessionId'</span><span class="token punctuation">,</span> session<span class="token punctuation">)</span>
+            response<span class="token punctuation">.</span>location <span class="token operator">=</span> flask<span class="token punctuation">.</span>escape<span class="token punctuation">(</span><span class="token string">'/'</span><span class="token punctuation">)</span>
+            <span class="token keyword">return</span> response
+    <span class="token keyword">else</span><span class="token punctuation">:</span>
+        <span class="token keyword">return</span> flask<span class="token punctuation">.</span>abort<span class="token punctuation">(</span><span class="token number">400</span><span class="token punctuation">)</span>
+
+<span class="token keyword">def</span> <span class="token function">query_login_state</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
+    sid <span class="token operator">=</span> flask<span class="token punctuation">.</span>request<span class="token punctuation">.</span>cookies<span class="token punctuation">.</span>get<span class="token punctuation">(</span><span class="token string">'SessionId'</span><span class="token punctuation">,</span> <span class="token string">''</span><span class="token punctuation">)</span>
+    <span class="token keyword">if</span> <span class="token operator">not</span> sid<span class="token punctuation">:</span>
+        <span class="token keyword">return</span> <span class="token boolean">False</span>
+
+    now <span class="token operator">=</span> datetime<span class="token punctuation">.</span>datetime<span class="token punctuation">.</span>now<span class="token punctuation">(</span><span class="token punctuation">)</span>
+    <span class="token keyword">with</span> psycopg2<span class="token punctuation">.</span>connect<span class="token punctuation">(</span>
+            host<span class="token operator">=</span><span class="token string">"challenge-db"</span><span class="token punctuation">,</span>
+            database<span class="token operator">=</span><span class="token string">"ctf"</span><span class="token punctuation">,</span>
+            user<span class="token operator">=</span><span class="token string">"ctf"</span><span class="token punctuation">,</span>
+            password<span class="token operator">=</span><span class="token string">"ctf"</span><span class="token punctuation">)</span> <span class="token keyword">as</span> conn<span class="token punctuation">:</span>
+        cursor <span class="token operator">=</span> conn<span class="token punctuation">.</span>cursor<span class="token punctuation">(</span><span class="token punctuation">)</span>
+        cursor<span class="token punctuation">.</span>execute<span class="token punctuation">(</span><span class="token string">"SELECT sessionid"</span>
+           <span class="token string">"  FROM login_session"</span>
+           <span class="token string">"  WHERE sessionid = %s"</span>
+           <span class="token string">"    AND valid_since &lt;= %s"</span>
+           <span class="token string">"    AND valid_until >= %s"</span>
+           <span class="token string">""</span><span class="token punctuation">,</span> <span class="token punctuation">(</span>sid<span class="token punctuation">,</span> now<span class="token punctuation">,</span> now<span class="token punctuation">)</span><span class="token punctuation">)</span>
+        data <span class="token operator">=</span> <span class="token punctuation">[</span>r <span class="token keyword">for</span> r <span class="token keyword">in</span> cursor<span class="token punctuation">.</span>fetchall<span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">]</span>
+        <span class="token keyword">return</span> bool<span class="token punctuation">(</span>data<span class="token punctuation">)</span>
+
+<span class="token keyword">def</span> <span class="token function">query_login_attempt</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
+    username <span class="token operator">=</span> flask<span class="token punctuation">.</span>request<span class="token punctuation">.</span>form<span class="token punctuation">.</span>get<span class="token punctuation">(</span><span class="token string">'username'</span><span class="token punctuation">,</span> <span class="token string">''</span><span class="token punctuation">)</span>
+    password <span class="token operator">=</span> flask<span class="token punctuation">.</span>request<span class="token punctuation">.</span>form<span class="token punctuation">.</span>get<span class="token punctuation">(</span><span class="token string">'password'</span><span class="token punctuation">,</span> <span class="token string">''</span><span class="token punctuation">)</span>
+    <span class="token keyword">if</span> <span class="token operator">not</span> username <span class="token operator">and</span> <span class="token operator">not</span> password<span class="token punctuation">:</span>
+        <span class="token keyword">return</span> <span class="token boolean">False</span>
+
+    sql <span class="token operator">=</span> <span class="token punctuation">(</span><span class="token string">"SELECT id, account"</span>
+           <span class="token string">"  FROM target_credentials"</span>
+           <span class="token string">"  WHERE password = '{}'"</span><span class="token punctuation">)</span><span class="token punctuation">.</span>format<span class="token punctuation">(</span>hashlib<span class="token punctuation">.</span>md5<span class="token punctuation">(</span>password<span class="token punctuation">.</span>encode<span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">.</span>hexdigest<span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
+    user <span class="token operator">=</span> sql_exec<span class="token punctuation">(</span>sql<span class="token punctuation">)</span>
+    name <span class="token operator">=</span> user<span class="token punctuation">[</span><span class="token number">0</span><span class="token punctuation">]</span><span class="token punctuation">[</span><span class="token number">1</span><span class="token punctuation">]</span> <span class="token keyword">if</span> user <span class="token operator">and</span> user<span class="token punctuation">[</span><span class="token number">0</span><span class="token punctuation">]</span> <span class="token operator">and</span> user<span class="token punctuation">[</span><span class="token number">0</span><span class="token punctuation">]</span><span class="token punctuation">[</span><span class="token number">1</span><span class="token punctuation">]</span> <span class="token keyword">else</span> <span class="token string">''</span>
+    <span class="token keyword">return</span> name <span class="token operator">==</span> username
+
+<span class="token keyword">def</span> <span class="token function">create_session</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
+    valid_since <span class="token operator">=</span> datetime<span class="token punctuation">.</span>datetime<span class="token punctuation">.</span>now<span class="token punctuation">(</span><span class="token punctuation">)</span>
+    valid_until <span class="token operator">=</span> datetime<span class="token punctuation">.</span>datetime<span class="token punctuation">.</span>now<span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">+</span> datetime<span class="token punctuation">.</span>timedelta<span class="token punctuation">(</span>days<span class="token operator">=</span><span class="token number">1</span><span class="token punctuation">)</span>
+    sessionid <span class="token operator">=</span> hashlib<span class="token punctuation">.</span>md5<span class="token punctuation">(</span><span class="token punctuation">(</span>str<span class="token punctuation">(</span>valid_since<span class="token punctuation">)</span><span class="token operator">+</span>str<span class="token punctuation">(</span>valid_until<span class="token punctuation">)</span><span class="token operator">+</span>str<span class="token punctuation">(</span>datetime<span class="token punctuation">.</span>datetime<span class="token punctuation">.</span>now<span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">.</span>encode<span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">.</span>hexdigest<span class="token punctuation">(</span><span class="token punctuation">)</span>
+
+    sql_exec_update<span class="token punctuation">(</span><span class="token punctuation">(</span><span class="token string">"INSERT INTO login_session (sessionid, valid_since, valid_until)"</span>
+           <span class="token string">"  VALUES ('{}', '{}', '{}')"</span><span class="token punctuation">)</span><span class="token punctuation">.</span>format<span class="token punctuation">(</span>sessionid<span class="token punctuation">,</span> valid_since<span class="token punctuation">,</span> valid_until<span class="token punctuation">)</span><span class="token punctuation">)</span>
+    <span class="token keyword">return</span> sessionid
+
+<span class="token keyword">def</span> <span class="token function">query_kill_time</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
+    name <span class="token operator">=</span> flask<span class="token punctuation">.</span>request<span class="token punctuation">.</span>form<span class="token punctuation">.</span>get<span class="token punctuation">(</span><span class="token string">'name'</span><span class="token punctuation">,</span> <span class="token string">''</span><span class="token punctuation">)</span>
+    <span class="token keyword">if</span> <span class="token operator">not</span> name<span class="token punctuation">:</span>
+        <span class="token keyword">return</span> None
+
+    sql <span class="token operator">=</span> <span class="token punctuation">(</span><span class="token string">"SELECT name, born"</span>
+           <span class="token string">"  FROM target"</span>
+           <span class="token string">"  WHERE age > 0"</span>
+           <span class="token string">"    AND name = '{}'"</span><span class="token punctuation">)</span><span class="token punctuation">.</span>format<span class="token punctuation">(</span>name<span class="token punctuation">)</span>
+    nb <span class="token operator">=</span> sql_exec<span class="token punctuation">(</span>sql<span class="token punctuation">)</span>
+    <span class="token keyword">if</span> <span class="token operator">not</span> nb<span class="token punctuation">:</span>
+        <span class="token keyword">return</span> None
+    <span class="token keyword">return</span> <span class="token string">'{}: {}'</span><span class="token punctuation">.</span>format<span class="token punctuation">(</span><span class="token operator">*</span>nb<span class="token punctuation">[</span><span class="token number">0</span><span class="token punctuation">]</span><span class="token punctuation">)</span>
+
+<span class="token keyword">def</span> <span class="token function">sql_exec</span><span class="token punctuation">(</span>stmt<span class="token punctuation">)</span><span class="token punctuation">:</span>
+    data <span class="token operator">=</span> list<span class="token punctuation">(</span><span class="token punctuation">)</span>
+    <span class="token keyword">try</span><span class="token punctuation">:</span>
+        <span class="token keyword">with</span> psycopg2<span class="token punctuation">.</span>connect<span class="token punctuation">(</span>
+                host<span class="token operator">=</span><span class="token string">"challenge-db"</span><span class="token punctuation">,</span>
+                database<span class="token operator">=</span><span class="token string">"ctf"</span><span class="token punctuation">,</span>
+                user<span class="token operator">=</span><span class="token string">"ctf"</span><span class="token punctuation">,</span>
+                password<span class="token operator">=</span><span class="token string">"ctf"</span><span class="token punctuation">)</span> <span class="token keyword">as</span> conn<span class="token punctuation">:</span>
+            cursor <span class="token operator">=</span> conn<span class="token punctuation">.</span>cursor<span class="token punctuation">(</span><span class="token punctuation">)</span>
+            cursor<span class="token punctuation">.</span>execute<span class="token punctuation">(</span>stmt<span class="token punctuation">)</span>
+            <span class="token keyword">for</span> row <span class="token keyword">in</span> cursor<span class="token punctuation">.</span>fetchall<span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
+                data<span class="token punctuation">.</span>append<span class="token punctuation">(</span><span class="token punctuation">[</span>col <span class="token keyword">for</span> col <span class="token keyword">in</span> row<span class="token punctuation">]</span><span class="token punctuation">)</span>
+            cursor<span class="token punctuation">.</span>close<span class="token punctuation">(</span><span class="token punctuation">)</span>
+    <span class="token keyword">except</span> Exception <span class="token keyword">as</span> e<span class="token punctuation">:</span>
+        <span class="token keyword">print</span><span class="token punctuation">(</span>e<span class="token punctuation">)</span>
+    <span class="token keyword">return</span> data
+
+<span class="token keyword">def</span> <span class="token function">sql_exec_update</span><span class="token punctuation">(</span>stmt<span class="token punctuation">)</span><span class="token punctuation">:</span>
+    data <span class="token operator">=</span> list<span class="token punctuation">(</span><span class="token punctuation">)</span>
+    <span class="token keyword">try</span><span class="token punctuation">:</span>
+        <span class="token keyword">with</span> psycopg2<span class="token punctuation">.</span>connect<span class="token punctuation">(</span>
+                host<span class="token operator">=</span><span class="token string">"challenge-db"</span><span class="token punctuation">,</span>
+                database<span class="token operator">=</span><span class="token string">"ctf"</span><span class="token punctuation">,</span>
+                user<span class="token operator">=</span><span class="token string">"ctf"</span><span class="token punctuation">,</span>
+                password<span class="token operator">=</span><span class="token string">"ctf"</span><span class="token punctuation">)</span> <span class="token keyword">as</span> conn<span class="token punctuation">:</span>
+            cursor <span class="token operator">=</span> conn<span class="token punctuation">.</span>cursor<span class="token punctuation">(</span><span class="token punctuation">)</span>
+            cursor<span class="token punctuation">.</span>execute<span class="token punctuation">(</span>stmt<span class="token punctuation">)</span>
+            conn<span class="token punctuation">.</span>commit<span class="token punctuation">(</span><span class="token punctuation">)</span>
+    <span class="token keyword">except</span> Exception <span class="token keyword">as</span> e<span class="token punctuation">:</span>
+        <span class="token keyword">print</span><span class="token punctuation">(</span>e<span class="token punctuation">)</span>
+    <span class="token keyword">return</span> data
+
+<span class="token keyword">if</span> __name__ <span class="token operator">==</span> <span class="token string">"__main__"</span><span class="token punctuation">:</span>
+    app<span class="token punctuation">.</span>run<span class="token punctuation">(</span>host<span class="token operator">=</span><span class="token string">'0.0.0.0'</span><span class="token punctuation">,</span> port<span class="token operator">=</span><span class="token number">8080</span><span class="token punctuation">)</span>
+</code></pre>
+          <!--noindex-->
+            <div class="post-button">
+              <a class="btn" href="/%5BRWCTF2021%5Dwp.html#more" rel="contents">
+                阅读全文 &raquo;
+              </a>
+            </div>
+          <!--/noindex-->
+        
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
     <link itemprop="mainEntityOfPage" href="https://blog.z3ratu1.cn/hxpctf2021%E5%A4%8D%E7%8E%B0.html">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -608,114 +873,10 @@
   
   
 
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
-    <link itemprop="mainEntityOfPage" href="https://blog.z3ratu1.cn/%E4%BA%8C%E8%BF%9B%E5%88%B6%E7%AE%80%E5%8D%95%E5%85%A5%E9%97%A8.html">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="https://q2.qlogo.cn/headimg_dl?dst_uin=1207039417&spec=160">
-      <meta itemprop="name" content="Z3ratu1">
-      <meta itemprop="description" content="与其感慨路难行，不如现在出发">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Z3ratu1's blog">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/%E4%BA%8C%E8%BF%9B%E5%88%B6%E7%AE%80%E5%8D%95%E5%85%A5%E9%97%A8.html" class="post-title-link" itemprop="url">栈溢出简单入门</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2021-11-12 14:23:27" itemprop="dateCreated datePublished" datetime="2021-11-12T14:23:27+08:00">2021-11-12</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="far fa-calendar-check"></i>
-                </span>
-                <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2021-11-26 15:39:16" itemprop="dateModified" datetime="2021-11-26T15:39:16+08:00">2021-11-26</time>
-              </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-folder"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/%E7%AC%94%E8%AE%B0/" itemprop="url" rel="index"><span itemprop="name">笔记</span></a>
-                </span>
-            </span>
-
-          
-            <span id="/%E4%BA%8C%E8%BF%9B%E5%88%B6%E7%AE%80%E5%8D%95%E5%85%A5%E9%97%A8.html" class="post-meta-item leancloud_visitors" data-flag-title="栈溢出简单入门" title="阅读次数">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-eye"></i>
-              </span>
-              <span class="post-meta-item-text">阅读次数：</span>
-              <span class="leancloud-visitors-count"></span>
-            </span>
-  
-  <span class="post-meta-item">
-    
-      <span class="post-meta-item-icon">
-        <i class="far fa-comment"></i>
-      </span>
-      <span class="post-meta-item-text">Valine：</span>
-    
-    <a title="valine" href="/%E4%BA%8C%E8%BF%9B%E5%88%B6%E7%AE%80%E5%8D%95%E5%85%A5%E9%97%A8.html#valine-comments" itemprop="discussionUrl">
-      <span class="post-comments-count valine-comment-count" data-xid="/%E4%BA%8C%E8%BF%9B%E5%88%B6%E7%AE%80%E5%8D%95%E5%85%A5%E9%97%A8.html" itemprop="commentCount"></span>
-    </a>
-  </span>
-  
-  
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <h1 id="栈溢出简单入门"><a href="#栈溢出简单入门" class="headerlink" title="栈溢出简单入门"></a>栈溢出简单入门</h1><p>别问，问就是闲的<br>所以稍微学一下<br>很水，且基本没用实践过</p>
-<h2 id="函数入栈退栈过程"><a href="#函数入栈退栈过程" class="headerlink" title="函数入栈退栈过程"></a>函数入栈退栈过程</h2><p>主要和三个寄存器相关，<code>esp ebp eip</code><br>esp为栈顶指针，指向栈顶，ebp为栈底指针，指向当前栈帧的栈底。eip则保存执行指令的地址<br>这里首先需要理解，栈和代码段是分开的，栈理论上可读可写不可执行，代码段可读可执行</p>
-<h3 id="入栈"><a href="#入栈" class="headerlink" title="入栈"></a>入栈</h3>
-          <!--noindex-->
-            <div class="post-button">
-              <a class="btn" href="/%E4%BA%8C%E8%BF%9B%E5%88%B6%E7%AE%80%E5%8D%95%E5%85%A5%E9%97%A8.html#more" rel="contents">
-                阅读全文 &raquo;
-              </a>
-            </div>
-          <!--/noindex-->
-        
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
 
   
   <nav class="pagination">
-    <a class="extend prev" rel="prev" href="/page/3/"><i class="fa fa-angle-left" aria-label="上一页"></i></a><a class="page-number" href="/">1</a><a class="page-number" href="/page/2/">2</a><a class="page-number" href="/page/3/">3</a><span class="page-number current">4</span><a class="page-number" href="/page/5/">5</a><a class="page-number" href="/page/6/">6</a><a class="page-number" href="/page/7/">7</a><span class="space">&hellip;</span><a class="page-number" href="/page/31/">31</a><a class="extend next" rel="next" href="/page/5/"><i class="fa fa-angle-right" aria-label="下一页"></i></a>
+    <a class="extend prev" rel="prev" href="/page/3/"><i class="fa fa-angle-left" aria-label="上一页"></i></a><a class="page-number" href="/">1</a><a class="page-number" href="/page/2/">2</a><a class="page-number" href="/page/3/">3</a><span class="page-number current">4</span><a class="page-number" href="/page/5/">5</a><a class="page-number" href="/page/6/">6</a><a class="page-number" href="/page/7/">7</a><span class="space">&hellip;</span><a class="page-number" href="/page/32/">32</a><a class="extend next" rel="next" href="/page/5/"><i class="fa fa-angle-right" aria-label="下一页"></i></a>
   </nav>
 
 
@@ -782,7 +943,7 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">155</span>
+          <span class="site-state-item-count">156</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
