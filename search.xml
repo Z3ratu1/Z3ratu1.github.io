@@ -1262,6 +1262,12 @@ debugfs -w name
 <h3 id="脏牛与VDSO"><a href="#脏牛与VDSO" class="headerlink" title="脏牛与VDSO"></a>脏牛与VDSO</h3><p>Linux超级远古的至尊漏洞，Dirty CopyOnWrite<br>利用写入时复制和条件竞争进行任意内存读写的超级漏洞<br>VDSO Virtual Dynamic Shared Object（虚拟动态共享对象）简单来说就是存在在内核空间的.so文件<br>在容器内打VDSO内存中的<code>clock_gettime()</code>进行逃逸<br>网上都有现成的工具</p>
 <h2 id="参考链接"><a href="#参考链接" class="headerlink" title="参考链接"></a>参考链接</h2><p><a href="https://coolshell.cn/articles/17010.html">DOCKER基础技术：LINUX NAMESPACE（上）</a><br><a href="https://coolshell.cn/articles/17049.html">DOCKER基础技术：LINUX CGROUP</a><br><a href="https://www.docker.com/blog/experimenting-with-rootless-docker/">Experimenting with Rootless Docker</a><br><a href="http://dockone.io/article/152">Docker run 命令的使用方法</a><br><a href="https://xz.aliyun.com/t/1098">利用 &#x2F;proc&#x2F;sys&#x2F;kernel&#x2F;core_pattern隐藏系统后门</a><br><a href="https://0x00sec.org/t/linux-infecting-running-processes/1097">[Linux] Infecting Running Processes</a><br><a href="https://security.tencent.com/index.php/blog/msg/183">红蓝对抗中的云原生漏洞挖掘及利用实录</a></p>
 ]]></content>
+      <categories>
+        <category>笔记</category>
+      </categories>
+      <tags>
+        <tag>docker</tag>
+      </tags>
   </entry>
   <entry>
     <title>Common-Collections系列payload复现</title>
@@ -19309,6 +19315,32 @@ bitsadmin <span class="token operator">/</span>complete &lt;name> <span class="t
       <tags>
         <tag>Windows</tag>
         <tag>pentest</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>ASLR与PIC与PIE</title>
+    <url>/ASLR%E4%B8%8EPIC%E4%B8%8EPIE.html</url>
+    <content><![CDATA[<h1 id="ASLR与PIC与PIE"><a href="#ASLR与PIC与PIE" class="headerlink" title="ASLR与PIC与PIE"></a>ASLR与PIC与PIE</h1><p>简单的说就是看计算机基础的时候想起来函数调用的地址应当是在编译时确定的，而ASLR在运行时会对内存地址进行高强度随机化，那这样一来编译时写死的东西不就跑不起来了？然后开始的纠结和挣扎。二进制基础-&gt;0太难了啊。</p>
+<h2 id="PLT-amp-GOT"><a href="#PLT-amp-GOT" class="headerlink" title="PLT&amp;GOT"></a>PLT&amp;GOT</h2><p>PLT与GOT表，这个是属于之前二进制入门的时候就学过的东西了。PLT位于代码段，可读可执行，GOT表位于数据段，可读可写。PLT和GOT表是动态链接时延迟加载的必备条件。PLT指向GOT表表项，GOT表初始每一项都指向PLT开始处的resolver，当函数第一次被调用时resolver解析函数加载在内存中的地址回填GOT表，即可实现对动态链接运行时加载的函数位置重定向。动态链接库声明的变量理论上来说也位于GOT表中。</p>
+<h2 id="ASLR"><a href="#ASLR" class="headerlink" title="ASLR"></a>ASLR</h2><p>Address Space Layout Randomization，地址随机化，能开几个程度的buff，0不开，1开了没完全开，2全开。理论上默认都是开到2<br>开1的话对共享库、栈、mmap和VDSO的地址随机化（VDSO是什么。。。），简单的说就是堆、数据段和代码段不会随机化<br>开2的话堆、数据段和代码段也全都随机化。用来防return2libc之类的攻击的。理论上已经学过<br>如果是只随机化堆栈的话，感觉防的是简单的栈溢出ret2shellcode，不过这年头栈都是不可执行的了吧。。。</p>
+<h2 id="位置相关代码"><a href="#位置相关代码" class="headerlink" title="位置相关代码"></a>位置相关代码</h2><p>位置相关代码中，变量、函数等地址在编译时即被确定，均以绝对地址的形式编译进二进制文件。位置相关代码就没法随机化，开了随机化随机加载一下地址全乱就跑不起来了。<br>并且对于动态链接库而言，如果用位置相关代码，动态链接库被加载进其他进程空间中的地址是随机的，动态链接库中写死了地址的话，被加载进其他进程时也就运行不起来了</p>
+<h2 id="PIC"><a href="#PIC" class="headerlink" title="PIC"></a>PIC</h2><p>position independent code，位置无关代码。位置相关是因为使用了绝对地址，那么位置无关就需要使用相对地址来解决问题。</p>
+<p>然而相对地址就能实现随机化了吗？比如对于动态链接的函数，虽然会被解析到PLT和GOT表，但这两个表在加载的时候不会被随机而无法确定地址吗？想要明确的认识这一点，需要注意一个比较重要的事实。</p>
+<p><strong>数据段和代码段的相对偏移总是保持不变的</strong></p>
+<p>也就是说数据段和代码段在编译时就确定了他们的相对偏移，而在装载入内存时开启随机化，数据段和代码段是作为一个整体去随机化的，随机是对这两个段合起来的一个大段进行偏移，从而实现了在编译时确定的相对地址能够自由使用。<br>汇编中的CALL指令支持使用相对地址对函数进行调用，对于该程序内部实现的函数，可以在编译时确定好相对偏移，直接调用，而对于外部动态链接的函数，也可在编译时确定与PLT表项的相对偏移，在运行时等待PLT修改GOT表进而访问确切地址。<br>据说x86下的mov指令不支持使用相对地址，因此对于GOT表中导出的外部变量需要通过绝对地址访问。可以通过一个trick获取当前指令地址，再与编译时确定的GOT表表项偏移相加即可获得GOT表表项绝对地址。<br>PIC使得动态链接库可以被加载到随机地址，防范的是ret2libc攻击</p>
+<h3 id="PIE"><a href="#PIE" class="headerlink" title="PIE"></a>PIE</h3><p>理论上来说是为了配合aslr，加了这个buff就能随机化代码段好数据段，防止ret2ROP攻击<br>位置无关可执行程序，听起来好像和PIC没什么区别？引用一下gcc的文档</p>
+<blockquote>
+<p>-fpic<br>Generate position-independent code (PIC) suitable for use in a shared library…<br>-fpie<br>These options are similar to -fpic and -fPIC, but generated position independent code can be only linked into executables….</p>
+</blockquote>
+<p>似乎，就是fpic用于生成位置无关的动态链接库（说起来动态链接库如果地址有关也绝对跑不起来吧。。。），fpie则用来生成位置无关的可执行程序<br>实现的整体功能是类似的，但因为一个是生成动态链接库，一个是生成可执行程序，多少有些细微的差别，所以就变成了两个指令吧。<br>使用PIE选项编译出的可执行程序会在编译为位置无关代码<br>在PIE文件中，所有的全局变量都被放在GOT表内（包括本地全局变量？）</p>
+<p>普通的程序入口位置是固定的，即不添加fpie生成的可执行程序是位置有关程序，因为程序的入口地址被固定在0x400000（x86下），直接从这个位置加载然后顺序排列过去，即使启动2级别的aslr，也无法随机化代码段和数据段，否则全乱。而加了pie选项之后可以生成位置无关的可执行程序，该方法生成的程序默认装载地址为0，在装载时会被链接器重定位</p>
+<h2 id="参考链接"><a href="#参考链接" class="headerlink" title="参考链接"></a>参考链接</h2><p><a href="https://www.modb.pro/db/87717">深入理解 Linux 位置无关代码 PIC</a> 这个讲的很清楚<br><a href="https://luomuxiaoxiao.com/?p=516">Linux X86 程序启动 – main函数是如何被执行的？</a><br><a href="https://hansimov.gitbook.io/csapp/part2/ch07-linking/7.12-position-independent-code">位置无关代码</a><br><a href="https://zhuanlan.zhihu.com/p/68588184">CALL指令有多少种写法</a><br><a href="https://stackoverflow.com/questions/28119365/what-are-the-differences-comparing-pie-pic-code-and-executable-on-64-bit-x86-pl">What are the differences comparing PIE, PIC code and executable on 64-bit x86 platform?</a><br><a href="https://stackoverflow.com/questions/2463150/what-is-the-fpie-option-for-position-independent-executables-in-gcc-and-ld">What is the -fPIE option for position-independent executables in gcc and ld?</a><br><a href="https://gcc.gnu.org/onlinedocs/gcc-4.8.0/gcc/Code-Gen-Options.html#Code-Gen-Options">gcc&#x2F;Code-Gen-Options.html</a></p>
+]]></content>
+      <categories>
+        <category>笔记</category>
+      </categories>
+      <tags>
+        <tag>pwn</tag>
       </tags>
   </entry>
 </search>
