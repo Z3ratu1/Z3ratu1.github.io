@@ -1,0 +1,765 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 6.0.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"blog.z3ratu1.cn","root":"/","scheme":"Pisces","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"always","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":true},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+  </script>
+
+  <meta name="description" content="windows免杀入门护网的时候遇到了一台火绒+windows defender+360拉满的机器，那个时候凭借我们的垃圾技术，完全打不进去，最后是学弟不知道加了多少buff用奇怪的套壳软件给套过去了，现在尝试着进行基础学习。 周末尝试和katzebin去看defcon qual，比去年还坐牢。。。 去年唯一一个web是一个解混淆的题，我还后续好歹学了下AST长点知识，今年这个题真有点莫名其妙，感">
+<meta property="og:type" content="article">
+<meta property="og:title" content="windows免杀入门">
+<meta property="og:url" content="https://blog.z3ratu1.cn/Windows%E5%85%8D%E6%9D%80%E5%85%A5%E9%97%A8.html">
+<meta property="og:site_name" content="Z3ratu1&#39;s blog">
+<meta property="og:description" content="windows免杀入门护网的时候遇到了一台火绒+windows defender+360拉满的机器，那个时候凭借我们的垃圾技术，完全打不进去，最后是学弟不知道加了多少buff用奇怪的套壳软件给套过去了，现在尝试着进行基础学习。 周末尝试和katzebin去看defcon qual，比去年还坐牢。。。 去年唯一一个web是一个解混淆的题，我还后续好歹学了下AST长点知识，今年这个题真有点莫名其妙，感">
+<meta property="og:locale">
+<meta property="article:published_time" content="2022-05-22T07:43:41.000Z">
+<meta property="article:modified_time" content="2022-05-31T14:46:58.515Z">
+<meta property="article:author" content="Z3ratu1">
+<meta property="article:tag" content="Windows">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="https://blog.z3ratu1.cn/Windows%E5%85%8D%E6%9D%80%E5%85%A5%E9%97%A8.html">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-Hans'
+  };
+</script>
+
+  <title>windows免杀入门 | Z3ratu1's blog</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+<link rel="stylesheet" href="/css/prism-tomorrow.css" type="text/css"></head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">Z3ratu1's blog</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">Welcome</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>关于</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+        <li class="menu-item menu-item-links">
+
+    <a href="/links/" rel="section"><i class="fa fa-link fa-fw"></i>友链</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off" placeholder="搜索..." spellcheck="false" type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+  <a href="https://github.com/Z3ratu1" class="github-corner" title="Follow me on GitHub" aria-label="Follow me on GitHub" rel="external nofollow noopener noreferrer" target="_blank"><svg width="80" height="80" viewbox="0 0 250 250" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"/><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"/><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"/></svg></a>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
+    <link itemprop="mainEntityOfPage" href="https://blog.z3ratu1.cn/Windows%E5%85%8D%E6%9D%80%E5%85%A5%E9%97%A8.html">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="https://q2.qlogo.cn/headimg_dl?dst_uin=1207039417&spec=160">
+      <meta itemprop="name" content="Z3ratu1">
+      <meta itemprop="description" content="与其感慨路难行，不如现在出发">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Z3ratu1's blog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          windows免杀入门
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2022-05-22 15:43:41" itemprop="dateCreated datePublished" datetime="2022-05-22T15:43:41+08:00">2022-05-22</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2022-05-31 22:46:58" itemprop="dateModified" datetime="2022-05-31T22:46:58+08:00">2022-05-31</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E6%B8%97%E9%80%8F/" itemprop="url" rel="index"><span itemprop="name">渗透</span></a>
+                </span>
+            </span>
+
+          
+            <span id="/Windows%E5%85%8D%E6%9D%80%E5%85%A5%E9%97%A8.html" class="post-meta-item leancloud_visitors" data-flag-title="windows免杀入门" title="阅读次数">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span class="leancloud-visitors-count"></span>
+            </span>
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="far fa-comment"></i>
+      </span>
+      <span class="post-meta-item-text">Valine：</span>
+    
+    <a title="valine" href="/Windows%E5%85%8D%E6%9D%80%E5%85%A5%E9%97%A8.html#valine-comments" itemprop="discussionUrl">
+      <span class="post-comments-count valine-comment-count" data-xid="/Windows%E5%85%8D%E6%9D%80%E5%85%A5%E9%97%A8.html" itemprop="commentCount"></span>
+    </a>
+  </span>
+  
+  
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h1 id="windows免杀入门"><a href="#windows免杀入门" class="headerlink" title="windows免杀入门"></a>windows免杀入门</h1><p>护网的时候遇到了一台火绒+windows defender+360拉满的机器，那个时候凭借我们的垃圾技术，完全打不进去，最后是学弟不知道加了多少buff用奇怪的套壳软件给套过去了，现在尝试着进行基础学习。</p>
+<p>周末尝试和katzebin去看defcon qual，比去年还坐牢。。。</p>
+<p>去年唯一一个web是一个解混淆的题，我还后续好歹学了下AST长点知识，今年这个题真有点莫名其妙，感觉吧，和web关系要大不大要小不小，完全看不懂。自闭了</p>
+<p>然后还是继续学点windows吧。。。</p>
+<h2 id="前置知识"><a href="#前置知识" class="headerlink" title="前置知识"></a>前置知识</h2><p>在开始之前，需要配备一些前置知识。</p>
+<h3 id="shellcode"><a href="#shellcode" class="headerlink" title="shellcode"></a>shellcode</h3><p>就个人意见而言，shellcode就是一段能够执行目标命令的机器码，属于非常底层的payload类型，需要直接导入到内存的可执行区域并将指令寄存器指向shellcode的开头，pwn打的多应该挺好理解的，web垃圾还真就学了一下什么情况。。。。比如栈溢出时经典的系统调用反弹shell，对于更为现代的攻击者，使用msf或是CS进行攻击时，也可以通过生成raw的payload产生shellcode。</p>
+<p>shellcode的运行方案也就如上文所言，加载进可执行的内存，并让指令寄存器指向shellcode开始处开始运行即可。以C为例，直接将shellcode用char数组声明一个变量，通过系统调用修改变量所在的地址为可执行，然后使用shellcode的地址作为函数指针直接一波调用过去即可。<br><a target="_blank" rel="external nofollow noopener noreferrer" href="http://blog.leanote.com/post/snowming/e1a1266471dc">从一段代码理解函数指针</a><br><a target="_blank" rel="external nofollow noopener noreferrer" href="https://blog.csdn.net/Kwansy/article/details/79328003">函数指针和shellcode</a><br><a target="_blank" rel="external nofollow noopener noreferrer" href="https://luckyfuture.top/BypassAVLearning.html">从0开始写ShellCode加载器0x1-Windows内存操作api</a></p>
+<h3 id="Windows-API"><a href="#Windows-API" class="headerlink" title="Windows API"></a>Windows API</h3><p>shellcode加载器常用的Windows API，当后面GO免杀模块的参考好了</p>
+<p>这篇虽然是说进程注入的，但是对windows API和undocumented API还有系统调用说的很清楚。<br><a target="_blank" rel="external nofollow noopener noreferrer" href="https://aliongreen.github.io/posts/remote-thread-injection.html">Process Injection: Remote Thread Injection or CreateRemoteThread</a></p>
+<p>也就是大概权限分了三个层次，kernel32.dll，标准windows API，实现是对ntdll.dll中的native API（也叫做undocumented API）进行了一层包装。而直接使用system call的话则是直接和系统内核ntoskrnl.exe进行交互<br>windows在32位中使用sysenter进入内核，而64位则是syscall</p>
+<p>native API由于实现比较原始，windows在外面套了一层标准API，这样子就使得windows可以修改native API但标准API不变，这也导致native API在不同的版本上用起来会出问题，以及native API大多以Nt或者Zw开头</p>
+<h4 id="VirtualAlloc"><a href="#VirtualAlloc" class="headerlink" title="VirtualAlloc"></a>VirtualAlloc</h4><p>位于Kernel32.dll<br>经典内存申请函数</p>
+<pre class=" language-C++"><code class="language-C++">LPVOID VirtualAlloc(
+  [in, optional] LPVOID lpAddress,
+  [in]           SIZE_T dwSize,
+  [in]           DWORD  flAllocationType,
+  [in]           DWORD  flProtect
+);
+</code></pre>
+<p>第一个参数指定在哪分配内存，是一个指针，设置为NULL就由系统决定，所以设置为NULL就行了，go里面的话由于使用系统调用传的参数都是uintptr，这个东西理论上就是一个无符号数，但里面装的东西一般被当做地址处理，填个0就代表NULL了<br>第二个也很简单，需要申请的内存大小，理论上应该go传参应该是uintptr，但这玩意既能当地址也能当unsigned int，所以直接塞个数字也行，似乎能隐式转换。并且文档上还写了很抽象的东西，说如果lpAddress是NULL的话会round to（四舍五入？）到下一页的边界。意思就是分配的内存大小不能跨页咯？<br>第三个参数为申请内存的类型，有几个定义的常量，一般使用MEM_COMMIT|MEM_RESERVE两个选项，RESERVE申请一块虚拟内存内存区，COMMIT将虚拟内存映射到物理内存，同样是直接传数字就行<br>第三个参数为内存的读写执行权限，选项很多，直接PAGE_EXECUTE_READWRITE读写执行拉满或者读写均可，也是数字，可以在<code>golang.org/x/sys/windows</code>这个包下面拿到（说起来这个应该是比较新的用来调用系统API的包，syscall理论上已经被弃用了，简单翻了一下好像实现了一些常用的接口？但某些不常见的API可能还是得用syscall去dll里翻）</p>
+<p>有一个ex版VirtualAllocEx，再最前面加了一个参数</p>
+<pre class=" language-C++"><code class="language-C++">LPVOID VirtualAllocEx(
+  [in]           HANDLE hProcess,
+  [in, optional] LPVOID lpAddress,
+  [in]           SIZE_T dwSize,
+  [in]           DWORD  flAllocationType,
+  [in]           DWORD  flProtect
+);
+</code></pre>
+<p>功能是在某个进程内申请一篇空间，所以第一个参数也就是对应进程的handler</p>
+<h4 id="HeapAlloc"><a href="#HeapAlloc" class="headerlink" title="HeapAlloc"></a>HeapAlloc</h4><p>位于Kernel32.dll<br>另一个经典内存分配函数</p>
+<pre class=" language-C++"><code class="language-C++">DECLSPEC_ALLOCATOR LPVOID HeapAlloc(
+  [in] HANDLE hHeap,
+  [in] DWORD  dwFlags,
+  [in] SIZE_T dwBytes
+);
+</code></pre>
+<p>第一个参数为HeapCreate或GetProcessHeap返回的handler，第二个参数用来初始化堆，置零之类的，第三个参数长度</p>
+<p>HeapCreate懒得写了。。。自己翻msdn</p>
+<h4 id="ZwAllocateVirtualMemory"><a href="#ZwAllocateVirtualMemory" class="headerlink" title="ZwAllocateVirtualMemory"></a>ZwAllocateVirtualMemory</h4><p>位于NtosKrnl.exe，这不在dll里面啊？不懂ing<br>但是看现成的代码中的使用方案是从ntdll里面可以找到这个函数，属于undocumented API</p>
+<pre class=" language-C++"><code class="language-C++">NTSYSAPI NTSTATUS ZwAllocateVirtualMemory(
+  [in]      HANDLE    ProcessHandle,
+  [in, out] PVOID     *BaseAddress,
+  [in]      ULONG_PTR ZeroBits,
+  [in, out] PSIZE_T   RegionSize,
+  [in]      ULONG     AllocationType,
+  [in]      ULONG     Protect
+);
+</code></pre>
+<p>第一个参数文档上写得是个process的handler，但实际上我看直接用CreateHeap返回的handler也行<br>第二个起始地址，NULL由系统决定<br>第三个参数看不懂，得小于21，填0就是了<br>第四个参数为申请的大小<br>第五个参数是申请的类型，经典COMMIT<br>第六个参数经典读写执行</p>
+<h4 id="VirtualProtect"><a href="#VirtualProtect" class="headerlink" title="VirtualProtect"></a>VirtualProtect</h4><p>位于Kernel32.dll<br>改内存权限的，看名字也能猜出来</p>
+<pre class=" language-C++"><code class="language-C++">BOOL VirtualProtect(
+  [in]  LPVOID lpAddress,
+  [in]  SIZE_T dwSize,
+  [in]  DWORD  flNewProtect,
+  [out] PDWORD lpflOldProtect
+);
+</code></pre>
+<p>前两个参数与VirtualAlloc一致，第三个参数和VirtualAlloc第四个参数一致，使用方法多为先alloc一个读写内存，shellcode写完再改成可执行，第四个参数锤子用没有，前面写了个out意为输出，是一个用来接收原来被改的这个内存权限的变量，必须传一个有效值，是NULL函数就自爆</p>
+<p>同有一个EX版本，与VirtualAllocEx一致</p>
+<h4 id="RtlCopyMemory"><a href="#RtlCopyMemory" class="headerlink" title="RtlCopyMemory"></a>RtlCopyMemory</h4><p>位于ntdll.dll<br>还有一个长得差不多的函数RtlMoveMemory，签名几乎都一样</p>
+<pre class=" language-C++"><code class="language-C++">VOID RtlMoveMemory(
+  _Out_       VOID UNALIGNED *Destination,
+  _In_  const VOID UNALIGNED *Source,
+  _In_        SIZE_T         Length
+);
+</code></pre>
+<p>这个签名也能很简单的猜出了怎么用。两个指针一个源一个目的地，一个长度，不过一个是移动一个是复制，移动的话估计移过去本来的地方就没了吧</p>
+<h4 id="OpenProcess"><a href="#OpenProcess" class="headerlink" title="OpenProcess"></a>OpenProcess</h4><p>位于Kernel32.dll<br>获取进程对应的handler的函数，用于进程注入<br>CreateProcess则是直接创建新进程</p>
+<pre class=" language-C++"><code class="language-C++">HANDLE OpenProcess(
+  [in] DWORD dwDesiredAccess,
+  [in] BOOL  bInheritHandle,
+  [in] DWORD dwProcessId
+);
+</code></pre>
+<p>第一个参数是需要的权限，buff有一堆，一般来说是<br>PROCESS_CREATE_THREAD|PROCESS_VM_OPERATION|PROCESS_VM_WRITE|PROCESS_VM_READ|PROCESS_QUERY_INFORMATION<br>第二个参数没仔细看，反正bool填0就是了<br>第三个参数为pid</p>
+<h4 id="WriteProcessMemory"><a href="#WriteProcessMemory" class="headerlink" title="WriteProcessMemory"></a>WriteProcessMemory</h4><p>位于Kernel32.dll<br>用于跨进程写内存空间，进程注入或者创建新进程都用这个</p>
+<pre class=" language-C++"><code class="language-C++">BOOL WriteProcessMemory(
+  [in]  HANDLE  hProcess,
+  [in]  LPVOID  lpBaseAddress,
+  [in]  LPCVOID lpBuffer,
+  [in]  SIZE_T  nSize,
+  [out] SIZE_T  *lpNumberOfBytesWritten
+);
+</code></pre>
+<p>第一个参数process handler，第二个写入的地址，不能置为NULL，使用VirtualAllocEx返回的地址即可，第三个源数据地址，第四个参数，第五个是输出写了多少字节</p>
+<h3 id="windows版本号与对应系统版本"><a href="#windows版本号与对应系统版本" class="headerlink" title="windows版本号与对应系统版本"></a>windows版本号与对应系统版本</h3><p>似乎会存在某些API在某个版本之后才出现之类的情况，对于XP 2003等老系统而言尤为突出，而windows并不是后面的数字完全对应版本号的，需要略微进行了解</p>
+<blockquote>
+<ul>
+<li>Windows NT 3.1、3.5、3.51</li>
+<li>Windows NT 4.0</li>
+<li>Windows 2000（NT 5.0）</li>
+<li>Windows XP（NT 5.1）</li>
+<li>Windows Server 2003（NT 5.2）</li>
+<li>Windows Vista（NT 6.0）</li>
+<li>Windows Server 2008（NT 6.0）</li>
+<li>Windows 7（NT 6.1）</li>
+<li>Windows Server 2008 R2（NT 6.1）</li>
+<li>Windows Home Server</li>
+<li>Windows 8（6.2）</li>
+<li>Windows Server 2012（NT 6.2）</li>
+<li>Windows 8.1（NT 6.3）</li>
+<li>Windows Server 2012 R2（NT 6.3）</li>
+<li>Windows 10（NT 6.4，现NT 10.0）</li>
+<li>Windows Server 2016（NT 10.0）</li>
+<li>Windows Server 2019（NT 10.0）</li>
+<li>Windows Server 2022（NT 10.0）</li>
+<li>Windows 11（NT 10.0）</li>
+</ul>
+</blockquote>
+<p>理论上来说NT号即为版本<br><a target="_blank" rel="external nofollow noopener noreferrer" href="https://zh.wikipedia.org/zh-sg/Microsoft_Windows%E7%9A%84%E5%8E%86%E5%8F%B2">Microsoft Windows的历史</a></p>
+<h3 id="WOW64"><a href="#WOW64" class="headerlink" title="WOW64"></a>WOW64</h3><p>全称原来是Windows 32-bit on Windows 64-bit。。。虽然我知道这个玩意是用于在64位windows上跑32位的程序的</p>
+<h3 id="APC"><a href="#APC" class="headerlink" title="APC"></a>APC</h3><p>Asynchronous Procedure Call，不知道中文是什么，直接翻译成异步过程调用好了。</p>
+<blockquote>
+<p>Asynchronous Procedure Call or APC is a function to run code in the context of another thread. every thread has it’s own queue of APCs. if the thread enters an alertable state it starts to do APC jobs in the form of first in first out (FIFO). A thread can enters an alertable state by using SleepEx, SignalObjectAndWait, MsgWaitForMultipleObjectsEx, WaitForMultipleObjectsEx, or WaitForSingleObjectEx functions.</p>
+</blockquote>
+<p>APC是一个在windows在单一线程上下文中实现任务队列的技术，一般被用来实现异步操作的回调。说起来js也是event loop+任务队列实现的单线程异步回调吧？</p>
+<p>在攻击里则作为一种经典的进程注入手段<br>APC API均为undocumented API，所以在不同版本的操作系统上可能会出现些许问题（大概）<br>每个线程均拥有两个APC队列，一个用户态队列和一个内核态队列。攻击通过User APC进行。（显然你不能操作内核）</p>
+<p>触发User APC有三种方式，等待进程进入alertable state，NtTestAlert主动清空APC队列，和win10 RS5版本后的Special User APC</p>
+<h4 id="QueueUserAPC"><a href="#QueueUserAPC" class="headerlink" title="QueueUserAPC"></a>QueueUserAPC</h4><p>基础方案，就给目标线程指派一个APC，然后他什么时候进alertable state触发看命。svchost据说会经常处于该状态</p>
+<blockquote>
+<p>When a user-mode APC is queued, the thread to which it is queued is not directed to call the APC function unless it is in an alertable state. A thread enters an alertable state when it calls the SleepEx, SignalObjectAndWait, MsgWaitForMultipleObjectsEx, WaitForMultipleObjectsEx, or WaitForSingleObjectEx function</p>
+</blockquote>
+<h4 id="NtTestAlert"><a href="#NtTestAlert" class="headerlink" title="NtTestAlert"></a>NtTestAlert</h4><p>这个函数运行<code>before the lifetime of a thread</code>，该函数会检查当前线程的APC队列，并当队列中存在任务时，调用<code>KiUserApcDispatcher</code>完成队列中的任务<br>通过CreateProcess一个挂起的进程，再用QueueUserAPC加入任务，在Resume启动线程时，在线程启动前触发</p>
+<h4 id="Special-User-APC"><a href="#Special-User-APC" class="headerlink" title="Special User APC"></a>Special User APC</h4><p>通过在win10 RS5发布的NtQueueApcThreadEx系统调用中强制执行APC。新科技对渗透没有用的嗼。渗透打的都是一万年前的垃圾机器，XP时有出现</p>
+<h2 id="免杀方案"><a href="#免杀方案" class="headerlink" title="免杀方案"></a>免杀方案</h2><h3 id="编码器"><a href="#编码器" class="headerlink" title="编码器"></a>编码器</h3><p>就是在shellcode生成的时候加混淆，给shellcode加点密，整点花指令假判断什么的，传说中的经典UPX壳应该也是类似的操作？（不过好像套UPX壳的任何软件都直接被当做马杀了）比较出名的应该是msf的Shikata Ga Nai编码器。（效果似乎非常一般，落地就给defender杀了。。。）<br><a target="_blank" rel="external nofollow noopener noreferrer" href="https://www.mandiant.com/resources/shikata-ga-nai-encoder-still-going-strong">Shikata Ga Nai Encoder Still Going Strong</a><br>19年的still strong，在22年看来还是有点过时了。</p>
+<p>在msf console中<code>show encoders</code>查看所有可用编码器，使用-i选项指定encoder套娃次数，也许多套几层就不会被杀了？</p>
+<h3 id="汇编免杀"><a href="#汇编免杀" class="headerlink" title="汇编免杀"></a>汇编免杀</h3><p>虽说我不怎么清楚杀软的工作原理，但据说有一种方案是对用户态危险API进行hook，比如VirtualAlloc，VirtualProtect这些内存申请修改操作。既然如此，使用通过写汇编的方式直接进行系统调用，而不是使用windows提供的API，也许就能绕过杀软。</p>
+<p>至于怎么通过汇编调用系统调用，已经有了成熟的解决方案<a target="_blank" rel="external nofollow noopener noreferrer" href="https://github.com/jthuraisamy/SysWhispers2">SysWhispers2</a></p>
+<p>以该项目为例，<a target="_blank" rel="external nofollow noopener noreferrer" href="https://github.com/mai1zhi2/ShellCodeFramework">ShellCodeFramework</a><br>使用汇编进行系统调用，加载shellcode。这个是作者的介绍文章<br><a target="_blank" rel="external nofollow noopener noreferrer" href="https://www.52pojie.cn/thread-1360548-1-1.html">shellcode免杀框架内附SysWhispers2_x86直接系统调用</a><br>不过实际上前面那段自己实现shellcode的部分不适合我。。。还是直接套CS和msf比较好。</p>
+<p>该项目的Syscalls.h&#x2F;c&#x2F;asm来应该是源自于SysWhispers的，然而SysWhispers生成的payload仅支持在64位windows机器上运行（但是shellcode这个项目编译感觉又得选x86进行编译。。。），也有可能是因为这个项目shellcode加载部分的代码是只适配x86的，但是我C++水平有限，没法写出稍微复杂一点的shellcode加载器。。。。</p>
+<p>实际上这里使用的Syscalls.h&#x2F;c&#x2F;asm应该是作者自己魔改的支持32位的SysWhispers<br><a target="_blank" rel="external nofollow noopener noreferrer" href="https://github.com/mai1zhi2/SysWhispers2_x86">SysWhispers2_x86</a></p>
+<p>该项目的整体思路并不复杂，用aes对shellcode进行了一轮加密，将shellcode放在一个特定的数据段(.edata)中，使用时将shellcode解密，系统调用该内存段变成可执行，将指令寄存器指向shellcode地址完成（C++手写AES麻烦的要死，作者也是抄的现成代码）。该项目使用aes加密防止了对明文shellcode的检测（现在msf，cs这类生成的明文shellcode是个杀软就能查出来，没编译就一串16进制数都能给你抓了。。。），而对于修改shellcode内存为可执行这一步关键操作，则使用SysWhispers产生的汇编进行系统调用，绕过杀软。</p>
+<h4 id="坑"><a href="#坑" class="headerlink" title="坑"></a>坑</h4><p>然而这个项目踩了不少坑。。。<br>首先项目采用Release+x86进行编译，项目两个loader都编译成32位可执行文件的，理论上sysenter用于在x86机器上运行，wow64在x64机器上运行。不编译成64位的主要原因在于shellcode加载器中有一些数据结构似乎x86 x64不兼容，而我也不会改。。。</p>
+<h5 id="静态链接"><a href="#静态链接" class="headerlink" title="静态链接"></a>静态链接</h5><p>首先一个是缺dll，动态链接生成的木马在目标没有安装C++开发环境的情况下缺一堆dll，解决方案也很简单，搜一下怎么静态链接，在<code>属性-&gt;C/C++-&gt;代码生成</code>处，把运行库改成<code>多线程(/MT)</code>即可</p>
+<h5 id="系统兼容性"><a href="#系统兼容性" class="headerlink" title="系统兼容性"></a>系统兼容性</h5><p>直接就着项目编译出来的马只能在win10上运行，win7和win2008均直接退出，估计原因是作者的syswhispers是自己魔改过的支持x86的，存在迷之bug，重新下了个syswhispers2重新生成了一套payload就跑起来了</p>
+<h5 id="WinXP适配"><a href="#WinXP适配" class="headerlink" title="WinXP适配"></a>WinXP适配</h5><p>虽然Syswhispers是支持XP的，但是直接编译出来的程序放到XP上跑直接显示<code>not a valid win32 application</code>，简单搜一下是windows不同系统使用的sdk有差距，远古XP系列以及被弃用了，所以还得用VS装一个XP工具集，使用visual studio install装一个即可。<br>然而装了也不一定编译的起来，期间我遇到了各种各样的问题，改了一堆配置但是想不起来几个了<br><a target="_blank" rel="external nofollow noopener noreferrer" href="https://stackoverflow.com/questions/58417992/how-to-compile-code-for-windows-xp-in-visual-studio-2017">How to compile code for Windows XP in Visual Studio 2017</a></p>
+<p>然后就在XP上跑起来了，然而放到win2003上还是跑不起来，理论上2003应该是xp的服务器版本啊？（维基百科说的）报错为<a target="_blank" rel="external nofollow noopener noreferrer" href="https://superuser.com/questions/164671/the-procedure-entry-point-decodepointer-could-not-be-located-in-the-dynamic-link">The procedure entry point DecodePointer could not be located in the dynamic link library KERNEL32.dll</a>，非常抽象，但是kernel32.dll是一个非常核心的dll。可能是因为我这个2003虚拟机是32位的？而原生SysWhispers不支持32位？但是xp也是32位的啊。。。。而被魔改的SysWhispers_x86又不支持XP工具集，导致在32位的XP系列系统上无法成功利用</p>
+<p>但总而言之我算是基本会用了。。。虽然对手写windows API调用还是没什么认知</p>
+<h4 id="结论"><a href="#结论" class="headerlink" title="结论"></a>结论</h4><p>windows7,10,2008三个64位虚拟机均能上线<br>32位XP能上线<br>32位2003不行，原因未知</p>
+<p>免杀效果，win10物理机windows defender落地击杀，win10虚拟机报警但未阻止，低版本windows乱杀。学弟给我发了个他写的rust的马，他说本地火绒defender都过了，VT只有五个引擎查出来，然后我这边下载下来落地击杀。。。defender真无敌啊。。。<br>VT的话能有十多个引擎查出来，能用就行啦</p>
+<h3 id="go免杀"><a href="#go免杀" class="headerlink" title="go免杀"></a>go免杀</h3><p>新型语言类免杀，代表作品为go和rust。主要原因可能是新型语言编译出来的东西和传统C差距过大，并且这类语言由于不像C可以依赖机器自带的一套libc一类的东西，需要打包自己实现的一系列底层操作，导致整体分析复杂的一比。简单的说就是和杀软比速度，现在杀软的分析对于新型语言并不成熟从而进行绕过。作为编译型语言也不需要目标机器存在解释器，理论上来说是没有太多依赖需求的。然后就会使得我不太能理解这些东西怎么跑起来的，可能真的自己实现了一套底层然后编译时超级静态链接打包吧。。。</p>
+<p>但是想使用go写马，就有一种非常奇怪的感觉，用一个感觉比较高等级的语言，在这里指来指去。。。感觉都封装的很好，不需要考虑什么情况的复杂结果，我反而需要去看他内部怎么实现，传值传引用，然后进行各种底层的一逼的内存操作。。。折磨王</p>
+<p>学习思路参考项目<a target="_blank" rel="external nofollow noopener noreferrer" href="https://github.com/safe6Sec/GolangBypassAV">GolangBypassAV</a><br>然而在这之前，需要一些奇怪的前置知识和go语言基础。</p>
+<h4 id="语言基础"><a href="#语言基础" class="headerlink" title="语言基础"></a>语言基础</h4><h5 id="unsafe-Pointer与uintptr"><a href="#unsafe-Pointer与uintptr" class="headerlink" title="unsafe.Pointer与uintptr"></a>unsafe.Pointer与uintptr</h5><p>用C写马时需要获取shellcode地址分配内存改可执行内存拷贝等各种操作，直接使用指针似乎比较易于理解，而在go里面shellcode的加载是一致的，然而你仍然需要进行各种复杂的内存操作。go中使用unsafe.Pointer和uintptr进行指针类型的地址操作</p>
+<p>go的话比较玄幻，不允许地址被直接转换为指针，而是要套一层unsafe.Pointer，这个玩意就像一个中转，或者说一个void指针，想从一个指针转移到另一个指针就需要使用这个东西</p>
+<p>uintptr，这个玩意一般会配合unsafe.Pointer使用，但是这个东西又不是一个指针，而是一个可以用来记载地址的无符号数（说起来指针实际上不也就是一个记载地址的无符号数），反正go在指针这里套了一堆，如果想对地址进行加减操作，就需要将unsafe.Pointer转换成uintptr<br>文档上写的也很抽象</p>
+<blockquote>
+<p>uintptr is an integer type that is large enough to hold the bit pattern of any pointer.</p>
+</blockquote>
+<p>所以说实际上是个数字</p>
+<p>光说是没有用的捏，实际用起来就知道有多抽象了<br><a target="_blank" rel="external nofollow noopener noreferrer" href="https://www.cnblogs.com/echojson/p/10743530.html">Go之unsafe.Pointer &amp;&amp; uintptr 类型</a></p>
+<h5 id="Array与Slice"><a href="#Array与Slice" class="headerlink" title="Array与Slice"></a>Array与Slice</h5><p>现代语言一般来说都实现了可变数组，就C++也有经典vector之类的东西，go也不例外。go中的array就是经典的不可变数组，而slice则是可变数组，在声明上类似</p>
+<pre class=" language-go"><code class="language-go"><span class="token comment" spellcheck="true">// Array</span>
+a <span class="token operator">:=</span> <span class="token punctuation">[</span><span class="token number">4</span><span class="token punctuation">]</span><span class="token builtin">int</span><span class="token punctuation">{</span><span class="token number">1</span><span class="token punctuation">,</span><span class="token number">2</span><span class="token punctuation">,</span><span class="token number">3</span><span class="token punctuation">,</span><span class="token number">4</span><span class="token punctuation">}</span>
+<span class="token comment" spellcheck="true">// Slice</span>
+b <span class="token operator">:=</span> <span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token builtin">int</span><span class="token punctuation">{</span><span class="token number">1</span><span class="token punctuation">,</span><span class="token number">2</span><span class="token punctuation">,</span><span class="token number">3</span><span class="token punctuation">,</span><span class="token number">4</span><span class="token punctuation">}</span>
+</code></pre>
+<p>这就是非常抽象的一点，先不说这个类型放后面的反人类操作，C中隐式声明定长数组的操作在这里就变成声明了一个变长数组了。一度令我感到困惑<br><strong>go中，只有括号里带数字的是定长数组，其余皆为切片</strong></p>
+<p>除此之外，套用C的思路，一般来说数组作为参数传入的直接是数组头指针，也就是传引用，而在go中array和slice均为传值，即函数内修改值不会影响实际值？但实际上slice是由一个结构体实现的，内部还是一个数组，而结构体中的数组却又是由指针进行存储的。所以slice其实又传了引用，但没完全传。。。。</p>
+<p>slice内部大概就是这么个样子，乱写的，可能类型不太对。。。反正这里的arr是一个指向实际实现的数组的指针</p>
+<pre class=" language-go"><code class="language-go"><span class="token punctuation">{</span>
+    <span class="token keyword">var</span> arr <span class="token builtin">uintptr</span>
+    <span class="token keyword">var</span> <span class="token builtin">len</span> <span class="token builtin">int</span>
+    <span class="token keyword">var</span> <span class="token builtin">cap</span> <span class="token builtin">int</span>
+<span class="token punctuation">}</span>
+</code></pre>
+<p><a target="_blank" rel="external nofollow noopener noreferrer" href="https://segmentfault.com/q/1010000000122913">关于Go语言中数组的参数传递问题</a><br><a target="_blank" rel="external nofollow noopener noreferrer" href="https://zhuanlan.zhihu.com/p/54780689">【Go】深入剖析slice和array</a></p>
+<h5 id="GO-windows-API操作"><a href="#GO-windows-API操作" class="headerlink" title="GO windows API操作"></a>GO windows API操作</h5><p>使用syscall包进行（说起来这个包好像已经被弃用了）<br>想用windows API必然需要加载dll，可以使用如下三个函数进行加载，参数都是dll名字符串，很简单<br><code>syscall.NewLazyDLL syscall.LoadLibrary syscall.MustLoadDLL</code><br>区别不晓得，网上还搜不到太详细的资料，官方文档都没有？NewLazyDLL一看就知道是用时才加载，LoadLibrary能是即时加载吧，MustLoadDLL是加载出错会产生panic</p>
+<p>加载了DLL之后还需要从DLL中获取需要使用的系统调用，这里也有三个函数<br><code>MustFindProc NewProc syscall.GetProcAddress</code>，前两个函数作为dll的方法调用，需要的参数为需要使用的函数名字符串，不需要函数签名（dll里面没有函数重载吗？函数根据到时候调用时使用的参数进行重载？）<br>最后一个函数需要传入dll和函数名两个参数</p>
+<p><em>上述所有函数均有两个返回值，分别是结果和错误<br>下述所有系统调用要求入参全部都是uintptr类型，然后就会出现我之前提到的unsafe.Pointer+uintptr套娃问题，如果参数本身是数字的话uintptr本身就是数字，不用类型转换，返回值为三个，第一个是结果，第二个不知道，第三个是错误</em></p>
+<p>得到函数之后就可以发起系统调用了，调用使用<code>func.Call</code>即可。第一个参数是参数个数，然后接参数</p>
+<p>直接发起系统调用则需要使用<code>syscall.Syscall</code>，这个函数有一个系列<br><code>syscall.Syscall/6,9,12,15</code>，分别代表参数为3-5,6-8….个参数的系统调用，上限15个参数。函数的第一个参数是得到的函数的地址，第二个参数是输入的参数数量，然后就是参数<br><a target="_blank" rel="external nofollow noopener noreferrer" href="https://www.ascotbe.com/2021/09/04/GoUseWindowsApi/">Go使用WindowsApi笔记</a></p>
+<p>用得到的知识写一个破烂，最简单的直接把shellcode写在变量里，然后让变量所在的内存可执行直接调用</p>
+<pre class=" language-go"><code class="language-go"><span class="token keyword">package</span> main
+
+<span class="token keyword">import</span> <span class="token punctuation">(</span>
+    <span class="token string">"syscall"</span>
+    <span class="token string">"unsafe"</span>
+<span class="token punctuation">)</span>
+<span class="token keyword">const</span> <span class="token punctuation">(</span>
+    PAGE_EXECUTE_READWRITE <span class="token operator">=</span> <span class="token number">0x40</span>
+<span class="token punctuation">)</span>
+<span class="token keyword">var</span> procVirtualProtect <span class="token operator">=</span> syscall<span class="token punctuation">.</span><span class="token function">NewLazyDLL</span><span class="token punctuation">(</span><span class="token string">"kernel32.dll"</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">NewProc</span><span class="token punctuation">(</span><span class="token string">"VirtualProtect"</span><span class="token punctuation">)</span>
+<span class="token keyword">func</span> <span class="token function">VirtualProtect1</span><span class="token punctuation">(</span>lpAddress <span class="token builtin">uintptr</span><span class="token punctuation">,</span> dwSize <span class="token builtin">uintptr</span><span class="token punctuation">,</span> flNewProtect <span class="token builtin">uintptr</span><span class="token punctuation">,</span> lpflOldProtect <span class="token builtin">uintptr</span><span class="token punctuation">)</span> <span class="token builtin">bool</span> <span class="token punctuation">{</span>
+    <span class="token comment" spellcheck="true">///ad</span>
+    ret<span class="token punctuation">,</span> <span class="token boolean">_</span><span class="token punctuation">,</span> <span class="token boolean">_</span> <span class="token operator">:=</span> procVirtualProtect<span class="token punctuation">.</span><span class="token function">Call</span><span class="token punctuation">(</span>
+        lpAddress<span class="token punctuation">,</span>
+        dwSize<span class="token punctuation">,</span>
+        flNewProtect<span class="token punctuation">,</span>
+        lpflOldProtect<span class="token punctuation">)</span>
+    <span class="token keyword">return</span> ret <span class="token operator">></span> <span class="token number">0</span>
+<span class="token punctuation">}</span>
+
+<span class="token keyword">func</span> <span class="token function">run</span><span class="token punctuation">(</span>shellcode <span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token builtin">byte</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token keyword">var</span> old <span class="token builtin">uint32</span>
+    <span class="token function">VirtualProtect1</span><span class="token punctuation">(</span><span class="token operator">*</span><span class="token punctuation">(</span><span class="token operator">*</span><span class="token builtin">uintptr</span><span class="token punctuation">)</span><span class="token punctuation">(</span>unsafe<span class="token punctuation">.</span><span class="token function">Pointer</span><span class="token punctuation">(</span><span class="token operator">&amp;</span>shellcode<span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">,</span> <span class="token function">uintptr</span><span class="token punctuation">(</span><span class="token function">len</span><span class="token punctuation">(</span>shellcode<span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">,</span> PAGE_EXECUTE_READWRITE<span class="token punctuation">,</span> <span class="token function">uintptr</span><span class="token punctuation">(</span>unsafe<span class="token punctuation">.</span><span class="token function">Pointer</span><span class="token punctuation">(</span><span class="token operator">&amp;</span>old<span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
+    addr <span class="token operator">:=</span> <span class="token operator">*</span><span class="token punctuation">(</span><span class="token operator">*</span><span class="token builtin">uintptr</span><span class="token punctuation">)</span><span class="token punctuation">(</span>unsafe<span class="token punctuation">.</span><span class="token function">Pointer</span><span class="token punctuation">(</span><span class="token operator">&amp;</span>shellcode<span class="token punctuation">)</span><span class="token punctuation">)</span>
+    <span class="token boolean">_</span><span class="token punctuation">,</span> <span class="token boolean">_</span><span class="token punctuation">,</span> <span class="token boolean">_</span> <span class="token operator">=</span> syscall<span class="token punctuation">.</span><span class="token function">Syscall</span><span class="token punctuation">(</span>addr<span class="token punctuation">,</span> <span class="token number">0</span><span class="token punctuation">,</span> <span class="token number">0</span><span class="token punctuation">,</span> <span class="token number">0</span><span class="token punctuation">,</span> <span class="token number">0</span><span class="token punctuation">)</span>
+<span class="token punctuation">}</span>
+
+<span class="token keyword">func</span> <span class="token function">main</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    b <span class="token operator">:=</span> <span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token builtin">byte</span><span class="token punctuation">{</span>shellcode<span class="token punctuation">}</span>
+    <span class="token function">run</span><span class="token punctuation">(</span>b<span class="token punctuation">)</span>
+<span class="token punctuation">}</span>
+</code></pre>
+<p>整体下来只有一个操作比较难以理解，就是这个<code>*(*uintptr)(unsafe.Pointer(&amp;shellcode)</code><br>考虑一下，这里的shellcode是一个切片，切片是传值的，因此对shellcode取址得到的是一个指向slice结构体的指针，而这里将这个指针通过unsafe.Pointer转换为了一个uintptr的指针，即，将指向slice结构体的指针变成了一个指向uintptr的指针，而slice的开头刚好是一个指向内部数组的uintptr，对其解引用，得到了指向内部数组的uintptr<br>然后将该指针传入VirtualProtect中，修改内存为可执行，并使用系统调用将指令寄存器指向改地址执行shellcode</p>
+<p>后来看见了另一个写法。。。<code>uintptr(unsafe.Pointer(&amp;a[0]))</code>总觉得简单明了了不少。。。直接把数组头地址作为指针不是看起来好理解多了吗。。。之前那个操作还多套一层让我理解半天</p>
+<p>实现了一个最基础的go语言的直接的shellcode加载器。</p>
+<h4 id="Bypass方案"><a href="#Bypass方案" class="headerlink" title="Bypass方案"></a>Bypass方案</h4><p>不想动手捏。。。就着这个项目看吧<br>确实大部分都是对普通的利用方法的go重写？</p>
+<h5 id="CreateFiber"><a href="#CreateFiber" class="headerlink" title="CreateFiber"></a>CreateFiber</h5><p>使用纤程的概念注入shellcode。。。头一次听到这个概念<br><a target="_blank" rel="external nofollow noopener noreferrer" href="http://blog.leanote.com/post/snowming/fcdac52e3b5b">利用纤程进行 Shellcode 本地进程注入</a><br>就是把线程捏成更小的线程？这个线程是用户态实现的，所以线程切换不需要进内核，减少开销<br>用到这几个函数，均位于kernel32.dll</p>
+<pre class=" language-C++"><code class="language-C++">LPVOID ConvertThreadToFiber(
+  [in, optional] LPVOID lpParameter
+);
+
+LPVOID CreateFiber(
+  [in]           SIZE_T                dwStackSize,
+  [in]           LPFIBER_START_ROUTINE lpStartAddress,
+  [in, optional] LPVOID                lpParameter
+);
+
+void SwitchToFiber(
+  [in] LPVOID lpFiber
+);
+</code></pre>
+<p>第一个函数不用传参也能用<br>第二个函数需要传一个栈大小和一个开始的地址（显然开始地址就是shellcode地址）<br>第三个函数传入CreateFiber的指针</p>
+<h5 id="CreateProcess"><a href="#CreateProcess" class="headerlink" title="CreateProcess"></a>CreateProcess</h5><p>创建一个子进程注入shellcode，直接用的<code>golang.org/x/sys/windows</code>包下的CreateProcess函数，然后用VirtualAlloc和VirtualProtect的Ex版本跨进程申请内存和修改权限<br>使用<code>WriteProcessMemory</code>函数写入shellcode</p>
+<p>接下来的操作是读了好多次内存，不太熟悉看不懂。。。。可能是为了确认主进程的入口位置，然后再写一次内存改机器码直接jump到shellcode处</p>
+<h5 id="CreateProcessWithPipe"><a href="#CreateProcessWithPipe" class="headerlink" title="CreateProcessWithPipe"></a>CreateProcessWithPipe</h5><p>感觉就是多套了一层管道获取了stdout看输出。。。对我们这种直接CS上线的感觉没什么区别<br>不过可以看一下这个管道介绍的文章<br><a target="_blank" rel="external nofollow noopener noreferrer" href="https://cloud.tencent.com/developer/article/1625924">浅谈 windows 命名管道</a></p>
+<h5 id="CreateRemoteThread"><a href="#CreateRemoteThread" class="headerlink" title="CreateRemoteThread"></a>CreateRemoteThread</h5><p>进程注入操作，通过<code>OpenProcess</code>获取目标进程的handler，然后<code>VirtualAllocEx</code>和<code>WriteProcessMemory</code>等组合拳申请内存写入改成可执行，最后调用<code>CreateRemoteThreadEx</code>，以写入的shellcode地址作为RemoteThread的地址完成注入</p>
+<p>CreateRemoteThread就是创建一个给与地址作为入口点的线程，Remote可能体现在在给与的handler对应的进程中创建，这个函数也有一个Ex版，似乎只是增加了更多参数选项。<br>该方法可以配合LoadLibrary完成DLL注入，不过需要额外写shellcode调用<code>LoadLibraryA</code>这个函数<br>感觉直接写shellcode可能还来的快一点？常见的注入进程是经典svchost</p>
+<p><a target="_blank" rel="external nofollow noopener noreferrer" href="https://threathunterplaybook.com/notebooks/windows/05_defense_evasion/WIN-180719170510.html">DLL Injection via CreateRemoteThread and LoadLibrary</a><br>这里面也提到了两个undocumented的创建线程的函数NtCreateThreadEx，RtlCreateUserThread，之前有一次go写的马在老版本机器上跑不起来，报错是ntdll.dll找不到，windows大师和我说这个是核心dll肯定找得到，可能是因为我用了undocumented API</p>
+<p>也有一个CreateThread函数用于在当前进程内创建线程</p>
+<h5 id="CreateRemoteThreadNative"><a href="#CreateRemoteThreadNative" class="headerlink" title="CreateRemoteThreadNative"></a>CreateRemoteThreadNative</h5><p>和普通的没什么区别，就是把用go的windows包的OpenProcess换成了syscall从kernel32.dll里翻出来的OpenProcess<br>（说起来看了一下windows包的实现感觉也还是syscall）</p>
+<h5 id="CreateThread"><a href="#CreateThread" class="headerlink" title="CreateThread"></a>CreateThread</h5><p>创建本地线程</p>
+<h5 id="CreateThreadNative"><a href="#CreateThreadNative" class="headerlink" title="CreateThreadNative"></a>CreateThreadNative</h5><p>windows包换syscall</p>
+<h5 id="RtlCreateUserThread"><a href="#RtlCreateUserThread" class="headerlink" title="RtlCreateUserThread"></a>RtlCreateUserThread</h5><p>类似于<code>CreateRemoteThread</code>，进程注入操作，换了个API，与<code>EtwpCreateEtwThread</code>一样属于undocumented API<br><a target="_blank" rel="external nofollow noopener noreferrer" href="http://undocumented.ntinternals.net/index.html?page=UserMode/Undocumented%20Functions/Executable%20Images/RtlCreateUserThread.html">RtlCreateUserThread</a></p>
+<h5 id="dpapi"><a href="#dpapi" class="headerlink" title="dpapi"></a>dpapi</h5><p>用了windows的data protect api（dpapi），对shellcode进行加解密，但是没看懂捏？怎么只有加密没有解密？</p>
+<h5 id="EtwpCreateEtwThread"><a href="#EtwpCreateEtwThread" class="headerlink" title="EtwpCreateEtwThread"></a>EtwpCreateEtwThread</h5><p>整体操作与CreateThread区别不大，但是创建线程的方式使用了这个奇怪的函数，这是一个<code>undocumented API</code>，所以使用冷门API可能会导致绕过杀软，也可能导致在老版本系统上跑不起来</p>
+<blockquote>
+<p>The list that follows is of ETW functions implemented in NTDLL version 6.0, i.e., for Windows Vista</p>
+</blockquote>
+<p><a target="_blank" rel="external nofollow noopener noreferrer" href="https://www.geoffchappell.com/studies/windows/win32/ntdll/api/etw/index.htm">Event Tracing for Windows</a></p>
+<p>关于windows版本，确实有点难理清楚，可以看维基百科，XP和2003的版本号分别是5.1和5.2，就用不了这个API</p>
+<h5 id="HeapAlloc-1"><a href="#HeapAlloc-1" class="headerlink" title="HeapAlloc"></a>HeapAlloc</h5><p>创建一个堆来分配内存。（说起来VirtualAlloc分配的内存难道就不在堆上了吗。。。）<br>除了使用堆分配相关的函数外并无新意</p>
+<h5 id="Hgate"><a href="#Hgate" class="headerlink" title="Hgate"></a>Hgate</h5><p>地狱之门的强化版。均为防止杀软hook系统调用导致shellcode无法执行的方案。<br>与SysWhisper的思路类似，通过从ntdll中直接还原出系统调用号，直接发起系统调用绕过杀软hook。<br>windows装载进程进内存时，第一个模块是PE文件本身，第二个模块就是ntdll.dll，第三个是kernel32.dll。<br>然后windows有一个究极PEB结构，里面有双向链表可以把各个模块连起来，由此可以获取到ntdll的地址</p>
+<p>地狱之门的缺点在于设计的比较原始，ntdll的位置被杀软修改之后就跑不起来了，光环之门则通过从杀软没有hook的系统调用的位置加加减减获取全部系统调用的位置。。。但我的智力条件有限，看的不是很懂。。。<br>这篇文章拉满了<br><a target="_blank" rel="external nofollow noopener noreferrer" href="https://tttang.com/archive/1464/">syscall的前世今生</a></p>
+<h5 id="EarlyBird"><a href="#EarlyBird" class="headerlink" title="EarlyBird"></a>EarlyBird</h5><p>和<code>NtQueueApcThreadEx</code>为APC二连。APC是进程注入的一种捏，不过是新开进程注入的那种，CreateRemoteThread可以找一个已经存在的目标进程注入进去，所以和CreateProcess有点像。<br>不过CreateProcess需要该程序入口的汇编jump到shellcode上，对应不同的架构需要做很多额外的处理，而这里在创建进程分配内存写入数据修改为可执行后，直接使用了一个<code>QueueUserAPC</code>把shellcode地址作为APC任务的回调函数，resume的时候会优先清空APC队列，触发回调shellcode</p>
+<p>该方案是一种逃避动态监测的方案。因为NtTestAlert在线程开始之前触发，杀软可能在进程启动时对危险API进行hook，在线程开始前把shellcode跑完就不用担心被hook了</p>
+<h5 id="NtQueueApcThreadEx"><a href="#NtQueueApcThreadEx" class="headerlink" title="NtQueueApcThreadEx"></a>NtQueueApcThreadEx</h5><p>APC 进程注入，APC章节提到的新版本windows10实现的新系统调用，可主动触发APC，可能没有那么快被hook，但是只兼容新版本+使用不当可能死锁之类的程序崩溃。感觉不一定好用</p>
+<h5 id="UuidFromString"><a href="#UuidFromString" class="headerlink" title="UuidFromString"></a>UuidFromString</h5><p>应该是用的这个师傅的思路，其实感觉和AES等加密方式的区别并不是很大，只是换了一种shellcode存储的方式，可能能够通过调用奇怪的系统调用打乱杀软对调用顺序的检测？<br>然后在shellcode的触发上没有使用常见的直接调用，而是用了个EnumSystemLocalesA函数，将shellcode地址作为函数指针传入该函数的回调函数中进行触发<br>这里在开发的时候有一个小注意点，<code>u := append([]byte(uuid), 0)</code>，因为系统调用需要传一个指向uuid的指针进去，而C的字符串是以0截断的，所以这里将uuid转换为byte数组然后补一个0上去<br>文中也提到了用mac和ipv6地址等方案实现的想法<br><a target="_blank" rel="external nofollow noopener noreferrer" href="https://www.crisprx.top/archives/515">CS 内存加载器免杀及实现</a></p>
+<h2 id="参考链接"><a href="#参考链接" class="headerlink" title="参考链接"></a>参考链接</h2><p><a target="_blank" rel="external nofollow noopener noreferrer" href="https://github.com/luckyfuture0177/ReZeroBypassAV">ReZeroBypassAV</a><br><a target="_blank" rel="external nofollow noopener noreferrer" href="https://repnz.github.io/posts/apc/user-apc/#nttestalert">APC Series: User APC API</a><br><a target="_blank" rel="external nofollow noopener noreferrer" href="https://www.cyberbit.com/blog/endpoint-security/new-early-bird-code-injection-technique-discovered/">New Early Bird Code Injection Technique Discovered</a><br><a target="_blank" rel="external nofollow noopener noreferrer" href="https://0x00sec.org/t/process-injection-apc-injection/24608">Process Injection: APC Injection</a><br><a target="_blank" rel="external nofollow noopener noreferrer" href="https://vxug.fakedoma.in/papers/VXUG/Exclusive/HellsGate.pdf">HellsGate.pdf</a><br><a target="_blank" rel="external nofollow noopener noreferrer" href="https://rioasmara.com/2022/03/09/hellgate-technique-on-av-bypass/">HELLGATE TECHNIQUE ON AV BYPASS</a><br><a target="_blank" rel="external nofollow noopener noreferrer" href="https://3gstudent.github.io/%E6%B8%97%E9%80%8F%E5%9F%BA%E7%A1%80-Windows-Defender">渗透基础——Windows Defender</a></p>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/Windows/" rel="tag"># Windows</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/%E6%B8%97%E9%80%8F%E9%9D%B6%E5%9C%BA%E7%BB%83%E4%B9%A0.html" rel="prev" title="ATT&CK靶场(1)练习">
+      <i class="fa fa-chevron-left"></i> ATT&CK靶场(1)练习
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/ASLR%E4%B8%8EPIC%E4%B8%8EPIE.html" rel="next" title="ASLR与PIC与PIE">
+      ASLR与PIC与PIE <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+    <div class="comments" id="valine-comments"></div>
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#windows%E5%85%8D%E6%9D%80%E5%85%A5%E9%97%A8"><span class="nav-number">1.</span> <span class="nav-text">windows免杀入门</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%89%8D%E7%BD%AE%E7%9F%A5%E8%AF%86"><span class="nav-number">1.1.</span> <span class="nav-text">前置知识</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#shellcode"><span class="nav-number">1.1.1.</span> <span class="nav-text">shellcode</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Windows-API"><span class="nav-number">1.1.2.</span> <span class="nav-text">Windows API</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#VirtualAlloc"><span class="nav-number">1.1.2.1.</span> <span class="nav-text">VirtualAlloc</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#HeapAlloc"><span class="nav-number">1.1.2.2.</span> <span class="nav-text">HeapAlloc</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#ZwAllocateVirtualMemory"><span class="nav-number">1.1.2.3.</span> <span class="nav-text">ZwAllocateVirtualMemory</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#VirtualProtect"><span class="nav-number">1.1.2.4.</span> <span class="nav-text">VirtualProtect</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#RtlCopyMemory"><span class="nav-number">1.1.2.5.</span> <span class="nav-text">RtlCopyMemory</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#OpenProcess"><span class="nav-number">1.1.2.6.</span> <span class="nav-text">OpenProcess</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#WriteProcessMemory"><span class="nav-number">1.1.2.7.</span> <span class="nav-text">WriteProcessMemory</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#windows%E7%89%88%E6%9C%AC%E5%8F%B7%E4%B8%8E%E5%AF%B9%E5%BA%94%E7%B3%BB%E7%BB%9F%E7%89%88%E6%9C%AC"><span class="nav-number">1.1.3.</span> <span class="nav-text">windows版本号与对应系统版本</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#WOW64"><span class="nav-number">1.1.4.</span> <span class="nav-text">WOW64</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#APC"><span class="nav-number">1.1.5.</span> <span class="nav-text">APC</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#QueueUserAPC"><span class="nav-number">1.1.5.1.</span> <span class="nav-text">QueueUserAPC</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#NtTestAlert"><span class="nav-number">1.1.5.2.</span> <span class="nav-text">NtTestAlert</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Special-User-APC"><span class="nav-number">1.1.5.3.</span> <span class="nav-text">Special User APC</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%85%8D%E6%9D%80%E6%96%B9%E6%A1%88"><span class="nav-number">1.2.</span> <span class="nav-text">免杀方案</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%BC%96%E7%A0%81%E5%99%A8"><span class="nav-number">1.2.1.</span> <span class="nav-text">编码器</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%B1%87%E7%BC%96%E5%85%8D%E6%9D%80"><span class="nav-number">1.2.2.</span> <span class="nav-text">汇编免杀</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%9D%91"><span class="nav-number">1.2.2.1.</span> <span class="nav-text">坑</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#%E9%9D%99%E6%80%81%E9%93%BE%E6%8E%A5"><span class="nav-number">1.2.2.1.1.</span> <span class="nav-text">静态链接</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#%E7%B3%BB%E7%BB%9F%E5%85%BC%E5%AE%B9%E6%80%A7"><span class="nav-number">1.2.2.1.2.</span> <span class="nav-text">系统兼容性</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#WinXP%E9%80%82%E9%85%8D"><span class="nav-number">1.2.2.1.3.</span> <span class="nav-text">WinXP适配</span></a></li></ol></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E7%BB%93%E8%AE%BA"><span class="nav-number">1.2.2.2.</span> <span class="nav-text">结论</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#go%E5%85%8D%E6%9D%80"><span class="nav-number">1.2.3.</span> <span class="nav-text">go免杀</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E8%AF%AD%E8%A8%80%E5%9F%BA%E7%A1%80"><span class="nav-number">1.2.3.1.</span> <span class="nav-text">语言基础</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#unsafe-Pointer%E4%B8%8Euintptr"><span class="nav-number">1.2.3.1.1.</span> <span class="nav-text">unsafe.Pointer与uintptr</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#Array%E4%B8%8ESlice"><span class="nav-number">1.2.3.1.2.</span> <span class="nav-text">Array与Slice</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#GO-windows-API%E6%93%8D%E4%BD%9C"><span class="nav-number">1.2.3.1.3.</span> <span class="nav-text">GO windows API操作</span></a></li></ol></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Bypass%E6%96%B9%E6%A1%88"><span class="nav-number">1.2.3.2.</span> <span class="nav-text">Bypass方案</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#CreateFiber"><span class="nav-number">1.2.3.2.1.</span> <span class="nav-text">CreateFiber</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#CreateProcess"><span class="nav-number">1.2.3.2.2.</span> <span class="nav-text">CreateProcess</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#CreateProcessWithPipe"><span class="nav-number">1.2.3.2.3.</span> <span class="nav-text">CreateProcessWithPipe</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#CreateRemoteThread"><span class="nav-number">1.2.3.2.4.</span> <span class="nav-text">CreateRemoteThread</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#CreateRemoteThreadNative"><span class="nav-number">1.2.3.2.5.</span> <span class="nav-text">CreateRemoteThreadNative</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#CreateThread"><span class="nav-number">1.2.3.2.6.</span> <span class="nav-text">CreateThread</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#CreateThreadNative"><span class="nav-number">1.2.3.2.7.</span> <span class="nav-text">CreateThreadNative</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#RtlCreateUserThread"><span class="nav-number">1.2.3.2.8.</span> <span class="nav-text">RtlCreateUserThread</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#dpapi"><span class="nav-number">1.2.3.2.9.</span> <span class="nav-text">dpapi</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#EtwpCreateEtwThread"><span class="nav-number">1.2.3.2.10.</span> <span class="nav-text">EtwpCreateEtwThread</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#HeapAlloc-1"><span class="nav-number">1.2.3.2.11.</span> <span class="nav-text">HeapAlloc</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#Hgate"><span class="nav-number">1.2.3.2.12.</span> <span class="nav-text">Hgate</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#EarlyBird"><span class="nav-number">1.2.3.2.13.</span> <span class="nav-text">EarlyBird</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#NtQueueApcThreadEx"><span class="nav-number">1.2.3.2.14.</span> <span class="nav-text">NtQueueApcThreadEx</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#UuidFromString"><span class="nav-number">1.2.3.2.15.</span> <span class="nav-text">UuidFromString</span></a></li></ol></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%8F%82%E8%80%83%E9%93%BE%E6%8E%A5"><span class="nav-number">1.3.</span> <span class="nav-text">参考链接</span></a></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Z3ratu1" src="https://q2.qlogo.cn/headimg_dl?dst_uin=1207039417&spec=160">
+  <p class="site-author-name" itemprop="name">Z3ratu1</p>
+  <div class="site-description" itemprop="description">与其感慨路难行，不如现在出发</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">158</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">5</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">87</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+  <div class="beian"><a href="http://www.beian.miit.gov.cn/" rel="external nofollow noopener noreferrer" target="_blank">湘ICP备2020021580号 </a>
+      <img src="/./images/beian.png" style="display: inline-block;">
+  </div>
+
+<div class="copyright">
+  
+  &copy; 2019 – 
+  <span itemprop="copyrightYear">2022</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Z3ratu1</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="external nofollow noopener noreferrer" target="_blank">Hexo</a> & <a href="https://pisces.theme-next.org/" class="theme-link" rel="external nofollow noopener noreferrer" target="_blank">NexT.Pisces</a> 强力驱动
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+
+<script>
+NexT.utils.loadComments(document.querySelector('#valine-comments'), () => {
+  NexT.utils.getScript('https://cdn.jsdelivr.net/npm/valine@1.4.14/dist/Valine.min.js', () => {
+    var GUEST = ['nick', 'mail', 'link'];
+    var guest = 'nick,mail,link';
+    guest = guest.split(',').filter(item => {
+      return GUEST.includes(item);
+    });
+    new Valine({
+      el         : '#valine-comments',
+      verify     : false,
+      notify     : false,
+      appId      : '7H8kg0XdWO8IbhOcu4K1JaAT-gzGzoHsz',
+      appKey     : 'wPKQjkbVtvPaRR7gh2yjfLSi',
+      placeholder: "Just go go",
+      avatar     : 'mm',
+      meta       : guest,
+      pageSize   : '10' || 10,
+      visitor    : true,
+      lang       : '' || 'zh-cn',
+      path       : location.pathname,
+      recordIP   : false,
+      serverURLs : ''
+    });
+  }, window.Valine);
+});
+</script>
+
+</body>
+</html>
