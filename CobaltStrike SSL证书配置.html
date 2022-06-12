@@ -27,11 +27,13 @@
 <meta property="og:site_name" content="Z3ratu1&#39;s blog">
 <meta property="og:description" content="CobaltStrike SSL证书配置起因是我发现我的机器由于长期挂着CS的服务端，然后导致我被扫描器发现，并且把我的机器标记成威胁服务器了。。。。而为了隐藏CS服务端的信息，就需要从几个方面进行改造，其中之一就是经典的ssl证书配置，而其实CS主要需要配的证书有两个：cobaltstrike.store&amp;https-certificate 期间踩了一个很大的坑，关于在win7等较老机器">
 <meta property="og:locale">
+<meta property="og:image" content="https://blog.z3ratu1.cn/images/CobaltStrike_SSL%E8%AF%81%E4%B9%A6%E9%85%8D%E7%BD%AE/image-20220612170334704.png">
 <meta property="article:published_time" content="2022-06-12T09:26:03.000Z">
-<meta property="article:modified_time" content="2022-06-12T09:26:28.197Z">
+<meta property="article:modified_time" content="2022-06-12T09:45:05.213Z">
 <meta property="article:author" content="Z3ratu1">
 <meta property="article:tag" content="CobaltStrike">
 <meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://blog.z3ratu1.cn/images/CobaltStrike_SSL%E8%AF%81%E4%B9%A6%E9%85%8D%E7%BD%AE/image-20220612170334704.png">
 
 <link rel="canonical" href="https://blog.z3ratu1.cn/CobaltStrike%20SSL%E8%AF%81%E4%B9%A6%E9%85%8D%E7%BD%AE.html">
 
@@ -224,7 +226,7 @@
               <span class="post-meta-item-text">发表于</span>
               
 
-              <time title="创建时间：2022-06-12 17:26:03 / 修改时间：17:26:28" itemprop="dateCreated datePublished" datetime="2022-06-12T17:26:03+08:00">2022-06-12</time>
+              <time title="创建时间：2022-06-12 17:26:03 / 修改时间：17:45:05" itemprop="dateCreated datePublished" datetime="2022-06-12T17:26:03+08:00">2022-06-12</time>
             </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -304,10 +306,10 @@
 <p>对于低版本windows（这里试的是win7），web delivery各种打不通，真证书也不行，报错为<code>基础连接已经关闭: 发送时发生错误</code>，简单搜索都说是win7对tls版本的支持问题，网上搜了几个buff加上去，还是屁用没有。。。http下倒是可以，然而再把下下来的马回连listener的时候，https的listener又打不通。。。最后http的web delivery+http listener打通了。</p>
 <h2 id="win7使用https上线"><a href="#win7使用https上线" class="headerlink" title="win7使用https上线"></a>win7使用https上线</h2><p>直接生成一个beacon.exe跑一下，wireshark抓包，会发现win7尝试用tls1.2去连接CS服务器，然后CS服务器应答一个<code>Alert(Level: Fatal,Description: Protocol Version)</code>，感觉意思是不支持tls1.2。但是换成win10，也是发的tls1.2，然后就行了。。。什么原理</p>
 <p>然后开一个https的web delivery，再用wireshark抓包，还是tls1.2？<br>但是用百度得到的这个命令<code>[Net.ServicePointManager]::SecurityProtocol</code>的输出结果是<code>ssl3,tls</code>，看不懂。。。</p>
-<p>总之，最后通过谷歌搜索到了这个链接<a target="_blank" rel="external nofollow noopener noreferrer" href="https://www.ch1ng.com/blog/253.html">解决 Cobalt Strike HTTPS Listener 无法在 Win7 运行问题</a><br>大致意思就是jdk更新之后禁用了tls1.0和1.1，在CS服务端把tls老版本启用就好了</p>
+<p>总之，最后通过谷歌搜索到了这个链接<br><a target="_blank" rel="external nofollow noopener noreferrer" href="https://www.ch1ng.com/blog/253.html">解决 Cobalt Strike HTTPS Listener 无法在 Win7 运行问题</a><br>大致意思就是jdk更新之后禁用了tls1.0和1.1，在CS服务端把tls老版本启用就好了</p>
 <p>然后关于win7发1.2为什么不行，又检查了一下。。。原来是wireshark的显示问题，win7其实是想协商tls1.0的，但是wireshark粗略显示的确是1.2，点开看详细的才显示是1.0。迷惑了我好久。。。</p>
-<p>![image-20220612170334704](&#x2F;images&#x2F;CobaltStrike SSL证书配置&#x2F;image-20220612170334704.png)</p>
-<p>看了下win7只对外协商tls1.0和ssl3.0，而正如上文所述，java在更新中弃用了老算法，导致老一点的tls协议不接受，所以连不上，启用后即可接受tls1.0成功上线了（所以没事套什么https，http解决一切烦恼）</p>
+<p><img src="/images/CobaltStrike_SSL%E8%AF%81%E4%B9%A6%E9%85%8D%E7%BD%AE/image-20220612170334704.png" alt="image-20220612170334704"></p>
+<p>看了下win7只对外协商tls1.0和ssl3.0，而正如上文所述，java在更新中弃用了老算法，导致老一点的tls协议不接受，所以连不上，启用后即可接受tls1.0成功上线了</p>
 <p>翻到了微软文档</p>
 <blockquote>
 <p>Windows 8.1, Windows Server 2012 R2, Windows 10, Windows Server 2016, and later versions of Windows natively support TLS 1.2 for client-server communications over WinHTTP.</p>
