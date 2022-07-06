@@ -29,7 +29,7 @@
 <meta property="og:locale">
 <meta property="og:image" content="https://blog.z3ratu1.cn/images/CobaltStrike_SSL%E8%AF%81%E4%B9%A6%E9%85%8D%E7%BD%AE/image-20220612170334704.png">
 <meta property="article:published_time" content="2022-06-12T09:26:03.000Z">
-<meta property="article:modified_time" content="2022-06-12T09:45:05.213Z">
+<meta property="article:modified_time" content="2022-06-18T12:04:49.088Z">
 <meta property="article:author" content="Z3ratu1">
 <meta property="article:tag" content="CobaltStrike">
 <meta name="twitter:card" content="summary">
@@ -224,10 +224,16 @@
                 <i class="far fa-calendar"></i>
               </span>
               <span class="post-meta-item-text">发表于</span>
-              
 
-              <time title="创建时间：2022-06-12 17:26:03 / 修改时间：17:45:05" itemprop="dateCreated datePublished" datetime="2022-06-12T17:26:03+08:00">2022-06-12</time>
+              <time title="创建时间：2022-06-12 17:26:03" itemprop="dateCreated datePublished" datetime="2022-06-12T17:26:03+08:00">2022-06-12</time>
             </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2022-06-18 20:04:49" itemprop="dateModified" datetime="2022-06-18T20:04:49+08:00">2022-06-18</time>
+              </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
                 <i class="far fa-folder"></i>
@@ -320,6 +326,7 @@
 <h2 id="结论"><a href="#结论" class="headerlink" title="结论"></a>结论</h2><p>若要使用web delivery配合https，需要使用真证书过powershell等证书真实性校验<br>若只要抹除beacon https通信的证书特征，随便签一个假证书即可<br>对于win7等较老机器对任何与https有关的操作都不能用的情况，是由于旧机器只支持低版本tls协议而CS服务端不支持低版本tls协议导致的，修补方案为修改<code>jkdpath/jre/lib/security/java.security</code>文件，把<code>jdk.tls.disabledAlgorithms</code>中禁用的老协议去掉即可</p>
 <p>无论如何都打不通时，http解决一切烦恼</p>
 <h2 id="参考链接"><a href="#参考链接" class="headerlink" title="参考链接"></a>参考链接</h2><p><a target="_blank" rel="external nofollow noopener noreferrer" href="http://blog.leanote.com/post/snowming/6a724671de78">CS 合法证书 + Powershell 上线</a><br><a target="_blank" rel="external nofollow noopener noreferrer" href="https://wbglil.gitbook.io/cobalt-strike/cobalt-strikekuo-zhan/csmo-ren-duan-53e3-zheng-4e66-za-xiang">CS证书相关</a><br><a target="_blank" rel="external nofollow noopener noreferrer" href="https://www.anquanke.com/post/id/231448">如何隐蔽你的C2</a><br>CS profile教程<br><a target="_blank" rel="external nofollow noopener noreferrer" href="https://trial.cobaltstrike.com/help-malleable-c2">Malleable Command and Control</a></p>
+<p>默认情况下listener会同时在端口运行stage下发payload服务，这个服务能被任何人访问到，导致CS服务器被轻易探测，这里提出了一个躲避方法<br><a target="_blank" rel="external nofollow noopener noreferrer" href="https://mp.weixin.qq.com/s?__biz=MzU2NTc2MjAyNg==&mid=2247484689&idx=1&sn=8cf9c031f3d926c155ee5c018941b416">Bypass cobaltstrike beacon config scan</a></p>
 
     </div>
 
