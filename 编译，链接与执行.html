@@ -1,0 +1,538 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 6.0.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"blog.z3ratu1.cn","root":"/","scheme":"Pisces","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"always","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":true},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+  </script>
+
+  <meta name="description" content="编译，链接与装载执行大概是rCore-Tutorial系列文章的第一篇。该tutorial大致教学从从头用rust写一个miniOS，加强一下对操作系统的理解首先来到迷之补基础环节 编译最初的问题是来自于当初写go的时候的，因为虽然接触了java，js，python，PHP等一众语言，但编译型语言终究只学了大一时的那一点点C++，因此对go，rust等语言的编译情况产生了简单的困惑。 C&amp;#x2F">
+<meta property="og:type" content="article">
+<meta property="og:title" content="编译，链接与装载执行">
+<meta property="og:url" content="https://blog.z3ratu1.cn/%E7%BC%96%E8%AF%91%EF%BC%8C%E9%93%BE%E6%8E%A5%E4%B8%8E%E6%89%A7%E8%A1%8C.html">
+<meta property="og:site_name" content="Z3ratu1&#39;s blog">
+<meta property="og:description" content="编译，链接与装载执行大概是rCore-Tutorial系列文章的第一篇。该tutorial大致教学从从头用rust写一个miniOS，加强一下对操作系统的理解首先来到迷之补基础环节 编译最初的问题是来自于当初写go的时候的，因为虽然接触了java，js，python，PHP等一众语言，但编译型语言终究只学了大一时的那一点点C++，因此对go，rust等语言的编译情况产生了简单的困惑。 C&amp;#x2F">
+<meta property="og:locale">
+<meta property="article:published_time" content="2022-07-12T01:54:13.000Z">
+<meta property="article:modified_time" content="2022-07-16T11:04:47.724Z">
+<meta property="article:author" content="Z3ratu1">
+<meta property="article:tag" content="rCore">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="https://blog.z3ratu1.cn/%E7%BC%96%E8%AF%91%EF%BC%8C%E9%93%BE%E6%8E%A5%E4%B8%8E%E6%89%A7%E8%A1%8C.html">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-Hans'
+  };
+</script>
+
+  <title>编译，链接与装载执行 | Z3ratu1's blog</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+<link rel="stylesheet" href="/css/prism-tomorrow.css" type="text/css"></head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">Z3ratu1's blog</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">Welcome</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>关于</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+        <li class="menu-item menu-item-links">
+
+    <a href="/links/" rel="section"><i class="fa fa-link fa-fw"></i>友链</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off" placeholder="搜索..." spellcheck="false" type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+  <a href="https://github.com/Z3ratu1" class="github-corner" title="Follow me on GitHub" aria-label="Follow me on GitHub" rel="external nofollow noopener noreferrer" target="_blank"><svg width="80" height="80" viewbox="0 0 250 250" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"/><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"/><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"/></svg></a>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
+    <link itemprop="mainEntityOfPage" href="https://blog.z3ratu1.cn/%E7%BC%96%E8%AF%91%EF%BC%8C%E9%93%BE%E6%8E%A5%E4%B8%8E%E6%89%A7%E8%A1%8C.html">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="https://q2.qlogo.cn/headimg_dl?dst_uin=1207039417&spec=160">
+      <meta itemprop="name" content="Z3ratu1">
+      <meta itemprop="description" content="与其感慨路难行，不如现在出发">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Z3ratu1's blog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          编译，链接与装载执行
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2022-07-12 09:54:13" itemprop="dateCreated datePublished" datetime="2022-07-12T09:54:13+08:00">2022-07-12</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2022-07-16 19:04:47" itemprop="dateModified" datetime="2022-07-16T19:04:47+08:00">2022-07-16</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E7%AC%94%E8%AE%B0/" itemprop="url" rel="index"><span itemprop="name">笔记</span></a>
+                </span>
+            </span>
+
+          
+            <span id="/%E7%BC%96%E8%AF%91%EF%BC%8C%E9%93%BE%E6%8E%A5%E4%B8%8E%E6%89%A7%E8%A1%8C.html" class="post-meta-item leancloud_visitors" data-flag-title="编译，链接与装载执行" title="阅读次数">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span class="leancloud-visitors-count"></span>
+            </span>
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="far fa-comment"></i>
+      </span>
+      <span class="post-meta-item-text">Valine：</span>
+    
+    <a title="valine" href="/%E7%BC%96%E8%AF%91%EF%BC%8C%E9%93%BE%E6%8E%A5%E4%B8%8E%E6%89%A7%E8%A1%8C.html#valine-comments" itemprop="discussionUrl">
+      <span class="post-comments-count valine-comment-count" data-xid="/%E7%BC%96%E8%AF%91%EF%BC%8C%E9%93%BE%E6%8E%A5%E4%B8%8E%E6%89%A7%E8%A1%8C.html" itemprop="commentCount"></span>
+    </a>
+  </span>
+  
+  
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h1 id="编译，链接与装载执行"><a href="#编译，链接与装载执行" class="headerlink" title="编译，链接与装载执行"></a>编译，链接与装载执行</h1><p>大概是<a target="_blank" rel="external nofollow noopener noreferrer" href="http://rcore-os.cn/rCore-Tutorial-Book-v3/index.html">rCore-Tutorial</a>系列文章的第一篇。该tutorial大致教学从从头用rust写一个miniOS，加强一下对操作系统的理解<br>首先来到迷之补基础环节</p>
+<h2 id="编译"><a href="#编译" class="headerlink" title="编译"></a>编译</h2><p>最初的问题是来自于当初写go的时候的，因为虽然接触了java，js，python，PHP等一众语言，但编译型语言终究只学了大一时的那一点点C++，因此对go，rust等语言的编译情况产生了简单的困惑。</p>
+<h3 id="C-x2F-go-x2F-rust编译差异"><a href="#C-x2F-go-x2F-rust编译差异" class="headerlink" title="C&#x2F;go&#x2F;rust编译差异"></a>C&#x2F;go&#x2F;rust编译差异</h3><p>第一个问题是他们编译出的二进制代码的形式和C的关系，因为go和rust似乎有着自己的一套实现，而现代操作系统都是用C实现的，如果go和rust完全不依赖于C，那么就意味着其需要从最底层实现例如IO内存分配等方法，至少要实现到和操作系统交互的系统调用级别。好像听起来就不太科学。。。尤其是对于windows这种不开源底层还乱变的操作系统。。。<br>实际上，标准库可以说已经是融入到操作系统一级的存在了，其向外提供了操作系统系统调用的接口，C和rust都会老老实实的依赖标准库，go在windows上也会听标准库的。然而go的堆栈结构自己魔改了一下，与传统C的堆栈结构不一致，如果控制流直接跳转到C的库上数据结构会炸，所以整体套了一层goruntime的环境来协调C和go，一开始就是因为这个原因我以为go自己实现了所有底层困惑了半天，最后用ldd命令看动态链接库情况发现链接了一堆动态库上去。。。</p>
+<p>总而言之，无论是什么编译型语言，最终都是要符合平台<a target="_blank" rel="external nofollow noopener noreferrer" href="https://stackoverflow.com/questions/2171177/what-is-an-application-binary-interface-abi">ABI</a>规范的，程序的结构，函数调用的约定什么的都是一致的，否则程序运行不起来。<br>go在linux上的表现有点狂野，真的自己实现了一套底层到系统调用的代码，完全依赖于本身的goruntime运行，可惜在windows上就狂不起来了。rust虽然也有许多自身的实现，但自身实现的目的是对接标准库的，最终还是依赖于标准库。</p>
+<p>说起来，还有一个<code>nm</code>指令可以查看文件导出的符号表，总之，如果用上述语句去看编译到linux平台的go二进制的话，会看到一个究极巨大的goruntime。。。里面有go自己实现的一大套运行时，rust也有一套自己的对接libc的东西</p>
+<h3 id="交叉编译"><a href="#交叉编译" class="headerlink" title="交叉编译"></a>交叉编译</h3><p>第二个问题是交叉编译，即在windows平台上编译出linux上的elf文件或是其他平台的文件等。之前我们一直知道，跨平台与跨架构的情况下，二进制文件是无法成功执行的。跨平台的主要问题在于操作系统的系统调用差异和标准库之间的差异，而跨架构则是CPU指令集以及寄存器之间的差异。交叉编译的原理实际上就是实现一个能将高级语言转化到目标架构和平台机器码的编译器罢了，没有什么玄幻高深的原理。</p>
+<p>唯一需要考虑的问题在于标准库。现代操作系统都提供了一套标准库对外提供接口与功能，我们编写的程序从未考虑从系统调用层面对硬件进行控制，我们平时使用的似乎是“自带”的函数都是由操作系统提供的标准库提供的。然而，对于同一个操作系统，使用的标准库是可能存在出入的，如linux下的经典glibc与musl，甚至glibc的不同版本之间也会存在一定的兼容性问题。<br>在普遍的情况下，编译出一个可执行文件一定会用上对应平台的标准库，因此，交叉编译同样通过携带一份目标的标准库，使得用户可以正常的使用标准库携带的功能而不是手搓系统调用。<br>以rust为例，使用<code>rustc --print target-list</code>查看rust支持的交叉编译选项，可以看到如下形式的内容</p>
+<pre><code>...
+mipsel-unknown-linux-uclibc
+mipsel-unknown-none
+mipsisa32r6-unknown-linux-gnu
+mipsisa32r6el-unknown-linux-gnu
+mipsisa64r6-unknown-linux-gnuabi64
+mipsisa64r6el-unknown-linux-gnuabi64
+msp430-none-elf
+nvptx64-nvidia-cuda
+powerpc-unknown-freebsd
+powerpc-unknown-linux-gnu
+powerpc-unknown-linux-gnuspe
+...
+</code></pre>
+<p>第一列为操作系统，第二列为CPU厂商，第三列为OS，第四列为标准库，可以看到，对应同样架构同样的操作系统，当目标平台上存在不同的标准库时，交叉编译则需要携带对应的标准库方可成功<br><a target="_blank" rel="external nofollow noopener noreferrer" href="http://rcore-os.cn/rCore-Tutorial-Book-v3/chapter1/1app-ee-platform.html#id5">平台与目标三元组</a></p>
+<p>但是还有一个怪问题，交叉编译还可以进行静态链接，rust如果交叉编译+静态链接的话，似乎会把其自带的标准库打包进去（未考证），go在静态交叉编译到linux平台的时候，会用go自己实现的一套标准库，直接手搓系统调用的那种，但是windows这种系统调用疯狂变化的操作系统，加上时常变动的底层API，感觉自实现系统调用不太现实？可能就打包比较稳定的ntdll进去？否则应该会高强度出现兼容问题（未考证）</p>
+<h2 id="链接"><a href="#链接" class="headerlink" title="链接"></a>链接</h2><p>编译完了就是链接，比较完整的编译过程应该是把源代码加工到可执行文件范围，编译仅仅是将文件从源码变为目标文件（linux下的.o后缀），而链接则实现了把目标文件组合成可执行文件的环节</p>
+<p>编译器在目标文件中导出了文件的符号表，而链接器则将多个目标文件的各个sector组合起来，这会导致原先符号表中导出的地址与实际地址产生差异，因此链接器同样负责最终决定组合完成后各内部变量以及函数的绝对地址（对于位置相关代码），对于位置无关代码则直接塞进GOT表中等待运行时重定位，位置无关代码移步之前文章<a href="https://blog.z3ratu1.cn/ASLR%E4%B8%8EPIC%E4%B8%8EPIE.html">ASLR与PIC与PIE</a></p>
+<h2 id="装载执行"><a href="#装载执行" class="headerlink" title="装载执行"></a>装载执行</h2><p>go在linux下的表现太过狂野，此处以标准C程序为例，可以用<code>readelf -h</code>来查看可执行文件的头部信息，其中有一项entry标记了程序的入口地址。程序的入口地址并非我们的main函数，而是libc中的<code>_start</code>函数，该函数会对main方法启动前的环境进行初始化，比如初始化main函数的栈然后把argc argv和env压到栈上之类的。<br>可以使用<code>objdump -D</code>查看汇编情况找到<code>_start</code>函数，然而go的话会找到一个go自己实现的究极runtime环境。。。此处不做考虑，rust的话还是走start，但是后续就乱七八糟的了</p>
+<p>由于子进程是由父进程fork出来的，据某位windows大师所言，windows如ntdll等系统模块在每个进程中的地址都是不变的，是由于经典copy on write，因此，每次机器上电开机后，本次机器中所有进程ntdll等模块的地址是不变的</p>
+<h2 id="参考链接"><a href="#参考链接" class="headerlink" title="参考链接"></a>参考链接</h2><p><a target="_blank" rel="external nofollow noopener noreferrer" href="http://rcore-os.cn/rCore-Tutorial-Book-v3/chapter1/3first-instruction-in-kernel1.html#id6">程序内存布局与编译流程</a><br><a target="_blank" rel="external nofollow noopener noreferrer" href="https://segmentfault.com/a/1190000016433947">彻底理解链接器：四，重定位</a><br>美团技术团队的文章真不错<br><a target="_blank" rel="external nofollow noopener noreferrer" href="https://tech.meituan.com/2015/01/22/linker.html">高级语言的编译：链接及装载过程介绍</a></p>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/rCore/" rel="tag"># rCore</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/CobaltStrike%20SSL%E8%AF%81%E4%B9%A6%E9%85%8D%E7%BD%AE.html" rel="prev" title="CobaltStrike SSL证书配置">
+      <i class="fa fa-chevron-left"></i> CobaltStrike SSL证书配置
+    </a></div>
+      <div class="post-nav-item"></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+    <div class="comments" id="valine-comments"></div>
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E7%BC%96%E8%AF%91%EF%BC%8C%E9%93%BE%E6%8E%A5%E4%B8%8E%E8%A3%85%E8%BD%BD%E6%89%A7%E8%A1%8C"><span class="nav-number">1.</span> <span class="nav-text">编译，链接与装载执行</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%BC%96%E8%AF%91"><span class="nav-number">1.1.</span> <span class="nav-text">编译</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#C-x2F-go-x2F-rust%E7%BC%96%E8%AF%91%E5%B7%AE%E5%BC%82"><span class="nav-number">1.1.1.</span> <span class="nav-text">C&#x2F;go&#x2F;rust编译差异</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BA%A4%E5%8F%89%E7%BC%96%E8%AF%91"><span class="nav-number">1.1.2.</span> <span class="nav-text">交叉编译</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E9%93%BE%E6%8E%A5"><span class="nav-number">1.2.</span> <span class="nav-text">链接</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%A3%85%E8%BD%BD%E6%89%A7%E8%A1%8C"><span class="nav-number">1.3.</span> <span class="nav-text">装载执行</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%8F%82%E8%80%83%E9%93%BE%E6%8E%A5"><span class="nav-number">1.4.</span> <span class="nav-text">参考链接</span></a></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Z3ratu1" src="https://q2.qlogo.cn/headimg_dl?dst_uin=1207039417&spec=160">
+  <p class="site-author-name" itemprop="name">Z3ratu1</p>
+  <div class="site-description" itemprop="description">与其感慨路难行，不如现在出发</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">160</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">5</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">89</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+  <div class="beian"><a href="http://www.beian.miit.gov.cn/" rel="external nofollow noopener noreferrer" target="_blank">湘ICP备2020021580号 </a>
+      <img src="/./images/beian.png" style="display: inline-block;">
+  </div>
+
+<div class="copyright">
+  
+  &copy; 2019 – 
+  <span itemprop="copyrightYear">2022</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Z3ratu1</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="external nofollow noopener noreferrer" target="_blank">Hexo</a> & <a href="https://pisces.theme-next.org/" class="theme-link" rel="external nofollow noopener noreferrer" target="_blank">NexT.Pisces</a> 强力驱动
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+
+<script>
+NexT.utils.loadComments(document.querySelector('#valine-comments'), () => {
+  NexT.utils.getScript('https://cdn.jsdelivr.net/npm/valine@1.4.14/dist/Valine.min.js', () => {
+    var GUEST = ['nick', 'mail', 'link'];
+    var guest = 'nick,mail,link';
+    guest = guest.split(',').filter(item => {
+      return GUEST.includes(item);
+    });
+    new Valine({
+      el         : '#valine-comments',
+      verify     : false,
+      notify     : false,
+      appId      : '7H8kg0XdWO8IbhOcu4K1JaAT-gzGzoHsz',
+      appKey     : 'wPKQjkbVtvPaRR7gh2yjfLSi',
+      placeholder: "Just go go",
+      avatar     : 'mm',
+      meta       : guest,
+      pageSize   : '10' || 10,
+      visitor    : true,
+      lang       : '' || 'zh-cn',
+      path       : location.pathname,
+      recordIP   : false,
+      serverURLs : ''
+    });
+  }, window.Valine);
+});
+</script>
+
+</body>
+</html>
