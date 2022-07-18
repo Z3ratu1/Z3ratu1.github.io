@@ -1,0 +1,641 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 6.0.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"blog.z3ratu1.cn","root":"/","scheme":"Pisces","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"always","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":true},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+  </script>
+
+  <meta name="description" content="rCore_Tutorial_CP1第一章：应用程序与基础环境 内核第一条指令（实践篇）链接布局可以手写链接器规则来定义程序的内存布局，此处将text段放置在固定位置0x80200000文中有一个函数ALIGN没提到什么意思，不过看那个样子也能猜出来，应该是内存布局对其到4kBLOCK and ALIGN in linker script">
+<meta property="og:type" content="article">
+<meta property="og:title" content="rCore_Tutorial_CP1">
+<meta property="og:url" content="https://blog.z3ratu1.cn/rCore_Tutorial_CP1.html">
+<meta property="og:site_name" content="Z3ratu1&#39;s blog">
+<meta property="og:description" content="rCore_Tutorial_CP1第一章：应用程序与基础环境 内核第一条指令（实践篇）链接布局可以手写链接器规则来定义程序的内存布局，此处将text段放置在固定位置0x80200000文中有一个函数ALIGN没提到什么意思，不过看那个样子也能猜出来，应该是内存布局对其到4kBLOCK and ALIGN in linker script">
+<meta property="og:locale">
+<meta property="article:published_time" content="2022-07-17T02:06:55.000Z">
+<meta property="article:modified_time" content="2022-07-18T09:49:56.914Z">
+<meta property="article:author" content="Z3ratu1">
+<meta property="article:tag" content="rCore">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="https://blog.z3ratu1.cn/rCore_Tutorial_CP1.html">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-Hans'
+  };
+</script>
+
+  <title>rCore_Tutorial_CP1 | Z3ratu1's blog</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+<link rel="stylesheet" href="/css/prism-tomorrow.css" type="text/css"></head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">Z3ratu1's blog</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">Welcome</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>关于</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+        <li class="menu-item menu-item-links">
+
+    <a href="/links/" rel="section"><i class="fa fa-link fa-fw"></i>友链</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off" placeholder="搜索..." spellcheck="false" type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+  <a href="https://github.com/Z3ratu1" class="github-corner" title="Follow me on GitHub" aria-label="Follow me on GitHub" rel="external nofollow noopener noreferrer" target="_blank"><svg width="80" height="80" viewbox="0 0 250 250" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"/><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"/><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"/></svg></a>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
+    <link itemprop="mainEntityOfPage" href="https://blog.z3ratu1.cn/rCore_Tutorial_CP1.html">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="https://q2.qlogo.cn/headimg_dl?dst_uin=1207039417&spec=160">
+      <meta itemprop="name" content="Z3ratu1">
+      <meta itemprop="description" content="与其感慨路难行，不如现在出发">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Z3ratu1's blog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          rCore_Tutorial_CP1
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2022-07-17 10:06:55" itemprop="dateCreated datePublished" datetime="2022-07-17T10:06:55+08:00">2022-07-17</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2022-07-18 17:49:56" itemprop="dateModified" datetime="2022-07-18T17:49:56+08:00">2022-07-18</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E7%AC%94%E8%AE%B0/" itemprop="url" rel="index"><span itemprop="name">笔记</span></a>
+                </span>
+            </span>
+
+          
+            <span id="/rCore_Tutorial_CP1.html" class="post-meta-item leancloud_visitors" data-flag-title="rCore_Tutorial_CP1" title="阅读次数">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span class="leancloud-visitors-count"></span>
+            </span>
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="far fa-comment"></i>
+      </span>
+      <span class="post-meta-item-text">Valine：</span>
+    
+    <a title="valine" href="/rCore_Tutorial_CP1.html#valine-comments" itemprop="discussionUrl">
+      <span class="post-comments-count valine-comment-count" data-xid="/rCore_Tutorial_CP1.html" itemprop="commentCount"></span>
+    </a>
+  </span>
+  
+  
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h1 id="rCore-Tutorial-CP1"><a href="#rCore-Tutorial-CP1" class="headerlink" title="rCore_Tutorial_CP1"></a>rCore_Tutorial_CP1</h1><p><a target="_blank" rel="external nofollow noopener noreferrer" href="http://rcore-os.cn/rCore-Tutorial-Book-v3/chapter1/">第一章：应用程序与基础环境</a></p>
+<h2 id="内核第一条指令（实践篇）"><a href="#内核第一条指令（实践篇）" class="headerlink" title="内核第一条指令（实践篇）"></a>内核第一条指令（实践篇）</h2><h3 id="链接布局"><a href="#链接布局" class="headerlink" title="链接布局"></a>链接布局</h3><p>可以手写链接器规则来定义程序的内存布局，此处将text段放置在固定位置0x80200000<br>文中有一个函数ALIGN没提到什么意思，不过看那个样子也能猜出来，应该是内存布局对其到4k<br><a target="_blank" rel="external nofollow noopener noreferrer" href="https://stackoverflow.com/questions/43686352/block-and-align-in-linker-script">BLOCK and ALIGN in linker script</a></p>
+<p>理论上来说这里规划的内存布局就是程序被加载到内存后各段的布局。但是这里仍然执行了一步裁剪，将程序只保留了text段的一点点汇编。这个的主要原因是qemu加载文件的时候直接把整个文件装载到对应地址了，并没有按照文件头提供的信息进行装载，故等于我们手动把代码装载上去（说起来这种删去了文件各种信息的纯二进制的指令实际上就和shellcode是一个概念吧，不过shellcode应该位置无关，这个位置有关还得装载到指定地址）</p>
+<p>有一个指令<code>readelf -ahW</code>可以高强度查看elf文件布局，就可以看各个段的长度位置之类的<br>qemu退出为<code>Ctrl a</code>后按<code>x</code>，记得松开ctrl再按x</p>
+<p>这章有提到0x1000处的qemu的加载指令，以及rustsbi提供的加载指令。暂且认为rustsbi就等同于BIOS里的BootLoader吧，起码BootLoader这块不需要我自己实现了</p>
+<h2 id="为内核支持函数调用"><a href="#为内核支持函数调用" class="headerlink" title="为内核支持函数调用"></a>为内核支持函数调用</h2><p>手搓汇编啊。。。等于说要自己实现libc提供的main函数装载环节了</p>
+<h3 id="调用规范"><a href="#调用规范" class="headerlink" title="调用规范"></a>调用规范</h3><p>这句话说的很好，有一种我不好用语言表达他却说明白了的感觉</p>
+<blockquote>
+<p>调用规范是对于一种确定的编程语言来说的，因为一般意义上的函数调用只会在编程语言的内部进行。</p>
+</blockquote>
+<p>但是这里说到栈内数据访问是通过栈顶指针通过加法向上访问的，感觉许多情况确实是这样，但是总感觉栈是从栈底往上生长的，从栈底做减法往下不应该会更合理吗？不然遇到局部变量栈生长的时候栈顶位置就会发生变化？或者说编译器在一开始就把所有的局部变量提升并规定好了长度？<br>还提到了caller和callee间寄存器的保存于恢复，之前学32位栈结构的时候好像从来没考虑寄存器。返回地址，栈帧地址，局部变量好像就是栈的全部了</p>
+<h3 id="分配并使用启动栈"><a href="#分配并使用启动栈" class="headerlink" title="分配并使用启动栈"></a>分配并使用启动栈</h3><p>手动分配初始栈位置，手写汇编定义了一个<code>.bss.stack</code>段</p>
+<pre><code>    .section .bss.stack
+    .globl boot_stack
+boot_stack:
+    .space 4096 * 16
+    .globl boot_stack_top
+boot_stack_top:
+</code></pre>
+<p>并将其塞入真实的bss段下方</p>
+<pre><code>.bss : &#123;
+    *(.bss.stack)
+    sbss = .;
+    *(.bss .bss.*)
+    *(.sbss .sbss.*)
+&#125;
+ebss = .;
+</code></pre>
+<p>之后手动将栈底指向这个自定义的.bss.stack段。。。感觉其他的可执行程序应该不会是这么实现的吧？可能是直接依赖glibc在程序装载时给他分配栈空间和初始栈帧<br>这里手动分配占空间应该是因为我们自己就是最底层的环境，没有lib来给我安排初始化栈了，但是为什么不自定义一个其他的section放在高位地址而是整了个bss段下的小段并塞在bss段下面呢。。。</p>
+<p>所以我想魔改一下asm直接在bss段后面加一个.mystack段，再改一下linker把这个段链接到bss段后面，感觉会合理一点，然后链接大失败。。。果然我还是完全没有理解这个过程。。。</p>
+<p>这段的操作只是初始化栈的位置和指定栈底，函数调用的出入栈保存恢复都由编译器搞定了。。。不然这个手写汇编可能要暴毙</p>
+<p>然后是这段清理bss段代码</p>
+<pre class=" language-rust"><code class="language-rust"><span class="token keyword">fn</span> <span class="token function">clear_bss</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token keyword">extern</span> <span class="token string">"C"</span> <span class="token punctuation">{</span>
+        <span class="token keyword">fn</span> <span class="token function">sbss</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token keyword">fn</span> <span class="token function">ebss</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+    <span class="token punctuation">(</span>sbss <span class="token keyword">as</span> usize<span class="token punctuation">..</span>ebss <span class="token keyword">as</span> usize<span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">for_each</span><span class="token punctuation">(</span><span class="token closure-params"><span class="token punctuation">|</span>a<span class="token punctuation">|</span></span> <span class="token punctuation">{</span>
+        <span class="token keyword">unsafe</span> <span class="token punctuation">{</span> <span class="token punctuation">(</span>a <span class="token keyword">as</span> <span class="token operator">*</span><span class="token keyword">mut</span> u8<span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">write_volatile</span><span class="token punctuation">(</span><span class="token number">0</span><span class="token punctuation">)</span> <span class="token punctuation">}</span>
+    <span class="token punctuation">}</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
+</code></pre>
+<p>extern C可以使用C声明的外部函数，但实际上函数也就是一段机器指令，函数的符号也不过是一个指向函数实现的指针。这两个是在linker里面定义的bss段的起始地址和结束地址symbol，把它当函数引入，实际上是<code>引用位置标志并将其转成 usize 获取它的地址。</code>（说实话还是有点玄幻）然后再一波把地址转成<code>*mut u8</code>的指向单个字节的指针，把指向的地址写为0。评论区里面有一个小朋友认为<code>*mut u8</code>是解引用，显然是C基础没学好</p>
+<h2 id="基于-SBI-服务完成输出和关机"><a href="#基于-SBI-服务完成输出和关机" class="headerlink" title="基于 SBI 服务完成输出和关机"></a>基于 SBI 服务完成输出和关机</h2><p>sbi除了BootLoader功能外，还是多多少少又套了点其他的功能，起码不用手写驱动了。。。<br>可以通过与SBI交互完成简单的IO开关机之类的功能</p>
+<p>但是这里有一段代码有点超越rust垃圾的理解范围</p>
+<h3 id="实现格式化输出"><a href="#实现格式化输出" class="headerlink" title="实现格式化输出"></a>实现格式化输出</h3><p>我直接看菜鸟教程<br><a target="_blank" rel="external nofollow noopener noreferrer" href="https://www.runoob.com/rust/rust-project-management.html">Rust 组织管理</a><br><a target="_blank" rel="external nofollow noopener noreferrer" href="https://www.runoob.com/rust/rust-generics.html">Rust 泛型与特性</a></p>
+<pre class=" language-rust"><code class="language-rust"><span class="token keyword">use</span> <span class="token keyword">crate</span><span class="token punctuation">:</span><span class="token punctuation">:</span>sbi<span class="token punctuation">:</span><span class="token punctuation">:</span>console_putchar<span class="token punctuation">;</span>
+<span class="token keyword">use</span> core<span class="token punctuation">:</span><span class="token punctuation">:</span>fmt<span class="token punctuation">:</span><span class="token punctuation">:</span><span class="token punctuation">{</span><span class="token keyword">self</span><span class="token punctuation">,</span> Write<span class="token punctuation">}</span><span class="token punctuation">;</span>
+
+<span class="token keyword">struct</span> Stdout<span class="token punctuation">;</span>
+
+<span class="token keyword">impl</span> Write <span class="token keyword">for</span> Stdout <span class="token punctuation">{</span>
+    <span class="token keyword">fn</span> <span class="token function">write_str</span><span class="token punctuation">(</span><span class="token operator">&amp;</span><span class="token keyword">mut</span> <span class="token keyword">self</span><span class="token punctuation">,</span> s<span class="token punctuation">:</span> <span class="token operator">&amp;</span>str<span class="token punctuation">)</span> <span class="token punctuation">-></span> fmt<span class="token punctuation">:</span><span class="token punctuation">:</span>Result <span class="token punctuation">{</span>
+        <span class="token keyword">for</span> c <span class="token keyword">in</span> s<span class="token punctuation">.</span><span class="token function">chars</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+            <span class="token function">console_putchar</span><span class="token punctuation">(</span>c <span class="token keyword">as</span> usize<span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token punctuation">}</span>
+        <span class="token function">Ok</span><span class="token punctuation">(</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
+    <span class="token punctuation">}</span>
+<span class="token punctuation">}</span>
+</code></pre>
+<p><code>core::fmt::Write</code>是一个rust定义的trait（特性），特性类似于接口，但是特性本身可以实现方法，使得impl特性的结构体可以调用其default的方法。Stdout是我们定义的一个没有成员的结构体，直接去翻Write定义，其存在三个方法</p>
+<pre class=" language-rust"><code class="language-rust"><span class="token keyword">fn</span> <span class="token function">write_str</span><span class="token punctuation">(</span><span class="token operator">&amp;</span><span class="token keyword">mut</span> <span class="token keyword">self</span><span class="token punctuation">,</span> s<span class="token punctuation">:</span> <span class="token operator">&amp;</span>str<span class="token punctuation">)</span> <span class="token punctuation">-></span> Result
+<span class="token keyword">fn</span> <span class="token function">write_char</span><span class="token punctuation">(</span><span class="token operator">&amp;</span><span class="token keyword">mut</span> <span class="token keyword">self</span><span class="token punctuation">,</span> c<span class="token punctuation">:</span> char<span class="token punctuation">)</span> <span class="token punctuation">-></span> Result
+<span class="token keyword">fn</span> <span class="token function">write_fmt</span><span class="token punctuation">(</span><span class="token keyword">mut</span> <span class="token keyword">self</span><span class="token punctuation">:</span> <span class="token operator">&amp;</span><span class="token keyword">mut</span> Self<span class="token punctuation">,</span> args<span class="token punctuation">:</span> Arguments<span class="token operator">&lt;</span>'_<span class="token operator">></span><span class="token punctuation">)</span> <span class="token punctuation">-></span> Result
+</code></pre>
+<p>其中<code>write_str</code>没有实现，所以这里手动实现了一下<code>write_str</code>，但目的却在于调用现成的<code>write_fmt</code>方法</p>
+<p>然后下面是两个超级rust宏定义，定义了经典print和println两个宏，但这个定义看不懂。。。</p>
+<p>需要把如下代码放在其他引入的mod的前面，这样才能在其他引入的mod中使用这里面定义的宏</p>
+<pre class=" language-rust"><code class="language-rust"><span class="token attribute attr-name">#[macro_use]</span>
+<span class="token keyword">mod</span> console<span class="token punctuation">;</span>
+</code></pre>
+<p>然后就可以用那个究极命令一把梭运行了</p>
+<pre><code>qemu-system-riscv64 \
+-machine virt \
+-nographic \
+-bios ../bootloader/rustsbi-qemu.bin \
+-device loader,file=target/riscv64gc-unknown-none-elf/release/os.bin,addr=0x80200000
+</code></pre>
+<p>然后发现卡住了，然后发现新编译出来的东西没有strip header。。。<br>删一下<code>rust-objcopy --strip-all target/riscv64gc-unknown-none-elf/release/os -O binary target/riscv64gc-unknown-none-elf/release/os.bin</code><br>删之前可以再用readelf看一眼加了rust编译出来的文件，段内容就拉满了，加了一堆rust的符号，不过text段起始还是经典入口0x80200000（linker里面写好的，必然如此）</p>
+<p>成功运行，任务完成</p>
+<h3 id="基于-GDB-验证启动流程"><a href="#基于-GDB-验证启动流程" class="headerlink" title="基于 GDB 验证启动流程"></a>基于 GDB 验证启动流程</h3><p>写完了代码再反过来调<br>这里用教程给出的riscv toolchain py版本debug，但是pwndbg和教程给出的dashboard都用不了，报错是so里面有一个symbol找不到，不会修拉倒，开始高强度手调</p>
+<p>用给出的命令调试</p>
+<pre><code>riscv64-unknown-elf-gdb \
+    -ex &#39;file target/riscv64gc-unknown-none-elf/release/os&#39; \
+    -ex &#39;set arch riscv:rv64&#39; \
+    -ex &#39;target remote localhost:1234&#39;
+</code></pre>
+<p><del>这里的file参数感觉没什么用？</del>有用，虽然file不写也能跑，但是指定之后能读符号表，就会变的友好一点<br>调试进去之后0x1000这个纯机器码环节。。。常见的step next disassemble全用不了。。。只能用这里给出的si单步汇编，以及<code>x/10i $pc</code>打印PC寄存器后十条指令</p>
+<p>看汇编也太折磨我了。。。总之就是一通操作把t0写成了目标地址jump过去了，然后跳过0x80000000的rustsbi部分，直接在地址上下断点，快进到BootLoader，下断点快进到自己手写的entry</p>
+<pre><code>(gdb) b *0x80200000
+Breakpoint 1 at 0x80200000
+(gdb) c
+Continuing.
+
+Breakpoint 1, 0x0000000080200000 in stext ()
+(gdb) disassemble 
+Dump of assembler code for function stext:
+=&gt; 0x0000000080200000 &lt;+0&gt;:    auipc    sp,0x14
+   0x0000000080200004 &lt;+4&gt;:    mv    sp,sp
+   0x0000000080200008 &lt;+8&gt;:    auipc    ra,0x0
+   0x000000008020000c &lt;+12&gt;:    jalr    470(ra) # 0x802001de &lt;os::rust_main&gt;
+End of assembler dump.
+</code></pre>
+<pre><code>    la sp, boot_stack_top
+    call rust_main
+</code></pre>
+<p>可以看到当初手写的两条汇编被翻译成了四条指令，有了符号表jump到rust main之后甚至能看对应源码<br>说起来，这里似乎将stext这个标记对应的这段汇编当成函数了，不过现在栈顶寄存器的值sp还是0x0，毕竟这段汇编是用来设置栈顶的嘛</p>
+<p>然后后面猛调一通也看不懂哈哈<br>可以看下这个<a target="_blank" rel="external nofollow noopener noreferrer" href="https://zhuanlan.zhihu.com/p/462483036">RISC-V函数调用规范</a></p>
+<h2 id="练习"><a href="#练习" class="headerlink" title="练习"></a>练习</h2><p>编程第一题列目录网上复制粘贴一下就行，第二题太难了8不会，第三题系统调用？？？我自己不是操作系统吗，还能调用谁，rustsbi里面好像也没有看到对应的调用</p>
+<p>做一下那个log输出和颜色吧。这个就需要去定义宏。。。就得看之前那段抽象代码并且模仿一下了<br><a target="_blank" rel="external nofollow noopener noreferrer" href="https://kaisery.github.io/trpl-zh-cn/ch19-06-macros.html">RUST宏</a><br><a target="_blank" rel="external nofollow noopener noreferrer" href="https://zhuanlan.zhihu.com/p/104469645">Rust宏开发入门</a><br>得出结论rust真反人类啊。虽然还是不会写，但是就着现在手头上已有的println魔改加颜色还是能做到的，concat前后加上颜色代码即可</p>
+<pre class=" language-rust"><code class="language-rust"><span class="token comment" spellcheck="true">/// info string macro</span>
+<span class="token attribute attr-name">#[macro_export]</span>
+<span class="token macro-rules function">macro_rules!</span> info <span class="token punctuation">{</span>
+    <span class="token punctuation">(</span>$fmt<span class="token punctuation">:</span> literal $<span class="token punctuation">(</span><span class="token punctuation">,</span> $<span class="token punctuation">(</span>$arg<span class="token punctuation">:</span> tt<span class="token punctuation">)</span><span class="token operator">+</span><span class="token punctuation">)</span>?<span class="token punctuation">)</span> <span class="token operator">=</span><span class="token operator">></span> <span class="token punctuation">{</span>
+        $<span class="token keyword">crate</span><span class="token punctuation">:</span><span class="token punctuation">:</span>console<span class="token punctuation">:</span><span class="token punctuation">:</span><span class="token function">print</span><span class="token punctuation">(</span><span class="token function">format_args!</span><span class="token punctuation">(</span><span class="token function">concat!</span><span class="token punctuation">(</span><span class="token string">"\x1b[34m"</span><span class="token punctuation">,</span> $fmt<span class="token punctuation">,</span> <span class="token string">"\x1b[0m\n"</span><span class="token punctuation">)</span> $<span class="token punctuation">(</span><span class="token punctuation">,</span> $<span class="token punctuation">(</span>$arg<span class="token punctuation">)</span><span class="token operator">+</span><span class="token punctuation">)</span>?<span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+<span class="token punctuation">}</span>
+</code></pre>
+<p>log输出等级完全不会</p>
+<blockquote>
+<p>请用相关工具软件分析并给出应用程序A的代码段&#x2F;数据段&#x2F;堆&#x2F;栈的地址空间范围。</p>
+</blockquote>
+<p>不会，只会把程序用gdb挂住然后翻pid去翻proc maps。。。</p>
+<blockquote>
+<p>为了让应用程序能在计算机上执行，操作系统与编译器之间需要达成哪些协议？</p>
+</blockquote>
+<p>寄存器有哪些？但是操作系统也不能决定寄存器有几个吧？从能用就行的角度来看，感觉操作系统的作用就是提高一套lib捏。调用规范反正是编译器自己定，内存分配之类的对程序本身也透明。抽象</p>
+<blockquote>
+<p>为何应用程序员编写应用时不需要建立栈空间和指定地址空间？</p>
+</blockquote>
+<p>因为操作系统，我滴超人。libc的经典<code>_start</code>经过了一系列操作把main函数的栈给设置好了才跳到main的<br><a target="_blank" rel="external nofollow noopener noreferrer" href="https://luomuxiaoxiao.com/?p=516">Linux X86 程序启动 – main函数是如何被执行的?</a></p>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/rCore/" rel="tag"># rCore</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/%E7%BC%96%E8%AF%91%EF%BC%8C%E9%93%BE%E6%8E%A5%E4%B8%8E%E6%89%A7%E8%A1%8C.html" rel="prev" title="编译，链接与装载执行">
+      <i class="fa fa-chevron-left"></i> 编译，链接与装载执行
+    </a></div>
+      <div class="post-nav-item"></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+    <div class="comments" id="valine-comments"></div>
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#rCore-Tutorial-CP1"><span class="nav-number">1.</span> <span class="nav-text">rCore_Tutorial_CP1</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%86%85%E6%A0%B8%E7%AC%AC%E4%B8%80%E6%9D%A1%E6%8C%87%E4%BB%A4%EF%BC%88%E5%AE%9E%E8%B7%B5%E7%AF%87%EF%BC%89"><span class="nav-number">1.1.</span> <span class="nav-text">内核第一条指令（实践篇）</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E9%93%BE%E6%8E%A5%E5%B8%83%E5%B1%80"><span class="nav-number">1.1.1.</span> <span class="nav-text">链接布局</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%BA%E5%86%85%E6%A0%B8%E6%94%AF%E6%8C%81%E5%87%BD%E6%95%B0%E8%B0%83%E7%94%A8"><span class="nav-number">1.2.</span> <span class="nav-text">为内核支持函数调用</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%B0%83%E7%94%A8%E8%A7%84%E8%8C%83"><span class="nav-number">1.2.1.</span> <span class="nav-text">调用规范</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%88%86%E9%85%8D%E5%B9%B6%E4%BD%BF%E7%94%A8%E5%90%AF%E5%8A%A8%E6%A0%88"><span class="nav-number">1.2.2.</span> <span class="nav-text">分配并使用启动栈</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%9F%BA%E4%BA%8E-SBI-%E6%9C%8D%E5%8A%A1%E5%AE%8C%E6%88%90%E8%BE%93%E5%87%BA%E5%92%8C%E5%85%B3%E6%9C%BA"><span class="nav-number">1.3.</span> <span class="nav-text">基于 SBI 服务完成输出和关机</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%AE%9E%E7%8E%B0%E6%A0%BC%E5%BC%8F%E5%8C%96%E8%BE%93%E5%87%BA"><span class="nav-number">1.3.1.</span> <span class="nav-text">实现格式化输出</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%9F%BA%E4%BA%8E-GDB-%E9%AA%8C%E8%AF%81%E5%90%AF%E5%8A%A8%E6%B5%81%E7%A8%8B"><span class="nav-number">1.3.2.</span> <span class="nav-text">基于 GDB 验证启动流程</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%BB%83%E4%B9%A0"><span class="nav-number">1.4.</span> <span class="nav-text">练习</span></a></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Z3ratu1" src="https://q2.qlogo.cn/headimg_dl?dst_uin=1207039417&spec=160">
+  <p class="site-author-name" itemprop="name">Z3ratu1</p>
+  <div class="site-description" itemprop="description">与其感慨路难行，不如现在出发</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">161</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">5</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">89</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+  <div class="beian"><a href="http://www.beian.miit.gov.cn/" rel="external nofollow noopener noreferrer" target="_blank">湘ICP备2020021580号 </a>
+      <img src="/./images/beian.png" style="display: inline-block;">
+  </div>
+
+<div class="copyright">
+  
+  &copy; 2019 – 
+  <span itemprop="copyrightYear">2022</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Z3ratu1</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="external nofollow noopener noreferrer" target="_blank">Hexo</a> & <a href="https://pisces.theme-next.org/" class="theme-link" rel="external nofollow noopener noreferrer" target="_blank">NexT.Pisces</a> 强力驱动
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+
+<script>
+NexT.utils.loadComments(document.querySelector('#valine-comments'), () => {
+  NexT.utils.getScript('https://cdn.jsdelivr.net/npm/valine@1.4.14/dist/Valine.min.js', () => {
+    var GUEST = ['nick', 'mail', 'link'];
+    var guest = 'nick,mail,link';
+    guest = guest.split(',').filter(item => {
+      return GUEST.includes(item);
+    });
+    new Valine({
+      el         : '#valine-comments',
+      verify     : false,
+      notify     : false,
+      appId      : '7H8kg0XdWO8IbhOcu4K1JaAT-gzGzoHsz',
+      appKey     : 'wPKQjkbVtvPaRR7gh2yjfLSi',
+      placeholder: "Just go go",
+      avatar     : 'mm',
+      meta       : guest,
+      pageSize   : '10' || 10,
+      visitor    : true,
+      lang       : '' || 'zh-cn',
+      path       : location.pathname,
+      recordIP   : false,
+      serverURLs : ''
+    });
+  }, window.Valine);
+});
+</script>
+
+</body>
+</html>

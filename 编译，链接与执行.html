@@ -28,7 +28,7 @@
 <meta property="og:description" content="编译，链接与装载执行大概是rCore-Tutorial系列文章的第一篇。该tutorial大致教学从从头用rust写一个miniOS，加强一下对操作系统的理解首先来到迷之补基础环节 编译最初的问题是来自于当初写go的时候的，因为虽然接触了java，js，python，PHP等一众语言，但编译型语言终究只学了大一时的那一点点C++，因此对go，rust等语言的编译情况产生了简单的困惑。 C&amp;#x2F">
 <meta property="og:locale">
 <meta property="article:published_time" content="2022-07-12T01:54:13.000Z">
-<meta property="article:modified_time" content="2022-07-16T11:04:47.724Z">
+<meta property="article:modified_time" content="2022-07-18T05:53:57.299Z">
 <meta property="article:author" content="Z3ratu1">
 <meta property="article:tag" content="rCore">
 <meta name="twitter:card" content="summary">
@@ -230,7 +230,7 @@
                   <i class="far fa-calendar-check"></i>
                 </span>
                 <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2022-07-16 19:04:47" itemprop="dateModified" datetime="2022-07-16T19:04:47+08:00">2022-07-16</time>
+                <time title="修改时间：2022-07-18 13:53:57" itemprop="dateModified" datetime="2022-07-18T13:53:57+08:00">2022-07-18</time>
               </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -301,6 +301,7 @@ powerpc-unknown-linux-gnuspe
 <p>编译器在目标文件中导出了文件的符号表，而链接器则将多个目标文件的各个sector组合起来，这会导致原先符号表中导出的地址与实际地址产生差异，因此链接器同样负责最终决定组合完成后各内部变量以及函数的绝对地址（对于位置相关代码），对于位置无关代码则直接塞进GOT表中等待运行时重定位，位置无关代码移步之前文章<a href="https://blog.z3ratu1.cn/ASLR%E4%B8%8EPIC%E4%B8%8EPIE.html">ASLR与PIC与PIE</a></p>
 <h2 id="装载执行"><a href="#装载执行" class="headerlink" title="装载执行"></a>装载执行</h2><p>go在linux下的表现太过狂野，此处以标准C程序为例，可以用<code>readelf -h</code>来查看可执行文件的头部信息，其中有一项entry标记了程序的入口地址。程序的入口地址并非我们的main函数，而是libc中的<code>_start</code>函数，该函数会对main方法启动前的环境进行初始化，比如初始化main函数的栈然后把argc argv和env压到栈上之类的。<br>可以使用<code>objdump -D</code>查看汇编情况找到<code>_start</code>函数，然而go的话会找到一个go自己实现的究极runtime环境。。。此处不做考虑，rust的话还是走start，但是后续就乱七八糟的了</p>
 <p>由于子进程是由父进程fork出来的，据某位windows大师所言，windows如ntdll等系统模块在每个进程中的地址都是不变的，是由于经典copy on write，因此，每次机器上电开机后，本次机器中所有进程ntdll等模块的地址是不变的</p>
+<p>Stack Overflow上有一个回答提到过这个问题<br><a target="_blank" rel="external nofollow noopener noreferrer" href="https://stackoverflow.com/questions/22750112/dll-injection-with-createremotethread">DLL Injection with CreateRemoteThread</a></p>
 <h2 id="参考链接"><a href="#参考链接" class="headerlink" title="参考链接"></a>参考链接</h2><p><a target="_blank" rel="external nofollow noopener noreferrer" href="http://rcore-os.cn/rCore-Tutorial-Book-v3/chapter1/3first-instruction-in-kernel1.html#id6">程序内存布局与编译流程</a><br><a target="_blank" rel="external nofollow noopener noreferrer" href="https://segmentfault.com/a/1190000016433947">彻底理解链接器：四，重定位</a><br>美团技术团队的文章真不错<br><a target="_blank" rel="external nofollow noopener noreferrer" href="https://tech.meituan.com/2015/01/22/linker.html">高级语言的编译：链接及装载过程介绍</a></p>
 
     </div>
@@ -323,7 +324,10 @@ powerpc-unknown-linux-gnuspe
     <a href="/CobaltStrike%20SSL%E8%AF%81%E4%B9%A6%E9%85%8D%E7%BD%AE.html" rel="prev" title="CobaltStrike SSL证书配置">
       <i class="fa fa-chevron-left"></i> CobaltStrike SSL证书配置
     </a></div>
-      <div class="post-nav-item"></div>
+      <div class="post-nav-item">
+    <a href="/rCore_Tutorial_CP1.html" rel="next" title="rCore_Tutorial_CP1">
+      rCore_Tutorial_CP1 <i class="fa fa-chevron-right"></i>
+    </a></div>
     </div>
       </footer>
     
@@ -398,7 +402,7 @@ powerpc-unknown-linux-gnuspe
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">160</span>
+          <span class="site-state-item-count">161</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
