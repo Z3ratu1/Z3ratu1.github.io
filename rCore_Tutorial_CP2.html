@@ -1,0 +1,602 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 6.0.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"blog.z3ratu1.cn","root":"/","scheme":"Pisces","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"always","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":true},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+  </script>
+
+  <meta name="description" content="rCore_Tutorial_CP2这一章的文件结构略微的复杂了一点，需要开始之前先稍微强化一下对rust mod use等关键字的认知。。。 rust mod&#x2F;use&#x2F;externPackages and Crates rust认为src下的main.rs是二进制crate的主文件，而lib.rs则是库crate的主文件，所以这里的lib.rs是主文件，和cargo.toml">
+<meta property="og:type" content="article">
+<meta property="og:title" content="rCore_Tutorial_CP2">
+<meta property="og:url" content="https://blog.z3ratu1.cn/rCore_Tutorial_CP2.html">
+<meta property="og:site_name" content="Z3ratu1&#39;s blog">
+<meta property="og:description" content="rCore_Tutorial_CP2这一章的文件结构略微的复杂了一点，需要开始之前先稍微强化一下对rust mod use等关键字的认知。。。 rust mod&#x2F;use&#x2F;externPackages and Crates rust认为src下的main.rs是二进制crate的主文件，而lib.rs则是库crate的主文件，所以这里的lib.rs是主文件，和cargo.toml">
+<meta property="og:locale">
+<meta property="article:published_time" content="2022-07-19T05:25:46.000Z">
+<meta property="article:modified_time" content="2022-07-24T02:23:11.620Z">
+<meta property="article:author" content="Z3ratu1">
+<meta property="article:tag" content="RCore">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="https://blog.z3ratu1.cn/rCore_Tutorial_CP2.html">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-Hans'
+  };
+</script>
+
+  <title>rCore_Tutorial_CP2 | Z3ratu1's blog</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+<link rel="stylesheet" href="/css/prism-tomorrow.css" type="text/css"></head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">Z3ratu1's blog</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">Welcome</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>关于</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+        <li class="menu-item menu-item-links">
+
+    <a href="/links/" rel="section"><i class="fa fa-link fa-fw"></i>友链</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off" placeholder="搜索..." spellcheck="false" type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+  <a href="https://github.com/Z3ratu1" class="github-corner" title="Follow me on GitHub" aria-label="Follow me on GitHub" rel="external nofollow noopener noreferrer" target="_blank"><svg width="80" height="80" viewbox="0 0 250 250" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"/><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"/><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"/></svg></a>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
+    <link itemprop="mainEntityOfPage" href="https://blog.z3ratu1.cn/rCore_Tutorial_CP2.html">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="https://q2.qlogo.cn/headimg_dl?dst_uin=1207039417&spec=160">
+      <meta itemprop="name" content="Z3ratu1">
+      <meta itemprop="description" content="与其感慨路难行，不如现在出发">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Z3ratu1's blog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          rCore_Tutorial_CP2
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2022-07-19 13:25:46" itemprop="dateCreated datePublished" datetime="2022-07-19T13:25:46+08:00">2022-07-19</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2022-07-24 10:23:11" itemprop="dateModified" datetime="2022-07-24T10:23:11+08:00">2022-07-24</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E7%AC%94%E8%AE%B0/" itemprop="url" rel="index"><span itemprop="name">笔记</span></a>
+                </span>
+            </span>
+
+          
+            <span id="/rCore_Tutorial_CP2.html" class="post-meta-item leancloud_visitors" data-flag-title="rCore_Tutorial_CP2" title="阅读次数">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span class="leancloud-visitors-count"></span>
+            </span>
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="far fa-comment"></i>
+      </span>
+      <span class="post-meta-item-text">Valine：</span>
+    
+    <a title="valine" href="/rCore_Tutorial_CP2.html#valine-comments" itemprop="discussionUrl">
+      <span class="post-comments-count valine-comment-count" data-xid="/rCore_Tutorial_CP2.html" itemprop="commentCount"></span>
+    </a>
+  </span>
+  
+  
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h1 id="rCore-Tutorial-CP2"><a href="#rCore-Tutorial-CP2" class="headerlink" title="rCore_Tutorial_CP2"></a>rCore_Tutorial_CP2</h1><p>这一章的文件结构略微的复杂了一点，需要开始之前先稍微强化一下对rust mod use等关键字的认知。。。</p>
+<h2 id="rust-mod-x2F-use-x2F-extern"><a href="#rust-mod-x2F-use-x2F-extern" class="headerlink" title="rust mod&#x2F;use&#x2F;extern"></a>rust mod&#x2F;use&#x2F;extern</h2><p><a target="_blank" rel="external nofollow noopener noreferrer" href="https://doc.rust-lang.org/book/ch07-01-packages-and-crates.html">Packages and Crates</a> rust认为src下的main.rs是二进制crate的主文件，而lib.rs则是库crate的主文件，所以这里的lib.rs是主文件，和cargo.toml中的name赋值为<code>user_lib</code>并无关联。。。</p>
+<blockquote>
+<p>When we entered the command, Cargo created a Cargo.toml file, giving us a package. Looking at the contents of Cargo.toml, there’s no mention of src&#x2F;main.rs because Cargo follows a convention that src&#x2F;main.rs is the crate root of a binary crate with the same name as the package. Likewise, Cargo knows that if the package directory contains src&#x2F;lib.rs, the package contains a library crate with the same name as the package, and src&#x2F;lib.rs is its crate root. Cargo passes the crate root files to rustc to build the library or binary.</p>
+</blockquote>
+<p>Here, we have a package that only contains src&#x2F;main.rs, meaning it only contains a binary crate named my-project. If a package contains src&#x2F;main.rs and src&#x2F;lib.rs, it has two crates: a binary and a library, both with the same name as the package. A package can have multiple binary crates by placing files in the src&#x2F;bin directory: each file will be a separate binary crate.</p>
+<p>所以user&#x2F;src&#x2F;bin下面塞的几个独立文件实际上也是都依赖于lib.rs这个库的</p>
+<p>其次是mod关键字，mod就是用来进行模块化编程的，但是网上常见的教程都是直接写一个文件里面mod套mod折磨人，并且mod的实现直接写在定义后的body内，而实际使用时的mod给人的感觉却像是一个import语句，这里解释了什么情况<br><a target="_blank" rel="external nofollow noopener noreferrer" href="https://panaetius.io/post/2020/11/the-difference-between-mod-and-use-in-rust">The difference between mod and use in Rust</a></p>
+<blockquote>
+<p>In the example above we see that we can write a mod statement without declaring a body (the curly brackets {}). When you do this and compile your crate, Cargo will look for a .rs file in the current directory with the name given after the mod declaration.</p>
+</blockquote>
+<p>所以在正常开发流程中一般不会出现mod套mod，也不会出现主文件外的地方使用mod关键字，因为mod的实际结构应当由文件结构实现，而mod也不是一个import的语句，虽然表现上有点像，但实际上这个是对自身子模块的定义，为了较为高效的开发将子模块从主文件中移除出去的关键字罢了</p>
+<p>这里console.rs中的第一句<code>use super::write</code>就是子模块使用父模块的write函数。直接用crate来表示最顶级模块也是可以的，比如<code>use crate::write</code>，模块与模块之间可以使用路径进行引入（use关键字其实也不是引入关键字，感觉更像别名关键字），在<code>use crate::write</code>之后可以直接使用write来表名这个函数，但你不用use也可以直接crate::write完整路径调用这个方法<br>bin目录下的extern crate就是引入外部crate，实际上不引入用全名也一样。并且rust2018之后直接use也一样。。。垃圾语言嗼<br><a target="_blank" rel="external nofollow noopener noreferrer" href="https://stackoverflow.com/questions/29403920/whats-the-difference-between-use-and-extern">What’s the difference between use and extern?</a><br>所以魔改成这样也跑得起来</p>
+<pre class=" language-rust"><code class="language-rust"><span class="token attribute attr-name">#![no_std]</span>
+<span class="token attribute attr-name">#![no_main]</span>
+
+<span class="token attribute attr-name">#[macro_use]</span>
+<span class="token keyword">use</span> user_lib<span class="token punctuation">:</span><span class="token punctuation">:</span><span class="token operator">*</span><span class="token punctuation">;</span>
+
+<span class="token attribute attr-name">#[no_mangle]</span>
+<span class="token keyword">fn</span> <span class="token function">main</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">-></span> i32 <span class="token punctuation">{</span>
+    <span class="token function">println!</span><span class="token punctuation">(</span><span class="token string">"Hello, world!"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token number">0</span>
+<span class="token punctuation">}</span>
+</code></pre>
+<p>或者删了use直接<code>user_lib::println!</code>都行</p>
+<p>总而言之整体和之前写的js python什么的不一样，不是一份文件写好了哪里用哪里import，而是整个项目有一个目录层级，项目内的文件都互相直接可达，直接按照目录层级访问方法即可。mod关键字就是用来组织目录层级的</p>
+<h2 id="实现应用程序"><a href="#实现应用程序" class="headerlink" title="实现应用程序"></a>实现应用程序</h2><p>原始操作系统的部分以库函数的形式与应用程序进行强耦合。这里编写的lib.rs实现了系统调用和函数入口点装载等操作。<br>可以先使用qemu-riscv64在riscv64的linux系统上先模拟运行一下，用户应用程序中未实现CH1中的asm手搓初始化栈和预留初始栈空间以及裁剪elf header。操作系统通过我们提供的elf header直接将程序加载并在entry处进入，并设置好了初始栈。操作系统，我滴超人</p>
+<h2 id="实现批处理操作系统"><a href="#实现批处理操作系统" class="headerlink" title="实现批处理操作系统"></a>实现批处理操作系统</h2><p>rust，我滴精神病人<br>这个语言真反人类啊<br>光看懂代码就花了半天<br><code>x..y</code>表示<code>[x,y)</code>我是知道的，原来<code>x..=y</code>是<code>[x,y]</code>啊<br>各种生命周期加借用就已经给我整无语了，这里还来了一套rust指针操作借用切片混合双打，垃圾语言嗼<br><a target="_blank" rel="external nofollow noopener noreferrer" href="https://stackoverflow.com/questions/30794235/what-is-the-difference-between-a-slice-and-an-array">What is the difference between a slice and an array?</a></p>
+<p>这里多次使用了<code>from_raw_parts(_mut)</code>这个函数，这个是一个unsafe的函数，参数为指针和长度，获得一个指向目标地址对应长度的切片的引用。mut就是得到的引用还可更改，后面有用这个情况内存，功能类似memset</p>
+<pre class=" language-rust"><code class="language-rust"><span class="token keyword">let</span> <span class="token keyword">mut</span> app_start<span class="token punctuation">:</span> <span class="token punctuation">[</span>usize<span class="token punctuation">;</span> MAX_APP_NUM <span class="token operator">+</span> <span class="token number">1</span><span class="token punctuation">]</span> <span class="token operator">=</span> <span class="token punctuation">[</span><span class="token number">0</span><span class="token punctuation">;</span> MAX_APP_NUM <span class="token operator">+</span> <span class="token number">1</span><span class="token punctuation">]</span><span class="token punctuation">;</span>
+<span class="token keyword">let</span> app_start_raw<span class="token punctuation">:</span> <span class="token operator">&amp;</span><span class="token punctuation">[</span>usize<span class="token punctuation">]</span> <span class="token operator">=</span> 
+    core<span class="token punctuation">:</span><span class="token punctuation">:</span>slice<span class="token punctuation">:</span><span class="token punctuation">:</span><span class="token function">from_raw_parts</span><span class="token punctuation">(</span>num_app_ptr<span class="token punctuation">.</span><span class="token function">add</span><span class="token punctuation">(</span><span class="token number">1</span><span class="token punctuation">)</span><span class="token punctuation">,</span> num_app <span class="token operator">+</span> <span class="token number">1</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+app_start<span class="token punctuation">[</span><span class="token punctuation">..</span><span class="token operator">=</span>num_app<span class="token punctuation">]</span><span class="token punctuation">.</span><span class="token function">copy_from_slice</span><span class="token punctuation">(</span>app_start_raw<span class="token punctuation">)</span><span class="token punctuation">;</span>
+</code></pre>
+<p>所以这里先是指向获取到数据段上的app地址数组，再把个数组拷过来</p>
+<p>在load_app中，系统将程序加载到了0x80400000的位置，与编译程序时使用的base addr一致。但在上一小节的评论区有人指出，rust编译出来的代码为位置无关码，因此load app中的base addr即使与编译时的base addr不同，只要指令本身位置无关，并不会产生影响。<br>（然后在本章评论中作者又指出我们生成的代码是位置有关的。。。什么情况捏）<br>但又指出如果修改编译时的base addr，会导致bss段的两个符号位置改变，在clear bss时可能破坏程序数据。但如果bss段的符号在编译时就确定且导出到符号表的话，在运行时如果加载位置存在偏差可能导致符号指向的位置存在问题</p>
+<p>试着魔改了一下ch1的os加载地址，完全不行，因为rustsbi默认跳到0x80200000，即使修改启动参数也不行，所以内核被加载到另一个地址就算位置无关但pc指不到入口。并且qemu那个加载也怪怪的，在编译地址和加载地址不一致的时候并不是想象中简单的把整个二进制文件移到对应地址，会出现问题。好怪</p>
+<h2 id="实现特权级的切换"><a href="#实现特权级的切换" class="headerlink" title="实现特权级的切换"></a>实现特权级的切换</h2><p>主要看一下汇编，指令都忘了<br><code>sd ra imm(sp)</code>该指令将ra的值放入栈顶指针sp加上立即数偏移imm的位置<br>这里手写汇编保存寄存器，由于栈是往低地址生长的，所以入栈是往高地址加<br>这里一共x0-x31 32个寄存器+两个状态sstatus&#x2F;sepc，因此开了34个空间。x0不存，所以初始偏移直接从1*8开始<br>等于说在内核栈上手搓了一个TrapContext实例，然后塞进a0里面寄存器传参调用trap_handler。。。真是狂野又原始的编程风格。大概call这个伪指令会完成实际调用时的栈指针移动8</p>
+<p>在<code>__restore</code>处把当做参数的a0塞回了sp，文档中未给出解释，估计是因为这个结构体是手搓入栈的，导致正常栈结构不太对，call一轮正常入栈出栈导致栈顶指针位置歪了吧？然后正常恢复寄存器，栈顶移回去，把内核栈与用户栈指针换回来，完成</p>
+<blockquote>
+<p>有兴趣的同学可以思考： sscratch 是何时被设置为内核栈顶的？</p>
+</blockquote>
+<p>评论下面给出了答案，但仍然略微的有些抽象，内核栈顶的指针在内核初始化时就已经被设定为sp了，在远古时期写的entry.asm中设定的，但实际上我们使用的内核栈数据结果和初始asm中在汇编里定下的bss段的栈是一个栈吗？<br>似乎不一定。前文提到了文档中未解释的<code>mv sp, a0</code>，由于程序初始化时新建了一个初始context恢复给用户态，并将该context放置在后续设定的kernel stack上，而push_context函数将context作为返回值，寄存器传参的情况下，a0就变成了指向后续定义的内核栈的指针，成功一波偷梁换柱，将asm中的栈指向了自定义的栈。</p>
+<p>翻了下评论，挺多说这个问题的，作者也有给出解释</p>
+<blockquote>
+<p>64KiB的空间是启动栈，仅在内核初始化自身，也就是调用rust_main函数直到task::run_first_task之前由内核使用。在此之后应用使用UserStack而内核使用KernelStack，启动栈不再被使用。</p>
+</blockquote>
+<p>还有很多小朋友问用户栈没看到这个代码用？用户栈内核用锤子，用户空间自己调用函数的时候用的。栈又不需要在编译时确定，运行的时候给片空间给个栈指针就能自动加加减减</p>
+<p>tutorial中没有提到app的生成情况，在os目录下有一个build.rs写了怎么样把user目录下的程序编译成目标汇编并导出符号的。在os的main.rs的开头引入了link_app.S，然后靠导出的符号确定内存中的位置</p>
+<h2 id="总结一下批处理系统的运行逻辑？"><a href="#总结一下批处理系统的运行逻辑？" class="headerlink" title="总结一下批处理系统的运行逻辑？"></a>总结一下批处理系统的运行逻辑？</h2><p>相较于第一章整个程序之间和操作系统编译到一起运行，这回起码抽出来了一个内核，然后系统调用部分以库函数的形式和用户程序一起编译，内核则实现了简单的隔离和特权。也就实现了一次多读几个程序进来一个完了立即处理下一个。程序出了问题也能及时杀掉运行下一个，保证了效率。</p>
+<p>特权的隔离想了半天没想通。因为这里操作系统的最终实现还是一层ecall发起系统调用，感觉似乎用户程序也能写一模一样的汇编绕过操作系统和硬件交互<br>所以这里有这样子的一个图<br><a target="_blank" rel="external nofollow noopener noreferrer" href="http://rcore-os.cn/rCore-Tutorial-Book-v3/chapter2/1rv-privilege.html#environment-call-flow">environment call flow</a><br>实际上ecall应该会根据当前所在的特权级提升特权，最终的硬件交互可能需要提升至machine级别才能完成执行，而用户运行在user下，直接手搓的ecall也只能抵达操作系统handler的trap中<br>但是指向trap的寄存器stvec只有一个，也许machine级别的代码有另一个地方会存储M级的trap handler吧</p>
+<p>应当是所有可能危害操作系统和其他应用程序的指令均在硬件层面只允许内核态使用，确保用户态即使在知道交互的方法时也无法直接手搓汇编完成访问。同时，用户态程序可以通过手搓汇编的方法绕过操作系统提供的系统调用（比如user中直接搓汇编调用而不是调用sys_write，这样一来如果在sys_write中添加检查就会无效，比如windows下经典的syswhispher就能在这个程度上过掉库函数层面的hook），但无论如何ecall会进入trap，且用户态无法改变<code>stvec</code>指向的trap处理程序，而trap又会将控制流移交操作系统，操作系统在trap后实现安全检查即可保证安全性。</p>
+<p>其实就是划分了权限的高低级，低权限代码写的再花反正硬件规定了这些操作权限不够做不了，只能去找高权限的内核做，而高权限的内核只提供几个不会破坏系统安全的功能（系统调用）出来，确保整个系统能平稳运行</p>
+<p>但是操作系统应当确保进程间的隔离，现在这个原始系统完全没有完成隔离，导致用户程序可以随意读写内核和其他程序的数据。。。</p>
+<h2 id="练习"><a href="#练习" class="headerlink" title="练习"></a>练习</h2><p>伏笔回收，在练习里面就提到了这个内存没有隔离的问题。但是也只是简单的限制系统调用而已。。。毕竟没有虚拟内存的话，都不需要系统调用，就把所有数据当自己的读写就行了。不过实现了虚拟内存之后，物理内存读取做好隔离就能防住了吧</p>
+<p>只需要把用户栈的范围和用户APP的范围搞出来，然后在系统调用的时候检查一下就行了<br>但是rust垃圾并不知道怎么样跨文件使用全局变量。。。并且user stack的get sp是作为结构体的方法。。。rust垃圾只能自己重新在batch.rs里面写了一堆pub的获取地址的函数。。。</p>
+<pre class=" language-rust"><code class="language-rust"><span class="token keyword">pub</span> <span class="token keyword">fn</span> <span class="token function">get_user_stack_range</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">-></span> <span class="token punctuation">(</span>usize<span class="token punctuation">,</span>usize<span class="token punctuation">)</span><span class="token punctuation">{</span>
+    <span class="token punctuation">(</span>USER_STACK<span class="token punctuation">.</span>data<span class="token punctuation">.</span><span class="token function">as_ptr</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token keyword">as</span> usize<span class="token punctuation">,</span> USER_STACK<span class="token punctuation">.</span>data<span class="token punctuation">.</span><span class="token function">as_ptr</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token keyword">as</span> usize <span class="token operator">+</span> USER_STACK_SIZE<span class="token punctuation">)</span>
+<span class="token punctuation">}</span>
+
+<span class="token keyword">pub</span> <span class="token keyword">fn</span> <span class="token function">get_current_app_range</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">-></span> <span class="token punctuation">(</span>usize<span class="token punctuation">,</span> usize<span class="token punctuation">)</span><span class="token punctuation">{</span>
+    <span class="token keyword">let</span> <span class="token keyword">mut</span> app_manager <span class="token operator">=</span> APP_MANAGER<span class="token punctuation">.</span><span class="token function">exclusive_access</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token keyword">let</span> i <span class="token operator">=</span> app_manager<span class="token punctuation">.</span>current_app <span class="token operator">-</span> <span class="token number">1</span><span class="token punctuation">;</span>
+    <span class="token punctuation">(</span>app_manager<span class="token punctuation">.</span>app_start<span class="token punctuation">[</span>i<span class="token punctuation">]</span><span class="token punctuation">,</span> app_manager<span class="token punctuation">.</span>app_start<span class="token punctuation">[</span>i<span class="token operator">+</span><span class="token number">1</span><span class="token punctuation">]</span><span class="token punctuation">)</span>
+<span class="token punctuation">}</span>
+</code></pre>
+<p>check</p>
+<pre class=" language-rust"><code class="language-rust">    <span class="token keyword">let</span> start <span class="token operator">=</span> buf <span class="token keyword">as</span> usize<span class="token punctuation">;</span>
+    <span class="token keyword">let</span> end <span class="token operator">=</span> start <span class="token operator">+</span> len<span class="token punctuation">;</span>
+    <span class="token keyword">let</span> <span class="token punctuation">(</span>stack_top<span class="token punctuation">,</span> stack_bottom<span class="token punctuation">)</span> <span class="token operator">=</span> <span class="token keyword">crate</span><span class="token punctuation">:</span><span class="token punctuation">:</span>batch<span class="token punctuation">:</span><span class="token punctuation">:</span><span class="token function">get_user_stack_range</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token keyword">let</span> <span class="token punctuation">(</span>app_bottom<span class="token punctuation">,</span> app_top<span class="token punctuation">)</span> <span class="token operator">=</span> <span class="token keyword">crate</span><span class="token punctuation">:</span><span class="token punctuation">:</span>batch<span class="token punctuation">:</span><span class="token punctuation">:</span><span class="token function">get_current_app_range</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token keyword">if</span> <span class="token operator">!</span><span class="token punctuation">(</span>start <span class="token operator">></span> stack_top <span class="token operator">&amp;&amp;</span> end <span class="token operator">&lt;</span> stack_bottom <span class="token operator">||</span>
+        start <span class="token operator">></span> app_bottom <span class="token operator">&amp;&amp;</span> end <span class="token operator">&lt;</span> app_top<span class="token punctuation">)</span><span class="token punctuation">{</span>
+        <span class="token keyword">return</span> <span class="token operator">-</span><span class="token number">1</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+</code></pre>
+<p>寄存器都是usize，应该不会给length搓出来个负数吧。。。</p>
+<p><code>git checkout ch2-lab</code>切到实验代码，但是这里面rust-toolchain那个文件版本回退了，是21年的，编译之后asm那块超级报错。看评论区换成ch1的22年版，然后原来用的<code>#![feature(asm)]</code>也屁用没有，全部手动加<code>use core::arch::asm/global_asm;</code></p>
+<p>启动的<code>make run TEST=1</code>简单看了一下，就是通配<code>test$(TEST)*</code>的文件编译加载，所以能把两个test的输出文件编译加载进去</p>
+<p>但是好像跑不起来。。。检查了半天发现了问题，在操作系统中定义的用户栈长度是0x2000，而write0中定义的用户栈长度为0x1000，导致write0认为的溢出了的栈在我这边是没有溢出的。。。<br>把检测时返回的用户栈范围变成0x1000即可</p>
+<pre class=" language-rust"><code class="language-rust"><span class="token keyword">pub</span> <span class="token keyword">fn</span> <span class="token function">get_user_stack_range</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">-></span> <span class="token punctuation">(</span>usize<span class="token punctuation">,</span>usize<span class="token punctuation">)</span><span class="token punctuation">{</span>
+    <span class="token punctuation">(</span>USER_STACK<span class="token punctuation">.</span>data<span class="token punctuation">.</span><span class="token function">as_ptr</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token keyword">as</span> usize<span class="token punctuation">,</span> USER_STACK<span class="token punctuation">.</span>data<span class="token punctuation">.</span><span class="token function">as_ptr</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token keyword">as</span> usize <span class="token operator">+</span> <span class="token number">0x1000</span><span class="token punctuation">)</span>
+<span class="token punctuation">}</span>
+
+<span class="token keyword">pub</span> <span class="token keyword">fn</span> <span class="token function">get_current_app_range</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">-></span> <span class="token punctuation">(</span>usize<span class="token punctuation">,</span> usize<span class="token punctuation">)</span><span class="token punctuation">{</span>
+    <span class="token keyword">let</span> <span class="token keyword">mut</span> app_manager <span class="token operator">=</span> APP_MANAGER<span class="token punctuation">.</span><span class="token function">exclusive_access</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token keyword">let</span> index <span class="token operator">=</span> app_manager<span class="token punctuation">.</span>current_app<span class="token number">-1</span><span class="token punctuation">;</span>
+    <span class="token punctuation">(</span>app_manager<span class="token punctuation">.</span>app_start<span class="token punctuation">[</span>index<span class="token punctuation">]</span><span class="token punctuation">,</span> app_manager<span class="token punctuation">.</span>app_start<span class="token punctuation">[</span>index<span class="token operator">+</span><span class="token number">1</span><span class="token punctuation">]</span><span class="token punctuation">)</span>
+<span class="token punctuation">}</span>
+</code></pre>
+<p>current_app那里要减一是因为load app的时候就加了一，需要减一复原回去</p>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/RCore/" rel="tag"># RCore</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/rCore_Tutorial_CP1.html" rel="prev" title="rCore_Tutorial_CP1">
+      <i class="fa fa-chevron-left"></i> rCore_Tutorial_CP1
+    </a></div>
+      <div class="post-nav-item"></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+    <div class="comments" id="valine-comments"></div>
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#rCore-Tutorial-CP2"><span class="nav-number">1.</span> <span class="nav-text">rCore_Tutorial_CP2</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#rust-mod-x2F-use-x2F-extern"><span class="nav-number">1.1.</span> <span class="nav-text">rust mod&#x2F;use&#x2F;extern</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%AE%9E%E7%8E%B0%E5%BA%94%E7%94%A8%E7%A8%8B%E5%BA%8F"><span class="nav-number">1.2.</span> <span class="nav-text">实现应用程序</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%AE%9E%E7%8E%B0%E6%89%B9%E5%A4%84%E7%90%86%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F"><span class="nav-number">1.3.</span> <span class="nav-text">实现批处理操作系统</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%AE%9E%E7%8E%B0%E7%89%B9%E6%9D%83%E7%BA%A7%E7%9A%84%E5%88%87%E6%8D%A2"><span class="nav-number">1.4.</span> <span class="nav-text">实现特权级的切换</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%80%BB%E7%BB%93%E4%B8%80%E4%B8%8B%E6%89%B9%E5%A4%84%E7%90%86%E7%B3%BB%E7%BB%9F%E7%9A%84%E8%BF%90%E8%A1%8C%E9%80%BB%E8%BE%91%EF%BC%9F"><span class="nav-number">1.5.</span> <span class="nav-text">总结一下批处理系统的运行逻辑？</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%BB%83%E4%B9%A0"><span class="nav-number">1.6.</span> <span class="nav-text">练习</span></a></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Z3ratu1" src="https://q2.qlogo.cn/headimg_dl?dst_uin=1207039417&spec=160">
+  <p class="site-author-name" itemprop="name">Z3ratu1</p>
+  <div class="site-description" itemprop="description">与其感慨路难行，不如现在出发</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">162</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">5</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">90</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+  <div class="beian"><a href="http://www.beian.miit.gov.cn/" rel="external nofollow noopener noreferrer" target="_blank">湘ICP备2020021580号 </a>
+      <img src="/./images/beian.png" style="display: inline-block;">
+  </div>
+
+<div class="copyright">
+  
+  &copy; 2019 – 
+  <span itemprop="copyrightYear">2022</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Z3ratu1</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="external nofollow noopener noreferrer" target="_blank">Hexo</a> & <a href="https://pisces.theme-next.org/" class="theme-link" rel="external nofollow noopener noreferrer" target="_blank">NexT.Pisces</a> 强力驱动
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+
+<script>
+NexT.utils.loadComments(document.querySelector('#valine-comments'), () => {
+  NexT.utils.getScript('https://cdn.jsdelivr.net/npm/valine@1.4.14/dist/Valine.min.js', () => {
+    var GUEST = ['nick', 'mail', 'link'];
+    var guest = 'nick,mail,link';
+    guest = guest.split(',').filter(item => {
+      return GUEST.includes(item);
+    });
+    new Valine({
+      el         : '#valine-comments',
+      verify     : false,
+      notify     : false,
+      appId      : '7H8kg0XdWO8IbhOcu4K1JaAT-gzGzoHsz',
+      appKey     : 'wPKQjkbVtvPaRR7gh2yjfLSi',
+      placeholder: "Just go go",
+      avatar     : 'mm',
+      meta       : guest,
+      pageSize   : '10' || 10,
+      visitor    : true,
+      lang       : '' || 'zh-cn',
+      path       : location.pathname,
+      recordIP   : false,
+      serverURLs : ''
+    });
+  }, window.Valine);
+});
+</script>
+
+</body>
+</html>
