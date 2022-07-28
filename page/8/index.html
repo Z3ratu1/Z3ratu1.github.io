@@ -196,6 +196,104 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
+    <link itemprop="mainEntityOfPage" href="https://blog.z3ratu1.cn/[NCTF2019]phar%20matches%20everything.html">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="https://q2.qlogo.cn/headimg_dl?dst_uin=1207039417&spec=160">
+      <meta itemprop="name" content="Z3ratu1">
+      <meta itemprop="description" content="与其感慨路难行，不如现在出发">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Z3ratu1's blog">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/%5BNCTF2019%5Dphar%20matches%20everything.html" class="post-title-link" itemprop="url">[NCTF2019]phar matches everything</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+              
+
+              <time title="创建时间：2021-08-20 11:12:58 / 修改时间：12:16:15" itemprop="dateCreated datePublished" datetime="2021-08-20T11:12:58+08:00">2021-08-20</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E5%88%B7%E9%A2%98%E8%AE%B0%E5%BD%95/" itemprop="url" rel="index"><span itemprop="name">刷题记录</span></a>
+                </span>
+            </span>
+
+          
+            <span id="/%5BNCTF2019%5Dphar%20matches%20everything.html" class="post-meta-item leancloud_visitors" data-flag-title="[NCTF2019]phar matches everything" title="阅读次数">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span class="leancloud-visitors-count"></span>
+            </span>
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="far fa-comment"></i>
+      </span>
+      <span class="post-meta-item-text">Valine：</span>
+    
+    <a title="valine" href="/%5BNCTF2019%5Dphar%20matches%20everything.html#valine-comments" itemprop="discussionUrl">
+      <span class="post-comments-count valine-comment-count" data-xid="/%5BNCTF2019%5Dphar%20matches%20everything.html" itemprop="commentCount"></span>
+    </a>
+  </span>
+  
+  
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h1 id="NCTF2019-phar-matches-everything"><a href="#NCTF2019-phar-matches-everything" class="headerlink" title="[NCTF2019]phar matches everything"></a>[NCTF2019]phar matches everything</h1><p>BUU继续重拳出击，总觉得刷题的意义正在逐渐消失，不想这么单纯的刷体了，感觉只能让我成为一个赛棍。应该学点什么，以后水一点的题就不记了，起码要学到一点点东西再说</p>
+<h2 id="题解"><a href="#题解" class="headerlink" title="题解"></a>题解</h2><p>buu上给出了源码，两个关键文件，一个文件上传，一个反序列化，文件上传限制了后缀和文件名，反序列化处有一个经典用phar来触发的操作，反序列化的结果就是一次curl</p>
+<p>反序列化的操作非常简单不在赘述，稍微要考虑一下的就是文件上传。检测后缀对phar来说并没有什么问题，因为phar协议指定去读一个文件也不管他是什么后缀。唯一要过的点就是那个imagesize函数的检测，也很简单，用那个经典的<code>#define width 1</code>就能过，就放在那个压缩进phar的文件里就行，要另起一行才能正确识别</p>
+          <!--noindex-->
+            <div class="post-button">
+              <a class="btn" href="/%5BNCTF2019%5Dphar%20matches%20everything.html#more" rel="contents">
+                阅读全文 &raquo;
+              </a>
+            </div>
+          <!--/noindex-->
+        
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
     <link itemprop="mainEntityOfPage" href="https://blog.z3ratu1.cn/[HFCTF2021]hatenum.html">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -596,129 +694,6 @@
   
   
 
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
-    <link itemprop="mainEntityOfPage" href="https://blog.z3ratu1.cn/CyBRICS2021.html">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="https://q2.qlogo.cn/headimg_dl?dst_uin=1207039417&spec=160">
-      <meta itemprop="name" content="Z3ratu1">
-      <meta itemprop="description" content="与其感慨路难行，不如现在出发">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Z3ratu1's blog">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/CyBRICS2021.html" class="post-title-link" itemprop="url">CyBRICS2021 wp</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2021-07-24 21:05:45" itemprop="dateCreated datePublished" datetime="2021-07-24T21:05:45+08:00">2021-07-24</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="far fa-calendar-check"></i>
-                </span>
-                <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2021-07-26 21:26:13" itemprop="dateModified" datetime="2021-07-26T21:26:13+08:00">2021-07-26</time>
-              </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-folder"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/%E5%88%B7%E9%A2%98%E8%AE%B0%E5%BD%95/" itemprop="url" rel="index"><span itemprop="name">刷题记录</span></a>
-                </span>
-            </span>
-
-          
-            <span id="/CyBRICS2021.html" class="post-meta-item leancloud_visitors" data-flag-title="CyBRICS2021 wp" title="阅读次数">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-eye"></i>
-              </span>
-              <span class="post-meta-item-text">阅读次数：</span>
-              <span class="leancloud-visitors-count"></span>
-            </span>
-  
-  <span class="post-meta-item">
-    
-      <span class="post-meta-item-icon">
-        <i class="far fa-comment"></i>
-      </span>
-      <span class="post-meta-item-text">Valine：</span>
-    
-    <a title="valine" href="/CyBRICS2021.html#valine-comments" itemprop="discussionUrl">
-      <span class="post-comments-count valine-comment-count" data-xid="/CyBRICS2021.html" itemprop="commentCount"></span>
-    </a>
-  </span>
-  
-  
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <h1 id="CyBRICS2021-wp"><a href="#CyBRICS2021-wp" class="headerlink" title="CyBRICS2021 wp"></a>CyBRICS2021 wp</h1><p>除了那个没太看懂怎么回事的0解题，剩下的题目都挺简单的，很适合我这种萌新去做</p>
-<h2 id="Ad-Network"><a href="#Ad-Network" class="headerlink" title="Ad Network"></a>Ad Network</h2><p>就是简单的跟随重定向就行了，跟1337次后得到flag但是他的服务器似乎有点土豆，所以直接写个脚本然后访问的话基本上重定向个一二十次就断了，浏览器访问当然是直接重定向过多，所以不跟重定向然后自己每次重新访问重定向的内容就行</p>
-<pre class=" language-python"><code class="language-python"><span class="token keyword">import</span> requests
-
-url <span class="token operator">=</span> <span class="token string">"http://adnetwork-cybrics2021.ctf.su/adnetwork"</span>
-cnt <span class="token operator">=</span> <span class="token number">0</span>
-
-
-<span class="token keyword">while</span> cnt <span class="token operator">&lt;=</span> <span class="token number">1337</span><span class="token punctuation">:</span>
-    <span class="token keyword">try</span><span class="token punctuation">:</span>
-        response <span class="token operator">=</span> requests<span class="token punctuation">.</span>get<span class="token punctuation">(</span>url<span class="token punctuation">,</span> allow_redirects<span class="token operator">=</span><span class="token boolean">False</span><span class="token punctuation">,</span> timeout<span class="token operator">=</span><span class="token number">2</span><span class="token punctuation">)</span>
-        cnt <span class="token operator">+=</span> <span class="token number">1</span>
-        <span class="token keyword">if</span> response<span class="token punctuation">.</span>status_code <span class="token operator">></span> <span class="token number">300</span><span class="token punctuation">:</span>
-            <span class="token keyword">print</span><span class="token punctuation">(</span>response<span class="token punctuation">.</span>headers<span class="token punctuation">[</span><span class="token string">'Location'</span><span class="token punctuation">]</span><span class="token punctuation">)</span>
-            url <span class="token operator">=</span> response<span class="token punctuation">.</span>headers<span class="token punctuation">[</span><span class="token string">'Location'</span><span class="token punctuation">]</span>
-        <span class="token keyword">else</span><span class="token punctuation">:</span>
-            <span class="token keyword">print</span><span class="token punctuation">(</span>response<span class="token punctuation">.</span>text<span class="token punctuation">)</span>
-    <span class="token keyword">except</span> Exception <span class="token keyword">as</span> e<span class="token punctuation">:</span>
-        <span class="token keyword">print</span><span class="token punctuation">(</span>e<span class="token punctuation">)</span>
-
-ans <span class="token operator">=</span> <span class="token string">"http://tend.adnetwork-cybrics2021.ctf.su/military-front-low/learn-fill-though-factor-line/hear-hundred-subject-wind/enough-lot-tree-will-color"</span>
-</code></pre>
-          <!--noindex-->
-            <div class="post-button">
-              <a class="btn" href="/CyBRICS2021.html#more" rel="contents">
-                阅读全文 &raquo;
-              </a>
-            </div>
-          <!--/noindex-->
-        
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
 
   
   <nav class="pagination">
@@ -789,7 +764,7 @@ ans <span class="token operator">=</span> <span class="token string">"http://ten
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">162</span>
+          <span class="site-state-item-count">163</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>

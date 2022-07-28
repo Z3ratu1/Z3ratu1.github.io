@@ -196,6 +196,129 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
+    <link itemprop="mainEntityOfPage" href="https://blog.z3ratu1.cn/CyBRICS2021.html">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="https://q2.qlogo.cn/headimg_dl?dst_uin=1207039417&spec=160">
+      <meta itemprop="name" content="Z3ratu1">
+      <meta itemprop="description" content="与其感慨路难行，不如现在出发">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Z3ratu1's blog">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/CyBRICS2021.html" class="post-title-link" itemprop="url">CyBRICS2021 wp</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2021-07-24 21:05:45" itemprop="dateCreated datePublished" datetime="2021-07-24T21:05:45+08:00">2021-07-24</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2021-07-26 21:26:13" itemprop="dateModified" datetime="2021-07-26T21:26:13+08:00">2021-07-26</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E5%88%B7%E9%A2%98%E8%AE%B0%E5%BD%95/" itemprop="url" rel="index"><span itemprop="name">刷题记录</span></a>
+                </span>
+            </span>
+
+          
+            <span id="/CyBRICS2021.html" class="post-meta-item leancloud_visitors" data-flag-title="CyBRICS2021 wp" title="阅读次数">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span class="leancloud-visitors-count"></span>
+            </span>
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="far fa-comment"></i>
+      </span>
+      <span class="post-meta-item-text">Valine：</span>
+    
+    <a title="valine" href="/CyBRICS2021.html#valine-comments" itemprop="discussionUrl">
+      <span class="post-comments-count valine-comment-count" data-xid="/CyBRICS2021.html" itemprop="commentCount"></span>
+    </a>
+  </span>
+  
+  
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h1 id="CyBRICS2021-wp"><a href="#CyBRICS2021-wp" class="headerlink" title="CyBRICS2021 wp"></a>CyBRICS2021 wp</h1><p>除了那个没太看懂怎么回事的0解题，剩下的题目都挺简单的，很适合我这种萌新去做</p>
+<h2 id="Ad-Network"><a href="#Ad-Network" class="headerlink" title="Ad Network"></a>Ad Network</h2><p>就是简单的跟随重定向就行了，跟1337次后得到flag但是他的服务器似乎有点土豆，所以直接写个脚本然后访问的话基本上重定向个一二十次就断了，浏览器访问当然是直接重定向过多，所以不跟重定向然后自己每次重新访问重定向的内容就行</p>
+<pre class=" language-python"><code class="language-python"><span class="token keyword">import</span> requests
+
+url <span class="token operator">=</span> <span class="token string">"http://adnetwork-cybrics2021.ctf.su/adnetwork"</span>
+cnt <span class="token operator">=</span> <span class="token number">0</span>
+
+
+<span class="token keyword">while</span> cnt <span class="token operator">&lt;=</span> <span class="token number">1337</span><span class="token punctuation">:</span>
+    <span class="token keyword">try</span><span class="token punctuation">:</span>
+        response <span class="token operator">=</span> requests<span class="token punctuation">.</span>get<span class="token punctuation">(</span>url<span class="token punctuation">,</span> allow_redirects<span class="token operator">=</span><span class="token boolean">False</span><span class="token punctuation">,</span> timeout<span class="token operator">=</span><span class="token number">2</span><span class="token punctuation">)</span>
+        cnt <span class="token operator">+=</span> <span class="token number">1</span>
+        <span class="token keyword">if</span> response<span class="token punctuation">.</span>status_code <span class="token operator">></span> <span class="token number">300</span><span class="token punctuation">:</span>
+            <span class="token keyword">print</span><span class="token punctuation">(</span>response<span class="token punctuation">.</span>headers<span class="token punctuation">[</span><span class="token string">'Location'</span><span class="token punctuation">]</span><span class="token punctuation">)</span>
+            url <span class="token operator">=</span> response<span class="token punctuation">.</span>headers<span class="token punctuation">[</span><span class="token string">'Location'</span><span class="token punctuation">]</span>
+        <span class="token keyword">else</span><span class="token punctuation">:</span>
+            <span class="token keyword">print</span><span class="token punctuation">(</span>response<span class="token punctuation">.</span>text<span class="token punctuation">)</span>
+    <span class="token keyword">except</span> Exception <span class="token keyword">as</span> e<span class="token punctuation">:</span>
+        <span class="token keyword">print</span><span class="token punctuation">(</span>e<span class="token punctuation">)</span>
+
+ans <span class="token operator">=</span> <span class="token string">"http://tend.adnetwork-cybrics2021.ctf.su/military-front-low/learn-fill-though-factor-line/hear-hundred-subject-wind/enough-lot-tree-will-color"</span>
+</code></pre>
+          <!--noindex-->
+            <div class="post-button">
+              <a class="btn" href="/CyBRICS2021.html#more" rel="contents">
+                阅读全文 &raquo;
+              </a>
+            </div>
+          <!--/noindex-->
+        
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
     <link itemprop="mainEntityOfPage" href="https://blog.z3ratu1.cn/[CISCN2021]%E5%86%B3%E8%B5%9B.html">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -602,110 +725,6 @@
   
   
 
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
-    <link itemprop="mainEntityOfPage" href="https://blog.z3ratu1.cn/%E5%88%B7%E9%A2%98%E5%88%B7%E9%A2%98.html">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="https://q2.qlogo.cn/headimg_dl?dst_uin=1207039417&spec=160">
-      <meta itemprop="name" content="Z3ratu1">
-      <meta itemprop="description" content="与其感慨路难行，不如现在出发">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Z3ratu1's blog">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/%E5%88%B7%E9%A2%98%E5%88%B7%E9%A2%98.html" class="post-title-link" itemprop="url">刷题刷题</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2021-06-28 21:07:04" itemprop="dateCreated datePublished" datetime="2021-06-28T21:07:04+08:00">2021-06-28</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="far fa-calendar-check"></i>
-                </span>
-                <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2021-07-02 19:43:34" itemprop="dateModified" datetime="2021-07-02T19:43:34+08:00">2021-07-02</time>
-              </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-folder"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/%E5%88%B7%E9%A2%98%E8%AE%B0%E5%BD%95/" itemprop="url" rel="index"><span itemprop="name">刷题记录</span></a>
-                </span>
-            </span>
-
-          
-            <span id="/%E5%88%B7%E9%A2%98%E5%88%B7%E9%A2%98.html" class="post-meta-item leancloud_visitors" data-flag-title="刷题刷题" title="阅读次数">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-eye"></i>
-              </span>
-              <span class="post-meta-item-text">阅读次数：</span>
-              <span class="leancloud-visitors-count"></span>
-            </span>
-  
-  <span class="post-meta-item">
-    
-      <span class="post-meta-item-icon">
-        <i class="far fa-comment"></i>
-      </span>
-      <span class="post-meta-item-text">Valine：</span>
-    
-    <a title="valine" href="/%E5%88%B7%E9%A2%98%E5%88%B7%E9%A2%98.html#valine-comments" itemprop="discussionUrl">
-      <span class="post-comments-count valine-comment-count" data-xid="/%E5%88%B7%E9%A2%98%E5%88%B7%E9%A2%98.html" itemprop="commentCount"></span>
-    </a>
-  </span>
-  
-  
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <h1 id="刷题刷题"><a href="#刷题刷题" class="headerlink" title="刷题刷题"></a>刷题刷题</h1><p>考试结束，保研没着落，打工不想打，算法不想刷，学习不想学，进入自闭模式，重回buu，对一分题重拳出击（被一分题乱杀）<br>然后很多几十分的题就智障的不行。。。<br>buu有一点坑的就是题目描述上给了个链接，你也不知道这个题目给没给源码，有时候好像没给，一看就觉得题目太傻逼了，有时候事实上是给了的，不看源码自己就变成傻逼了</p>
-<h2 id="HITCON-2016-Leaking"><a href="#HITCON-2016-Leaking" class="headerlink" title="[HITCON 2016]Leaking"></a>[HITCON 2016]Leaking</h2><p>orange出的题，因为是很老的比赛了所以现在的参考价值不大了，大概一个限制了12字符长度的VM沙箱，然后flag是在沙箱外通过require config加载进来的，想拿flag要绕12字符的沙箱逃逸命令执行，看起来有点离谱<br>这里涉及到的是nodejs的远古内存分配问题，nodejs在远古版本（Node.js v5.4.1&#x2F;v4.2.4）中的Buffer分配是就着以前用过的内存分配的，并且分配完了还不会初始化一下，也就意味着之前加载进内存然后被回收掉的内存位置可能被再次分配出来，并且还不会被初始化，原始数据还保留在那</p>
-<p>这个外国大哥的文章讲了原理<a target="_blank" rel="external nofollow noopener noreferrer" href="https://github.com/ChALkeR/notes/blob/master/Buffer-knows-everything.md">Node.js Buffer knows everything</a></p>
-          <!--noindex-->
-            <div class="post-button">
-              <a class="btn" href="/%E5%88%B7%E9%A2%98%E5%88%B7%E9%A2%98.html#more" rel="contents">
-                阅读全文 &raquo;
-              </a>
-            </div>
-          <!--/noindex-->
-        
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
 
   
   <nav class="pagination">
@@ -776,7 +795,7 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">162</span>
+          <span class="site-state-item-count">163</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
