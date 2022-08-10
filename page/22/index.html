@@ -196,6 +196,115 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
+    <link itemprop="mainEntityOfPage" href="https://blog.z3ratu1.cn/[SUCTF2018]anonymous.html">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="https://q2.qlogo.cn/headimg_dl?dst_uin=1207039417&spec=160">
+      <meta itemprop="name" content="Z3ratu1">
+      <meta itemprop="description" content="与其感慨路难行，不如现在出发">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Z3ratu1's blog">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/%5BSUCTF2018%5Danonymous.html" class="post-title-link" itemprop="url">[SUCTF2018]anonymous</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+              
+
+              <time title="创建时间：2020-09-02 20:29:29 / 修改时间：20:30:30" itemprop="dateCreated datePublished" datetime="2020-09-02T20:29:29+08:00">2020-09-02</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E5%88%B7%E9%A2%98%E8%AE%B0%E5%BD%95/" itemprop="url" rel="index"><span itemprop="name">刷题记录</span></a>
+                </span>
+            </span>
+
+          
+            <span id="/%5BSUCTF2018%5Danonymous.html" class="post-meta-item leancloud_visitors" data-flag-title="[SUCTF2018]anonymous" title="阅读次数">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span class="leancloud-visitors-count"></span>
+            </span>
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="far fa-comment"></i>
+      </span>
+      <span class="post-meta-item-text">Valine：</span>
+    
+    <a title="valine" href="/%5BSUCTF2018%5Danonymous.html#valine-comments" itemprop="discussionUrl">
+      <span class="post-comments-count valine-comment-count" data-xid="/%5BSUCTF2018%5Danonymous.html" itemprop="commentCount"></span>
+    </a>
+  </span>
+  
+  
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h1 id="SUCTF2018-anonymous"><a href="#SUCTF2018-anonymous" class="headerlink" title="[SUCTF2018]anonymous"></a>[SUCTF2018]anonymous</h1><p>SUCTF的老题，考的一个匿名函数</p>
+<h2 id="源码"><a href="#源码" class="headerlink" title="源码"></a>源码</h2><pre class=" language-php"><code class="language-php"><span class="token delimiter">&lt;?php</span>
+<span class="token variable">$MY</span> <span class="token operator">=</span> <span class="token function">create_function</span><span class="token punctuation">(</span><span class="token string">""</span><span class="token punctuation">,</span><span class="token string">"die(`dir`);"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token variable">$hash</span> <span class="token operator">=</span> <span class="token function">bin2hex</span><span class="token punctuation">(</span><span class="token function">openssl_random_pseudo_bytes</span><span class="token punctuation">(</span><span class="token number">32</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token function">eval</span><span class="token punctuation">(</span><span class="token string">"function SUCTF_$hash(){"</span>
+    <span class="token punctuation">.</span><span class="token string">"global \$MY;"</span>
+    <span class="token punctuation">.</span><span class="token string">"\$MY();"</span>
+    <span class="token punctuation">.</span><span class="token string">"}"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token keyword">if</span><span class="token punctuation">(</span><span class="token function">isset</span><span class="token punctuation">(</span><span class="token variable">$_GET</span><span class="token punctuation">[</span><span class="token string">'func_name'</span><span class="token punctuation">]</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">{</span>
+    <span class="token variable">$_GET</span><span class="token punctuation">[</span><span class="token string">"func_name"</span><span class="token punctuation">]</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token keyword">die</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
+</code></pre>
+<p>创建一个匿名函数，然后使用eval再创建一个名字为随机字符串的函数调用我们的匿名函数<br>允许提交一个func_name去动态调用一个没参数的函数。</p>
+          <!--noindex-->
+            <div class="post-button">
+              <a class="btn" href="/%5BSUCTF2018%5Danonymous.html#more" rel="contents">
+                阅读全文 &raquo;
+              </a>
+            </div>
+          <!--/noindex-->
+        
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
     <link itemprop="mainEntityOfPage" href="https://blog.z3ratu1.cn/[SUCTF2018]GetShell.html">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -638,104 +747,6 @@ payload <span class="token operator">=</span> <span class="token string">""</spa
   
   
 
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
-    <link itemprop="mainEntityOfPage" href="https://blog.z3ratu1.cn/[CISCN2020%20%E5%8D%8E%E4%B8%9C%E5%8C%97%E8%B5%9B%E5%8C%BA]web%20wp.html">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="https://q2.qlogo.cn/headimg_dl?dst_uin=1207039417&spec=160">
-      <meta itemprop="name" content="Z3ratu1">
-      <meta itemprop="description" content="与其感慨路难行，不如现在出发">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Z3ratu1's blog">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/%5BCISCN2020%20%E5%8D%8E%E4%B8%9C%E5%8C%97%E8%B5%9B%E5%8C%BA%5Dweb%20wp.html" class="post-title-link" itemprop="url">[CISCN2020 华东北赛区]web wp</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-              
-
-              <time title="创建时间：2020-08-21 11:04:48 / 修改时间：14:17:12" itemprop="dateCreated datePublished" datetime="2020-08-21T11:04:48+08:00">2020-08-21</time>
-            </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-folder"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/%E5%88%B7%E9%A2%98%E8%AE%B0%E5%BD%95/" itemprop="url" rel="index"><span itemprop="name">刷题记录</span></a>
-                </span>
-            </span>
-
-          
-            <span id="/%5BCISCN2020%20%E5%8D%8E%E4%B8%9C%E5%8C%97%E8%B5%9B%E5%8C%BA%5Dweb%20wp.html" class="post-meta-item leancloud_visitors" data-flag-title="[CISCN2020 华东北赛区]web wp" title="阅读次数">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-eye"></i>
-              </span>
-              <span class="post-meta-item-text">阅读次数：</span>
-              <span class="leancloud-visitors-count"></span>
-            </span>
-  
-  <span class="post-meta-item">
-    
-      <span class="post-meta-item-icon">
-        <i class="far fa-comment"></i>
-      </span>
-      <span class="post-meta-item-text">Valine：</span>
-    
-    <a title="valine" href="/%5BCISCN2020%20%E5%8D%8E%E4%B8%9C%E5%8C%97%E8%B5%9B%E5%8C%BA%5Dweb%20wp.html#valine-comments" itemprop="discussionUrl">
-      <span class="post-comments-count valine-comment-count" data-xid="/%5BCISCN2020%20%E5%8D%8E%E4%B8%9C%E5%8C%97%E8%B5%9B%E5%8C%BA%5Dweb%20wp.html" itemprop="commentCount"></span>
-    </a>
-  </span>
-  
-  
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <h1 id="CISCN2020-华东北赛区-web-wp"><a href="#CISCN2020-华东北赛区-web-wp" class="headerlink" title="[CISCN2020 华东北赛区]web wp"></a>[CISCN2020 华东北赛区]web wp</h1><p>国赛结束写wp，输出很低，web都被神仙们日穿了，每个题都几百解，太牛逼了<br>没保留题目源码，就凑合着写吧</p>
-<h2 id="easyphp"><a href="#easyphp" class="headerlink" title="easyphp"></a>easyphp</h2><p>用pntcl库开线程，子进程里面有命令执行，<code>call_user_func_array($_GET[&#39;a&#39;], array($_GET[&#39;b&#39;]), false, true);</code><br>父进程调用了pntcl_wait后调用pcntl_wifexited，子进程如果异常退出，父进程就会展示phpinfo，flag就在phpinfo里面，正则匹配$_GET[‘a’]不能有exec和pntcl之类的字段<br>使用call_user_func_array调用一个三个参数的函数，一开始fuzz能接受三个参数的函数fuzz了半天，最后意识到可以直接调用一个call_user_func，用call_user_func再去调用pntcl库的函数，不受正则影响，<br>师傅说子进程调用一个pntcl_wait就可以让父进程的pcntl_wifexited判断出问题，理论上感觉是子进程被挂起父进程wait结束发现子进程未正常退出吧？<br>在phpinfo中获取flag</p>
-<h2 id="littlegame"><a href="#littlegame" class="headerlink" title="littlegame"></a>littlegame</h2>
-          <!--noindex-->
-            <div class="post-button">
-              <a class="btn" href="/%5BCISCN2020%20%E5%8D%8E%E4%B8%9C%E5%8C%97%E8%B5%9B%E5%8C%BA%5Dweb%20wp.html#more" rel="contents">
-                阅读全文 &raquo;
-              </a>
-            </div>
-          <!--/noindex-->
-        
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
 
   
   <nav class="pagination">
@@ -806,7 +817,7 @@ payload <span class="token operator">=</span> <span class="token string">""</spa
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">163</span>
+          <span class="site-state-item-count">164</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>

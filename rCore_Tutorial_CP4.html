@@ -1,0 +1,525 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 6.0.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"blog.z3ratu1.cn","root":"/","scheme":"Pisces","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"always","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":true},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+  </script>
+
+  <meta name="description" content="rCore_Tutorial_CP4摸了几天继续看一下，第四章要实现究极虚拟内存，这非常关键，也是操作系统中的一个很核心的部分。之前的批处理和多道处理系统虽然实现了硬件特权的限制和系统调用，但是并没有对应用空间进行隔离，导致用户应用必须以规定的形式分布在内存中，并且还可以读取和修改其他用户程序，甚至是内核数据的内容，并不能认为是一个足够安全的系统。 本章的目标就是实现虚拟内存的分配，内存分页和页表">
+<meta property="og:type" content="article">
+<meta property="og:title" content="rCore_Tutorial_CP4">
+<meta property="og:url" content="https://blog.z3ratu1.cn/rCore_Tutorial_CP4.html">
+<meta property="og:site_name" content="Z3ratu1&#39;s blog">
+<meta property="og:description" content="rCore_Tutorial_CP4摸了几天继续看一下，第四章要实现究极虚拟内存，这非常关键，也是操作系统中的一个很核心的部分。之前的批处理和多道处理系统虽然实现了硬件特权的限制和系统调用，但是并没有对应用空间进行隔离，导致用户应用必须以规定的形式分布在内存中，并且还可以读取和修改其他用户程序，甚至是内核数据的内容，并不能认为是一个足够安全的系统。 本章的目标就是实现虚拟内存的分配，内存分页和页表">
+<meta property="og:locale">
+<meta property="article:published_time" content="2022-08-07T05:51:24.000Z">
+<meta property="article:modified_time" content="2022-08-10T07:31:44.503Z">
+<meta property="article:author" content="Z3ratu1">
+<meta property="article:tag" content="rCore">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="https://blog.z3ratu1.cn/rCore_Tutorial_CP4.html">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-Hans'
+  };
+</script>
+
+  <title>rCore_Tutorial_CP4 | Z3ratu1's blog</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+<link rel="stylesheet" href="/css/prism-tomorrow.css" type="text/css"></head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">Z3ratu1's blog</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">Welcome</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>关于</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+        <li class="menu-item menu-item-links">
+
+    <a href="/links/" rel="section"><i class="fa fa-link fa-fw"></i>友链</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off" placeholder="搜索..." spellcheck="false" type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+  <a href="https://github.com/Z3ratu1" class="github-corner" title="Follow me on GitHub" aria-label="Follow me on GitHub" rel="external nofollow noopener noreferrer" target="_blank"><svg width="80" height="80" viewbox="0 0 250 250" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"/><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"/><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"/></svg></a>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
+    <link itemprop="mainEntityOfPage" href="https://blog.z3ratu1.cn/rCore_Tutorial_CP4.html">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="https://q2.qlogo.cn/headimg_dl?dst_uin=1207039417&spec=160">
+      <meta itemprop="name" content="Z3ratu1">
+      <meta itemprop="description" content="与其感慨路难行，不如现在出发">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Z3ratu1's blog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          rCore_Tutorial_CP4
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2022-08-07 13:51:24" itemprop="dateCreated datePublished" datetime="2022-08-07T13:51:24+08:00">2022-08-07</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2022-08-10 15:31:44" itemprop="dateModified" datetime="2022-08-10T15:31:44+08:00">2022-08-10</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E7%AC%94%E8%AE%B0/" itemprop="url" rel="index"><span itemprop="name">笔记</span></a>
+                </span>
+            </span>
+
+          
+            <span id="/rCore_Tutorial_CP4.html" class="post-meta-item leancloud_visitors" data-flag-title="rCore_Tutorial_CP4" title="阅读次数">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span class="leancloud-visitors-count"></span>
+            </span>
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="far fa-comment"></i>
+      </span>
+      <span class="post-meta-item-text">Valine：</span>
+    
+    <a title="valine" href="/rCore_Tutorial_CP4.html#valine-comments" itemprop="discussionUrl">
+      <span class="post-comments-count valine-comment-count" data-xid="/rCore_Tutorial_CP4.html" itemprop="commentCount"></span>
+    </a>
+  </span>
+  
+  
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h1 id="rCore-Tutorial-CP4"><a href="#rCore-Tutorial-CP4" class="headerlink" title="rCore_Tutorial_CP4"></a>rCore_Tutorial_CP4</h1><p>摸了几天继续看一下，第四章要实现究极虚拟内存，这非常关键，也是操作系统中的一个很核心的部分。之前的批处理和多道处理系统虽然实现了硬件特权的限制和系统调用，但是并没有对应用空间进行隔离，导致用户应用必须以规定的形式分布在内存中，并且还可以读取和修改其他用户程序，甚至是内核数据的内容，并不能认为是一个足够安全的系统。</p>
+<p>本章的目标就是实现虚拟内存的分配，内存分页和页表映射，实现内核与各用户进程间的隔离。通过一层虚拟地址，使得操作系统获得了对实际物理内存访问的完全控制，用户程序只能访问由操作系统提供的虚拟地址，进而实现内存空间的完全隔离</p>
+<p>实现还是经典的页表，段表难维护碎片多。进程对内存的访问一般来说就是通过load等汇编指令进行的，在硬件层面提供一个MMU，并通过内核维护应用程序的页表，MMU访问页表对虚拟地址进行解析，顺便还能对页进行rwx等权限控制，进一步加强保护</p>
+<h2 id="SV39多级页表的硬件机制"><a href="#SV39多级页表的硬件机制" class="headerlink" title="SV39多级页表的硬件机制"></a>SV39多级页表的硬件机制</h2><p>好怪的地址范围，虚拟地址39位，物理地址56位。页面大小12位（4k）<br>虚拟页即为27位，页表项8bytes，如果顺序放的话直接1G页表，所以采用分级页表来降低空间消耗</p>
+<p>由于页表项8b，一个页仅能放512个页表项，即9位，故27位虚拟页要划到三级页表里面去，如果页表项拉满的话，应该是$$4k+4k<em>512+4k</em>512^2$$，最后一项就一个G了。。。<br>这也是必然的，毕竟最后分页的结果必然是一个物理页对应一个页表项，所以如果全部分配的话占用的空间是会大于顺序页表的，但实际情况就在于不可能有程序使用这么大的地址空间，也就使得按需分配的情况下页表项所占空间大规模减小了（但是操作系统还要负责多级页表里每一级的内存分配，好麻烦哦。。。感觉会在内核里反复触发缺页中断）</p>
+<p>根页表用一个内核态寄存器指过去，每个进程的根页表位置不一样，需要在操作系统层面对每个进程的根页表地址进行保管和切换。</p>
+<p>实现部分好麻烦哦。。。</p>
+<h2 id="管理SV39多级页表"><a href="#管理SV39多级页表" class="headerlink" title="管理SV39多级页表"></a>管理SV39多级页表</h2><p>这里提到了有意思的内容，在启动虚拟内存后，用户态和<strong>内核态</strong>的访存都会被认为是虚拟地址，经过MMU进行一系列的硬件实现访问到物理内存。</p>
+<p>这段真的让人头大，主要问题在于对于用户态程序，无需考虑物理地址的实现，一切均交由内核维护页表。而对于内核态程序，其同样运行在虚拟内存环境下，却需要同时对虚拟内存和物理内存进行管理，对物理内存的管理主要就体现在对页表的管理</p>
+<p>这里有一些方案的介绍<a target="_blank" rel="external nofollow noopener noreferrer" href="https://os.phil-opp.com/paging-implementation/#accessing-page-tables">accessing page tables</a><br>cr3寄存器（riscv里面是叫satp）指向页表所在的物理地址，之后以此为基址，将虚拟地址分为多段偏移，对多级页表进行查询。内核若需要对页表项进行修改，则需要访问cr3指向的物理地址的对应偏移，或是下一级页表物理地址基址的偏移。但内核运行在虚拟地址上，因此，如果试图对页表项进行修改，则需要得到该物理地址与虚拟地址的映射关系，一一映射能较为简单的解决该问题。即将整个物理内存映射到对应的虚拟内存位置上</p>
+<p>页表自映射则是通过另一种方法对页表进行访问，通过将页表最后一个entry指向自己，进而使用虚拟地址进行解析时对页表项完成访问，对于27位页长的三级页表而言（每页512个entry，27位分三级），若想访问三级页表，则将虚拟地址设置为511 511 511（即0x7ffffff，得到页后还需要通过偏移访问具体页表项），二级则为511 511 offset，一级即为511 offset2 offset3，上述链接中有较详细的图片描述<br>（但全映射会对后续直接访存也带来便利，页表自映射的话只解决了访问页表的问题）</p>
+<h2 id="内核与应用的地址空间"><a href="#内核与应用的地址空间" class="headerlink" title="内核与应用的地址空间"></a>内核与应用的地址空间</h2><p>已经快要猪脑过载了。。。太难了8<br>这里应该是定义了逻辑段，也就是代码段，数据段之类的段，并将段插入到应用的地址空间，组成MemorySet。<br>在sv39结构下，可用地址只有高256G和低256G，内核的低256G保存了内核的代码段数据段等内容，并且需要完成一个对物理内存的全映射，高256G放了应用内核栈和一个用户态内核态转换跳板<br>对于用户态应用，低256G放数据等各段，高256G同样和内核相同在最高处放置进入内核的状态转换跳板，并在次高处放置上下文。只需将其设置为用户态不可访问即可防止出现意外事故</p>
+<h2 id="基于地址空间的分时多任务"><a href="#基于地址空间的分时多任务" class="headerlink" title="基于地址空间的分时多任务"></a>基于地址空间的分时多任务</h2><p>实现内核态和用户态的转换，需要实现内核态和用户态地址空间的转换。其实这个的思路倒是很简单，只需要把页表翻转一下，然后清空快表就可以了。但是切换的时候还是有一些细节<br>因为指令在切换前后pc只会简单自增，所以此处是内核态和用户态的最高页均为跳板，即使页表发生了切换，但两个页表最高位的切换代码相同，可以被两份页表映射到对应的物理页上（好像映射到两份不同位置的页上了，感觉这种只读数据全部映射到同一个也没问题），继续执行</p>
+<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>由于时间等各种乱七八糟因素，以及这章难度爆表，并没有看的非常认真。。。。<br>大致理解了虚拟内存的工作原理和一些实现框架。。。。但是细看实现实在是有点看不进去了。。。并且这里的内存布局还是有一点点的简陋，在用户空间的构造上，没有对堆空间进行布局分配。但是已经大致的完成了虚拟空间的构建和用户各程序与内核间的隔离。<br>比较需要注意的点就是虚拟地址与物理地址间寻址的方法，页表中存储的均为物理地址，在中断时要考虑内核地址与用户地址的差异，确保中断切换前后中断控制流能正常运行等</p>
+<p>练习中提到那个时间系统调用不能用了，需要改造。但是时间系统调用不是硬件实现计数器硬件中断吗？和现在的虚拟地址空间有什么关系呢？无法理解呜呜呜太垃圾了</p>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/rCore/" rel="tag"># rCore</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/rCore_Tutorial_CP3.html" rel="prev" title="rCore_Tutorial_CP3">
+      <i class="fa fa-chevron-left"></i> rCore_Tutorial_CP3
+    </a></div>
+      <div class="post-nav-item"></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+    <div class="comments" id="valine-comments"></div>
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#rCore-Tutorial-CP4"><span class="nav-number">1.</span> <span class="nav-text">rCore_Tutorial_CP4</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#SV39%E5%A4%9A%E7%BA%A7%E9%A1%B5%E8%A1%A8%E7%9A%84%E7%A1%AC%E4%BB%B6%E6%9C%BA%E5%88%B6"><span class="nav-number">1.1.</span> <span class="nav-text">SV39多级页表的硬件机制</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%AE%A1%E7%90%86SV39%E5%A4%9A%E7%BA%A7%E9%A1%B5%E8%A1%A8"><span class="nav-number">1.2.</span> <span class="nav-text">管理SV39多级页表</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%86%85%E6%A0%B8%E4%B8%8E%E5%BA%94%E7%94%A8%E7%9A%84%E5%9C%B0%E5%9D%80%E7%A9%BA%E9%97%B4"><span class="nav-number">1.3.</span> <span class="nav-text">内核与应用的地址空间</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%9F%BA%E4%BA%8E%E5%9C%B0%E5%9D%80%E7%A9%BA%E9%97%B4%E7%9A%84%E5%88%86%E6%97%B6%E5%A4%9A%E4%BB%BB%E5%8A%A1"><span class="nav-number">1.4.</span> <span class="nav-text">基于地址空间的分时多任务</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%80%BB%E7%BB%93"><span class="nav-number">1.5.</span> <span class="nav-text">总结</span></a></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Z3ratu1" src="https://q2.qlogo.cn/headimg_dl?dst_uin=1207039417&spec=160">
+  <p class="site-author-name" itemprop="name">Z3ratu1</p>
+  <div class="site-description" itemprop="description">与其感慨路难行，不如现在出发</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">164</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">5</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">90</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+  <div class="beian"><a href="http://www.beian.miit.gov.cn/" rel="external nofollow noopener noreferrer" target="_blank">湘ICP备2020021580号 </a>
+      <img src="/./images/beian.png" style="display: inline-block;">
+  </div>
+
+<div class="copyright">
+  
+  &copy; 2019 – 
+  <span itemprop="copyrightYear">2022</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Z3ratu1</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="external nofollow noopener noreferrer" target="_blank">Hexo</a> & <a href="https://pisces.theme-next.org/" class="theme-link" rel="external nofollow noopener noreferrer" target="_blank">NexT.Pisces</a> 强力驱动
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+
+<script>
+NexT.utils.loadComments(document.querySelector('#valine-comments'), () => {
+  NexT.utils.getScript('https://cdn.jsdelivr.net/npm/valine@1.4.14/dist/Valine.min.js', () => {
+    var GUEST = ['nick', 'mail', 'link'];
+    var guest = 'nick,mail,link';
+    guest = guest.split(',').filter(item => {
+      return GUEST.includes(item);
+    });
+    new Valine({
+      el         : '#valine-comments',
+      verify     : false,
+      notify     : false,
+      appId      : '7H8kg0XdWO8IbhOcu4K1JaAT-gzGzoHsz',
+      appKey     : 'wPKQjkbVtvPaRR7gh2yjfLSi',
+      placeholder: "Just go go",
+      avatar     : 'mm',
+      meta       : guest,
+      pageSize   : '10' || 10,
+      visitor    : true,
+      lang       : '' || 'zh-cn',
+      path       : location.pathname,
+      recordIP   : false,
+      serverURLs : ''
+    });
+  }, window.Valine);
+});
+</script>
+
+</body>
+</html>
