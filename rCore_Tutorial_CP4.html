@@ -28,7 +28,7 @@
 <meta property="og:description" content="rCore_Tutorial_CP4摸了几天继续看一下，第四章要实现究极虚拟内存，这非常关键，也是操作系统中的一个很核心的部分。之前的批处理和多道处理系统虽然实现了硬件特权的限制和系统调用，但是并没有对应用空间进行隔离，导致用户应用必须以规定的形式分布在内存中，并且还可以读取和修改其他用户程序，甚至是内核数据的内容，并不能认为是一个足够安全的系统。 本章的目标就是实现虚拟内存的分配，内存分页和页表">
 <meta property="og:locale">
 <meta property="article:published_time" content="2022-08-07T05:51:24.000Z">
-<meta property="article:modified_time" content="2022-08-10T07:31:44.503Z">
+<meta property="article:modified_time" content="2022-09-01T12:02:27.407Z">
 <meta property="article:author" content="Z3ratu1">
 <meta property="article:tag" content="rCore">
 <meta name="twitter:card" content="summary">
@@ -230,7 +230,7 @@
                   <i class="far fa-calendar-check"></i>
                 </span>
                 <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2022-08-10 15:31:44" itemprop="dateModified" datetime="2022-08-10T15:31:44+08:00">2022-08-10</time>
+                <time title="修改时间：2022-09-01 20:02:27" itemprop="dateModified" datetime="2022-09-01T20:02:27+08:00">2022-09-01</time>
               </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -283,10 +283,13 @@
 <p>实现部分好麻烦哦。。。</p>
 <h2 id="管理SV39多级页表"><a href="#管理SV39多级页表" class="headerlink" title="管理SV39多级页表"></a>管理SV39多级页表</h2><p>这里提到了有意思的内容，在启动虚拟内存后，用户态和<strong>内核态</strong>的访存都会被认为是虚拟地址，经过MMU进行一系列的硬件实现访问到物理内存。</p>
 <p>这段真的让人头大，主要问题在于对于用户态程序，无需考虑物理地址的实现，一切均交由内核维护页表。而对于内核态程序，其同样运行在虚拟内存环境下，却需要同时对虚拟内存和物理内存进行管理，对物理内存的管理主要就体现在对页表的管理</p>
-<p>这里有一些方案的介绍<a target="_blank" rel="external nofollow noopener noreferrer" href="https://os.phil-opp.com/paging-implementation/#accessing-page-tables">accessing page tables</a><br>cr3寄存器（riscv里面是叫satp）指向页表所在的物理地址，之后以此为基址，将虚拟地址分为多段偏移，对多级页表进行查询。内核若需要对页表项进行修改，则需要访问cr3指向的物理地址的对应偏移，或是下一级页表物理地址基址的偏移。但内核运行在虚拟地址上，因此，如果试图对页表项进行修改，则需要得到该物理地址与虚拟地址的映射关系，一一映射能较为简单的解决该问题。即将整个物理内存映射到对应的虚拟内存位置上</p>
+<p>这里有一些方案的介绍<a target="_blank" rel="external nofollow noopener noreferrer" href="https://os.phil-opp.com/paging-implementation/#accessing-page-tables">accessing page tables</a><br>cr3寄存器（riscv里面是叫satp）指向页表所在的物理地址，之后以此为基址，将虚拟地址分为多段偏移，对多级页表进行查询。内核若需要对页表项进行修改，则需要访问cr3指向的物理地址的对应偏移，或是下一级页表物理地址基址的偏移。但内核运行在虚拟地址上，因此，如果试图对页表项进行修改，则需要得到该物理地址与虚拟地址的映射关系，一一映射能较为简单的解决该问题。即将整个物理内存映射到对应的虚拟内存位置上以解决该问题</p>
+<p>但需要注意的是，内核地址空间也是虚拟地址空间，而内核是无法在未产生页表前正常使用虚拟空间的，所以实际的实现是，内核在初始化时先实现对页表的映射和规划，再通过修改指示虚拟地址空间的寄存器启动虚拟空间</p>
 <p>页表自映射则是通过另一种方法对页表进行访问，通过将页表最后一个entry指向自己，进而使用虚拟地址进行解析时对页表项完成访问，对于27位页长的三级页表而言（每页512个entry，27位分三级），若想访问三级页表，则将虚拟地址设置为511 511 511（即0x7ffffff，得到页后还需要通过偏移访问具体页表项），二级则为511 511 offset，一级即为511 offset2 offset3，上述链接中有较详细的图片描述<br>（但全映射会对后续直接访存也带来便利，页表自映射的话只解决了访问页表的问题）</p>
 <h2 id="内核与应用的地址空间"><a href="#内核与应用的地址空间" class="headerlink" title="内核与应用的地址空间"></a>内核与应用的地址空间</h2><p>已经快要猪脑过载了。。。太难了8<br>这里应该是定义了逻辑段，也就是代码段，数据段之类的段，并将段插入到应用的地址空间，组成MemorySet。<br>在sv39结构下，可用地址只有高256G和低256G，内核的低256G保存了内核的代码段数据段等内容，并且需要完成一个对物理内存的全映射，高256G放了应用内核栈和一个用户态内核态转换跳板<br>对于用户态应用，低256G放数据等各段，高256G同样和内核相同在最高处放置进入内核的状态转换跳板，并在次高处放置上下文。只需将其设置为用户态不可访问即可防止出现意外事故</p>
-<h2 id="基于地址空间的分时多任务"><a href="#基于地址空间的分时多任务" class="headerlink" title="基于地址空间的分时多任务"></a>基于地址空间的分时多任务</h2><p>实现内核态和用户态的转换，需要实现内核态和用户态地址空间的转换。其实这个的思路倒是很简单，只需要把页表翻转一下，然后清空快表就可以了。但是切换的时候还是有一些细节<br>因为指令在切换前后pc只会简单自增，所以此处是内核态和用户态的最高页均为跳板，即使页表发生了切换，但两个页表最高位的切换代码相同，可以被两份页表映射到对应的物理页上（好像映射到两份不同位置的页上了，感觉这种只读数据全部映射到同一个也没问题），继续执行</p>
+<h2 id="基于地址空间的分时多任务"><a href="#基于地址空间的分时多任务" class="headerlink" title="基于地址空间的分时多任务"></a>基于地址空间的分时多任务</h2><p>提出了两种内核空间隔离的方法，方案A为当前教程的实现思路，建立独立的内核空间与用户空间隔离，并在trap时产生地址空间的转换；方案B为之前操作系统课和目前大部分系统的实现方案，将内核地址直接映射到用户空间的高位，所有用户进程的高位均映射到同一份内核地址上。方案B相较于方案A，在trap时无需发生地址空间的切换，在一定程度上减少了开销。文中指出方案B在进程切换时无需进行地址空间转换，由内核完成，但实际上进程切换时首先需要trap进内核，再恢复时回到用户态，实际上还是进行了地址空间的转换</p>
+<p>但是方案B将用户态和内核态放在一起，就易遭受到类似于熔断的攻击，然后通过加强buff上kpti之类的手段进行防护</p>
+<p>由于方案A中trap前后位于两个不同的地址空间，地址空间变换后pc并不会改变，所以此处是内核态和用户态的最高页均为跳板，即使页表发生了切换，但两个地址空间最高位的代码相同，不会出现紊乱，系统得以继续执行</p>
 <h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>由于时间等各种乱七八糟因素，以及这章难度爆表，并没有看的非常认真。。。。<br>大致理解了虚拟内存的工作原理和一些实现框架。。。。但是细看实现实在是有点看不进去了。。。并且这里的内存布局还是有一点点的简陋，在用户空间的构造上，没有对堆空间进行布局分配。但是已经大致的完成了虚拟空间的构建和用户各程序与内核间的隔离。<br>比较需要注意的点就是虚拟地址与物理地址间寻址的方法，页表中存储的均为物理地址，在中断时要考虑内核地址与用户地址的差异，确保中断切换前后中断控制流能正常运行等</p>
 <p>练习中提到那个时间系统调用不能用了，需要改造。但是时间系统调用不是硬件实现计数器硬件中断吗？和现在的虚拟地址空间有什么关系呢？无法理解呜呜呜太垃圾了</p>
 
@@ -310,7 +313,10 @@
     <a href="/rCore_Tutorial_CP3.html" rel="prev" title="rCore_Tutorial_CP3">
       <i class="fa fa-chevron-left"></i> rCore_Tutorial_CP3
     </a></div>
-      <div class="post-nav-item"></div>
+      <div class="post-nav-item">
+    <a href="/rCore_Tutorial_CP5.html" rel="next" title="rCore_Tutorial_CP5">
+      rCore_Tutorial_CP5 <i class="fa fa-chevron-right"></i>
+    </a></div>
     </div>
       </footer>
     
@@ -385,7 +391,7 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">164</span>
+          <span class="site-state-item-count">165</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
