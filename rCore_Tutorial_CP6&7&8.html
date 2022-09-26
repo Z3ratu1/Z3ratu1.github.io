@@ -20,20 +20,20 @@
     var CONFIG = {"hostname":"blog.z3ratu1.cn","root":"/","scheme":"Pisces","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"always","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":true},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
   </script>
 
-  <meta name="description" content="rCore_Tutorial_CP5第五章，进程看之前感觉好像没什么东西，看到一半感觉还是非常牛逼的 进程概念及重要系统调用这里面阐述了任务(Task)和进程(Process)之间的区别说实话很多地方还是觉得很抽象，按照本科期间的说法，进程就是一个运行的二进制程序，但这么说似乎和任务没什么区别。从本章提到的内容上来说，感觉任务是计算机依次加载的一系列程序，以规定的顺序运行，而进程则是通过fork和">
+  <meta name="description" content="rCore_Tutorial_CP6&amp;7&amp;8因为有点摆了所以就变成了n章合起来写了，也没记什么具体的东西，第九章抽象的要死，感觉没有学到啥也没记，就这样结束了8 CP6第六章是文件系统，并没有提到怎么写驱动。。。然后简要的说了下superblock，inode，多重索引之类的操作系统课上学过的东西，代码实现也有点过于复杂，本着开摆的精神，不予记录 CP7">
 <meta property="og:type" content="article">
-<meta property="og:title" content="rCore_Tutorial_CP5">
-<meta property="og:url" content="https://blog.z3ratu1.cn/rCore_Tutorial_CP5.html">
+<meta property="og:title" content="rCore_Tutorial_CP6&amp;7&amp;8">
+<meta property="og:url" content="https://blog.z3ratu1.cn/rCore_Tutorial_CP6&7&8.html">
 <meta property="og:site_name" content="Z3ratu1&#39;s blog">
-<meta property="og:description" content="rCore_Tutorial_CP5第五章，进程看之前感觉好像没什么东西，看到一半感觉还是非常牛逼的 进程概念及重要系统调用这里面阐述了任务(Task)和进程(Process)之间的区别说实话很多地方还是觉得很抽象，按照本科期间的说法，进程就是一个运行的二进制程序，但这么说似乎和任务没什么区别。从本章提到的内容上来说，感觉任务是计算机依次加载的一系列程序，以规定的顺序运行，而进程则是通过fork和">
+<meta property="og:description" content="rCore_Tutorial_CP6&amp;7&amp;8因为有点摆了所以就变成了n章合起来写了，也没记什么具体的东西，第九章抽象的要死，感觉没有学到啥也没记，就这样结束了8 CP6第六章是文件系统，并没有提到怎么写驱动。。。然后简要的说了下superblock，inode，多重索引之类的操作系统课上学过的东西，代码实现也有点过于复杂，本着开摆的精神，不予记录 CP7">
 <meta property="og:locale">
-<meta property="article:published_time" content="2022-08-28T06:14:36.000Z">
-<meta property="article:modified_time" content="2022-09-01T12:09:34.471Z">
+<meta property="article:published_time" content="2022-09-26T02:55:29.000Z">
+<meta property="article:modified_time" content="2022-09-26T02:56:52.050Z">
 <meta property="article:author" content="Z3ratu1">
 <meta property="article:tag" content="rCore">
 <meta name="twitter:card" content="summary">
 
-<link rel="canonical" href="https://blog.z3ratu1.cn/rCore_Tutorial_CP5.html">
+<link rel="canonical" href="https://blog.z3ratu1.cn/rCore_Tutorial_CP6&7&8.html">
 
 
 <script id="page-configurations">
@@ -46,7 +46,7 @@
   };
 </script>
 
-  <title>rCore_Tutorial_CP5 | Z3ratu1's blog</title>
+  <title>rCore_Tutorial_CP6&7&8 | Z3ratu1's blog</title>
   
 
 
@@ -200,7 +200,7 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
-    <link itemprop="mainEntityOfPage" href="https://blog.z3ratu1.cn/rCore_Tutorial_CP5.html">
+    <link itemprop="mainEntityOfPage" href="https://blog.z3ratu1.cn/rCore_Tutorial_CP6&7&8.html">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="https://q2.qlogo.cn/headimg_dl?dst_uin=1207039417&spec=160">
@@ -213,7 +213,7 @@
     </span>
       <header class="post-header">
         <h1 class="post-title" itemprop="name headline">
-          rCore_Tutorial_CP5
+          rCore_Tutorial_CP6&7&8
         </h1>
 
         <div class="post-meta">
@@ -222,16 +222,10 @@
                 <i class="far fa-calendar"></i>
               </span>
               <span class="post-meta-item-text">发表于</span>
+              
 
-              <time title="创建时间：2022-08-28 14:14:36" itemprop="dateCreated datePublished" datetime="2022-08-28T14:14:36+08:00">2022-08-28</time>
+              <time title="创建时间：2022-09-26 10:55:29 / 修改时间：10:56:52" itemprop="dateCreated datePublished" datetime="2022-09-26T10:55:29+08:00">2022-09-26</time>
             </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="far fa-calendar-check"></i>
-                </span>
-                <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2022-09-01 20:09:34" itemprop="dateModified" datetime="2022-09-01T20:09:34+08:00">2022-09-01</time>
-              </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
                 <i class="far fa-folder"></i>
@@ -243,7 +237,7 @@
             </span>
 
           
-            <span id="/rCore_Tutorial_CP5.html" class="post-meta-item leancloud_visitors" data-flag-title="rCore_Tutorial_CP5" title="阅读次数">
+            <span id="/rCore_Tutorial_CP6&7&8.html" class="post-meta-item leancloud_visitors" data-flag-title="rCore_Tutorial_CP6&7&8" title="阅读次数">
               <span class="post-meta-item-icon">
                 <i class="fa fa-eye"></i>
               </span>
@@ -258,8 +252,8 @@
       </span>
       <span class="post-meta-item-text">Valine：</span>
     
-    <a title="valine" href="/rCore_Tutorial_CP5.html#valine-comments" itemprop="discussionUrl">
-      <span class="post-comments-count valine-comment-count" data-xid="/rCore_Tutorial_CP5.html" itemprop="commentCount"></span>
+    <a title="valine" href="/rCore_Tutorial_CP6&7&8.html#valine-comments" itemprop="discussionUrl">
+      <span class="post-comments-count valine-comment-count" data-xid="/rCore_Tutorial_CP6&7&8.html" itemprop="commentCount"></span>
     </a>
   </span>
   
@@ -274,23 +268,24 @@
     <div class="post-body" itemprop="articleBody">
 
       
-        <h1 id="rCore-Tutorial-CP5"><a href="#rCore-Tutorial-CP5" class="headerlink" title="rCore_Tutorial_CP5"></a>rCore_Tutorial_CP5</h1><p>第五章，进程<br>看之前感觉好像没什么东西，看到一半感觉还是非常牛逼的</p>
-<h2 id="进程概念及重要系统调用"><a href="#进程概念及重要系统调用" class="headerlink" title="进程概念及重要系统调用"></a>进程概念及重要系统调用</h2><p>这里面阐述了任务(Task)和进程(Process)之间的区别<br>说实话很多地方还是觉得很抽象，按照本科期间的说法，进程就是一个运行的二进制程序，但这么说似乎和任务没什么区别。从本章提到的内容上来说，感觉任务是计算机依次加载的一系列程序，以规定的顺序运行，而进程则是通过fork和exec系统调用，在用户的交互下进行，可以选择执行的二进制程序</p>
-<p>并且进程间存在父子关系，子进程由父进程fork产生，linux中所有进程均由pid为1的初始进程产生，以前我以为pid为1的进程就是操作系统，现在看来，似乎操作系统(内核)运行在更下一层，而pid为1的进程是内核创建出来对所有进程进行管理并提供用户交互的初始进程</p>
-<p>当一个进程退出时，并不会被立即回收，而是成为一个僵尸进程，等待其父进程将其回收，如果父进程一直不退出且不调用waitpid进行回收，则该进程会一直存在。僵尸进程不占用存储空间，其调用exit()退出时内存空间已经被释放，然而其仍然会占用一个pid和内核控制块数据</p>
-<p>而父进程先于子进程退出时，子进程并不会随之退出，而是成为一个所谓的孤儿进程，然后被pid1的进程领养，被接管为pid1的子进程，并在退出后由该进程回收。<br>这里实现的pid1进程即为一个循环调用waitpid的回收进程</p>
-<h3 id="fork-exec-waitpid"><a href="#fork-exec-waitpid" class="headerlink" title="fork,exec,waitpid"></a>fork,exec,waitpid</h3><p>实现进程所需的三个关键系统调用。<br>fork用于产生一个完全相同的进程，堆栈空间布局完全一致，在copy on write的情况下也许只会在内核中创建一个对应的控制块而内存映射一致？<br>exec，将fork出来的内存清空，载入指定二进制程序并重新初始化堆栈。<br>waitpid，父进程用于回收子进程的系统调用，发起该系统调用后，父进程会等待子进程退出，并回收其占用的资源（资源回收其实是操作系统做吧？），也算是一种父子进程的同步</p>
-<h2 id="进程管理的核心数据结构"><a href="#进程管理的核心数据结构" class="headerlink" title="进程管理的核心数据结构"></a>进程管理的核心数据结构</h2><p>对于不动手开摆的人来说这一部分主要是用于理解实现原理<br>由于还没有实现文件系统，应用程序还是直接链接到内核里面，并且添加全局符号进行加载<br>PCB相较于TCB并无太大变化，就是额外记录了一下pid，然后为了维护父子进程关系，添加了指向父子进程的PCB指针，在内核中，PCB就代表着一个进程的全部，内核应当以PCB为进程控制的单元，由于子进程是由父进程fork出来的，所以直接在PCB里面实现fork和exec两个系统调用，让父进程管理子进程的PCB</p>
-<p>CPU调度方面，switch汇编存寄存器经典换入换出不变，但原来集成在task manager里面的current task取了出来，单独用processor维护，表示在当前处理器上运行的进程，也是为以后考虑多核做准备吧</p>
-<p>除此之外，processor实现了一个idle控制流，在内核中单独建立了一条控制流，在启动第一个任务时在<code>run_tasks</code>换出。而之后的任务切换均由<code>_switch</code>换回idle控制流，即回到<code>run_tasks</code>上下文中，该方法是一个循环，重复取出可用task并从idle切换出去</p>
-<h2 id="进程管理机制的设计实现"><a href="#进程管理机制的设计实现" class="headerlink" title="进程管理机制的设计实现"></a>进程管理机制的设计实现</h2><p>主要看fork和exec的实现吧。这里的fork就是简单的复制，基础教程当然不需要上copy on write这种高级技巧。先创建两份一样的虚拟页表，然后将父进程映射的页面遍历一遍，给子进程也映射进去</p>
-<p>fork在PCB中实现进程空间的创建复制和初始化，再进行封装到sys_fork，由于子进程和父进程拥有完全一致的trap上下文（fork系统调用trap进内核），因此从trap后恢复时即可从同样的状态下继续运行，然而，fork需要以不同的返回值来区分父子进程，因此，直接通过修改trap上下文中a0寄存器对应的值进行返回值的区分</p>
-<p>exec是被fork出的子进程再次发起的系统调用，在该次系统调用中，需要将父进程的地址空间全部清除，加载新的二进制程序，因为该进程发起了exec trap到了内核，同样需要构造一个trap上下文恢复到用户态。<br>但是这里提到无需保存任务上下文，被暂停的任务才需要保管任务上下文（任务上下文是干什么的来着？是用户在内核态被switch出去的时候，需要把switch前的上下文再存一层用来恢复的）</p>
-<p>trap在syscall后也需要进行额外处理，因为exec会覆盖掉整个地址空间，原先的trap context就没了，需要重新获取，从task manager里面拿（这里是直接从Processor上拿现在运行的PCB，也行）</p>
-<p>在进程调用exit退出或是因为错误trap到内核被退出时，内核使用<code>exit_current_and_run_next</code>函数处理，将当前processor上的进程标记为Zombie进程，将exit code写入PCB，并遍历其子进程，将所有该进程为负责回收的子进程交由init进程托管回收，最后释放所有物理页。由此可以看出，僵尸进程仅存在PCB等待父进程将其回收，而不占用任何页面</p>
-<h2 id="进程调度"><a href="#进程调度" class="headerlink" title="进程调度"></a>进程调度</h2><p>这个倒是没什么好看的，都是操作系统课上讲过的几个先来先服务，最短有限，round robin。高级一点的多级队列，然后防饥饿加个老化机制，都是学过的东西了捏</p>
-<p>实时系统调度那段不太想看。。。感觉实时这个需求就略微的有些玄学，不知道在什么场景才能应用上</p>
-<p>课后练习第三题属于是操作系统经典了</p>
+        <h1 id="rCore-Tutorial-CP6-amp-7-amp-8"><a href="#rCore-Tutorial-CP6-amp-7-amp-8" class="headerlink" title="rCore_Tutorial_CP6&amp;7&amp;8"></a>rCore_Tutorial_CP6&amp;7&amp;8</h1><p>因为有点摆了所以就变成了n章合起来写了，也没记什么具体的东西，第九章抽象的要死，感觉没有学到啥也没记，就这样结束了8</p>
+<h2 id="CP6"><a href="#CP6" class="headerlink" title="CP6"></a>CP6</h2><p>第六章是文件系统，并没有提到怎么写驱动。。。然后简要的说了下superblock，inode，多重索引之类的操作系统课上学过的东西，代码实现也有点过于复杂，本着开摆的精神，不予记录</p>
+<h2 id="CP7"><a href="#CP7" class="headerlink" title="CP7"></a>CP7</h2><p>第七章提到了IO重定向与管道，没做过底层开发真不知道管道这么写的。。。</p>
+<h3 id="IO重定向与管道"><a href="#IO重定向与管道" class="headerlink" title="IO重定向与管道"></a>IO重定向与管道</h3><p>fork系统调用在创建子进程时，同时也将父进程的所有fd给子进程复制了一遍（这里实现的时候是把父进程的fd都push了一遍，数据结构是vector，被关闭的fd会变成none，none也会被推进子进程的fd列表里），子进程是共享父进程的fd的，所以shell拉起来的新任务能够接受用户输入和输出在屏幕上，很合理</p>
+<p>首先明确一个一切皆文件的思想，pipe实际上就是将一个缓冲区当成一个文件提供给两个进程，两方各持一个只读&#x2F;写的fd，从而实现进程间通信<br>为此pipe只实现打开两个fd指向同一个缓冲区，而实际使用则是父进程拿到调用pipe拿到fd之后调用fork和子进程共享fd，然后父子进程分别把读&#x2F;写端关掉进行通信。</p>
+<p>而对shell实现输入输出重定向，实际上只是在拉起子进程的时候，将子进程的fd 0&#x2F;1&#x2F;2close掉，再吧需要重定向的文件dup一下重新分配到对应的fd号上<br>对于shell管道符的实现也是通过pipe之后分别启动两个子进程，第一个子进程把写端dup到fd 1上，第二个子进程把读端dup到fd 0上，可以看这个回答的例子<br><a target="_blank" rel="external nofollow noopener noreferrer" href="https://stackoverflow.com/a/69239074/16375885">pipe example</a></p>
+<h3 id="signal实现"><a href="#signal实现" class="headerlink" title="signal实现"></a>signal实现</h3><p>最后简单的介绍了一下信号的实现，信号是在程序从内核态返回用户态时进行处理的，使用系统调用发送信号，或是产生错误以及硬件中断产生信号时，会将未处理的信号注册到对应的进程上。</p>
+<p>当在trap处理完毕返回用户态前，对信号进行检查，如果存在信号则进行处理，部分信号只能由内核处理，剩下的信号可以用用户自定义的handler返回用户态处理。当一个进程由于调度恢复到CPU继续执行时，也是从内核态返回，同样会进行sign处理</p>
+<p>signaction系统调用注册信号处理函数，而kill实际上是发送信号。像Ctrl C还有segment fault这类信号都能被用户handler，吊啊。不过Ctrl C发的是SIGINT，应该是interrupt，可以被用户捕获，真正的kill是SIGKILL，就是经典的<code>kill -9</code>，这个是不能被捕获的<br>印象里dirsearch就是捕获了Ctrl C来让用户二次确认是否退出，也可以尝试直接忽略Ctrl C写流氓软件？</p>
+<h2 id="CP8"><a href="#CP8" class="headerlink" title="CP8"></a>CP8</h2><p>说起来这章内容应该在操作系统课上学过，好像当初重点讲的就是同步和互斥。。。。可惜记不太清了已经</p>
+<h3 id="用户线程与内核线程"><a href="#用户线程与内核线程" class="headerlink" title="用户线程与内核线程"></a>用户线程与内核线程</h3><p>进程实现，进程是可以分为用户态实现和内核实现的。用户态实现需要用户自行对线程进行维护，也就直接在进程的空间里面维护上各个进程的状态并将初始启动的进程作为0进程。但用户态实现的进程存在一个缺点，即用户态进程的实现对内核是透明的，内核无法感知到用户线程的存在，也就导致内核仍然以进程为调度单位，线程不会被时钟中断打断，只能通过主动交出控制权的方式让出CPU。并且如果一个线程阻塞，那么操作系统可能就认为整个进程阻塞，就把CPU让给别的进程了，也完全没有体现多线程的并发性。</p>
+<p>内核线程调度的实现，就是通过将进程作为内存分配的单位，而线程作为CPU调度的单位进行（操作系统的记忆开始复苏），调度方面和进程调度别无二致，只是进程中不再保留运行相关的数据，所有的运行情况都通过在进程中新开一个线程控制块进行记录。<br>关于资源的控制，在线程退出时，主线程通过waittid对其他线程的资源进行释放，这一步是释放了其他线程占用的进程的虚拟空间，而一旦主线程退出，则直接销毁其他线程以及整个进程，释放了进程占用的物理空间</p>
+<h3 id="锁"><a href="#锁" class="headerlink" title="锁"></a>锁</h3><p>锁的实现方面，有用户实现的锁，比较简陋，也有硬件实现的锁，需要硬件提供原子操作，比较生猛的是允许用户态关中断，但是这样子就会出现一个用户态关中断永久占用CPU为所欲为的情况</p>
+<p>说到底条件竞争是由于操作系统对线程进行了抢占式调度，只需要将获取锁的操作放在内核中进行，内核不会被抢占，就能保证互斥了。但是感觉上只能实现单核CPU上的互斥，如果存在多核，多个CPU上的内核对锁进行竞争是不是又会出问题呢？</p>
+<p>看到有说法说多核情况下就用原子操作实现自旋锁完成内核内部对锁的访问，如果多核情况下两个盒同时执行同一个原子操作又会怎么样呢？（好像也有专门的硬件实现，比较原始的一种是直接控制总线，只允许单独CPU访问内存，多核退化到单核）</p>
+<h3 id="信号量"><a href="#信号量" class="headerlink" title="信号量"></a>信号量</h3><p>信号量是锁的强化实现，当线程进入临界区时信号量–，出临界区是信号量++，信号量大于0时线程可以进入临界区，同样需要保证对信号量的操作是原子的（但是怎么保证？感觉应该可以直接原子操作）<br>信号量初值为1即为互斥锁，并且可以设置初值为0，然后使用生产者对信号量++消费者对信号量–，实现一个进程间的顺序执行，也就是同步</p>
+<h3 id="管程与条件变量"><a href="#管程与条件变量" class="headerlink" title="管程与条件变量"></a>管程与条件变量</h3><p>这个是用来解决线程间同步问题的，而不是互斥与临界区。（信号量和条件变量感觉差不多。。。都是用来解决同步的）不过条件变量要配合锁使用<br>使用情形为线程对共享值的操作需要等待<strong>条件</strong>时，需要先进入临界区，再等待条件，而这会由于线程占用锁并等待条件，造成死锁。条件变量即为在线程等待条件时将锁释放，并将线程挂起到等待队列，当条件满足时通过条件变量将挂起的线程恢复，并上锁，确保其对共享变量的操作在临界区内</p>
+<p>但说实话，内核中的各项实现仍然有被竞争的可能，对锁进行操作时会出现一个递归的对锁的互斥锁操作，感觉实际上应该还要保证这些锁操作的函数在执行的时候也上一个简单的原子操作自旋锁来保证绝对互斥？但是会不会出现获取lock失败时把自己挂起又占用锁进而导致的死锁呢？</p>
 
     </div>
 
@@ -309,13 +304,10 @@
         
     <div class="post-nav">
       <div class="post-nav-item">
-    <a href="/rCore_Tutorial_CP4.html" rel="prev" title="rCore_Tutorial_CP4">
-      <i class="fa fa-chevron-left"></i> rCore_Tutorial_CP4
+    <a href="/BalsnCTF2022web%20wp.html" rel="prev" title="BalsnCTF2022 web wp">
+      <i class="fa fa-chevron-left"></i> BalsnCTF2022 web wp
     </a></div>
-      <div class="post-nav-item">
-    <a href="/BalsnCTF2022web%20wp.html" rel="next" title="BalsnCTF2022 web wp">
-      BalsnCTF2022 web wp <i class="fa fa-chevron-right"></i>
-    </a></div>
+      <div class="post-nav-item"></div>
     </div>
       </footer>
     
@@ -375,7 +367,7 @@
 
       <!--noindex-->
       <div class="post-toc-wrap sidebar-panel">
-          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#rCore-Tutorial-CP5"><span class="nav-number">1.</span> <span class="nav-text">rCore_Tutorial_CP5</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%BF%9B%E7%A8%8B%E6%A6%82%E5%BF%B5%E5%8F%8A%E9%87%8D%E8%A6%81%E7%B3%BB%E7%BB%9F%E8%B0%83%E7%94%A8"><span class="nav-number">1.1.</span> <span class="nav-text">进程概念及重要系统调用</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#fork-exec-waitpid"><span class="nav-number">1.1.1.</span> <span class="nav-text">fork,exec,waitpid</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%BF%9B%E7%A8%8B%E7%AE%A1%E7%90%86%E7%9A%84%E6%A0%B8%E5%BF%83%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84"><span class="nav-number">1.2.</span> <span class="nav-text">进程管理的核心数据结构</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%BF%9B%E7%A8%8B%E7%AE%A1%E7%90%86%E6%9C%BA%E5%88%B6%E7%9A%84%E8%AE%BE%E8%AE%A1%E5%AE%9E%E7%8E%B0"><span class="nav-number">1.3.</span> <span class="nav-text">进程管理机制的设计实现</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%BF%9B%E7%A8%8B%E8%B0%83%E5%BA%A6"><span class="nav-number">1.4.</span> <span class="nav-text">进程调度</span></a></li></ol></li></ol></div>
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#rCore-Tutorial-CP6-amp-7-amp-8"><span class="nav-number">1.</span> <span class="nav-text">rCore_Tutorial_CP6&amp;7&amp;8</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#CP6"><span class="nav-number">1.1.</span> <span class="nav-text">CP6</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#CP7"><span class="nav-number">1.2.</span> <span class="nav-text">CP7</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#IO%E9%87%8D%E5%AE%9A%E5%90%91%E4%B8%8E%E7%AE%A1%E9%81%93"><span class="nav-number">1.2.1.</span> <span class="nav-text">IO重定向与管道</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#signal%E5%AE%9E%E7%8E%B0"><span class="nav-number">1.2.2.</span> <span class="nav-text">signal实现</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#CP8"><span class="nav-number">1.3.</span> <span class="nav-text">CP8</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%94%A8%E6%88%B7%E7%BA%BF%E7%A8%8B%E4%B8%8E%E5%86%85%E6%A0%B8%E7%BA%BF%E7%A8%8B"><span class="nav-number">1.3.1.</span> <span class="nav-text">用户线程与内核线程</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E9%94%81"><span class="nav-number">1.3.2.</span> <span class="nav-text">锁</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BF%A1%E5%8F%B7%E9%87%8F"><span class="nav-number">1.3.3.</span> <span class="nav-text">信号量</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%AE%A1%E7%A8%8B%E4%B8%8E%E6%9D%A1%E4%BB%B6%E5%8F%98%E9%87%8F"><span class="nav-number">1.3.4.</span> <span class="nav-text">管程与条件变量</span></a></li></ol></li></ol></li></ol></div>
       </div>
       <!--/noindex-->
 

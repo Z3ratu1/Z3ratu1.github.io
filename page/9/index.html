@@ -196,6 +196,104 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
+    <link itemprop="mainEntityOfPage" href="https://blog.z3ratu1.cn/[HFCTF2021]hatenum.html">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="https://q2.qlogo.cn/headimg_dl?dst_uin=1207039417&spec=160">
+      <meta itemprop="name" content="Z3ratu1">
+      <meta itemprop="description" content="与其感慨路难行，不如现在出发">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Z3ratu1's blog">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/%5BHFCTF2021%5Dhatenum.html" class="post-title-link" itemprop="url">[HFCTF2021]hatenum</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+              
+
+              <time title="创建时间：2021-08-17 20:10:16 / 修改时间：22:12:46" itemprop="dateCreated datePublished" datetime="2021-08-17T20:10:16+08:00">2021-08-17</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E5%88%B7%E9%A2%98%E8%AE%B0%E5%BD%95/" itemprop="url" rel="index"><span itemprop="name">刷题记录</span></a>
+                </span>
+            </span>
+
+          
+            <span id="/%5BHFCTF2021%5Dhatenum.html" class="post-meta-item leancloud_visitors" data-flag-title="[HFCTF2021]hatenum" title="阅读次数">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span class="leancloud-visitors-count"></span>
+            </span>
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="far fa-comment"></i>
+      </span>
+      <span class="post-meta-item-text">Valine：</span>
+    
+    <a title="valine" href="/%5BHFCTF2021%5Dhatenum.html#valine-comments" itemprop="discussionUrl">
+      <span class="post-comments-count valine-comment-count" data-xid="/%5BHFCTF2021%5Dhatenum.html" itemprop="commentCount"></span>
+    </a>
+  </span>
+  
+  
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h1 id="HFCTF2021-hatenum"><a href="#HFCTF2021-hatenum" class="headerlink" title="[HFCTF2021]hatenum"></a>[HFCTF2021]hatenum</h1><p>BUU上的复现，之前做其他题的时候一直在想HFCTF是个啥，合肥CTF？听起来就很不合理，这次这个题是之前队里师傅出的，所以我到这个时候才发现原来是虎符CTF。。。</p>
+<p>SQL注入题，但是我作为SQL注入废物，自然是不能很顺畅的做出来</p>
+<h2 id="题解"><a href="#题解" class="headerlink" title="题解"></a>题解</h2><p>代码很简单，登录注册两个功能，admin登录就能拿flag。过滤了一堆东西<code>    preg_match(&#39;/union|select|or|and|\&#39;|&quot;|sleep|benchmark|regexp|repeat|get_lock|count|=|&gt;|&lt;| |\*|,|;|\r|\n|\t|substr|right|left|mid/i&#39;, $str))</code>，同时还限制了数字<code>(preg_match(&#39;/\d&#123;9&#125;|0x[0-9a-f]&#123;9&#125;/i&#39;,$str))</code>。登录的话，登录成功失败和发生错误是三个不同的回显，所以可以通过触发错误进行盲注，常见操作就是整数溢出注入了，但是这里限制了数字的位数，所以整数溢出似乎也做不到。</p>
+          <!--noindex-->
+            <div class="post-button">
+              <a class="btn" href="/%5BHFCTF2021%5Dhatenum.html#more" rel="contents">
+                阅读全文 &raquo;
+              </a>
+            </div>
+          <!--/noindex-->
+        
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
     <link itemprop="mainEntityOfPage" href="https://blog.z3ratu1.cn/[GKCTF2021]babycat.html">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -621,110 +719,6 @@ ans <span class="token operator">=</span> <span class="token string">"http://ten
   
   
 
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
-    <link itemprop="mainEntityOfPage" href="https://blog.z3ratu1.cn/[CISCN2021]%E5%86%B3%E8%B5%9B.html">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="https://q2.qlogo.cn/headimg_dl?dst_uin=1207039417&spec=160">
-      <meta itemprop="name" content="Z3ratu1">
-      <meta itemprop="description" content="与其感慨路难行，不如现在出发">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Z3ratu1's blog">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/%5BCISCN2021%5D%E5%86%B3%E8%B5%9B.html" class="post-title-link" itemprop="url">[CISCN2021]决赛</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2021-07-20 14:26:06" itemprop="dateCreated datePublished" datetime="2021-07-20T14:26:06+08:00">2021-07-20</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="far fa-calendar-check"></i>
-                </span>
-                <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2021-08-31 16:54:31" itemprop="dateModified" datetime="2021-08-31T16:54:31+08:00">2021-08-31</time>
-              </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-folder"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/%E5%88%B7%E9%A2%98%E8%AE%B0%E5%BD%95/" itemprop="url" rel="index"><span itemprop="name">刷题记录</span></a>
-                </span>
-            </span>
-
-          
-            <span id="/%5BCISCN2021%5D%E5%86%B3%E8%B5%9B.html" class="post-meta-item leancloud_visitors" data-flag-title="[CISCN2021]决赛" title="阅读次数">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-eye"></i>
-              </span>
-              <span class="post-meta-item-text">阅读次数：</span>
-              <span class="leancloud-visitors-count"></span>
-            </span>
-  
-  <span class="post-meta-item">
-    
-      <span class="post-meta-item-icon">
-        <i class="far fa-comment"></i>
-      </span>
-      <span class="post-meta-item-text">Valine：</span>
-    
-    <a title="valine" href="/%5BCISCN2021%5D%E5%86%B3%E8%B5%9B.html#valine-comments" itemprop="discussionUrl">
-      <span class="post-comments-count valine-comment-count" data-xid="/%5BCISCN2021%5D%E5%86%B3%E8%B5%9B.html" itemprop="commentCount"></span>
-    </a>
-  </span>
-  
-  
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <h1 id="CISCN2021-决赛"><a href="#CISCN2021-决赛" class="headerlink" title="[CISCN2021]决赛"></a>[CISCN2021]决赛</h1><p>居然混到了国一，队友牛逼！可信计算牛逼！</p>
-<h2 id="day1"><a href="#day1" class="headerlink" title="day1"></a>day1</h2><p>经典awd坐牢，对tp等大型PHP框架的审计一无所知的我只能坐牢，官方流量要延迟一小时，意味着awd只会上车的我被乱杀，一度被打到倒数前十。但其实web也能自力更生的抓流量，但这回因为未知的原因，祖传脚本未能抓到流量，经过长达一个小时的边挨打边修边研究，发现是祖传脚本默认把流量写入tmp目录，而不知为何tmp目录不能写造成的。<br>查看phpinfo，disable_fucntion禁用了system，exec等命令执行函数，让写入不死马的几率降低到最小，open_basedir并没有值，那么应该不会影响到写入tmp，查看tmp权限，经典777+t，那么也不会影响写入。最后，为什么写不了tmp成为了一个永远的未解之谜。<br>然后挨了一个小时打之后发现流量能写本地，然后就开始上车，但这个时候的垃圾洞已经被修的差不多了，捡垃圾也只能捡一点点分，成功进入倒数前十。</p>
-<p>还是记录一下踩的坑吧。</p>
-          <!--noindex-->
-            <div class="post-button">
-              <a class="btn" href="/%5BCISCN2021%5D%E5%86%B3%E8%B5%9B.html#more" rel="contents">
-                阅读全文 &raquo;
-              </a>
-            </div>
-          <!--/noindex-->
-        
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
 
   
   <nav class="pagination">
@@ -795,7 +789,7 @@ ans <span class="token operator">=</span> <span class="token string">"http://ten
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">166</span>
+          <span class="site-state-item-count">167</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
