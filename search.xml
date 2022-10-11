@@ -20522,8 +20522,9 @@ input<span class="token punctuation">.</span><span class="token function">readOb
                     Runtime.getRuntime.exec
 </code></pre>
 <p>这里中间部分还是UIDefault到SwingLazyValue，然后执行命令的部分换成了<code>sun.reflect.misc.MethodUtil</code>，触发的入口是HashMap的equals。。。感觉这个equals入口好像是很显而易见的东西。。。比较HashMap里面对k&#x2F;v调用get应该非常的普遍，还是基础差了</p>
-<p>这里比较有意思的是MethodUtil这里命令执行的构造，实际上是对MethodUtil.invoke进行了两次调用的，道理也很简单，因为<code>SwingLazyValue.createValue</code>方法中是通过传入参数的类型去获取方法的，如果传入的参数本身<code>Method.class, Object.class, Object[].class</code>就没法找到invoke方法，就无法实现调用了，所以先传入了<code>invoke, new Object(), new Object[]&#123;&#125;</code>，再在后续的object[]中传入Runtime执行命令。<br>但是这里有一点其实我没理解，这里的第二个参数应该是方法对应的类实例，第一次应该也是传入<code>MethodUtil</code>，但这样也会造成找不到方法的问题，为什么传入Object也能用呢？</p>
-<p>这里还有另一个点，就是exec获取的方法参数签名为String.class，但我们传入的时候应该是一个Object[]{cmd}，因为invoke要求输入参数是一个Object数组，如果想钓鱼String[].class的exec，就得传入Object[]{String[]{cmd}}</p>
+<p>这里比较有意思的是MethodUtil这里命令执行的构造，实际上是对MethodUtil.invoke进行了两次调用的，道理也很简单，因为<code>SwingLazyValue.createValue</code>方法中是通过传入参数的类型去获取方法的，如果传入的参数不是<code>Method.class, Object.class, Object[].class</code>就没法找到invoke方法，就无法实现调用了，所以先传入了<code>invoke, new Object(), new Object[]&#123;&#125;</code>，再在后续的object[]中传入Runtime执行命令。<br>这里有一个需要注意的点，反射调用中，这里的第二个参数应该是方法对应的类实例，第一次应该也是传入<code>MethodUtil</code>，但由于这里调用的是类的静态方法，所以可以传任意的对象进去，这里就是传了一个object</p>
+<p>这里还有另一个点，就是exec获取的方法参数签名为String.class，但我们传入的时候应该是一个Object[]{cmd}，因为invoke要求输入参数是一个Object数组，如果想调用参数为String[].class的exec，就得传入Object[]{String[]{cmd}}</p>
+<p>为什么不直接调用exec？因为exec不是静态方法</p>
 <p>然后这边还有一个坑，我一直以为Hessain应该没啥区别，所以没有用题目的jar包，直接pom里面引入Hessain本地调的，然后把payload搓出来之后打半天没反应。。。最后调了半天，走到第二次调用<code>MethodUtil</code>时，第二个参数本应该是Runtime类实例，结果给了我个HashMap？？？？最后和朋友调了半天发现我们俩payload完全一样，最后确认真的是Hessain的问题。。。在题目给的Hessain下可以正常反序列化出Runtime类，而本地的Hessain就不行。。。</p>
 <p>Hessain在SerializerFactory的getDeserializer中对类的Deserializer进行了判断，在我本地的Hessain4.0.65下，是一个</p>
 <pre class=" language-java"><code class="language-java">Class <span class="token class-name">cl</span> <span class="token operator">=</span> <span class="token keyword">this</span><span class="token punctuation">.</span><span class="token function">loadSerializedClass</span><span class="token punctuation">(</span>type<span class="token punctuation">)</span><span class="token punctuation">;</span>
@@ -20535,6 +20536,7 @@ deserializer <span class="token operator">=</span> <span class="token keyword">t
 deserializer <span class="token operator">=</span> <span class="token keyword">this</span><span class="token punctuation">.</span><span class="token function">getDeserializer</span><span class="token punctuation">(</span>cl<span class="token punctuation">)</span><span class="token punctuation">;</span>
 </code></pre>
 <p>可以直接获取到Runtime类然后使用UnsafeDeserializer反序列化。。。无语辣</p>
+<h3 id="解3"><a href="#解3" class="headerlink" title="解3"></a>解3</h3><p>好哥哥发来的最新方法，jndi中由于高版本关了远程codebase的信任，从而无法实现jndi注入，但是修改这个属性的System.setProperty却是一个静态方法，可以在这里被createValue调用，直接一键打通，然后再用开头给的XStream的<code>javax.naming.InitialContext.doLookup</code>即可</p>
 <h2 id="坑"><a href="#坑" class="headerlink" title="坑"></a>坑</h2><p>剩下的题估计是超越认知范围辣，不知道还会不会复现，我是Java垃圾呜呜</p>
 ]]></content>
       <categories>
