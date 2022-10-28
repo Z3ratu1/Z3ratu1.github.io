@@ -196,6 +196,110 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
+    <link itemprop="mainEntityOfPage" href="https://blog.z3ratu1.cn/%E5%B7%85%E5%B3%B0%E6%9E%81%E5%AE%A22021.html">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="https://q2.qlogo.cn/headimg_dl?dst_uin=1207039417&spec=160">
+      <meta itemprop="name" content="Z3ratu1">
+      <meta itemprop="description" content="与其感慨路难行，不如现在出发">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Z3ratu1's blog">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/%E5%B7%85%E5%B3%B0%E6%9E%81%E5%AE%A22021.html" class="post-title-link" itemprop="url">巅峰极客2021</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2021-07-31 20:11:11" itemprop="dateCreated datePublished" datetime="2021-07-31T20:11:11+08:00">2021-07-31</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2021-08-02 10:20:37" itemprop="dateModified" datetime="2021-08-02T10:20:37+08:00">2021-08-02</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E5%88%B7%E9%A2%98%E8%AE%B0%E5%BD%95/" itemprop="url" rel="index"><span itemprop="name">刷题记录</span></a>
+                </span>
+            </span>
+
+          
+            <span id="/%E5%B7%85%E5%B3%B0%E6%9E%81%E5%AE%A22021.html" class="post-meta-item leancloud_visitors" data-flag-title="巅峰极客2021" title="阅读次数">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span class="leancloud-visitors-count"></span>
+            </span>
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="far fa-comment"></i>
+      </span>
+      <span class="post-meta-item-text">Valine：</span>
+    
+    <a title="valine" href="/%E5%B7%85%E5%B3%B0%E6%9E%81%E5%AE%A22021.html#valine-comments" itemprop="discussionUrl">
+      <span class="post-comments-count valine-comment-count" data-xid="/%E5%B7%85%E5%B3%B0%E6%9E%81%E5%AE%A22021.html" itemprop="commentCount"></span>
+    </a>
+  </span>
+  
+  
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h1 id="巅峰极客2021"><a href="#巅峰极客2021" class="headerlink" title="巅峰极客2021"></a>巅峰极客2021</h1><p>这次的题四个web，但是抄原题的抄原题，套娃的套娃，并且感觉题目的重复程度好高。。。虽然垃圾的我做不出来，但是我还是觉得这次的题目没有那种让人眼前一亮或者学到东西的感觉。。。</p>
+<h2 id="ezjs"><a href="#ezjs" class="headerlink" title="ezjs"></a>ezjs</h2><p>魔改自XNUCA2020 oooooooooldjs，加载图片的地方可以任意文件读取，读了源码加package.json，然后npm audit看一下，能发现是打的一个express-validator的原型链污染，污染完了就是一个pug的rce，pug的rce是复制粘贴就能打的那种，express-validator的原型链污染也是复制粘贴就能打的，但是改了一个地方，原来的题目用了express.json支持json数据解析，所以json直接提交一个对象就能打通，这里没有json解析了，但是没有认真去了解过这个库是怎么处理数据的，不知道怎么样的提交能实现之前同样的效果<br>一开始在想怎么伪造admin身份，也有可能是打那个session-file-store，但是那个需要获取到session key和能写文件，session-file-store的session也和phpsessionid有点像，前半截文件名，默认路径是<code>./session</code>，后半截是拿key算的签名保证不被伪造，因为前半截的文件名完全没有校验，甚至可以目录穿越去加载session文件，但是这里既读不到key也写不了文件，也不行</p>
+<p>需要进行乱按来进行原型链污染，一开始没有意识到抄的payload里面的双引号是在转义json。。。所以抄payload的时候一直带着那个转义符，第二天复盘的时候突然意识到这一点，去掉之后瞬间打通。。。呜呜呜，污染完原型链之后就是复制粘贴打在开启pretty选项时pug的rce，纯复制粘贴题<br>非json解析下的原型链污染payload<br><code>a[__proto__][isadmin]=admin&amp;a&quot;].__proto__[&quot;isadmin=222</code></p>
+          <!--noindex-->
+            <div class="post-button">
+              <a class="btn" href="/%E5%B7%85%E5%B3%B0%E6%9E%81%E5%AE%A22021.html#more" rel="contents">
+                阅读全文 &raquo;
+              </a>
+            </div>
+          <!--/noindex-->
+        
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
     <link itemprop="mainEntityOfPage" href="https://blog.z3ratu1.cn/CyBRICS2021.html">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -621,110 +725,6 @@ ans <span class="token operator">=</span> <span class="token string">"http://ten
   
   
 
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
-    <link itemprop="mainEntityOfPage" href="https://blog.z3ratu1.cn/TCTF.html">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="https://q2.qlogo.cn/headimg_dl?dst_uin=1207039417&spec=160">
-      <meta itemprop="name" content="Z3ratu1">
-      <meta itemprop="description" content="与其感慨路难行，不如现在出发">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Z3ratu1's blog">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/TCTF.html" class="post-title-link" itemprop="url">TCTF/0CTF</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2021-07-03 21:28:31" itemprop="dateCreated datePublished" datetime="2021-07-03T21:28:31+08:00">2021-07-03</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="far fa-calendar-check"></i>
-                </span>
-                <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2021-07-20 19:47:35" itemprop="dateModified" datetime="2021-07-20T19:47:35+08:00">2021-07-20</time>
-              </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-folder"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/%E5%88%B7%E9%A2%98%E8%AE%B0%E5%BD%95/" itemprop="url" rel="index"><span itemprop="name">刷题记录</span></a>
-                </span>
-            </span>
-
-          
-            <span id="/TCTF.html" class="post-meta-item leancloud_visitors" data-flag-title="TCTF/0CTF" title="阅读次数">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-eye"></i>
-              </span>
-              <span class="post-meta-item-text">阅读次数：</span>
-              <span class="leancloud-visitors-count"></span>
-            </span>
-  
-  <span class="post-meta-item">
-    
-      <span class="post-meta-item-icon">
-        <i class="far fa-comment"></i>
-      </span>
-      <span class="post-meta-item-text">Valine：</span>
-    
-    <a title="valine" href="/TCTF.html#valine-comments" itemprop="discussionUrl">
-      <span class="post-comments-count valine-comment-count" data-xid="/TCTF.html" itemprop="commentCount"></span>
-    </a>
-  </span>
-  
-  
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <h1 id="TCTF-x2F-0CTF"><a href="#TCTF-x2F-0CTF" class="headerlink" title="TCTF&#x2F;0CTF"></a>TCTF&#x2F;0CTF</h1><p>至尊难，认认真真搞了一天一个题都做不出来，虽然做出来题的队伍不多，但是我还是太垃圾了呜呜</p>
-<p>赛后复现了2rm1，其中绝大多数的代码都是参考的rmb神仙，还超级提问麻烦了他几天，表示感谢</p>
-<h2 id="1linephp"><a href="#1linephp" class="headerlink" title="1linephp"></a>1linephp</h2><p>搜了一下发现了orange在18年给hitcon出的题目<br><a target="_blank" rel="external nofollow noopener noreferrer" href="https://blog.orange.tw/2018/10/hitcon-ctf-2018-one-line-php-challenge.html">HITCON CTF 2018 - One Line PHP Challenge</a><br>唯一的差距就是把之前无限制的文件名加了一个.php后缀。难度提升</p>
-          <!--noindex-->
-            <div class="post-button">
-              <a class="btn" href="/TCTF.html#more" rel="contents">
-                阅读全文 &raquo;
-              </a>
-            </div>
-          <!--/noindex-->
-        
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
 
   
   <nav class="pagination">
@@ -795,7 +795,7 @@ ans <span class="token operator">=</span> <span class="token string">"http://ten
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">168</span>
+          <span class="site-state-item-count">169</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
