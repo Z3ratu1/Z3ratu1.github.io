@@ -20,18 +20,18 @@
     var CONFIG = {"hostname":"blog.z3ratu1.cn","root":"/","scheme":"Pisces","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"always","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":true},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
   </script>
 
-  <meta name="description" content="Java RMI反序列化与JNDI注入入门本来是想更新原文章的，但是学着学着发现自己之前根本没懂，写了一万个错的东西，全部推倒重来真正的java漏洞分析都是无尽的代码截图和调试，我这种纯概念的文字叙述只能是记个笔记，先了解各大概 RMI反序列化主要是利用客户端，服务端以及注册中心交互过程中对象的传递进行反序列化 名词解释">
+  <meta name="description" content="Java RMI反序列化与JNDI注入入门本来是想更新原文章的，但是学着学着发现自己之前根本没懂，写了一万个错的东西，全部推倒重来。最近又看了一下weblogic关于JRMP的一系列漏洞，再订正一下真正的java漏洞分析都是无尽的代码截图和调试，我这种纯概念的文字叙述只能是记个笔记，先了解各大概 RMI反序列化主要是利用客户端，服务端以及注册中心交互过程中对象的传递进行反序列化 名词解释">
 <meta property="og:type" content="article">
 <meta property="og:title" content="Java RMI反序列化与JNDI注入入门">
 <meta property="og:url" content="https://blog.z3ratu1.cn/Java%20RMI%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96%E4%B8%8EJNDI%E6%B3%A8%E5%85%A5%E5%85%A5%E9%97%A8.html">
 <meta property="og:site_name" content="Z3ratu1&#39;s blog">
-<meta property="og:description" content="Java RMI反序列化与JNDI注入入门本来是想更新原文章的，但是学着学着发现自己之前根本没懂，写了一万个错的东西，全部推倒重来真正的java漏洞分析都是无尽的代码截图和调试，我这种纯概念的文字叙述只能是记个笔记，先了解各大概 RMI反序列化主要是利用客户端，服务端以及注册中心交互过程中对象的传递进行反序列化 名词解释">
+<meta property="og:description" content="Java RMI反序列化与JNDI注入入门本来是想更新原文章的，但是学着学着发现自己之前根本没懂，写了一万个错的东西，全部推倒重来。最近又看了一下weblogic关于JRMP的一系列漏洞，再订正一下真正的java漏洞分析都是无尽的代码截图和调试，我这种纯概念的文字叙述只能是记个笔记，先了解各大概 RMI反序列化主要是利用客户端，服务端以及注册中心交互过程中对象的传递进行反序列化 名词解释">
 <meta property="og:locale">
 <meta property="og:image" content="https://blog.z3ratu1.cn/images/JavaRMI%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96%E5%85%A5%E9%97%A8/structure.png">
 <meta property="og:image" content="https://blog.z3ratu1.cn/images/JavaRMI%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96%E5%85%A5%E9%97%A8/unmarshalValue.png">
 <meta property="og:image" content="https://blog.z3ratu1.cn/images/JavaRMI%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96%E5%85%A5%E9%97%A8/isPrimitive.png">
 <meta property="article:published_time" content="2021-04-13T11:57:58.000Z">
-<meta property="article:modified_time" content="2021-12-01T13:21:40.042Z">
+<meta property="article:modified_time" content="2022-11-22T11:22:25.390Z">
 <meta property="article:author" content="Z3ratu1">
 <meta property="article:tag" content="Java">
 <meta property="article:tag" content="RMI">
@@ -236,7 +236,7 @@
                   <i class="far fa-calendar-check"></i>
                 </span>
                 <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2021-12-01 21:21:40" itemprop="dateModified" datetime="2021-12-01T21:21:40+08:00">2021-12-01</time>
+                <time title="修改时间：2022-11-22 19:22:25" itemprop="dateModified" datetime="2022-11-22T19:22:25+08:00">2022-11-22</time>
               </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -280,7 +280,7 @@
     <div class="post-body" itemprop="articleBody">
 
       
-        <h1 id="Java-RMI反序列化与JNDI注入入门"><a href="#Java-RMI反序列化与JNDI注入入门" class="headerlink" title="Java RMI反序列化与JNDI注入入门"></a>Java RMI反序列化与JNDI注入入门</h1><p>本来是想更新原文章的，但是学着学着发现自己之前根本没懂，写了一万个错的东西，全部推倒重来<br>真正的java漏洞分析都是无尽的代码截图和调试，我这种纯概念的文字叙述只能是记个笔记，先了解各大概</p>
+        <h1 id="Java-RMI反序列化与JNDI注入入门"><a href="#Java-RMI反序列化与JNDI注入入门" class="headerlink" title="Java RMI反序列化与JNDI注入入门"></a>Java RMI反序列化与JNDI注入入门</h1><p>本来是想更新原文章的，但是学着学着发现自己之前根本没懂，写了一万个错的东西，全部推倒重来。最近又看了一下weblogic关于JRMP的一系列漏洞，再订正一下<br>真正的java漏洞分析都是无尽的代码截图和调试，我这种纯概念的文字叙述只能是记个笔记，先了解各大概</p>
 <h2 id="RMI反序列化"><a href="#RMI反序列化" class="headerlink" title="RMI反序列化"></a>RMI反序列化</h2><p>主要是利用客户端，服务端以及注册中心交互过程中对象的传递进行反序列化</p>
 <h3 id="名词解释"><a href="#名词解释" class="headerlink" title="名词解释"></a>名词解释</h3><p>没什么用的环节。Remote Method Invocation，远程方法调用<br>JRMP，Java Remote Method Protocol，Java远程方法协议，是Java RMI过程中使用的一种协议</p>
 <h3 id="实验环境"><a href="#实验环境" class="headerlink" title="实验环境"></a>实验环境</h3><p>项目结构如下<br><img src="/images/JavaRMI%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96%E5%85%A5%E9%97%A8/structure.png" alt="structure.png"><br>一般来说RMI中有三个主要成员，Server，Client和Registry，Registry提供一个记录和注册的服务，Server负责注册在Registry上方法的具体实现，而Client就只需要查找Registry中的方法然后调用。</p>
@@ -379,15 +379,18 @@
 <p>rmb神仙和我说RMI的通信过程和HTTP差不多，都是发一个应答一个，交互基本上就一次性的，所以也可以手搓流量（大概）进行攻击，但是有一些objid之类的东西是随机的？所以需要额外的操作</p>
 </blockquote>
 <h4 id="jdk8u121之前"><a href="#jdk8u121之前" class="headerlink" title="jdk8u121之前"></a>jdk8u121之前</h4><p>lookup也好，bind rebind也好，都可以直接发一个能用的链直接一键打穿，这是最快乐的年代</p>
-<h4 id="jdk8u121-8u232-b09"><a href="#jdk8u121-8u232-b09" class="headerlink" title="jdk8u121~8u232_b09"></a>jdk8u121~8u232_b09</h4><p>由于上文提到的类过滤，直接反序列化链的payload会因为不在白名单类中而失效，这时就需要想办法从白名单类中绕出来<br>这里使用的是允许的类中的Remote类和UnicastRef类<br>代码太高深，暂时还不是很懂，具体过程是通过控制UnicastRef对象中的LiveRef的属性，发起任意RMI连接，从而连接到恶意的server上，而RMI中传递的对象需要实现Remote接口，因此还需要用Remote类下的RemoteObjectInvocationHandler，调用其父类RemoteObject的readObject函数，而其中又调用了其ref属性的readExternal方法，这里的ref属性就是我们之前控制的UnicastRef类，抄一个函数介绍</p>
+<h4 id="jdk8u121-8u232-b09"><a href="#jdk8u121-8u232-b09" class="headerlink" title="jdk8u121~8u232_b09"></a>jdk8u121~8u232_b09</h4><p>由于上文提到的类过滤，直接反序列化链的payload会因为不在白名单类中而失效，这时就需要想办法从白名单类中绕出来<br>这里使用的是允许的类中的Remote类和UnicastRef类<br>就是yso中的经典JRMPClient操作，且由于<code>RemoteObjectInvocationHandler</code>中调用了<code>readExternal()</code>去反序列化<code>UnicastRef</code>对象，而不是用传入的ObjectInputStream，导致了weblogic中补丁的进一步绕过，详情参考这个文章<a target="_blank" rel="external nofollow noopener noreferrer" href="https://xz.aliyun.com/t/2479">Weblogic JRMP反序列化漏洞回顾</a>，不过yso中把最后的对象套了一层proxy，似乎是需要把对象强转成Remote类型的对象，可能这在打RMI上是必须的，不过如果单一个直接的反序列化就不需要套了？</p>
 <blockquote>
 <p>Java默认的序列化机制非常简单，而且序列化后的对象不需要再次调用构造器重新生成，但是在实际中，我们可以会希望对象的某一部分不需要被序列化，或者说一个对象被还原之后，其内部的某些子对象需要重新创建，从而不必将该子对象序列化。 在这些情况下，我们可以考虑实现Externalizable接口从而代替Serializable接口来对序列化过程进行控制。<br>Externalizable接口extends Serializable接口，而且在其基础上增加了两个方法：writeExternal()和readExternal()。这两个方法会在序列化和反序列化还原的过程中被自动调用，以便执行一些特殊的操作。</p>
 </blockquote>
-<p>在这里readExternal就用ref的ip port一路发起tcp连接并调用一个lookup函数，从而连接到传说中的JRMPListener</p>
+<p>在这里readExternal就用ref的ip port一路发起tcp连接并调用一个lookup函数，从而连接到的JRMPListener</p>
 <h5 id="JRMP-Listener-amp-amp-JRMP-Client"><a href="#JRMP-Listener-amp-amp-JRMP-Client" class="headerlink" title="JRMP Listener &amp;&amp; JRMP Client"></a>JRMP Listener &amp;&amp; JRMP Client</h5><p>yso中JRMP不仅分为Listener和Client，还分为payload和exploit，排列组合就等于有四个类型。两两一组形成两种利用模式<br>payload&#x2F;listener+expolit&#x2F;client和payload&#x2F;client+expolit&#x2F;listener</p>
 <p>前者通过发送一个反序列化链，使得目标机器启动一个RMI服务监听，然后利用JRMP client发送一个链进行利用</p>
 <p>后者通过发送一个反序列化链，使得目标机器反过来对攻击者的JRMP listener发起RMI连接，并通过listener返回一个恶意的链进行攻击</p>
 <p>上文提到的白名单绕过，就是使用JRMP Client绕过白名单，让目标对攻击者服务器发送RMI连接（调用lookup函数），此时绕过了对JEP290反序列化类的限制，再从无限制的RMI方法调用中返回真正的payload打穿。<br>JRMP Listener在RMI连接可控时，能稳定打一个反序列化，其可以通过返回一个ExceptionalReturn状态，在Client处理该状态时，会直接对返回的数据进行反序列化，从而打通。<br>这个方案不仅适用于lookup函数，在client进行远程方法调用等场合，无论返回值为何种类型，均可以返回该异常类型进行反序列化</p>
+<p>然后在之后的版本中<code>UnicastRef</code>类也被修了，JRMP就打不通了，不过好像说有一个用<code>UnicastRemoteObject</code>继续打的，然后在8u241被修了</p>
+<p>做了下yxxx师傅的<a target="_blank" rel="external nofollow noopener noreferrer" href="https://github.com/waderwu/javaDeserializeLabs">javaDeserializeLabs</a>，里面weblogic那一套JRMP反序列化就是这段的内容，不过在lab7的时候踩了一个坑，jdk在启动的时候指定了<code>-Djdk.serialFilter=!javax.management.BadAttributeValueExpException</code>，把这个类ban了，但是我感觉无影响，CC5用的这个，我换CC6&#x2F;7就是了，结果yso起了个JRMPListener之后打过去还是报这个错。。。然后仔细一看才发现，yso不知道为什么把反序列化的payload外面又套了一层<code>BadAttributeValueExpException</code>，重新缝一下把这句删掉就能打通了。<br>看了一下<a target="_blank" rel="external nofollow noopener noreferrer" href="https://xz.aliyun.com/t/7932">针对RMI服务的九重攻击</a>，原来是反序列化这里是把错误对象反序列化，先写了returnType和ID，然后就是object，当returnType是exception的时候就会把object反序列化，但实际上这里的object不是Exception类也无所谓</p>
+<p>越来越搞不懂rmi和jrmp的关系了。。。</p>
 <h3 id="registry攻击client"><a href="#registry攻击client" class="headerlink" title="registry攻击client"></a>registry攻击client</h3><p>同样也能打服务端，但是基本上注册中心和服务端都是一台机子，所以就不多说了。<br>其实从上面也能看出来，只要两个机器远程交互的时候传递了序列化的对象，那接受的机器基本上就没跑的会把序列化的对象给反序列化出来，只要目标机器上确实存在这个链，就能一键打通。<br>使用ysoserial可以生成一个恶意的注册中心，只要服务端调用注册中心的方法，就给你返回一个执行命令的Object给你反序列化</p>
 <h3 id="client攻击server"><a href="#client攻击server" class="headerlink" title="client攻击server"></a>client攻击server</h3><p>服务端对传递过来的参数放进了一个<code>unmarshalValue</code>函数进行处理，该方法在参数不是基本类型的情况下会对传入数据进行readObject，所以客户端提交给服务端的数据里得有一个Object，也就是服务端提供的函数调用中，至少得有一个函数接受的参数是一个Object，<strong>至少得不是一个primitive type才能触发readObject</strong>，才能发一个恶意对象过去进行利用<br>如图<br><img src="/images/JavaRMI%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96%E5%85%A5%E9%97%A8/unmarshalValue.png" alt="unmarshalValue.png"><br>这里可以看到服务端对传过来的类进行了一个类型判断，只要不是primitive type的类就直接进行readObject反序列化，而再来看一下primitive type有哪些<br><img src="/images/JavaRMI%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96%E5%85%A5%E9%97%A8/isPrimitive.png" alt="isPrimitive.png"><br>这意味着string也不是基础类型，服务端如果接受的是string也能打通</p>
 <p>把这个复现一下</p>
