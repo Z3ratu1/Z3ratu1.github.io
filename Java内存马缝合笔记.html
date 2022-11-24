@@ -1,0 +1,604 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 6.0.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"blog.z3ratu1.cn","root":"/","scheme":"Pisces","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"always","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":true},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+  </script>
+
+  <meta name="description" content="Java内存马缝合笔记之前渗透的时候遇到了一个java站，tomcat8跑的，能上传jsp，有shiro但是打不通（打通之后看了一眼无敌高版本）jsp上传之后会急速被删，可以条件竞争去抢，这样子的话打一个内存马就是最稳整的，但是我是java垃圾捏，不会打，幸好天哥最后给了个现成的内存马还有一个远古tomcat6的站，有一个jndi注入，最后也是靠whj好兄弟缝出来了一个tomcat6的回显打通，所">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Java内存马缝合笔记">
+<meta property="og:url" content="https://blog.z3ratu1.cn/Java%E5%86%85%E5%AD%98%E9%A9%AC%E7%BC%9D%E5%90%88%E7%AC%94%E8%AE%B0.html">
+<meta property="og:site_name" content="Z3ratu1&#39;s blog">
+<meta property="og:description" content="Java内存马缝合笔记之前渗透的时候遇到了一个java站，tomcat8跑的，能上传jsp，有shiro但是打不通（打通之后看了一眼无敌高版本）jsp上传之后会急速被删，可以条件竞争去抢，这样子的话打一个内存马就是最稳整的，但是我是java垃圾捏，不会打，幸好天哥最后给了个现成的内存马还有一个远古tomcat6的站，有一个jndi注入，最后也是靠whj好兄弟缝出来了一个tomcat6的回显打通，所">
+<meta property="og:locale">
+<meta property="article:published_time" content="2022-11-24T09:37:09.000Z">
+<meta property="article:modified_time" content="2022-11-24T12:18:23.358Z">
+<meta property="article:author" content="Z3ratu1">
+<meta property="article:tag" content="Java">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="https://blog.z3ratu1.cn/Java%E5%86%85%E5%AD%98%E9%A9%AC%E7%BC%9D%E5%90%88%E7%AC%94%E8%AE%B0.html">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-Hans'
+  };
+</script>
+
+  <title>Java内存马缝合笔记 | Z3ratu1's blog</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+<link rel="stylesheet" href="/css/prism-tomorrow.css" type="text/css"></head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">Z3ratu1's blog</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">Welcome</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>关于</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+        <li class="menu-item menu-item-links">
+
+    <a href="/links/" rel="section"><i class="fa fa-link fa-fw"></i>友链</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off" placeholder="搜索..." spellcheck="false" type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+  <a href="https://github.com/Z3ratu1" class="github-corner" title="Follow me on GitHub" aria-label="Follow me on GitHub" rel="external nofollow noopener noreferrer" target="_blank"><svg width="80" height="80" viewbox="0 0 250 250" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"/><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"/><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"/></svg></a>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
+    <link itemprop="mainEntityOfPage" href="https://blog.z3ratu1.cn/Java%E5%86%85%E5%AD%98%E9%A9%AC%E7%BC%9D%E5%90%88%E7%AC%94%E8%AE%B0.html">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="https://q2.qlogo.cn/headimg_dl?dst_uin=1207039417&spec=160">
+      <meta itemprop="name" content="Z3ratu1">
+      <meta itemprop="description" content="与其感慨路难行，不如现在出发">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Z3ratu1's blog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          Java内存马缝合笔记
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+              
+
+              <time title="创建时间：2022-11-24 17:37:09 / 修改时间：20:18:23" itemprop="dateCreated datePublished" datetime="2022-11-24T17:37:09+08:00">2022-11-24</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E7%AC%94%E8%AE%B0/" itemprop="url" rel="index"><span itemprop="name">笔记</span></a>
+                </span>
+            </span>
+
+          
+            <span id="/Java%E5%86%85%E5%AD%98%E9%A9%AC%E7%BC%9D%E5%90%88%E7%AC%94%E8%AE%B0.html" class="post-meta-item leancloud_visitors" data-flag-title="Java内存马缝合笔记" title="阅读次数">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span class="leancloud-visitors-count"></span>
+            </span>
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="far fa-comment"></i>
+      </span>
+      <span class="post-meta-item-text">Valine：</span>
+    
+    <a title="valine" href="/Java%E5%86%85%E5%AD%98%E9%A9%AC%E7%BC%9D%E5%90%88%E7%AC%94%E8%AE%B0.html#valine-comments" itemprop="discussionUrl">
+      <span class="post-comments-count valine-comment-count" data-xid="/Java%E5%86%85%E5%AD%98%E9%A9%AC%E7%BC%9D%E5%90%88%E7%AC%94%E8%AE%B0.html" itemprop="commentCount"></span>
+    </a>
+  </span>
+  
+  
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h1 id="Java内存马缝合笔记"><a href="#Java内存马缝合笔记" class="headerlink" title="Java内存马缝合笔记"></a>Java内存马缝合笔记</h1><p>之前渗透的时候遇到了一个java站，tomcat8跑的，能上传jsp，有shiro但是打不通（打通之后看了一眼无敌高版本）<br>jsp上传之后会急速被删，可以条件竞争去抢，这样子的话打一个内存马就是最稳整的，但是我是java垃圾捏，不会打，幸好天哥最后给了个现成的内存马<br>还有一个远古tomcat6的站，有一个jndi注入，最后也是靠whj好兄弟缝出来了一个tomcat6的回显打通，所以这波结束之后还是决定稍微学一下，就算不能懂原理，起码要缝出来一套能应对各个版本的内存马。。。以及遇到问题的时候起码有一套调试环境能排错</p>
+<p>由于java水平有限，写出来的东西基本上都是从网上东拼西凑出来的，超级缝合怪，但是不得不说我缝合的水平真是越来越好了，因为感觉就大家的内存马理论都学得很好，我学点皮毛能用就行了，所以就叫缝合笔记8</p>
+<p>3,2,1，开缝！</p>
+<h2 id="回显"><a href="#回显" class="headerlink" title="回显"></a>回显</h2><p>实际上要做的操作在本质上区别不大，都是找到tomcat下的某个对象，然后修改其属性之类的。</p>
+<p>回显的话就拿到request和response对象就可以了，所以操作起来简单一点，并且payload也短一些，在例如shiro等受到tomcatheader长度7300（听说的）的限制下能使用的几率更大<br>当然网上现在缩短payload的方法也一搜一堆，用javassist去行号之类的。或者直接反射改tomcat的最大长度限制之类的也行</p>
+<h3 id="spring回显"><a href="#spring回显" class="headerlink" title="spring回显"></a>spring回显</h3><p>回显似乎存在着更加通用的手法，因为ctf中的环境springboot居多，所以之前大多是用一个springboot的祖传回显进行的，spring下的回显似乎很稳定，从<code>org.springframework.web.context.request.RequestContextHolder</code>类中获取request和response，网上都有现成的，直接复制粘贴就打通一切了。</p>
+<h3 id="tomcat回显"><a href="#tomcat回显" class="headerlink" title="tomcat回显"></a>tomcat回显</h3><p>tomcat下就稍微麻烦一些。jsp的话本来就有request和response对象，当然这也不能加内存马了，就是直接的jsp木马，更多的是考虑反序列化等代码执行的情况下进行回显</p>
+<p>这里有一个注意点，tomcat从10开始讲<code>javax</code>转变为<code>jakarta</code>，并不知道有什么意义，但是对应的包名都需要重新修改一遍。</p>
+<p>网上流行的payload是一个经典的线程遍历，直接从currentThread往上拿到全部现场，然后一个个找线程拿到对应的request和response对象，据说这个操作是全版本通用的回显捏。后续的内存马操作有部分和这个类似，所以这里也就不着重讲</p>
+<p>不过说到底这些并不是今天的重点，回显用一次打一次还是有些不方便，不如直接一发内存马打进去一直用</p>
+<h2 id="内存马"><a href="#内存马" class="headerlink" title="内存马"></a>内存马</h2><p>在开始内存马之前，需要先掌握一些内存马相关的知识</p>
+<p>spring层面的内存马有controller和interceptor，而tomcat层面的则是serverlet，filter和listener</p>
+<p>每一种内存马都有自己的打法，但是打进去了效果都是一样的，网络上关于内存马的研究已经炉火纯青了，所以只需要百度一下疯狂缝合就基本上都能用。所以这篇文章也只是对看过的文章和踩过的小坑做记录，只要肯找网上现成的开箱即用的payload估计也能找到一堆</p>
+<p>我这里就研究了一下现在最流行的filter内存马。</p>
+<p>因为spring本身内置了tomcat，所以tomcat内存马同样适用于spring应用，就能一键打通了</p>
+<p>在开始之前稍微回顾一下打进去一个filter内存马需要的条件</p>
+<ol>
+<li>一个恶意filter类，实现了自己的doFilter方法（用的时候需要把传入的<code>ServletRequest</code>转为<code>HttpServletRequest</code>才能使用，不然会出问题。。。）</li>
+<li>一个当前应用的<code>StandardContext</code></li>
+<li>装载了恶意类的<code>FilterDef</code>，<code>FilterMap</code>和<code>ApplicationFilterConfig</code>，然后把他们添加进<code>StandardContext</code></li>
+</ol>
+<p>基本上各种操作都是围绕着如何获取<code>StandardContext</code>展开的</p>
+<h3 id="spring内存马"><a href="#spring内存马" class="headerlink" title="spring内存马"></a>spring内存马</h3><p>讲道理，能打tomcat的内存马应该就能打spring，不过spring有自己的获取<code>StandardContext</code>的方法，所以可以单独写一版</p>
+<p>但实际上，获取<code>StandardContext</code>的前一步一般是获取一个<code>HttpServletRequest</code>对象，进而从这个对象里面<code>getSession().getServletContext();</code>，而回显的时候就已经提到了，spring可以直接从一个类中拿到request对象。</p>
+<p>接下来需要对<code>ServletContext</code>的context对象进行迭代，有可能直接是一个<code>StandardContext</code>，也可能还是一个<code>ServletContext</code>，如果是<code>ServletContext</code>的话就继续访问其context属性直到其是一个<code>StandardContext</code>，这里对<code>StandardContext</code>需要反复迭代，文末会讲到</p>
+<pre class=" language-java"><code class="language-java">Object requestAttributes <span class="token operator">=</span> Class<span class="token punctuation">.</span><span class="token function">forName</span><span class="token punctuation">(</span><span class="token string">"org.springframework.web.context.request.RequestContextHolder"</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">getMethod</span><span class="token punctuation">(</span><span class="token string">"getRequestAttributes"</span><span class="token punctuation">,</span> <span class="token keyword">new</span> <span class="token class-name">Class</span><span class="token punctuation">[</span><span class="token number">0</span><span class="token punctuation">]</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">invoke</span><span class="token punctuation">(</span>null<span class="token punctuation">,</span> <span class="token keyword">new</span> <span class="token class-name">Object</span><span class="token punctuation">[</span><span class="token number">0</span><span class="token punctuation">]</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+HttpServletRequest request <span class="token operator">=</span> <span class="token punctuation">(</span>HttpServletRequest<span class="token punctuation">)</span> requestAttributes<span class="token punctuation">.</span><span class="token function">getClass</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">getMethod</span><span class="token punctuation">(</span><span class="token string">"getRequest"</span><span class="token punctuation">,</span> <span class="token keyword">new</span> <span class="token class-name">Class</span><span class="token punctuation">[</span><span class="token number">0</span><span class="token punctuation">]</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">invoke</span><span class="token punctuation">(</span>requestAttributes<span class="token punctuation">,</span> <span class="token keyword">new</span> <span class="token class-name">Object</span><span class="token punctuation">[</span><span class="token number">0</span><span class="token punctuation">]</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+response <span class="token operator">=</span> <span class="token punctuation">(</span>HttpServletResponse<span class="token punctuation">)</span> requestAttributes<span class="token punctuation">.</span><span class="token function">getClass</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">getMethod</span><span class="token punctuation">(</span><span class="token string">"getResponse"</span><span class="token punctuation">,</span> <span class="token keyword">new</span> <span class="token class-name">Class</span><span class="token punctuation">[</span><span class="token number">0</span><span class="token punctuation">]</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">invoke</span><span class="token punctuation">(</span>requestAttributes<span class="token punctuation">,</span> <span class="token keyword">new</span> <span class="token class-name">Object</span><span class="token punctuation">[</span><span class="token number">0</span><span class="token punctuation">]</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token keyword">final</span> String name <span class="token operator">=</span> <span class="token string">"AutomneGreet"</span><span class="token punctuation">;</span>
+ServletContext servletContext <span class="token operator">=</span> request<span class="token punctuation">.</span><span class="token function">getSession</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">getServletContext</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+</code></pre>
+<h3 id="tomcat内存马"><a href="#tomcat内存马" class="headerlink" title="tomcat内存马"></a>tomcat内存马</h3><h4 id="tomcat8-9"><a href="#tomcat8-9" class="headerlink" title="tomcat8-9"></a>tomcat8-9</h4><p>10也许也能用，只要把所有javax换成jakarta?但是感觉实战根本遇不上，也懒得下就没测<br>tomcat的话稍微麻烦一点点，不过如果是高版本其实会很简单，也可以直接从一个类中拿到</p>
+<pre class=" language-java"><code class="language-java">WebappClassLoaderBase webappClassLoaderBase <span class="token operator">=</span> <span class="token punctuation">(</span>WebappClassLoaderBase<span class="token punctuation">)</span> Thread<span class="token punctuation">.</span><span class="token function">currentThread</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">getContextClassLoader</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+StandardRoot resources <span class="token operator">=</span> <span class="token punctuation">(</span>StandardRoot<span class="token punctuation">)</span><span class="token function">getField</span><span class="token punctuation">(</span>webappClassLoaderBase<span class="token punctuation">,</span> <span class="token string">"resources"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+StandardContext standardContext <span class="token operator">=</span> <span class="token punctuation">(</span>StandardContext<span class="token punctuation">)</span> resources<span class="token punctuation">.</span><span class="token function">getContext</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+</code></pre>
+<p>这里的反射在低版本的tomcat下是不必要的，可以直接webappClassLoaderBase.getResouces().getContext()，印象里是之前出了个啥洞（好像是那个被吹得沸沸扬扬的tomcat+java9以上用module改日志配置写jsp的）好像用到了<code>getResouces()</code>，这个函数本身就是被废弃的函数，然后tomcat就顺手把这个函数的返回值变成null了，就没法用了，但是反射一下还是能拿到</p>
+<p>后续同spring部分</p>
+<h4 id="tomcat7"><a href="#tomcat7" class="headerlink" title="tomcat7"></a>tomcat7</h4><p>这个就变得很麻烦。。。因为上述步骤中的这个<code>StandardRoot</code>在tomcat7里面是不存在的，也不能像jsp一样直接获取。使用的手法和上述tomcat回显操作一致，直接遍历线程，从线程里面拿request对象，再从request对象里面拿到context</p>
+<p>拿到context之后后续仍同。</p>
+<p>但tomcat7和8-9又有一个区别，他filterMap那一套的类名不一样，需要单独引入依赖编译。。。如果有耐心写一个超级全反射可能也行，但是我没这个耐心。。。</p>
+<pre class=" language-java"><code class="language-java"><span class="token comment" spellcheck="true">// tomcat7</span>
+<span class="token keyword">import</span> org<span class="token punctuation">.</span>apache<span class="token punctuation">.</span>catalina<span class="token punctuation">.</span>deploy<span class="token punctuation">.</span>FilterDef<span class="token punctuation">;</span>
+<span class="token keyword">import</span> org<span class="token punctuation">.</span>apache<span class="token punctuation">.</span>catalina<span class="token punctuation">.</span>deploy<span class="token punctuation">.</span>FilterMap<span class="token punctuation">;</span>
+
+<span class="token comment" spellcheck="true">// tomcat 8-10</span>
+<span class="token keyword">import</span> org<span class="token punctuation">.</span>apache<span class="token punctuation">.</span>tomcat<span class="token punctuation">.</span>util<span class="token punctuation">.</span>descriptor<span class="token punctuation">.</span>web<span class="token punctuation">.</span>FilterDef<span class="token punctuation">;</span>
+<span class="token keyword">import</span> org<span class="token punctuation">.</span>apache<span class="token punctuation">.</span>tomcat<span class="token punctuation">.</span>util<span class="token punctuation">.</span>descriptor<span class="token punctuation">.</span>web<span class="token punctuation">.</span>FilterMap<span class="token punctuation">;</span>
+</code></pre>
+<p>说起来当时写这个东西的时候就在怀疑，如果是反序列化之类的我这边类编译起来他那边会不会缺这个类进而失败呢？或者说有那种反序列化serializeUID之类的？后来想了一下，反序列化应该是直接templatesImpl执行类字节码，首先不会有反序列化的版本问题，然后这里用的都是对应版本的核心类，应该也不会出现缺类的问题。。<br>如果是scriptEngine或者JNDI注入的打法应该也是一个原理，无影响</p>
+<h4 id="tomcat6"><a href="#tomcat6" class="headerlink" title="tomcat6"></a>tomcat6</h4><p>我本来也不会考虑这种二十年前的玩意，但是这把就是遇到了，那也就只能考虑他了，他和7又有一点不同，因为他的filterDef的写法也不一样，内部的逻辑也有区别，由于只是缝合，所以没有太细看原理，缝起来能用就行，前半段还是用tomcat通用的request获取，后半段缝了别人的代码，测验通过可用。</p>
+<p>所有文章都会放文末参考链接</p>
+<h2 id="踩过的怪坑"><a href="#踩过的怪坑" class="headerlink" title="踩过的怪坑"></a>踩过的怪坑</h2><h3 id="IDEA调试环境"><a href="#IDEA调试环境" class="headerlink" title="IDEA调试环境"></a>IDEA调试环境</h3><p>之前一直只是手动建立一个webapp然后配好tomcat开始跑，但是由于没有引入依赖，IDEA里面一片红，调试也很麻烦，专门找了一下怎么调试，记录一下</p>
+<h4 id="建立JSP项目"><a href="#建立JSP项目" class="headerlink" title="建立JSP项目"></a>建立JSP项目</h4><p>右键左侧边栏最顶上的项目名，有一个<code>Add Frameworks Support</code>，选web Application就能天加一个web app项目，然后直接在右上角的config里面添加tomcat，会有一个报错，点fix就能解决</p>
+<p>但是这个时候红字是拉满的，request对象都不认识的那种。虽然能跑了，但是IDEA不认识，只能在jsp代码里下断点，其他的地方都去不了。为了调试就需要引入依赖，并且要测反序列化能不能打肯定也要引入CC链，在<code>Project Structure</code>里面选择modules，右边dependencies添加，第一个是引入jar包，可以手动引入CC之类的依赖，第二个是library，就是能引入代码让IDEA调试，添加你的tomcat就能用了，基本上红字消除一半，剩下的一半是因为idea默认的tomcat的lib里只有两个jar包，双击添加的tomcat依赖，直接把tomcat下的lib文件夹整个作为依赖就没有红字了，并且接下来的调试也是为所欲为所欲为所欲为，吴迪。好像配的有问题的时候problem那里也会显示，没事多点点也许就解决了。idea真不错啊</p>
+<h4 id="springboot调试"><a href="#springboot调试" class="headerlink" title="springboot调试"></a>springboot调试</h4><p>这个简单，springboot本身就内嵌了tomcat，maven项目一把梭就行了，但是感觉想更改内嵌的tomcat版本就很玄幻。。。从网上找的pom里面添加一个tomcat.version，只能把小版本变一下，把tomcat9换成8就歇逼了。</p>
+<p>好像能改springboot版本更改其内嵌的tomcat，不过估计也就换到8，懒得整了</p>
+<h3 id="TemplatesImpl实现细节"><a href="#TemplatesImpl实现细节" class="headerlink" title="TemplatesImpl实现细节"></a>TemplatesImpl实现细节</h3><p>TemplatesImpl是通过defineClass加载类字节码执行里面的static字段实现命令执行的，然而我们在这里定义了一个自己构造的Filter内部类，直接用javassist获取字节码的时候是会忽略这个内部类的。。。。所以没有这个内部类的话payload跑起来会报一个类找不到的错误，怎么打都打不通。专门搜了下，javassist有专门的获取内部类字节码的方法，而TemplatesImpl的bytecode本身就是一个二维数组，支持多个类的定义，这里先把内部类放前面先定义，再触发恶意类的payload即可</p>
+<pre class=" language-java"><code class="language-java">        ClassPool pool <span class="token operator">=</span> ClassPool<span class="token punctuation">.</span><span class="token function">getDefault</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        CtClass ctClazz <span class="token operator">=</span> pool<span class="token punctuation">.</span><span class="token function">get</span><span class="token punctuation">(</span>TomcatFilter6<span class="token punctuation">.</span><span class="token keyword">class</span><span class="token punctuation">.</span><span class="token function">getName</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        CtClass<span class="token punctuation">[</span><span class="token punctuation">]</span> nestedClazz <span class="token operator">=</span> ctClazz<span class="token punctuation">.</span><span class="token function">getNestedClasses</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token keyword">byte</span><span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token punctuation">[</span><span class="token punctuation">]</span> targetBytes <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">byte</span><span class="token punctuation">[</span><span class="token number">1</span> <span class="token operator">+</span> nestedClazz<span class="token punctuation">.</span>length<span class="token punctuation">]</span><span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token punctuation">;</span>
+        <span class="token comment" spellcheck="true">// 内存马里面定义了自己写的类，内部类得单独拿出来处理，应该还得在payload实例化前先定义，不然到时候要用的时候找不到定义</span>
+        <span class="token keyword">for</span> <span class="token punctuation">(</span><span class="token keyword">int</span> i <span class="token operator">=</span> <span class="token number">0</span><span class="token punctuation">;</span> i <span class="token operator">&lt;</span> nestedClazz<span class="token punctuation">.</span>length<span class="token punctuation">;</span> i<span class="token operator">++</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+            targetBytes<span class="token punctuation">[</span>i<span class="token punctuation">]</span> <span class="token operator">=</span> nestedClazz<span class="token punctuation">[</span>i<span class="token punctuation">]</span><span class="token punctuation">.</span><span class="token function">toBytecode</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token punctuation">}</span>
+        <span class="token keyword">byte</span><span class="token punctuation">[</span><span class="token punctuation">]</span> classBytes <span class="token operator">=</span> ctClazz<span class="token punctuation">.</span><span class="token function">toBytecode</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        targetBytes<span class="token punctuation">[</span>targetBytes<span class="token punctuation">.</span>length <span class="token operator">-</span> <span class="token number">1</span><span class="token punctuation">]</span> <span class="token operator">=</span> classBytes<span class="token punctuation">;</span>
+</code></pre>
+<p>另一种写法是让自己的payload类同时<code>extends AbstractTranslet</code>再<code>implement Filter</code>，同时实现两个类的方法，然后Filter实例化的时候直接实例化自己。不过两个方法payload长度没啥变化，都可行吧</p>
+<h3 id="类字段获取不到"><a href="#类字段获取不到" class="headerlink" title="类字段获取不到"></a>类字段获取不到</h3><p>因为tomcat和spring和jsp环境不同 ，不同情况下拿到的对象好像基础套的层数也不一样，反射<code>getDeclaredField</code>会经常拿不到对应对象，看了下文档才知道，<code>getField</code>可以获得公开的字段，包括继承下来的，而<code>getDeclaredField</code>虽然可以拿私有字段，但是不能拿到继承的字段，这样子就只能<code>getSuperClass</code>往上找，但是你也不知道要找几层，主要还是不同环境下套的层数可能有差异，所以还是得专门写个方法来处理一下</p>
+<pre class=" language-java"><code class="language-java">    <span class="token keyword">public</span> <span class="token keyword">static</span> Object <span class="token function">getField</span><span class="token punctuation">(</span>Object object<span class="token punctuation">,</span> String fieldName<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        Field declaredField<span class="token punctuation">;</span>
+        Class <span class="token class-name">clazz</span> <span class="token operator">=</span> object<span class="token punctuation">.</span><span class="token function">getClass</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token keyword">while</span> <span class="token punctuation">(</span>clazz <span class="token operator">!=</span> Object<span class="token punctuation">.</span><span class="token keyword">class</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+            <span class="token keyword">try</span> <span class="token punctuation">{</span>
+                declaredField <span class="token operator">=</span> clazz<span class="token punctuation">.</span><span class="token function">getDeclaredField</span><span class="token punctuation">(</span>fieldName<span class="token punctuation">)</span><span class="token punctuation">;</span>
+                declaredField<span class="token punctuation">.</span><span class="token function">setAccessible</span><span class="token punctuation">(</span><span class="token boolean">true</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+                <span class="token keyword">return</span> declaredField<span class="token punctuation">.</span><span class="token function">get</span><span class="token punctuation">(</span>object<span class="token punctuation">)</span><span class="token punctuation">;</span>
+            <span class="token punctuation">}</span> <span class="token keyword">catch</span> <span class="token punctuation">(</span><span class="token class-name">Exception</span> e<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+            <span class="token punctuation">}</span>
+            clazz <span class="token operator">=</span> clazz<span class="token punctuation">.</span><span class="token function">getSuperclass</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token punctuation">}</span>
+        <span class="token keyword">return</span> null<span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+</code></pre>
+<h3 id="StandardContext获取不到"><a href="#StandardContext获取不到" class="headerlink" title="StandardContext获取不到"></a>StandardContext获取不到</h3><p>也是上述类似问题，从<code>ServletContext</code>中不知道要几层才能拿到StandardContext，所以也套一个for循环</p>
+<pre class=" language-java"><code class="language-java">StandardContext standardContext <span class="token operator">=</span> null<span class="token punctuation">;</span>
+<span class="token keyword">while</span> <span class="token punctuation">(</span>standardContext <span class="token operator">==</span> null<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    Field field <span class="token operator">=</span> servletContext<span class="token punctuation">.</span><span class="token function">getClass</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">getDeclaredField</span><span class="token punctuation">(</span><span class="token string">"context"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    field<span class="token punctuation">.</span><span class="token function">setAccessible</span><span class="token punctuation">(</span><span class="token boolean">true</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    Object o <span class="token operator">=</span> field<span class="token punctuation">.</span><span class="token function">get</span><span class="token punctuation">(</span>servletContext<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token keyword">if</span> <span class="token punctuation">(</span>o <span class="token keyword">instanceof</span> <span class="token class-name">ServletContext</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        servletContext <span class="token operator">=</span> <span class="token punctuation">(</span>ServletContext<span class="token punctuation">)</span> o<span class="token punctuation">;</span>
+    <span class="token punctuation">}</span> <span class="token keyword">else</span> <span class="token keyword">if</span> <span class="token punctuation">(</span>o <span class="token keyword">instanceof</span> <span class="token class-name">StandardContext</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        standardContext <span class="token operator">=</span> <span class="token punctuation">(</span>StandardContext<span class="token punctuation">)</span> o<span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+<span class="token punctuation">}</span>
+</code></pre>
+<h2 id="参考链接"><a href="#参考链接" class="headerlink" title="参考链接"></a>参考链接</h2><p><a target="_blank" rel="external nofollow noopener noreferrer" href="https://flowerwind.github.io/2021/10/11/tomcat6%E3%80%817%E3%80%818%E3%80%819%E5%86%85%E5%AD%98%E9%A9%AC/">tomcat6、7、8、9内存马</a><br><a target="_blank" rel="external nofollow noopener noreferrer" href="https://xz.aliyun.com/t/9914">Java内存马：一种Tomcat全版本获取StandardContext的新方法</a><br><a target="_blank" rel="external nofollow noopener noreferrer" href="https://su18.org/post/memory-shell/">JavaWeb 内存马一周目通关攻略</a><br><a target="_blank" rel="external nofollow noopener noreferrer" href="https://mp.weixin.qq.com/s/r-JHLX5UoccGNZCfJS3klg">Tomcat Servlet-Api内存马总结及代码实现</a></p>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/Java/" rel="tag"># Java</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/CobaltStrike%20beacon%E4%BA%8C%E5%BC%80%E6%8C%87%E5%8D%97.html" rel="prev" title="CobaltStrike beacon二开指南">
+      <i class="fa fa-chevron-left"></i> CobaltStrike beacon二开指南
+    </a></div>
+      <div class="post-nav-item"></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+    <div class="comments" id="valine-comments"></div>
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#Java%E5%86%85%E5%AD%98%E9%A9%AC%E7%BC%9D%E5%90%88%E7%AC%94%E8%AE%B0"><span class="nav-number">1.</span> <span class="nav-text">Java内存马缝合笔记</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%9B%9E%E6%98%BE"><span class="nav-number">1.1.</span> <span class="nav-text">回显</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#spring%E5%9B%9E%E6%98%BE"><span class="nav-number">1.1.1.</span> <span class="nav-text">spring回显</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#tomcat%E5%9B%9E%E6%98%BE"><span class="nav-number">1.1.2.</span> <span class="nav-text">tomcat回显</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%86%85%E5%AD%98%E9%A9%AC"><span class="nav-number">1.2.</span> <span class="nav-text">内存马</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#spring%E5%86%85%E5%AD%98%E9%A9%AC"><span class="nav-number">1.2.1.</span> <span class="nav-text">spring内存马</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#tomcat%E5%86%85%E5%AD%98%E9%A9%AC"><span class="nav-number">1.2.2.</span> <span class="nav-text">tomcat内存马</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#tomcat8-9"><span class="nav-number">1.2.2.1.</span> <span class="nav-text">tomcat8-9</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#tomcat7"><span class="nav-number">1.2.2.2.</span> <span class="nav-text">tomcat7</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#tomcat6"><span class="nav-number">1.2.2.3.</span> <span class="nav-text">tomcat6</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%B8%A9%E8%BF%87%E7%9A%84%E6%80%AA%E5%9D%91"><span class="nav-number">1.3.</span> <span class="nav-text">踩过的怪坑</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#IDEA%E8%B0%83%E8%AF%95%E7%8E%AF%E5%A2%83"><span class="nav-number">1.3.1.</span> <span class="nav-text">IDEA调试环境</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%BB%BA%E7%AB%8BJSP%E9%A1%B9%E7%9B%AE"><span class="nav-number">1.3.1.1.</span> <span class="nav-text">建立JSP项目</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#springboot%E8%B0%83%E8%AF%95"><span class="nav-number">1.3.1.2.</span> <span class="nav-text">springboot调试</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#TemplatesImpl%E5%AE%9E%E7%8E%B0%E7%BB%86%E8%8A%82"><span class="nav-number">1.3.2.</span> <span class="nav-text">TemplatesImpl实现细节</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%B1%BB%E5%AD%97%E6%AE%B5%E8%8E%B7%E5%8F%96%E4%B8%8D%E5%88%B0"><span class="nav-number">1.3.3.</span> <span class="nav-text">类字段获取不到</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#StandardContext%E8%8E%B7%E5%8F%96%E4%B8%8D%E5%88%B0"><span class="nav-number">1.3.4.</span> <span class="nav-text">StandardContext获取不到</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%8F%82%E8%80%83%E9%93%BE%E6%8E%A5"><span class="nav-number">1.4.</span> <span class="nav-text">参考链接</span></a></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Z3ratu1" src="https://q2.qlogo.cn/headimg_dl?dst_uin=1207039417&spec=160">
+  <p class="site-author-name" itemprop="name">Z3ratu1</p>
+  <div class="site-description" itemprop="description">与其感慨路难行，不如现在出发</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">170</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">5</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">90</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+  <div class="beian"><a href="http://www.beian.miit.gov.cn/" rel="external nofollow noopener noreferrer" target="_blank">湘ICP备2020021580号 </a>
+      <img src="/./images/beian.png" style="display: inline-block;">
+  </div>
+
+<div class="copyright">
+  
+  &copy; 2019 – 
+  <span itemprop="copyrightYear">2022</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Z3ratu1</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="external nofollow noopener noreferrer" target="_blank">Hexo</a> & <a href="https://pisces.theme-next.org/" class="theme-link" rel="external nofollow noopener noreferrer" target="_blank">NexT.Pisces</a> 强力驱动
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+
+<script>
+NexT.utils.loadComments(document.querySelector('#valine-comments'), () => {
+  NexT.utils.getScript('https://cdn.jsdelivr.net/npm/valine@1.4.14/dist/Valine.min.js', () => {
+    var GUEST = ['nick', 'mail', 'link'];
+    var guest = 'nick,mail,link';
+    guest = guest.split(',').filter(item => {
+      return GUEST.includes(item);
+    });
+    new Valine({
+      el         : '#valine-comments',
+      verify     : false,
+      notify     : false,
+      appId      : '7H8kg0XdWO8IbhOcu4K1JaAT-gzGzoHsz',
+      appKey     : 'wPKQjkbVtvPaRR7gh2yjfLSi',
+      placeholder: "Just go go",
+      avatar     : 'mm',
+      meta       : guest,
+      pageSize   : '10' || 10,
+      visitor    : true,
+      lang       : '' || 'zh-cn',
+      path       : location.pathname,
+      recordIP   : false,
+      serverURLs : ''
+    });
+  }, window.Valine);
+});
+</script>
+
+</body>
+</html>

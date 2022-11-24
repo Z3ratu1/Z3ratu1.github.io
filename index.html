@@ -196,6 +196,105 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
+    <link itemprop="mainEntityOfPage" href="https://blog.z3ratu1.cn/Java%E5%86%85%E5%AD%98%E9%A9%AC%E7%BC%9D%E5%90%88%E7%AC%94%E8%AE%B0.html">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="https://q2.qlogo.cn/headimg_dl?dst_uin=1207039417&spec=160">
+      <meta itemprop="name" content="Z3ratu1">
+      <meta itemprop="description" content="与其感慨路难行，不如现在出发">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Z3ratu1's blog">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/Java%E5%86%85%E5%AD%98%E9%A9%AC%E7%BC%9D%E5%90%88%E7%AC%94%E8%AE%B0.html" class="post-title-link" itemprop="url">Java内存马缝合笔记</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+              
+
+              <time title="创建时间：2022-11-24 17:37:09 / 修改时间：20:18:23" itemprop="dateCreated datePublished" datetime="2022-11-24T17:37:09+08:00">2022-11-24</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E7%AC%94%E8%AE%B0/" itemprop="url" rel="index"><span itemprop="name">笔记</span></a>
+                </span>
+            </span>
+
+          
+            <span id="/Java%E5%86%85%E5%AD%98%E9%A9%AC%E7%BC%9D%E5%90%88%E7%AC%94%E8%AE%B0.html" class="post-meta-item leancloud_visitors" data-flag-title="Java内存马缝合笔记" title="阅读次数">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span class="leancloud-visitors-count"></span>
+            </span>
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="far fa-comment"></i>
+      </span>
+      <span class="post-meta-item-text">Valine：</span>
+    
+    <a title="valine" href="/Java%E5%86%85%E5%AD%98%E9%A9%AC%E7%BC%9D%E5%90%88%E7%AC%94%E8%AE%B0.html#valine-comments" itemprop="discussionUrl">
+      <span class="post-comments-count valine-comment-count" data-xid="/Java%E5%86%85%E5%AD%98%E9%A9%AC%E7%BC%9D%E5%90%88%E7%AC%94%E8%AE%B0.html" itemprop="commentCount"></span>
+    </a>
+  </span>
+  
+  
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h1 id="Java内存马缝合笔记"><a href="#Java内存马缝合笔记" class="headerlink" title="Java内存马缝合笔记"></a>Java内存马缝合笔记</h1><p>之前渗透的时候遇到了一个java站，tomcat8跑的，能上传jsp，有shiro但是打不通（打通之后看了一眼无敌高版本）<br>jsp上传之后会急速被删，可以条件竞争去抢，这样子的话打一个内存马就是最稳整的，但是我是java垃圾捏，不会打，幸好天哥最后给了个现成的内存马<br>还有一个远古tomcat6的站，有一个jndi注入，最后也是靠whj好兄弟缝出来了一个tomcat6的回显打通，所以这波结束之后还是决定稍微学一下，就算不能懂原理，起码要缝出来一套能应对各个版本的内存马。。。以及遇到问题的时候起码有一套调试环境能排错</p>
+<p>由于java水平有限，写出来的东西基本上都是从网上东拼西凑出来的，超级缝合怪，但是不得不说我缝合的水平真是越来越好了，因为感觉就大家的内存马理论都学得很好，我学点皮毛能用就行了，所以就叫缝合笔记8</p>
+<p>3,2,1，开缝！</p>
+<h2 id="回显"><a href="#回显" class="headerlink" title="回显"></a>回显</h2>
+          <!--noindex-->
+            <div class="post-button">
+              <a class="btn" href="/Java%E5%86%85%E5%AD%98%E9%A9%AC%E7%BC%9D%E5%90%88%E7%AC%94%E8%AE%B0.html#more" rel="contents">
+                阅读全文 &raquo;
+              </a>
+            </div>
+          <!--/noindex-->
+        
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
     <link itemprop="mainEntityOfPage" href="https://blog.z3ratu1.cn/CobaltStrike%20beacon%E4%BA%8C%E5%BC%80%E6%8C%87%E5%8D%97.html">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -602,110 +701,6 @@
   
   
 
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
-    <link itemprop="mainEntityOfPage" href="https://blog.z3ratu1.cn/rCore_Tutorial_CP5.html">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="https://q2.qlogo.cn/headimg_dl?dst_uin=1207039417&spec=160">
-      <meta itemprop="name" content="Z3ratu1">
-      <meta itemprop="description" content="与其感慨路难行，不如现在出发">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Z3ratu1's blog">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/rCore_Tutorial_CP5.html" class="post-title-link" itemprop="url">rCore_Tutorial_CP5</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2022-08-28 14:14:36" itemprop="dateCreated datePublished" datetime="2022-08-28T14:14:36+08:00">2022-08-28</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="far fa-calendar-check"></i>
-                </span>
-                <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2022-09-01 20:09:34" itemprop="dateModified" datetime="2022-09-01T20:09:34+08:00">2022-09-01</time>
-              </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-folder"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/%E7%AC%94%E8%AE%B0/" itemprop="url" rel="index"><span itemprop="name">笔记</span></a>
-                </span>
-            </span>
-
-          
-            <span id="/rCore_Tutorial_CP5.html" class="post-meta-item leancloud_visitors" data-flag-title="rCore_Tutorial_CP5" title="阅读次数">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-eye"></i>
-              </span>
-              <span class="post-meta-item-text">阅读次数：</span>
-              <span class="leancloud-visitors-count"></span>
-            </span>
-  
-  <span class="post-meta-item">
-    
-      <span class="post-meta-item-icon">
-        <i class="far fa-comment"></i>
-      </span>
-      <span class="post-meta-item-text">Valine：</span>
-    
-    <a title="valine" href="/rCore_Tutorial_CP5.html#valine-comments" itemprop="discussionUrl">
-      <span class="post-comments-count valine-comment-count" data-xid="/rCore_Tutorial_CP5.html" itemprop="commentCount"></span>
-    </a>
-  </span>
-  
-  
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <h1 id="rCore-Tutorial-CP5"><a href="#rCore-Tutorial-CP5" class="headerlink" title="rCore_Tutorial_CP5"></a>rCore_Tutorial_CP5</h1><p>第五章，进程<br>看之前感觉好像没什么东西，看到一半感觉还是非常牛逼的</p>
-<h2 id="进程概念及重要系统调用"><a href="#进程概念及重要系统调用" class="headerlink" title="进程概念及重要系统调用"></a>进程概念及重要系统调用</h2><p>这里面阐述了任务(Task)和进程(Process)之间的区别<br>说实话很多地方还是觉得很抽象，按照本科期间的说法，进程就是一个运行的二进制程序，但这么说似乎和任务没什么区别。从本章提到的内容上来说，感觉任务是计算机依次加载的一系列程序，以规定的顺序运行，而进程则是通过fork和exec系统调用，在用户的交互下进行，可以选择执行的二进制程序</p>
-<p>并且进程间存在父子关系，子进程由父进程fork产生，linux中所有进程均由pid为1的初始进程产生，以前我以为pid为1的进程就是操作系统，现在看来，似乎操作系统(内核)运行在更下一层，而pid为1的进程是内核创建出来对所有进程进行管理并提供用户交互的初始进程</p>
-          <!--noindex-->
-            <div class="post-button">
-              <a class="btn" href="/rCore_Tutorial_CP5.html#more" rel="contents">
-                阅读全文 &raquo;
-              </a>
-            </div>
-          <!--/noindex-->
-        
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
 
   
   <nav class="pagination">
@@ -776,7 +771,7 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">169</span>
+          <span class="site-state-item-count">170</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
