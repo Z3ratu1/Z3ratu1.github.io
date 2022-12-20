@@ -1,0 +1,773 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 6.0.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"blog.z3ratu1.cn","root":"/","scheme":"Pisces","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"always","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":true},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+  </script>
+
+  <meta name="description" content="南京大学《软件分析》笔记所有作业已经上传到https:&#x2F;&#x2F;github.com&#x2F;Z3ratu1&#x2F;Tai-e-assignments 并全部上传oj通过，我卡住的地方都写了注释，要是有几个玄学的hidden case怎么都过不了可以参考一下。这个作业要全通过真的很坐牢。。。。  ch1 introduction简单讲了下静态分析的概念，提到静态分析要求覆盖全部范围，保证全覆盖但不负责漏报。比如判断数">
+<meta property="og:type" content="article">
+<meta property="og:title" content="南京大学《软件分析》笔记">
+<meta property="og:url" content="https://blog.z3ratu1.cn/%E8%BD%AF%E4%BB%B6%E5%88%86%E6%9E%90%E7%AC%94%E8%AE%B0.html">
+<meta property="og:site_name" content="Z3ratu1&#39;s blog">
+<meta property="og:description" content="南京大学《软件分析》笔记所有作业已经上传到https:&#x2F;&#x2F;github.com&#x2F;Z3ratu1&#x2F;Tai-e-assignments 并全部上传oj通过，我卡住的地方都写了注释，要是有几个玄学的hidden case怎么都过不了可以参考一下。这个作业要全通过真的很坐牢。。。。  ch1 introduction简单讲了下静态分析的概念，提到静态分析要求覆盖全部范围，保证全覆盖但不负责漏报。比如判断数">
+<meta property="og:locale">
+<meta property="og:image" content="https://blog.z3ratu1.cn/images/%E8%BD%AF%E4%BB%B6%E5%88%86%E6%9E%90%E7%AC%94%E8%AE%B0/image-20221216192926063.png">
+<meta property="og:image" content="https://blog.z3ratu1.cn/images/%E8%BD%AF%E4%BB%B6%E5%88%86%E6%9E%90%E7%AC%94%E8%AE%B0/image-20221026114252749.png">
+<meta property="og:image" content="https://blog.z3ratu1.cn/images/%E8%BD%AF%E4%BB%B6%E5%88%86%E6%9E%90%E7%AC%94%E8%AE%B0/ReachingDefinitionAnalysis.png">
+<meta property="og:image" content="https://blog.z3ratu1.cn/images/%E8%BD%AF%E4%BB%B6%E5%88%86%E6%9E%90%E7%AC%94%E8%AE%B0/image-20221026115315161.png">
+<meta property="og:image" content="https://blog.z3ratu1.cn/images/%E8%BD%AF%E4%BB%B6%E5%88%86%E6%9E%90%E7%AC%94%E8%AE%B0/image-20221026134011923.png">
+<meta property="og:image" content="https://blog.z3ratu1.cn/images/%E8%BD%AF%E4%BB%B6%E5%88%86%E6%9E%90%E7%AC%94%E8%AE%B0/image-20221026145324059.png">
+<meta property="og:image" content="https://blog.z3ratu1.cn/images/%E8%BD%AF%E4%BB%B6%E5%88%86%E6%9E%90%E7%AC%94%E8%AE%B0/image-20221026144631471.png">
+<meta property="og:image" content="https://blog.z3ratu1.cn/images/%E8%BD%AF%E4%BB%B6%E5%88%86%E6%9E%90%E7%AC%94%E8%AE%B0/image-20221026145222776.png">
+<meta property="og:image" content="https://blog.z3ratu1.cn/images/%E8%BD%AF%E4%BB%B6%E5%88%86%E6%9E%90%E7%AC%94%E8%AE%B0/image-20221027094705233.png">
+<meta property="og:image" content="https://blog.z3ratu1.cn/images/%E8%BD%AF%E4%BB%B6%E5%88%86%E6%9E%90%E7%AC%94%E8%AE%B0/image-20221029175612891.png">
+<meta property="og:image" content="https://blog.z3ratu1.cn/images/%E8%BD%AF%E4%BB%B6%E5%88%86%E6%9E%90%E7%AC%94%E8%AE%B0/image-20221126142516298.png">
+<meta property="og:image" content="https://blog.z3ratu1.cn/images/%E8%BD%AF%E4%BB%B6%E5%88%86%E6%9E%90%E7%AC%94%E8%AE%B0/image-20221126142351541.png">
+<meta property="og:image" content="https://blog.z3ratu1.cn/images/%E8%BD%AF%E4%BB%B6%E5%88%86%E6%9E%90%E7%AC%94%E8%AE%B0/image-20221126151318249.png">
+<meta property="og:image" content="https://blog.z3ratu1.cn/images/%E8%BD%AF%E4%BB%B6%E5%88%86%E6%9E%90%E7%AC%94%E8%AE%B0/image-20221128134455946.png">
+<meta property="og:image" content="https://blog.z3ratu1.cn/images/%E8%BD%AF%E4%BB%B6%E5%88%86%E6%9E%90%E7%AC%94%E8%AE%B0/image-20221128143100379.png">
+<meta property="og:image" content="https://blog.z3ratu1.cn/images/%E8%BD%AF%E4%BB%B6%E5%88%86%E6%9E%90%E7%AC%94%E8%AE%B0/image-20221128143304555.png">
+<meta property="og:image" content="https://blog.z3ratu1.cn/images/%E8%BD%AF%E4%BB%B6%E5%88%86%E6%9E%90%E7%AC%94%E8%AE%B0/image-20221128145557432.png">
+<meta property="og:image" content="https://blog.z3ratu1.cn/images/%E8%BD%AF%E4%BB%B6%E5%88%86%E6%9E%90%E7%AC%94%E8%AE%B0/image-20221128164340076.png">
+<meta property="og:image" content="https://blog.z3ratu1.cn/images/%E8%BD%AF%E4%BB%B6%E5%88%86%E6%9E%90%E7%AC%94%E8%AE%B0/image-20221128171011017.png">
+<meta property="og:image" content="https://blog.z3ratu1.cn/images/%E8%BD%AF%E4%BB%B6%E5%88%86%E6%9E%90%E7%AC%94%E8%AE%B0/image-20221129170001148.png">
+<meta property="og:image" content="https://blog.z3ratu1.cn/images/%E8%BD%AF%E4%BB%B6%E5%88%86%E6%9E%90%E7%AC%94%E8%AE%B0/image-20221210123229647.png">
+<meta property="og:image" content="https://blog.z3ratu1.cn/images/%E8%BD%AF%E4%BB%B6%E5%88%86%E6%9E%90%E7%AC%94%E8%AE%B0/image-20221129174940142.png">
+<meta property="og:image" content="https://blog.z3ratu1.cn/images/%E8%BD%AF%E4%BB%B6%E5%88%86%E6%9E%90%E7%AC%94%E8%AE%B0/image-20221207104319420.png">
+<meta property="og:image" content="https://blog.z3ratu1.cn/images/%E8%BD%AF%E4%BB%B6%E5%88%86%E6%9E%90%E7%AC%94%E8%AE%B0/image-20221207124514915.png">
+<meta property="og:image" content="https://blog.z3ratu1.cn/images/%E8%BD%AF%E4%BB%B6%E5%88%86%E6%9E%90%E7%AC%94%E8%AE%B0/image-20221207153427514.png">
+<meta property="og:image" content="https://blog.z3ratu1.cn/images/%E8%BD%AF%E4%BB%B6%E5%88%86%E6%9E%90%E7%AC%94%E8%AE%B0/image-20221207154034797.png">
+<meta property="og:image" content="https://blog.z3ratu1.cn/images/%E8%BD%AF%E4%BB%B6%E5%88%86%E6%9E%90%E7%AC%94%E8%AE%B0/image-20221207163511905.png">
+<meta property="og:image" content="https://blog.z3ratu1.cn/images/%E8%BD%AF%E4%BB%B6%E5%88%86%E6%9E%90%E7%AC%94%E8%AE%B0/image-20221207164046072.png">
+<meta property="og:image" content="https://blog.z3ratu1.cn/images/%E8%BD%AF%E4%BB%B6%E5%88%86%E6%9E%90%E7%AC%94%E8%AE%B0/image-20221207164557410.png">
+<meta property="og:image" content="https://blog.z3ratu1.cn/images/%E8%BD%AF%E4%BB%B6%E5%88%86%E6%9E%90%E7%AC%94%E8%AE%B0/image-20221214204206681.png">
+<meta property="og:image" content="https://blog.z3ratu1.cn/images/%E8%BD%AF%E4%BB%B6%E5%88%86%E6%9E%90%E7%AC%94%E8%AE%B0/image-20221214204742958.png">
+<meta property="og:image" content="https://blog.z3ratu1.cn/images/%E8%BD%AF%E4%BB%B6%E5%88%86%E6%9E%90%E7%AC%94%E8%AE%B0/image-20221214205617182.png">
+<meta property="og:image" content="https://blog.z3ratu1.cn/images/%E8%BD%AF%E4%BB%B6%E5%88%86%E6%9E%90%E7%AC%94%E8%AE%B0/image-20221219120054167.png">
+<meta property="og:image" content="https://blog.z3ratu1.cn/images/%E8%BD%AF%E4%BB%B6%E5%88%86%E6%9E%90%E7%AC%94%E8%AE%B0/image-20221219113054127.png">
+<meta property="og:image" content="https://blog.z3ratu1.cn/images/%E8%BD%AF%E4%BB%B6%E5%88%86%E6%9E%90%E7%AC%94%E8%AE%B0/image-20221219115433045.png">
+<meta property="og:image" content="https://blog.z3ratu1.cn/images/%E8%BD%AF%E4%BB%B6%E5%88%86%E6%9E%90%E7%AC%94%E8%AE%B0/image-20221219115347583.png">
+<meta property="og:image" content="https://blog.z3ratu1.cn/images/%E8%BD%AF%E4%BB%B6%E5%88%86%E6%9E%90%E7%AC%94%E8%AE%B0/image-20221219121609804.png">
+<meta property="article:published_time" content="2022-10-25T13:14:07.000Z">
+<meta property="article:modified_time" content="2022-12-20T04:21:24.315Z">
+<meta property="article:author" content="Z3ratu1">
+<meta property="article:tag" content="静态分析">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://blog.z3ratu1.cn/images/%E8%BD%AF%E4%BB%B6%E5%88%86%E6%9E%90%E7%AC%94%E8%AE%B0/image-20221216192926063.png">
+
+<link rel="canonical" href="https://blog.z3ratu1.cn/%E8%BD%AF%E4%BB%B6%E5%88%86%E6%9E%90%E7%AC%94%E8%AE%B0.html">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-Hans'
+  };
+</script>
+
+  <title>南京大学《软件分析》笔记 | Z3ratu1's blog</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+<link rel="stylesheet" href="/css/prism-tomorrow.css" type="text/css"></head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">Z3ratu1's blog</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">Welcome</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>关于</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+        <li class="menu-item menu-item-links">
+
+    <a href="/links/" rel="section"><i class="fa fa-link fa-fw"></i>友链</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off" placeholder="搜索..." spellcheck="false" type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+  <a href="https://github.com/Z3ratu1" class="github-corner" title="Follow me on GitHub" aria-label="Follow me on GitHub" rel="external nofollow noopener noreferrer" target="_blank"><svg width="80" height="80" viewbox="0 0 250 250" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"/><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"/><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"/></svg></a>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
+    <link itemprop="mainEntityOfPage" href="https://blog.z3ratu1.cn/%E8%BD%AF%E4%BB%B6%E5%88%86%E6%9E%90%E7%AC%94%E8%AE%B0.html">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="https://q2.qlogo.cn/headimg_dl?dst_uin=1207039417&spec=160">
+      <meta itemprop="name" content="Z3ratu1">
+      <meta itemprop="description" content="与其感慨路难行，不如现在出发">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Z3ratu1's blog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          南京大学《软件分析》笔记
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2022-10-25 21:14:07" itemprop="dateCreated datePublished" datetime="2022-10-25T21:14:07+08:00">2022-10-25</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2022-12-20 12:21:24" itemprop="dateModified" datetime="2022-12-20T12:21:24+08:00">2022-12-20</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E7%AC%94%E8%AE%B0/" itemprop="url" rel="index"><span itemprop="name">笔记</span></a>
+                </span>
+            </span>
+
+          
+            <span id="/%E8%BD%AF%E4%BB%B6%E5%88%86%E6%9E%90%E7%AC%94%E8%AE%B0.html" class="post-meta-item leancloud_visitors" data-flag-title="南京大学《软件分析》笔记" title="阅读次数">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span class="leancloud-visitors-count"></span>
+            </span>
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="far fa-comment"></i>
+      </span>
+      <span class="post-meta-item-text">Valine：</span>
+    
+    <a title="valine" href="/%E8%BD%AF%E4%BB%B6%E5%88%86%E6%9E%90%E7%AC%94%E8%AE%B0.html#valine-comments" itemprop="discussionUrl">
+      <span class="post-comments-count valine-comment-count" data-xid="/%E8%BD%AF%E4%BB%B6%E5%88%86%E6%9E%90%E7%AC%94%E8%AE%B0.html" itemprop="commentCount"></span>
+    </a>
+  </span>
+  
+  
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h1 id="南京大学《软件分析》笔记"><a href="#南京大学《软件分析》笔记" class="headerlink" title="南京大学《软件分析》笔记"></a>南京大学《软件分析》笔记</h1><p>所有作业已经上传到<a target="_blank" rel="external nofollow noopener noreferrer" href="https://github.com/Z3ratu1/Tai-e-assignments">https://github.com/Z3ratu1/Tai-e-assignments</a> 并全部上传oj通过，我卡住的地方都写了注释，要是有几个玄学的hidden case怎么都过不了可以参考一下。这个作业要全通过真的很坐牢。。。。</p>
+<p><img src="/images/%E8%BD%AF%E4%BB%B6%E5%88%86%E6%9E%90%E7%AC%94%E8%AE%B0/image-20221216192926063.png" alt="image-20221216192926063"></p>
+<h2 id="ch1-introduction"><a href="#ch1-introduction" class="headerlink" title="ch1 introduction"></a>ch1 introduction</h2><p>简单讲了下静态分析的概念，提到静态分析要求覆盖全部范围，保证全覆盖但不负责漏报。比如判断数字的符号，定义正数+负数&#x3D;undefined，即<code>[+]+[-]=[T]</code>，那么对于一个9+(-1)的实例，得出的结论也应当是undefined</p>
+<h2 id="ch2-Intermediate-Representation"><a href="#ch2-Intermediate-Representation" class="headerlink" title="ch2 Intermediate Representation"></a>ch2 Intermediate Representation</h2><p>讲了下3AC（三地址码），以及程序控制流图（CFG）和basic block（BB）的构建，BB构建时只需要注重BB的开头是BB的唯一入口，BB的结尾是BB的唯一出口这两个原理就很简单了</p>
+<p>在一开始有一个很不错的编译器前端的流程图</p>
+<p><img src="/images/%E8%BD%AF%E4%BB%B6%E5%88%86%E6%9E%90%E7%AC%94%E8%AE%B0/image-20221026114252749.png" alt="image-20221026114252749">Scanner进行Lexical Analysis（词法分析）确认单词符合单词构成词法，生成token（变量名为非数字开头的<code>[a-zA-Z0-9_]</code>之类的）<br>Parser进行Syntax Analysis（语法分析）使用Context-Free Grammar(上下文无关文法)确认语法正确（大概就是变量定义是int a不是a int这种？），生成AST<br>Type Checker进行Semantic Analysis（语义分析），生成Decorated AST（举的例子是不能把string值赋值给int变量之类的操作 ）<br>Translator将Decorated AST转换为IR，通常为三地址码（就是每个语句最多三个地址)</p>
+<p>三地址码的解析用的经典java静态分析框架soot，学到的比较有意思的东西是new关键字，实际上是先创建一个类的实例，然后调用类实例的<code>&lt;init&gt;</code>方法，也就是对应的构造函数（所以构造函数没有返回值，而new时我们却用一个变量去接收new的结果）。以及类static字段以及static块是生成一个<code>&lt;clinit&gt;</code>方法在类初始化时被调用</p>
+<h2 id="ch3-Data-Flow-Analysis-I"><a href="#ch3-Data-Flow-Analysis-I" class="headerlink" title="ch3 Data Flow Analysis I"></a>ch3 Data Flow Analysis I</h2><p>数据流分析第一课，讲了may analysis和must analysis，前者要求结果可能是真的，即涵盖可能即为真；后者要求结果必须是真的，即所有可能为真才为真，也就是说前者对结果做并集，后者对结果做交集。对于一个变量的是否定义的分析属于may analysis，也就是说可能会有多条路径去访问一个变量，但也许只有一条路径中这个变量是未被初始化的</p>
+<p>下图就是一个Reaching Definitions Analysis（变量定义的分析）算法与迭代例子，用于判断每个变量赋值语句的作用范围（似乎），使用forward分析，从前向后分析控制流<br><img src="/images/%E8%BD%AF%E4%BB%B6%E5%88%86%E6%9E%90%E7%AC%94%E8%AE%B0/ReachingDefinitionAnalysis.png" alt="ReachingDefinitionAnalysis"></p>
+<p><img src="/images/%E8%BD%AF%E4%BB%B6%E5%88%86%E6%9E%90%E7%AC%94%E8%AE%B0/image-20221026115315161.png" alt="image-20221026115315161"></p>
+<p>迭代的终点为所有输出不再变化，由于代码固定，故$gen_B$和$kill_B$不变，OUT[P]仅有IN[B]影响，故认为所有OUT不变时迭代结束。又因为IN[B]只会增加不会减少（$kill_B$所减少的值是固定的，被证实存在的值不会再消失），故认为迭代必然会终止</p>
+<p>从上述分析中也能看出来，迭代中的变化全部依赖于输入的变化，而输入的变化就来自于部分靠后的BB的输出由于控制流会合并到之前BB的输入。</p>
+<h2 id="ch4-Data-Flow-Analysis-II"><a href="#ch4-Data-Flow-Analysis-II" class="headerlink" title="ch4 Data Flow Analysis II"></a>ch4 Data Flow Analysis II</h2><p>Live Variables Analysis，分析一个变量在程序的某一点是否alive（在该点之后会被使用且期间未被修改）， 使用backward分析，从后往前分析效率更高。对于一个变量在分支下的一支被使用 ，则认为该变量被使用，同样是一个may analysis。<br>对于may analysis，一般来说初始条件初始化为空集，使用并集合并，而对于must analysis则初始化为全集，使用交集合并</p>
+<p><img src="/images/%E8%BD%AF%E4%BB%B6%E5%88%86%E6%9E%90%E7%AC%94%E8%AE%B0/image-20221026134011923.png" alt="image-20221026134011923"></p>
+<p><img src="/images/%E8%BD%AF%E4%BB%B6%E5%88%86%E6%9E%90%E7%AC%94%E8%AE%B0/image-20221026145324059.png" alt="image-20221026145324059"></p>
+<p>Available Expressions Analysis，分析一个expression<code>x op y</code>是否所有路径均可达，且<code>x op y</code>后不会对x和y重新赋值，属于must analysis，应用就是从if else里面提取公共语句，但是举的例子好像并不是这样。。。感觉是在算程序各BB后某个表达式的值是否可用</p>
+<p><img src="/images/%E8%BD%AF%E4%BB%B6%E5%88%86%E6%9E%90%E7%AC%94%E8%AE%B0/image-20221026144631471.png" alt="image-20221026144631471"></p>
+<p><img src="/images/%E8%BD%AF%E4%BB%B6%E5%88%86%E6%9E%90%E7%AC%94%E8%AE%B0/image-20221026145222776.png" alt="image-20221026145222776"></p>
+<p>最后画了个总结表格</p>
+<p><img src="/images/%E8%BD%AF%E4%BB%B6%E5%88%86%E6%9E%90%E7%AC%94%E8%AE%B0/image-20221027094705233.png" alt="image-20221027094705233"></p>
+<h2 id="Assignment-1"><a href="#Assignment-1" class="headerlink" title="Assignment 1"></a>Assignment 1</h2><p>Live variable算法的具体实现</p>
+<p>我是Java垃圾。。。给的代码看懂就花了半天。。。<br>首先先拎清楚项目逻辑8，要看的类都在<code>pascal.taie.analysis.dataflow</code>下，整个分析流程大概分为几个部分</p>
+<ol>
+<li>CFG，Control Flow Graph，这个是必须的，里面放置了每个Node节点，以及其对应的前序和后继</li>
+<li>DataFlowResult，这个是一个存结果的类，存储了每个Node对应的inFact和outFact</li>
+<li>Stmt，上述的Node和Fact都是泛型（一开始这里我看了好久。。。），Stmt就是这里Node的实例</li>
+<li>SetFact，同样的，是Fact的实例，一个泛型Set，对应不同的分析对象，Set中要存储不同的类型。这里是对Live Variable进行分析，所以里面存Var类型</li>
+<li>Solver，解析器类，用于实现算法的整体框架</li>
+<li>Analyser，分析器类，用于实现Node的in和out的具体算法</li>
+</ol>
+<p>因为拿到的类都是泛型，所以在Solver中只将各Node和Fact作为泛型构建算法框架，而具体的值操作均放到对应的Analyser中，在大概理清楚了逻辑之后就可以开始写了。。。</p>
+<p>主要踩了几个坑，第一个是初始化，Live var分析是把所有值初始化为空的，in和out都要初始化，然后我手贱让in等于out的值，而不是分别为空，用的<code>result.getOutFact()</code>，直接把out的引用给拿出来了。。。导致后续跑的时候总是会有变化，无限循环</p>
+<p>第二个是具体分析的算法，果然还是没有熟练，新的in是由$use_B\cup(OUT[B]-def_B)$产生的，而我忘了out b，导致缺结果。。。<br>这里还有一些边界条件的考虑之类的，比如遍历顺序，live var分析应该是逆序的，但逆序的实际表现应该是由OUT生成IN，遍历节点的顺序仍然可以正向，只不过这样子会导致迭代次数增长，然后算法中是否排除掉entry和exit，其实不排除也没什么问题，也许可以在各种地方优化一下卷生成时间</p>
+<p>这边还抄了一下rmb的答案，写的更加优雅捏，rmbtql8<br>他维护了一个节点队列进行迭代，而每次只回填结果有变的节点的前驱进入队列。这样子能减少不必要的迭代次数，思路确实也很简单，因为同一个stmt的def和use不变，in只由out生成，而out由后继的in生成，只有后继发生变化，当前节点才会再次变化<br>真不愧是rmb，tqltql</p>
+<p>还有一个要注意的小点，根据算法定义，应该是先生成OUT再去做减法和并集，但实际上直接将原IN和OUT先并一下再做后续的运算似乎也没问题，因为这个算法是递增的，即集合的结果只会越来越大，因此并上以前的结果也不会导致问题</p>
+<h2 id="ch5-Data-Flow-Analysis-Foundations-I"><a href="#ch5-Data-Flow-Analysis-Foundations-I" class="headerlink" title="ch5 Data Flow Analysis - Foundations I"></a>ch5 Data Flow Analysis - Foundations I</h2><p>超级数理基础课。。。听麻了</p>
+<p>定义Fix point（不动点），即$f(x)&#x3D;x$的值<br>定义了偏序（Partial Order），以及偏序集中的最大下界与最小上界<br>对于一个只有两个元素a,b的偏序集S，S的最小上界称为a与b的<strong>join</strong>，最大下界称为a与b的<strong>meet</strong>（对元素集来说就是并集和交集，用这个类比能快速理解）<br>定义了Lattice（格）的概念，偏序集P中任意两个元素a,b均存在最大下界和最小上界（最大下界和最小上界在P中即可）<br>Complete Lattice（全格），格P中的任意子集S均存在最大下界和最小上界</p>
+<p>整数级是Lattice但不是Complete Lattice，因为整数无上界，取大于某个数的集合为子集就没有最小上界了<br>任何有限的Lattice都是Complete Lattice，然而也存在无限的Lattice是Complete Lattice，比如0-1间的所有实数</p>
+<p>对全格而言，最大的元素称为<strong>top</strong>，最小的元素称为<strong>bottom</strong>，对应元素集合中的全集和空集</p>
+<p>然后超级证明了不动点理论，当L是一个Complete Lattice且存在一个$f:L\rightarrow L$为单调(monitonic)函数时，从$f(\bot)$迭代到$f^k(\bot)$一定能抵达最小不动点，反之从$f(\top)$迭代也能抵达最大不动点</p>
+<p>其实感觉从这些名词上就能看出来了，只需要证明我们的值域是一个Complete Lattice，且我们的算法是单调的，那么就一定能在有限的迭代下得到不动点，也就是迭代结束条件</p>
+<h2 id="ch6-Data-Flow-Analysis-Foundations-II"><a href="#ch6-Data-Flow-Analysis-Foundations-II" class="headerlink" title="ch6 Data Flow Analysis - Foundations II"></a>ch6 Data Flow Analysis - Foundations II</h2><p><img src="/images/%E8%BD%AF%E4%BB%B6%E5%88%86%E6%9E%90%E7%AC%94%E8%AE%B0/image-20221029175612891.png" alt="image-20221029175612891"></p>
+<p>这个图解释了为什么取得的最大&#x2F;小不动点一定是最优的不动点。这里以MUST analysis为例，举<code>Available Expressions Analysis</code>的例子，MUST analysis从全集出发向空集前进，此处的全集为所有语句均可用，即所有语句均可优化，是一个最强的优化结果，但是错误的结果，而空集则为所有语句均不可用，是一个绝对正确但没有意义的结果。因此迭代过程中越是往下，精确度越低，由此可以得出最大的不动点是在确保safe的情况下得出的最精确解</p>
+<p>同时也提到，meet和join操作得到的是最大下界和最小上界，能够保证每一步是最小步长，保证得到的是最大&#x2F;小不动点</p>
+<p>然后是MOP算法，这个算法的精确度相较于我们学的算法精确度要高一点，因为这个算法是以路径为单位进行遍历的，将所有路径的结果进行合并，而我们是以语句为单位进行合并，在一定程度上存在精度丢失。但MOP在大型程序中是不实际的，无法将所有的路径进行归并，当transfer function是distributive（$F(x\sqcup y)&#x3D;F(x)\sqcup F(y)$）的时候，迭代算法与 MOP精度一致</p>
+<p>最后用worklist算法 改进现在的迭代算法，就是和之前rmb的写法一样，因为输入不变输出不变，在每轮迭代中只将输入变化的节点加入下一轮迭代，加快迭代速度</p>
+<h2 id="Assignment-2"><a href="#Assignment-2" class="headerlink" title="Assignment 2"></a>Assignment 2</h2><p>看了一下，是通过率最低的一次作业，果然非常难。。。最后有一个例子我死活想不出来那里出了问题，还是一个hidden case，坐牢，最后去diff rmb的答案才发现，是参数初始化的时候，忘记判断参数是否<code>canHoldInt</code>了</p>
+<p>还是实现三个文件，主要的逻辑仍然是analysiser的实现类，<code>ConstantPropagation</code>，这里面要实现多个方法。<br>首先是边界条件<code>newBoundaryFact</code>，也就是输入参数。简单调试了一下，可以从cfg的IR里面拿到参数，参数全都初始化成NAC即可。因为我们这个实验就操作数字，所以只把数字相关类型纳入监测，<strong>一定要用<code>canHoldInt</code>检查！</strong>真的找了半天 不知道哪错了。。。</p>
+<p>普通的初始条件就初始化为空就行，<code>meetInto</code>和作业1是一样的，就看每次输入的值在现在的结果里面有没有，有的话合并冲突结果，没有的话直接加入，<code>meetValue</code>也就直接枚举各种情况返回即可，难度不大。</p>
+<p><code>transferNode</code>稍微调一下，因为输入是stmt，得从stmt拿exp。这里有一个<code>DefinitionStmt</code>的子类，可以用这个来确定调用是<code>x=y</code>这种赋值类型的（但是有一个<code>InvokeStmt</code>，函数调用类型的也被视为定义语句，该类型是没有左值的，所以可以使用左值判断忽略掉</p>
+<p>同样需要用canHoldInt对左值和右操作数进行检查<br>对于右值的处理则根据作业的提示完成，将输入的表达式分为三类，<code>BinaryExp</code>,<code>Var</code>,<code>IntLiteral</code>，变量取变量值赋值，字面量直接复制，二元操作的话需要运算</p>
+<p>但这里有一个需要注意的地方，就是形如<code>x+y</code>的表达式，会得到Var x,Var y,BinaryExp x+y三个右值，此时处理的顺序会变得比较重要，如果是<code>a=a+b</code>这种类型，如果先计算加法，再计算变量a，就会把a的值又赋给左边的a，覆盖掉a+b的结果<br>虽然调试的时候看起来BinaryExp会放在右值的最后，不过为了保险起见，直接在BinaryExp处理结束后添加了break</p>
+<p>二元操作的具体处理在evaluate函数中实现，只有一个注意点，任何数除零或者模零得到的是undefined。（但是我觉得任何数乘0以及0除模任何数也应该是0。。。应该是作者没考虑到吧。。。总之实现这个功能会使得自己的结果是错的。。。）</p>
+<p>二元操作的判断流程也可以参考作业中的提示，将Exp转换为BinaryExp之后，可以用getOperand方法获取操作数，依次写就好了</p>
+<p>worklistSolver实现一个worklist算法，用一个LinkedList当队列用pop push的就行，就是那个经典输出变化后将后继加入队尾即可</p>
+<h2 id="Assignment-3"><a href="#Assignment-3" class="headerlink" title="Assignment 3"></a>Assignment 3</h2><p>2&#x2F;3两个作业是一起布置的，但是我却因为有其他事隔了快一个月才去完成作业3。。。导致操作的时候其实是已经忘了很多东西的，又复习了半天</p>
+<p>这个作业实际上是结合了作业1&#x2F;2来做的一个死代码分析，所以还需要回顾一些之前的内容，但是又和之前的有一些区别，因为我们之前都只是写一个Analyser，然后配合一个Solver使用，他这里却把我们之前的Analyser拼到了一起，最后还拿这两个的结果进行进一步的分析。一开始比较疑惑的是这里要写对应的前序和后序遍历的初始化条件，以及worklist的前后序算法，后来才想通应该是对应liveVar和ConstProp的初始化条件和迭代算法，然后算法具体流程仍然由Analyser完成。最后的结果被汇总到我们的DeadCodeDetection里面进行分析</p>
+<p><strong>做作业之前一定要完整的把内容看一遍</strong><br>在描述里其实已经讲明白了绝大多数的情况了，所以只要按部就班的完成就行。对于控制流不可达的代码就直接从entry开始，把后继节点加入不停迭代即可找到所有直接不可达的代码。不过这里有一个小坑，形如<code>while(true)</code>的语句死循环之后其后面的所有语句包括return等就不可达了，但是exit节点仍然应当被加入进来，所以初始化的时候应该是entry和exit都加入</p>
+<p>对于无效变量，就直接看liveVar结果就行，如果左值不在当前语句的outFact里面就无效了，但是在判无效之前还是要看一下右值是否<code>hasNoSideEffect</code>，我就是这里一开始没写提交错了一次呜呜</p>
+<p>然后还有一个很大的坑。。。是我的逻辑没写好导致的，我最初的写法是先找出所有的不可达的分支，然后维护到一个<code>deadCondition</code>里面，然后从entry开始遍历，如果后继在<code>deadCondition</code>里面就排除，最后从把所有的可达节点排除获取所有deadcode</p>
+<p>看起来没什么问题，但是实际提交的时候硬是有8个假阳性消不掉。。。最后还是在rmb的指导下发现问题，这个写法在形如<code>do&#123;&#125;while(false)</code>的情况下会把整个块都作为死代码。因为我是先找到所有不可达的流，while false的结果肯定是不可达的，然后在遍历的时候就直接将其排除了。结果就是do的话还有另一种进入这个代码块的可能性，也一并被排除，导致了假阳性的结果</p>
+<p>所以最后还是得正向写，将所有可走到的加入列表遍历，而不是做一个排除项。或者说，应该随着遍历更新，而不是先遍历一遍拿一个结论结果覆盖掉了其他可能性</p>
+<h2 id="ch7-Interprocedural-Analysis"><a href="#ch7-Interprocedural-Analysis" class="headerlink" title="ch7 Interprocedural Analysis"></a>ch7 Interprocedural Analysis</h2><p>之前的内容都是过程内分析，就是分析一个方法内的操作<br> 现在讲过程间分析，就需要考虑函数调用了，这里因为是针对面向对象的语言的分析，所以要考虑类继承。这里使用了一个类层次结构算法（Class Hierarchy Analysis，CHA），以后会讲更复杂以及更精确的指针分析方法。<br>算法如下图，核心dispatch就是输入一个类和方法签名，并向上寻找父类直到找到对应签名。</p>
+<p>下图是resolve方法，对于不同的调用类型的处理方式。这里认为静态方法是不可继承的？所以对静态方法是直接返回，但实际上java是支持静态方法的继承的。。。对于specialCall，一般是private方法和constructor等不被继承的方法，所以直接dispatch向上找（感觉好像也直接返回也行？这些方法感觉也没法往上找实现啊？逐渐混乱。。。感觉把static和special的处理对调一下我反而能理解一点），virtualCall是最麻烦的，因为要考虑多态，一个声明为A类的对象可能实际上是BCD类的实例，就有调用BCD类重写过的该方法的可能，就需要对所有当前类的子类进行dispatch</p>
+<p><img src="/images/%E8%BD%AF%E4%BB%B6%E5%88%86%E6%9E%90%E7%AC%94%E8%AE%B0/image-20221126142516298.png" alt="image-20221126142516298"></p>
+<p>对virtualCall的处理如下图，因为是从类型声明往下寻找全部子类进行dispatch，因此会产生误差。同样注意虽然是对所有子类进行搜索，但dispatch是向上寻找继承的实现，对B类进行分析时由于B未实现foo方法，会找到A类的foo方法<br><img src="/images/%E8%BD%AF%E4%BB%B6%E5%88%86%E6%9E%90%E7%AC%94%E8%AE%B0/image-20221126142351541.png" alt="image-20221126142351541"></p>
+<p>不过并不存在误报，因为不可用用父类赋值给子类，所以对于一个声明类型B，其可能的值只有BCD三种，而不会存在A，这里B的调用会回溯到A.foo，虽然是寻找B及其子类的foo方法，但dispatch是向上寻找实现的，B类无foo方法实现则寻找到继承自A类的方法</p>
+<p>如下是一个过程间分析的结果，实际上就是在过程内分析的基础上添加方法调用，在普通的CFG上增加了call edge和return edge，并将参数和返回值传递，在发起调用的时候需要把返回值对应的变量kill掉，然后将return val和out进行合并得到新的结果，如果不kill的话可能会导致原值和返回值不一致，合并后成为NAC。目前的分析<strong>仅考虑值传参</strong></p>
+<p><img src="/images/%E8%BD%AF%E4%BB%B6%E5%88%86%E6%9E%90%E7%AC%94%E8%AE%B0/image-20221126151318249.png" alt="image-20221126151318249"></p>
+<h2 id="Assignment-4"><a href="#Assignment-4" class="headerlink" title="Assignment 4"></a>Assignment 4</h2><p>分为两个部分</p>
+<h3 id="构造调用图"><a href="#构造调用图" class="headerlink" title="构造调用图"></a>构造调用图</h3><p>就跟着题目中给的指导做就行了，不过这里存在一个不太想的通的点，static类型的调用似乎没法直接找到method，还是通过dispatch去类定义里面找，并且还是之前提到的问题，java里面static方法可以继承，private方法不能继承，不太理解为什么图上是static方法直接获取定义，而private方法要dispatch向上寻找。。。</p>
+<p>然后有一个小bug是题干里没提到的，就是abstract方法的分析，abstract方法应该被排除在分析范围内，因为实际运行情况下不可能出现对abstract方法的调用。这里的话我是对STATIC, SPECIAL两个情况下直接throw一个exception，而对于virtual和interface调用，是有可能搜索到一个abstract方法的，这种情况并非异常，直接忽略即可</p>
+<p>因为可以声明一个接口对象，再用接口的实现类去初始化并调用被实现的接口方法，这种情况下由于resolve是对声明及其子类做查找，就会顺带找到接口类中的抽象方法</p>
+<p>最后的最后踩了一个大坑。。。根据题目所言，PPT52页的算法是有一个专门的集合放reachable method，我就写了个set来装，主要是没想到CallGraph会用上这个内容，并且单独写一个set是可以通过本地的CHA test的。。。但是当把后面内容一合并之后发现构造出来的icfg是空的。。。想了好久没想到怎么回事，最后去抄rmb作业，发现CallGraph里面有一个addReachableMethod方法，把原来的set去掉就能构造出完整的图了。。。<br>debug了好久，因为看图是怎么构造的也不太现实，就发呆呜呜</p>
+<h3 id="过程间常量传播"><a href="#过程间常量传播" class="headerlink" title="过程间常量传播"></a>过程间常量传播</h3><p>题目的描述有一点抽象，不过我还是大概理解了</p>
+<p><code>Normal edge</code>即题图1-&gt;2类型的边<br><code>Call-to-return edge</code>即题图2-&gt;3类型的边<br><code>Call edge</code>即题图2-&gt;4类型的边<br><code>Return edge</code>即题图6-&gt;3类型的边</p>
+<p>实现也没啥困难，看对应的类有哪些定义和方法就行了<br>提示中也有提到，不应当修改上个节点输出的CPFact，因为stmt的输出是不应该变化的，是由额外添加的边transform方法对上一个节点的输出转换成下一个的输入</p>
+<p>唯一一个比较困扰的地方是return edge，这个边的source是函数结束的时候一个nop标记，也就是之前过程内分析的exit节点，而不是return语句，如果有形如如下形式的函数</p>
+<pre><code>int foo(...) &#123;
+     if (...) &#123;
+         return x;
+     &#125; else &#123;
+         return y;
+     &#125;
+&#125;
+</code></pre>
+<p>就会得到x和y两个返回变量，如果要分辨返回的是哪个值就不太可能，一开始不知道为什么脑袋里全是刚写完的控制流分析，感觉还有可能写出一个判断可能值。最后发现这里面也没提供控制流分析，写不了（实际上又去抄了rmb作业）<br>直接还是做sound的结论，将所有的返回值进行合并后返回</p>
+<p>至于返回之后返回值存储在哪个变量，ReturnEdge提供了一个getCallSite，可以直接拿到该函数的调用语句。</p>
+<p>对于新的transferNode方法，NoCall的直接调用原方法，Call的由于返回值实际上是由调用结束后的returnEdge决定（不考虑引用传参），因此直接把in输出到out即可。这里是不能kil掉返回值对应的变量的，因为函数调用本身也可能以返回值为参数，返回值的kill应当在CallToReturn edge中完成</p>
+<h3 id="求解器实现"><a href="#求解器实现" class="headerlink" title="求解器实现"></a>求解器实现</h3><p>这个倒是没什么难度，唯一的问题就是cfg原来有一个直接拿entry的办法，这里没有了，只能找entry method然后手动拿第一句作为entry</p>
+<p>然后在节点输入的合并上，需要不再是以前驱节点为单位进行合并，而是以前驱边为输入进行合并了，这也就保证了调用关系的处理在边上进行，而无需对原有节点类型逻辑进行更改</p>
+<h2 id="ch8-Pointer-Analysis"><a href="#ch8-Pointer-Analysis" class="headerlink" title="ch8 Pointer Analysis"></a>ch8 Pointer Analysis</h2><p>开始讲无敌的指针分析<br>第一节是概念课，讲了一堆概念和名词<br>下图展示了CHA方法存在的精度丢失的情况</p>
+<p><img src="/images/%E8%BD%AF%E4%BB%B6%E5%88%86%E6%9E%90%E7%AC%94%E8%AE%B0/image-20221128134455946.png" alt="image-20221128134455946"></p>
+<p>提到指针分析中数组下标的计算很困难，所以处理方法直接是忽略下标，将数组所有元素作为一个字段，对下标的所有赋值全都赋值到那个字段中</p>
+<p><img src="/images/%E8%BD%AF%E4%BB%B6%E5%88%86%E6%9E%90%E7%AC%94%E8%AE%B0/image-20221128143100379.png" alt="image-20221128143100379"></p>
+<p>在如上前提下，就可以将指针分析概括成如下机制赋值形式</p>
+<p><img src="/images/%E8%BD%AF%E4%BB%B6%E5%88%86%E6%9E%90%E7%AC%94%E8%AE%B0/image-20221128143304555.png" alt="image-20221128143304555"></p>
+<h2 id="ch9-Pointer-Analysis-Foundations-I"><a href="#ch9-Pointer-Analysis-Foundations-I" class="headerlink" title="ch9 Pointer Analysis - Foundations I"></a>ch9 Pointer Analysis - Foundations I</h2><p>指针分析中的关键概念<br>指针分析中的基础规则以及他们的处理方式，横线上面的红字是条件，下面的黑字是结果</p>
+<p><img src="/images/%E8%BD%AF%E4%BB%B6%E5%88%86%E6%9E%90%E7%AC%94%E8%AE%B0/image-20221128145557432.png" alt="image-20221128145557432"></p>
+<p>之前提到过，课程中讲的指针分析是控制流不敏感的，所以这里的分析过程不考虑控制流，即不会每个节点存在一个状态，而是直接一个状态概括整个程序的所有语句。所以构造的是数据流图，而非控制流图</p>
+<p>所以这里面是会有一定的误报的，比如一开始先令$a\rightarrow O_1$，经过了一顿store load操作之后又让$a\rightarrow O_2$，控制流不敏感分析会导致$O_2$的值也会被更新到之前对$O_1$进 行store load的其他变量<br>下图为算法梗概，因为控制流无关直接遍历所有语句也不考虑顺序了。这种分析在一定程度上是由编译器保证最基本的语法合规</p>
+<p><img src="/images/%E8%BD%AF%E4%BB%B6%E5%88%86%E6%9E%90%E7%AC%94%E8%AE%B0/image-20221128164340076.png" alt="image-20221128164340076"></p>
+<p>这个算法看下来，其实是把所有的new语句放到最前面，然后把赋值接在后面，把使用赋值情况全都传递一遍，最后再把字段的处理放最后再传递一遍。（所以感觉应该误报率大的离谱？。。。但是老师说这个工业上用的比流敏感多，因为流敏感的benefit不明显，之后课程会通过上下文敏感分析来提高流不敏感分析的精确度）</p>
+<p>极速理解的一个例子</p>
+<p><img src="/images/%E8%BD%AF%E4%BB%B6%E5%88%86%E6%9E%90%E7%AC%94%E8%AE%B0/image-20221128171011017.png" alt="image-20221128171011017"></p>
+<h2 id="ch10-Pointer-Analysis-Foundations-II"><a href="#ch10-Pointer-Analysis-Foundations-II" class="headerlink" title="ch10 Pointer Analysis - Foundations II"></a>ch10 Pointer Analysis - Foundations II</h2><p>指针分析基础第二节，上下文不敏感的指针分析。本节讲的主要是指针分析的过程间分析，和CHA类似，也需要构造一个调用图。同时补充了过程间分析中PFG所需要添加的边</p>
+<p>下图是更新算法</p>
+<p><img src="/images/%E8%BD%AF%E4%BB%B6%E5%88%86%E6%9E%90%E7%AC%94%E8%AE%B0/image-20221129170001148.png" alt="image-20221129170001148"></p>
+<p>对于方法调用的处理，参数和返回值通过直接在PFG中添加边来进行数据传递，由于指针分析中可以通过receiveObject来确切的获取到被调用的函数，也正是因此，对于receiveObject，也就是被调函数中的this，单纯的添加边会导致不同的父子类对象全部流入某个类的方法，造成和CHA一样的精度丢失，所有这里的做法是重新创建一个$m_{this}$，单独讲对应类的对象传入 </p>
+<p>具体的解释如下图</p>
+<p><img src="/images/%E8%BD%AF%E4%BB%B6%E5%88%86%E6%9E%90%E7%AC%94%E8%AE%B0/image-20221210123229647.png" alt="image-20221210123229647"></p>
+<p>如下图例子所示</p>
+<p><img src="/images/%E8%BD%AF%E4%BB%B6%E5%88%86%E6%9E%90%E7%AC%94%E8%AE%B0/image-20221129174940142.png" alt="image-20221129174940142"></p>
+<p>简要的谈谈理解，<code>AddReachable</code>方法中添加基础的赋值，<code>Propagate</code>方法用于将变化的值向后传递，之后在obj实例存在的情况下，对其字段值进行数据流构建，<code>AddEdge</code>即为构建两个节点的先后关系，先前节点的变化便是通过<code>Propagate</code>方法传递到后继节点</p>
+<h2 id="Assignment-5"><a href="#Assignment-5" class="headerlink" title="Assignment  5"></a>Assignment  5</h2><p>上下文不敏感的指针分析算法，认真听课+认真看题干似乎没有太大的问题。但是还是写了我一个下午+一个晚上。。。感觉这个作业就没有半天之内能写完的</p>
+<p>这里用指针类(Pointer)来指代PFG中的节点，并且将指针分为了变量指针，静态字段指针，实例字段指针和数组下标访问四种，毕竟实际的分析并不止变量一个类型，需要抽象出来。虽然store load两个操作在定义上需要先检查对应的obj是否存在，但在实现的时候似乎并不需要进行这个判断，因为在Propagate中进行合并时对输入的集合是否为空进行了判断，不同字段的赋值实际上说到底还是被抽象到了节点，也就是Pointer类，这样子看来<code>y=x.f</code>和<code>y=x</code>实际上是没有太大区别的</p>
+<p>一共有四个类实现了Pointer接口，分别是var，static field，instance field和array index，题目中要求我们对static field和array index也进行计算。这里考虑了半天这几个类应该放在哪里处理。</p>
+<p>应该是将<code>static field</code>的load和store当成和Copy类型一样的语句，即<code>x=y</code>来处理，直接在<code>addreachable</code>中完成。而<code>array index</code>则和<code>instance field</code>一样放到propagate后处理。理解这一点需要先理解为什么形如<code>x.f=y</code>的语句要放到后面单独处理，之所以<code>instance field</code>的store load需要放到<code>propagate</code>后执行，就是因为<code>instance field</code>是要以一个obj实例为基础进行构建的，所以要在对应的实例存在后才能继续操作。<code>array index</code>类似，虽然其只存储了一个obj对象，但在实际使用时，同样与new出来的对象相关联（并且Var类里面有<code>getStoreArrays</code>和<code>getLoadArrays</code>方法，和instance field的两个方法相对应，也算是一种提示，一开始没看见这个方法思考了好久怎么写。。。。。）。在代码中也可以看到，<code>instance field</code>类中存在一个成员变量base，而<code>static field</code>就和var差不多，<code>static field</code>只存一个字段对象，至于<code>instance field</code>直接不进行处理，因为在对var的处理时load和store就是对相关的field进行处理了，形如<code>T.f1=x.f2</code>的语句应该会被拆解为<code>tmp=x.f2;T.f1=tmp</code>的形式，也无需担心。</p>
+<p>addEdge是添加关联的，数据的更新依赖于关联存在后的propagate，只要能把关联添加起来，后续值的更新就不成问题</p>
+<p>一开始有一个很大的困惑，因为我们是以VarPtr为对象 进行处理 的，所以语句<code>y=x[i]</code>需要x的变化才会触发将x[i]的值传递给y，但x[i]是由单独的<code>ArrayIndex</code>来管理的。最后才意识到，一个数组被new出来的时候触发一次变化，而与此同时我们通过<code>getStoreArrays</code>和<code>getLoadArrays</code>拿到所有和数组相关的操作并且全部赋值了，并不存在某个array操作可能再此次操作完成后再被处理。而当arr base被赋值给一个新的new对象时，又会重新触发base变动进而触发后继变动</p>
+<h3 id="访问者模式"><a href="#访问者模式" class="headerlink" title="访问者模式"></a>访问者模式</h3><p>这里在AddReachable中需要对各个类型的语句进行处理，课上的算法中只有New和Copy两种类型，但是经过上述的分析，我们应当对static类型的load store以及array类型的load store均需要进行处理，如果对stmt进行一堆 if else instance of再强转就略微的有些不优雅，所以这里提到了访问者模式，通过对源代码最小的修改将其功能转移到一个visitor中</p>
+<p>实现的方法为为Stmt的每个子类实现一个accept方法，其中接受一个visitor，并调用visitor的visit方法，将this作为参数传入。而对各个类的处理逻辑则均由visitor实现，visitor类实现接受不同类型参数的visit方法，此时stmt的每个子类由于多态，在调用accept方法时传入的this为各具体子类，从而完成了对不同方法的调用</p>
+<p>所以这里实现给出的<code>StmtProcessor</code>类，并且实现一系列的visit方法（找了半天没找到哪里可以存reachableStmt，所以这里也顺手塞一个成员变量存进去，最后发现好像没有必要存这个玩意。。。直接在拿到一个方法里的新stmt的时候直接全遍历一遍就行了）</p>
+<h2 id="ch11-Pointer-Analysis-Context-Sensitivity-I"><a href="#ch11-Pointer-Analysis-Context-Sensitivity-I" class="headerlink" title="ch11 Pointer Analysis - Context Sensitivity I"></a>ch11 Pointer Analysis - Context Sensitivity I</h2><p>开始讲上下文敏感的指针分析，（这里的上下文应当指的是同一个函数在不同情况下调用产生的 不同调用上下文）上下文不敏感的指针分析在参数传递时，将所有传入的实参与形参关联，导致如下代码产生误报</p>
+<p><img src="/images/%E8%BD%AF%E4%BB%B6%E5%88%86%E6%9E%90%E7%AC%94%E8%AE%B0/image-20221207104319420.png" alt="image-20221207104319420"></p>
+<p>上下文不敏感导致误差的原因就是不同的函数调用会将实参全都汇聚到同一个形参当中，进一步传递到整个指针流图中，通过上下文敏感的方法将不同的callsite认定为不同的调用上下文，进而维护对应的上下文变量，即可消除此类误差</p>
+<p>类似的，对new这种AllocSite同样进行上下文敏感操作，称为上下文敏感的堆抽象</p>
+<p>老师这里给出了一个例子</p>
+<p><img src="/images/%E8%BD%AF%E4%BB%B6%E5%88%86%E6%9E%90%E7%AC%94%E8%AE%B0/image-20221207124514915.png" alt="image-20221207124514915"></p>
+<p>在只使用调用上下文敏感的情况下，虽然对函数调用的上下文正确了，但由于对<code>new X()</code>这种allocsite没有进行堆抽象，不同上下文中new处理的对象仍然被视为同一个，导致出现了误报。对堆对象使用上下文敏感后，即可对应不同的函数调用产生不同上下文中创建的对象，降低误报率。</p>
+<p>但这种技术并不能解决如下代码中后面new出来的a的field b也被影响的情况，这种误报感觉还是得靠之前学的<strong>控制流敏感</strong>的分析才能解决，即每条语句存在一个对应的状态</p>
+<pre><code>a = new A();
+a.b = 1;
+a = new A();
+</code></pre>
+<p>简单的说，控制流敏感将函数调用的输入和输出（即传入参数和返回值）绑定到了对应的上下文（这里是callsite）上，改变了非敏感情况下所有调用的输入均被传入同样的形参，返回值被返回到所有的结果的情况，提升了精度</p>
+<p>但由于其非流敏感，所以可能对于一个for循环中多次调用一个方法，会认为其是同一个callsite，最后造成误报（实际上控制流非敏感并不会去处理循环，在流不敏感的情况下所有的语句都没有先后顺序和goto逻辑之类的）</p>
+<h2 id="ch12-Pointer-Analysis-Context-Sensitivity-II"><a href="#ch12-Pointer-Analysis-Context-Sensitivity-II" class="headerlink" title="ch12 Pointer Analysis - Context Sensitivity II"></a>ch12 Pointer Analysis - Context Sensitivity II</h2><p>接上一节课，虽然当前分析是非流敏感的，但上下文敏感会对每次的函数调用出现新的上下文，对于递归类型的调用，会出现无穷递归，即使递归是有上限的，如下图所示。同时，如果程序中多个方法互相调用，也会造成类似的情形</p>
+<p><img src="/images/%E8%BD%AF%E4%BB%B6%E5%88%86%E6%9E%90%E7%AC%94%E8%AE%B0/image-20221207153427514.png" alt="image-20221207153427514"></p>
+<p>为此，直接定义上下文调用链的长度以限制无穷递归，并不是限制调用链的长度，而是限制新的上下文继承之前上下文的长度，如下图所示</p>
+<p><img src="/images/%E8%BD%AF%E4%BB%B6%E5%88%86%E6%9E%90%E7%AC%94%E8%AE%B0/image-20221207154034797.png" alt="image-20221207154034797"></p>
+<p>对于上下文不敏感的分析，可以认为其是一个<code>0-call-site</code>的特例</p>
+<p>另一个上下文敏感的算法是对象敏感，使用<code>receive object</code>代替<code>callsite</code>作为函数调用的上下文，下图是一个例子</p>
+<p><img src="/images/%E8%BD%AF%E4%BB%B6%E5%88%86%E6%9E%90%E7%AC%94%E8%AE%B0/image-20221207163511905.png" alt="image-20221207163511905"></p>
+<p>这里给出了一个<code>1-call-site</code>和<code>1-object</code>的对比，由于<code>1-call-site</code>只以上一个调用点为上下文，这里两个不同的对象经过一个中转方法调用另一个方法后数据流产生了合并，产生了误报</p>
+<p><img src="/images/%E8%BD%AF%E4%BB%B6%E5%88%86%E6%9E%90%E7%AC%94%E8%AE%B0/image-20221207164046072.png" alt="image-20221207164046072"></p>
+<p>但是<code>1-object</code>并不是一定比<code>1-call-site</code>好，这里给出了另一种情况，对于一个对象调用两次系统的方法，<code>1-object</code>会将两个调用合并到一个context内，产生误报</p>
+<p><img src="/images/%E8%BD%AF%E4%BB%B6%E5%88%86%E6%9E%90%E7%AC%94%E8%AE%B0/image-20221207164557410.png" alt="image-20221207164557410"></p>
+<p>课上最后做了个总结，说k取2时object方法远优于callsite</p>
+<h2 id="Assignment-6"><a href="#Assignment-6" class="headerlink" title="Assignment 6"></a>Assignment 6</h2><p>前半部分实现一个上下文敏感的指针分析，这段无难度，直接就着上一次作业的抄就能完成（别抄漏了就行。。），就是在创建pointer的时候多套一层context就行了，这回带context的pointer的获取统一移到了一个<code>csManager</code>里面，和之前的逻辑也一样，不存在创建，存在则返回</p>
+<p>有两个需要注意的地方，一个是函数调用处，在这里会创建出新的context，使用<code>contextSelector</code>创建，get方法也是不存在创建存在则返回，在参数传递返回值传递以及各种上下文构建时要注意谁是callerContext谁是calleeContext；另一个是new语句，这里需要对对象进行堆抽象，即不同调用上下文下创建的对象应当也有对应的上下文，一开始把这点忘了又去回顾了一下。。。但是这里堆上下文层数是比调用上下文少一层的，也就是说1-call-site是没有堆上下文的，感觉怪怪的？课上的那个例子是1-call-site对应一层的heap context。同时，heapContext需要传入一个obj进去，不知道应该传个啥，总觉得像是caller的receive obj之类的东西，但是拿不到，抄rmb作业的话他是直接传的当前被new出来的这个obj，好像也很有道理（不过题干中有显式说明这个参数不会用上）</p>
+<p>后半部分写六个context selector，虽然看起来挺多的，但是写起来也很快，题目中给出了每个selector的context内容，call用invoke stmt，obj用obj，type用obj的type。<br>一层的selector很简单，由于要求是k-1层heap context，所以全部返回空。call selector直接从callsite里面拿invoke stmt即可，静态和方法都可以拿，obj和type的话静态是没有recv obj的，<del>所以直接返回空</del>不能直接返回空，返回空是认为直接调用了静态方法，但是如果该静态方法在一个已经存在的上下文中调用，那么它应该继承之前的上下文。。。。（提示里面说了但是我又一开始没看。。。）一开始想了一下应该以csobj还是obj作为context，后来感觉obj这种不带上下文的应该靠谱一点，最后回去看了眼作业要求发现已经指明了用obj。。。在上下文的获取中也需要稍微注意一点，因为是以obj作为上下文了，所以callerContext应该从recvObj里面找。Type很容易写错，因为上课那段没认真听。。。type不是以recvObj的type作为context的，而是以recvObj声明时所在的类作为context。。。但是这样子的话我就不能理解为什么type是obj的一个抽象了。。。</p>
+<p>两层的稍微啰嗦一点点，实际上就是把之前的context不足2就补一个当前的，有两层就把第一个去掉。不过要做额外的堆上下文，堆和方法调用有一点区别，方法调用的话是对一次调用做操作，传进来的是caller的context，需要自己创建一个callee的context更新进去，而heap context是在callee里面使用了new，所以是直接从callee里面拿出一个上下文出来作为自己的上下文，因为不用新建，所以也都是一样的，直接复制粘贴</p>
+<p>然后这里天衣无缝的操作了一通，结果答案不对，过不了hidden test，排错排了一晚上没找着，抄rmb答案也觉得我们俩人写的一模一样，第二天早上才发现原来是static的调用里面return var的边构造写到传参边构造的for循环里面去了。。。。无语了，我是傻逼</p>
+<h2 id="Assignment-7"><a href="#Assignment-7" class="headerlink" title="Assignment 7"></a>Assignment 7</h2><p>看起来难度拉满了，<strong>开始之前先认真看题</strong></p>
+<blockquote>
+<p><strong>计算别名信息.</strong> 在本次作业中，我们借助你在之前的作业中实现的指针分析来计算程序的别名信息。 具体而言，对任意两个实例字段的访问（设为 x.f 和 y.f），如果它们的 base 变量的指针集（points-to set）有交集（即 x 和 y 的指针集有交集），那么我们认为对这两个实例字段的访问（x.f 和 y.f）互为别名。</p>
+</blockquote>
+<p>这里也提到了流不敏感情况下忽略语句顺序导致的误差</p>
+<blockquote>
+<p><strong>分析实例字段的精度取舍.</strong> 你可能注意到了，我们上面描述的处理实例字段的方式忽略了 load 和 store 语句出现的顺序，也就是说，我们的处理是流不敏感的（flow-insensitive）。和其他流不敏感的分析一样，这种处理方式会损失一些精度，例如如下代码片段：</p>
+<pre class=" language-java"><code class="language-java">p <span class="token operator">=</span> q <span class="token operator">=</span> a<span class="token punctuation">;</span>
+p<span class="token punctuation">.</span>f <span class="token operator">=</span> <span class="token number">555</span><span class="token punctuation">;</span>
+x <span class="token operator">=</span> a<span class="token punctuation">.</span>f<span class="token punctuation">;</span> <span class="token comment" spellcheck="true">// x -> NAC in the current handling</span>
+q<span class="token punctuation">.</span>f <span class="token operator">=</span> <span class="token number">666</span><span class="token punctuation">;</span>
+</code></pre>
+<p>分析可以发现 p.f 和 q.f 都是 a.f 的别名，因此我们将所有 store 到 a.f 和其任意别名的值（即 555 和 666）进行 meet 之后赋给 load 语句 x &#x3D; a.f 的左侧变量 x，从而结果得到 x 在第 3 行后为 NAC，这实际上是不精确的结果。</p>
+</blockquote>
+<p>做完之后回来回顾，这次作业的开放性过高，导致需要自己设计思路，难度++。并且我还是没有很认真的看题干，导致有一个提示了的问题最后debug了半天才发现</p>
+<blockquote>
+<p>在别名存在的情况下，通过对一个字段&#x2F;数组的访问来修改一个实例字段&#x2F;数组将会同时修改与这一访问相关的所有别名值。举例来说，如果 <code>x.f</code>，<code>y.f</code> 和 <code>z.f</code> 互为别名，那么 <code>store</code> 语句 <code>x.f = 5;</code> 不仅将 <code>x.f</code> 的值修改为 5，而且同时将 <code>y.f</code> 和 <code>z.f</code> 的值设为 5。因此，为了在常量传播中精确地分析字段和数组的值，我们需要取得被分析程序的别名信息。</p>
+</blockquote>
+<p>因为只需要对别名进行分析，所以作业的绝大多数内容都可以直接照抄原来的作业，作业中要求修改的api，实际上只有<code>transferNonCallNode</code>需要额外修改，但solver类里面需要加一些api让Analyser能拿到solver的一些成员</p>
+<p>需要处理的语句一共也就四种，其余的语句仍然使用原来的<code>cp.transferNode</code>即可，需要处理的语句分别为<code>(Load/Store)/(Array/Field)</code>，对于load语句，需要去找到所有的别名及其对应的store语句，然后进行合并，<strong>不要忘记load的左值存在初始值</strong>。对于store语句，则需要把所有的别名的load加入到worklist中再次进行更新。这是因为有时候对象的field是通过getter和setter更新的，而如果在分析时先分析了getter再分析setter就会出现setter中赋的值在getter中拿不到的问题，所以setter更新时将别名的所有load语句加入worklist，就和输出变化后将后继节点加入更新传递一样</p>
+<p>根据题目的意思应该是希望我在init那里构造好一个别名关系直接用，但是我一下子没想出来什么很好的维护别名关系的办法，就直接把pta作为成员变量然后每次要用的时候遍历了。。。所以关于别名的话会有一段比较丑陋的判断代码</p>
+<pre class=" language-java"><code class="language-java">        <span class="token keyword">for</span> <span class="token punctuation">(</span>Var var <span class="token operator">:</span> pta<span class="token punctuation">.</span><span class="token function">getVars</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+            <span class="token comment" spellcheck="true">// 先比较有没有指向相同的对象</span>
+            Set<span class="token operator">&lt;</span>Obj<span class="token operator">></span> tmp <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">HashSet</span><span class="token operator">&lt;</span><span class="token operator">></span><span class="token punctuation">(</span><span class="token punctuation">(</span>pta<span class="token punctuation">.</span><span class="token function">getPointsToSet</span><span class="token punctuation">(</span>var<span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+            <span class="token comment" spellcheck="true">// retainAll会修改值，所以创建一个新的变量上去进行交集</span>
+            tmp<span class="token punctuation">.</span><span class="token function">retainAll</span><span class="token punctuation">(</span>pta<span class="token punctuation">.</span><span class="token function">getPointsToSet</span><span class="token punctuation">(</span>instanceFieldAccess<span class="token punctuation">.</span><span class="token function">getBase</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+            <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token operator">!</span>tmp<span class="token punctuation">.</span><span class="token function">isEmpty</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+                <span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span>
+</code></pre>
+<p>我确实看不出来这里哪里错了，但是把这段换成rmb的mutilMap存储别名就对了。。。太玄学了，以及我当初是想直接写一个别名关系维护的但是想了半天没想出来。。。。</p>
+<h2 id="ch13-Static-Analysis-for-Security"><a href="#ch13-Static-Analysis-for-Security" class="headerlink" title="ch13 Static Analysis for Security"></a>ch13 Static Analysis for Security</h2><p>差不多是概念课，就感觉没有学到很多。先讲了经典保密性和完整性，显式传播和隐藏信道<br>最后讲了一点污点分析，污点传播，source定义为某些特殊函数的返回值（用户输入函数），sink即为危险方法点，输出一个trait flow。然后也提到了在污点传播的过程中，默认情况下都是只能传播BinaryExp，store，load之类的基本语句，像调用方法如append之类的就传播不过去了，需要自己手动添加边。。。坐过codeql的牢之后感觉真是太熟悉了，都回来了</p>
+<p>不过现在回想一下可能对当时codeql的global flow和local flow有了更多的理解，就是这里的过程间分析和过程内分析</p>
+<h2 id="Assignment-8"><a href="#Assignment-8" class="headerlink" title="Assignment 8"></a>Assignment 8</h2><p>最后一次作业辣，做一个偏向使用的污点分析。还是codeql的记忆疯狂复活环节。</p>
+<p>污点传播的理论知识较为完备，所以上手速度略有提升，题干中详细的给出了Source和Sink的生成方法，并指出了指针分析只能简单的进行赋值类型的污点传递，对于方法调用情况下的传递并不能正确分析，需要手动连上一条边（codeql也是这样，我当时还感觉这也太憨了。。。）在codeql中这样子的一个联系被称为<code>TaintStep</code>，作业中称为<code>TaintTransfer</code>，且有<code>base-to-result</code>,<code>arg-to-base</code>,<code>arg-to-result</code>三种转换方式。实现transfer并不难，仔细看给出的公式，注意taintObj的type和allocsite即可。</p>
+<p>困难的点在于在何处检测source和sink，并进行污点传播。</p>
+<p>首先，source，sink以及taintStep均是在方法调用处传递的，因此必然是对invoke语句进行处理。</p>
+<p>最好处理的是source，因为source肯定就第一次处理到时创建一个taintObj赋值上去，那么分别对于静态调用和实例调用第一次处理时添加即可，这里选择在visit和processCall的addReachable处添加source的检查，为了让污点对象能够随着指针分析传播，不直接修改PointToSet而是添加worklist entry（与处理addReachable中的new语句有点像，不过这里的new是新方法中的new obj，而污点则是本次调用第一次出现时创建污点对象）。</p>
+<p>其次是sink，从题目中也能看出来，在污点分析结束之后，遍历所有的调用，匹配sink且入参符合的设置为sink即可</p>
+<p>最麻烦的是taint transfer，这个是需要手动处理的额外传播方式，虽然我们能够通过添加taint Obj到指针集中让指针分析进行传播，但指针分析不能完成完整的污点传播，需要进行手动传播。</p>
+<p>污点传播同样发生在函数调用处，所以我一开始很想当然的在static invoke的visit和processCall里面进行处理。需要注意此处的处理不能放在addEdge中，因为source产生污点是和正常分析流程分离的，有可能第一次处理这个调用时污点还未传播到此处，而后续传播过来时若因为addEdge已添加而忽略就会导致问题。<br>但上述两个地方并不能覆盖所有的污点传播，由算法可知，visit只有第一次处理该语句的时候触发，而processCall是recvObj发生变化时对所有recvObj为base的方法调用进行处理，如果一个污点变量被作为方法的参数进行污点传播，即使污点对象被更新到了该变量中，算法也只会对污点变量为base的方法调用进行处理，我这里直接遍历了callGraph找所有这个变量在参数里的调用，手动再传播一次</p>
+<p>作业全部完成，完结散花</p>
+<h2 id="ch14-Datalog-Based-Program-Analysis"><a href="#ch14-Datalog-Based-Program-Analysis" class="headerlink" title="ch14 Datalog-Based Program Analysis"></a>ch14 Datalog-Based Program Analysis</h2><p>介绍了一个叫做datalog的语言，并且介绍了命令式语言和定义式语言的区别</p>
+<p>常用的编程语言基本上就我们正常写的C，java之类的，都是命令式语言，而定义式语言就是datalog，sql，codeql之类的。。。之前学的codeql内容在这里疯狂复活。定义式语言没有函数和方法，使用谓词(predicate)作为类似的替代，就是codeql那个。。。。谓词被用于判断一个陈述的真假，返回值只有真假两种，反正直接和codeql对应就行了。datalog感觉是一种类型吗，然后实现有各种的引擎，是不是codeql也是datalog的一种实现？</p>
+<p>定义式语言的谓词是对所有输入进行判断，并将所有符合条件的关对象挑选出来，下图是一个datalog下的指针分析算法</p>
+<p><img src="/images/%E8%BD%AF%E4%BB%B6%E5%88%86%E6%9E%90%E7%AC%94%E8%AE%B0/image-20221214204206681.png" alt="image-20221214204206681"></p>
+<p>意对所有的x调用k方法，对x指向的所有o进行dispatch，并将方法m的this取出来，最终将this指向o，并将被调用的方法加入reachable，并建立callgraph的一条边</p>
+<p><img src="/images/%E8%BD%AF%E4%BB%B6%E5%88%86%E6%9E%90%E7%AC%94%E8%AE%B0/image-20221214204742958.png" alt="image-20221214204742958"></p>
+<p>完整算法，这里的new处增加了一个m需求，意为只从reachable中取new字段，因为new是启动语句，排除掉不可达方法的new语句就能排除不可达方法中的其他分析</p>
+<p><img src="/images/%E8%BD%AF%E4%BB%B6%E5%88%86%E6%9E%90%E7%AC%94%E8%AE%B0/image-20221214205617182.png" alt="image-20221214205617182"></p>
+<h2 id="ch15-CFL-Reachability-and-IFDS"><a href="#ch15-CFL-Reachability-and-IFDS" class="headerlink" title="ch15 CFL-Reachability and IFDS"></a>ch15 CFL-Reachability and IFDS</h2><p>程序分析分为两部分，一个程序和一个需要被分析的问题的数据流分析</p>
+<p>该节为不做要求的先进内容，老师上课时说以后要是用到IFDS要看论文看不懂了就回这节课的视频和课件复习加强理解。确实讲的有点快并且略微的抽象，不过例子举一下还是能勉强跟上</p>
+<p>首先是这个Context Free Language的文法，如下产生式表示了对括号的匹配，即对应的调用call edge和return edge应当对应，如右上小图中的黄边和绿边</p>
+<p><img src="/images/%E8%BD%AF%E4%BB%B6%E5%88%86%E6%9E%90%E7%AC%94%E8%AE%B0/image-20221219120054167.png" alt="image-20221219120054167"></p>
+<p>下图是一个IFDS的分析流程<br>对如下程序进行未初始化变量分析，这个lambda函数的形式并没有很理解有什么特别的 。。。<br><img src="/images/%E8%BD%AF%E4%BB%B6%E5%88%86%E6%9E%90%E7%AC%94%E8%AE%B0/image-20221219113054127.png" alt="image-20221219113054127"></p>
+<p>这里在call to return edge上kill掉了全局变量g，与之前过程间分析的kill返回值类似，因为全局变量g如果在p中初始化了，那么S中会被删去g，如果该边不删去g，合并后g仍然被认为是未初始化的</p>
+<p>然后以lambda函数转换为这个奇怪的流程传播图的规则</p>
+<p><img src="/images/%E8%BD%AF%E4%BB%B6%E5%88%86%E6%9E%90%E7%AC%94%E8%AE%B0/image-20221219115433045.png" alt="image-20221219115433045"></p>
+<p>给出了最后由上述lambda函数生成的关系生成的dataflow</p>
+<p><img src="/images/%E8%BD%AF%E4%BB%B6%E5%88%86%E6%9E%90%E7%AC%94%E8%AE%B0/image-20221219115347583.png" alt="image-20221219115347583"></p>
+<p>然后得到如下图之后就可以对程序的可达性进行分析了，结合之前的括号匹配文法，确定调用边与对应的callsite的关系分析程序某一点的可达性，此处的绿线即为两个括号不匹配，即call和return 不匹配，由此可知不可达。。。但这么说呢，就是很抽象并且听不太懂</p>
+<p><img src="/images/%E8%BD%AF%E4%BB%B6%E5%88%86%E6%9E%90%E7%AC%94%E8%AE%B0/image-20221219121609804.png" alt="image-20221219121609804"></p>
+<h2 id="ch16-Soundness-and-Soundiness"><a href="#ch16-Soundness-and-Soundiness" class="headerlink" title="ch16 Soundness and Soundiness"></a>ch16 Soundness and Soundiness</h2><p>完结散花，这课前前后后断断续续花了快两个月终于全部完成了</p>
+<p>提到了Soundness的不可实现，比如java里的反射，native method，动态类加载；脚本类语言的eval等动态执行，对静态分析来说分析字符串是很困难的；对于C类语言超级指针操作内存乱按也很难分析</p>
+<p>（印象里有一次面试被问过静态分析的难点呜呜但是没答上来）</p>
+<p>因为上述语言特性的存在，使得soundness的静态分析是不太可能的，所以为了折中，提出了soundiness这个词，就是感觉差不多soundness但是对于上述的某些超级特性就是处理不好就soundiness了</p>
+<p>反射的主要问题就在于，反射是在运行时才被决定的，而静态分析是对编译时的内容进行分析，所以几乎无法对运行时的动态结果进行判断</p>
+<p>老师这里提出一个方法是利用invoke的时候传入的参数类型，去寻找可能的对应签名的方法，一定程度上解决了一些问题。那么如果我的参数也是反射出来的呢？那可就套娃起来了</p>
+<p>对于native方法，对于用户自己写的native方法，静态分析就完全没法得知native方法做了啥，也会导致无法分析，解决方案是对常见的native方法手动建模，用户自己写的就摆了</p>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/%E9%9D%99%E6%80%81%E5%88%86%E6%9E%90/" rel="tag"># 静态分析</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/rCore_Tutorial_CP6&7&8.html" rel="prev" title="rCore_Tutorial_CP6&7&8">
+      <i class="fa fa-chevron-left"></i> rCore_Tutorial_CP6&7&8
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/CobaltStrike%20beacon%E4%BA%8C%E5%BC%80%E6%8C%87%E5%8D%97.html" rel="next" title="CobaltStrike beacon二开指南">
+      CobaltStrike beacon二开指南 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+    <div class="comments" id="valine-comments"></div>
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%8D%97%E4%BA%AC%E5%A4%A7%E5%AD%A6%E3%80%8A%E8%BD%AF%E4%BB%B6%E5%88%86%E6%9E%90%E3%80%8B%E7%AC%94%E8%AE%B0"><span class="nav-number">1.</span> <span class="nav-text">南京大学《软件分析》笔记</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#ch1-introduction"><span class="nav-number">1.1.</span> <span class="nav-text">ch1 introduction</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#ch2-Intermediate-Representation"><span class="nav-number">1.2.</span> <span class="nav-text">ch2 Intermediate Representation</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#ch3-Data-Flow-Analysis-I"><span class="nav-number">1.3.</span> <span class="nav-text">ch3 Data Flow Analysis I</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#ch4-Data-Flow-Analysis-II"><span class="nav-number">1.4.</span> <span class="nav-text">ch4 Data Flow Analysis II</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Assignment-1"><span class="nav-number">1.5.</span> <span class="nav-text">Assignment 1</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#ch5-Data-Flow-Analysis-Foundations-I"><span class="nav-number">1.6.</span> <span class="nav-text">ch5 Data Flow Analysis - Foundations I</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#ch6-Data-Flow-Analysis-Foundations-II"><span class="nav-number">1.7.</span> <span class="nav-text">ch6 Data Flow Analysis - Foundations II</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Assignment-2"><span class="nav-number">1.8.</span> <span class="nav-text">Assignment 2</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Assignment-3"><span class="nav-number">1.9.</span> <span class="nav-text">Assignment 3</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#ch7-Interprocedural-Analysis"><span class="nav-number">1.10.</span> <span class="nav-text">ch7 Interprocedural Analysis</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Assignment-4"><span class="nav-number">1.11.</span> <span class="nav-text">Assignment 4</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%9E%84%E9%80%A0%E8%B0%83%E7%94%A8%E5%9B%BE"><span class="nav-number">1.11.1.</span> <span class="nav-text">构造调用图</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%BF%87%E7%A8%8B%E9%97%B4%E5%B8%B8%E9%87%8F%E4%BC%A0%E6%92%AD"><span class="nav-number">1.11.2.</span> <span class="nav-text">过程间常量传播</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%B1%82%E8%A7%A3%E5%99%A8%E5%AE%9E%E7%8E%B0"><span class="nav-number">1.11.3.</span> <span class="nav-text">求解器实现</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#ch8-Pointer-Analysis"><span class="nav-number">1.12.</span> <span class="nav-text">ch8 Pointer Analysis</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#ch9-Pointer-Analysis-Foundations-I"><span class="nav-number">1.13.</span> <span class="nav-text">ch9 Pointer Analysis - Foundations I</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#ch10-Pointer-Analysis-Foundations-II"><span class="nav-number">1.14.</span> <span class="nav-text">ch10 Pointer Analysis - Foundations II</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Assignment-5"><span class="nav-number">1.15.</span> <span class="nav-text">Assignment  5</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%AE%BF%E9%97%AE%E8%80%85%E6%A8%A1%E5%BC%8F"><span class="nav-number">1.15.1.</span> <span class="nav-text">访问者模式</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#ch11-Pointer-Analysis-Context-Sensitivity-I"><span class="nav-number">1.16.</span> <span class="nav-text">ch11 Pointer Analysis - Context Sensitivity I</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#ch12-Pointer-Analysis-Context-Sensitivity-II"><span class="nav-number">1.17.</span> <span class="nav-text">ch12 Pointer Analysis - Context Sensitivity II</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Assignment-6"><span class="nav-number">1.18.</span> <span class="nav-text">Assignment 6</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Assignment-7"><span class="nav-number">1.19.</span> <span class="nav-text">Assignment 7</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#ch13-Static-Analysis-for-Security"><span class="nav-number">1.20.</span> <span class="nav-text">ch13 Static Analysis for Security</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Assignment-8"><span class="nav-number">1.21.</span> <span class="nav-text">Assignment 8</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#ch14-Datalog-Based-Program-Analysis"><span class="nav-number">1.22.</span> <span class="nav-text">ch14 Datalog-Based Program Analysis</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#ch15-CFL-Reachability-and-IFDS"><span class="nav-number">1.23.</span> <span class="nav-text">ch15 CFL-Reachability and IFDS</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#ch16-Soundness-and-Soundiness"><span class="nav-number">1.24.</span> <span class="nav-text">ch16 Soundness and Soundiness</span></a></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Z3ratu1" src="https://q2.qlogo.cn/headimg_dl?dst_uin=1207039417&spec=160">
+  <p class="site-author-name" itemprop="name">Z3ratu1</p>
+  <div class="site-description" itemprop="description">与其感慨路难行，不如现在出发</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">171</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">5</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">91</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+  <div class="beian"><a href="http://www.beian.miit.gov.cn/" rel="external nofollow noopener noreferrer" target="_blank">湘ICP备2020021580号 </a>
+      <img src="/./images/beian.png" style="display: inline-block;">
+  </div>
+
+<div class="copyright">
+  
+  &copy; 2019 – 
+  <span itemprop="copyrightYear">2022</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Z3ratu1</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="external nofollow noopener noreferrer" target="_blank">Hexo</a> & <a href="https://pisces.theme-next.org/" class="theme-link" rel="external nofollow noopener noreferrer" target="_blank">NexT.Pisces</a> 强力驱动
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+
+<script>
+NexT.utils.loadComments(document.querySelector('#valine-comments'), () => {
+  NexT.utils.getScript('https://cdn.jsdelivr.net/npm/valine@1.4.14/dist/Valine.min.js', () => {
+    var GUEST = ['nick', 'mail', 'link'];
+    var guest = 'nick,mail,link';
+    guest = guest.split(',').filter(item => {
+      return GUEST.includes(item);
+    });
+    new Valine({
+      el         : '#valine-comments',
+      verify     : false,
+      notify     : false,
+      appId      : '7H8kg0XdWO8IbhOcu4K1JaAT-gzGzoHsz',
+      appKey     : 'wPKQjkbVtvPaRR7gh2yjfLSi',
+      placeholder: "Just go go",
+      avatar     : 'mm',
+      meta       : guest,
+      pageSize   : '10' || 10,
+      visitor    : true,
+      lang       : '' || 'zh-cn',
+      path       : location.pathname,
+      recordIP   : false,
+      serverURLs : ''
+    });
+  }, window.Valine);
+});
+</script>
+
+</body>
+</html>

@@ -196,6 +196,110 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
+    <link itemprop="mainEntityOfPage" href="https://blog.z3ratu1.cn/[GKCTF2021]babycat.html">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="https://q2.qlogo.cn/headimg_dl?dst_uin=1207039417&spec=160">
+      <meta itemprop="name" content="Z3ratu1">
+      <meta itemprop="description" content="与其感慨路难行，不如现在出发">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Z3ratu1's blog">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/%5BGKCTF2021%5Dbabycat.html" class="post-title-link" itemprop="url">[GKCTF2021]babycat与XMLDecoder反序列化</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2021-08-12 21:50:24" itemprop="dateCreated datePublished" datetime="2021-08-12T21:50:24+08:00">2021-08-12</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2021-08-13 21:23:55" itemprop="dateModified" datetime="2021-08-13T21:23:55+08:00">2021-08-13</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E5%88%B7%E9%A2%98%E8%AE%B0%E5%BD%95/" itemprop="url" rel="index"><span itemprop="name">刷题记录</span></a>
+                </span>
+            </span>
+
+          
+            <span id="/%5BGKCTF2021%5Dbabycat.html" class="post-meta-item leancloud_visitors" data-flag-title="[GKCTF2021]babycat与XMLDecoder反序列化" title="阅读次数">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span class="leancloud-visitors-count"></span>
+            </span>
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="far fa-comment"></i>
+      </span>
+      <span class="post-meta-item-text">Valine：</span>
+    
+    <a title="valine" href="/%5BGKCTF2021%5Dbabycat.html#valine-comments" itemprop="discussionUrl">
+      <span class="post-comments-count valine-comment-count" data-xid="/%5BGKCTF2021%5Dbabycat.html" itemprop="commentCount"></span>
+    </a>
+  </span>
+  
+  
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h1 id="GKCTF2021-babycat与XMLDecoder反序列化"><a href="#GKCTF2021-babycat与XMLDecoder反序列化" class="headerlink" title="[GKCTF2021]babycat与XMLDecoder反序列化"></a>[GKCTF2021]babycat与XMLDecoder反序列化</h1><p>java题，有一个非预期版本和一个完全体，由于我垃圾的java基础和审计水平，并没有发现非预期写的垃圾代码，都是按完全体思路去做的</p>
+<h2 id="题解"><a href="#题解" class="headerlink" title="题解"></a>题解</h2><p>注册登录两个路由，注册点了之后会有一个not allowed的烟雾弹，但是其实页面存在且有js提示。但是我直接抓了个登录的包然后改路由到register上成功注册了<br>登录进去之后有两个主要功能，一个上传一个下载，上传要求用户权限admin，而下载是个任意文件下载。一开始并没有意识到这个是java题，还在想是不是nodejs或者python，但是后来看那个默认的图片下载目录穿越了两层目录才下下来，越想越不对劲，感觉可能是java。开始乱按，对java的工作路径和目录结构不是很熟悉，但还是成功摸到<code>../../WEB-INF/web.xml</code>，看到了各个类的路径<br>依次根据各类路径下载class文件，丢到Intellij中反编译。</p>
+<h3 id="admin登录"><a href="#admin登录" class="headerlink" title="admin登录"></a>admin登录</h3>
+          <!--noindex-->
+            <div class="post-button">
+              <a class="btn" href="/%5BGKCTF2021%5Dbabycat.html#more" rel="contents">
+                阅读全文 &raquo;
+              </a>
+            </div>
+          <!--/noindex-->
+        
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
     <link itemprop="mainEntityOfPage" href="https://blog.z3ratu1.cn/[Fireshell2020]wp.html">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -621,108 +725,10 @@ ans <span class="token operator">=</span> <span class="token string">"http://ten
   
   
 
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
-    <link itemprop="mainEntityOfPage" href="https://blog.z3ratu1.cn/pwnhub7%E6%9C%88%E5%85%AC%E5%BC%80%E8%B5%9B.html">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="https://q2.qlogo.cn/headimg_dl?dst_uin=1207039417&spec=160">
-      <meta itemprop="name" content="Z3ratu1">
-      <meta itemprop="description" content="与其感慨路难行，不如现在出发">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Z3ratu1's blog">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/pwnhub7%E6%9C%88%E5%85%AC%E5%BC%80%E8%B5%9B.html" class="post-title-link" itemprop="url">pwnhub7月公开赛</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-              
-
-              <time title="创建时间：2021-07-06 20:32:47 / 修改时间：21:11:01" itemprop="dateCreated datePublished" datetime="2021-07-06T20:32:47+08:00">2021-07-06</time>
-            </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-folder"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/%E5%88%B7%E9%A2%98%E8%AE%B0%E5%BD%95/" itemprop="url" rel="index"><span itemprop="name">刷题记录</span></a>
-                </span>
-            </span>
-
-          
-            <span id="/pwnhub7%E6%9C%88%E5%85%AC%E5%BC%80%E8%B5%9B.html" class="post-meta-item leancloud_visitors" data-flag-title="pwnhub7月公开赛" title="阅读次数">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-eye"></i>
-              </span>
-              <span class="post-meta-item-text">阅读次数：</span>
-              <span class="leancloud-visitors-count"></span>
-            </span>
-  
-  <span class="post-meta-item">
-    
-      <span class="post-meta-item-icon">
-        <i class="far fa-comment"></i>
-      </span>
-      <span class="post-meta-item-text">Valine：</span>
-    
-    <a title="valine" href="/pwnhub7%E6%9C%88%E5%85%AC%E5%BC%80%E8%B5%9B.html#valine-comments" itemprop="discussionUrl">
-      <span class="post-comments-count valine-comment-count" data-xid="/pwnhub7%E6%9C%88%E5%85%AC%E5%BC%80%E8%B5%9B.html" itemprop="commentCount"></span>
-    </a>
-  </span>
-  
-  
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <h1 id="pwnhub7月公开赛"><a href="#pwnhub7月公开赛" class="headerlink" title="pwnhub7月公开赛"></a>pwnhub7月公开赛</h1><p>由于长时间的逃避SQL注入导致我现在又是一个SQL注入废物，以前做过的东西也记不清了</p>
-<h2 id="newsql"><a href="#newsql" class="headerlink" title="newsql"></a>newsql</h2><p>提示使用SQL8.0的新操作</p>
-<p>简单测一下发现有报错，过滤的比较关键的东西有select，去掉这个战斗力减少100%，给了报错但是extractvalue之类的函数也没了，sleep也没了，不过很明显的登录成功时状态码200，失败时状态码500。<br>出题人似乎还想用登录成功就直接重定向到home的界面来迷惑我，但是好像有点太直接了，反手一个python发包搞定<br>以前应该是做过SQL8.0的题目的，一时间想不起来了，后来翻了半天发现是去年年底的嘶吼SQL大礼包里面有一个8.0的table语句加行比较操作进行注入，这么一来就简单了。既然是学过的东西复现一下就能搞定，把嘶吼的垃圾脚本翻出来改改，慢悠悠的注就行<br>嘶吼的wp<br><a href="/%5BRoarCTF2020%5Dwp.html">RoarCTF2020wp</a><br>再补一个mysql8.0的操作<br><a target="_blank" rel="external nofollow noopener noreferrer" href="https://www.anquanke.com/post/id/231627">MySQL8.0绕过手段</a></p>
-          <!--noindex-->
-            <div class="post-button">
-              <a class="btn" href="/pwnhub7%E6%9C%88%E5%85%AC%E5%BC%80%E8%B5%9B.html#more" rel="contents">
-                阅读全文 &raquo;
-              </a>
-            </div>
-          <!--/noindex-->
-        
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
 
   
   <nav class="pagination">
-    <a class="extend prev" rel="prev" href="/page/9/"><i class="fa fa-angle-left" aria-label="上一页"></i></a><a class="page-number" href="/">1</a><span class="space">&hellip;</span><a class="page-number" href="/page/7/">7</a><a class="page-number" href="/page/8/">8</a><a class="page-number" href="/page/9/">9</a><span class="page-number current">10</span><a class="page-number" href="/page/11/">11</a><a class="page-number" href="/page/12/">12</a><a class="page-number" href="/page/13/">13</a><span class="space">&hellip;</span><a class="page-number" href="/page/34/">34</a><a class="extend next" rel="next" href="/page/11/"><i class="fa fa-angle-right" aria-label="下一页"></i></a>
+    <a class="extend prev" rel="prev" href="/page/9/"><i class="fa fa-angle-left" aria-label="上一页"></i></a><a class="page-number" href="/">1</a><span class="space">&hellip;</span><a class="page-number" href="/page/7/">7</a><a class="page-number" href="/page/8/">8</a><a class="page-number" href="/page/9/">9</a><span class="page-number current">10</span><a class="page-number" href="/page/11/">11</a><a class="page-number" href="/page/12/">12</a><a class="page-number" href="/page/13/">13</a><span class="space">&hellip;</span><a class="page-number" href="/page/35/">35</a><a class="extend next" rel="next" href="/page/11/"><i class="fa fa-angle-right" aria-label="下一页"></i></a>
   </nav>
 
 
@@ -789,7 +795,7 @@ ans <span class="token operator">=</span> <span class="token string">"http://ten
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">170</span>
+          <span class="site-state-item-count">171</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
@@ -802,7 +808,7 @@ ans <span class="token operator">=</span> <span class="token string">"http://ten
       <div class="site-state-item site-state-tags">
             <a href="/tags/">
           
-        <span class="site-state-item-count">90</span>
+        <span class="site-state-item-count">91</span>
         <span class="site-state-item-name">标签</span></a>
       </div>
   </nav>
