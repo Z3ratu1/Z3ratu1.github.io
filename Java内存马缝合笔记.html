@@ -28,7 +28,7 @@
 <meta property="og:description" content="Java内存马缝合笔记之前渗透的时候遇到了一个java站，tomcat8跑的，能上传jsp，有shiro但是打不通（打通之后看了一眼无敌高版本）jsp上传之后会急速被删，可以条件竞争去抢，这样子的话打一个内存马就是最稳整的，但是我是java垃圾捏，不会打，幸好天哥最后给了个现成的内存马还有一个远古tomcat6的站，有一个jndi注入，最后也是靠whj好兄弟缝出来了一个tomcat6的回显打通，所">
 <meta property="og:locale">
 <meta property="article:published_time" content="2022-11-24T09:37:09.000Z">
-<meta property="article:modified_time" content="2022-11-24T12:18:23.358Z">
+<meta property="article:modified_time" content="2022-12-28T01:53:24.908Z">
 <meta property="article:author" content="Z3ratu1">
 <meta property="article:tag" content="Java">
 <meta name="twitter:card" content="summary">
@@ -222,10 +222,16 @@
                 <i class="far fa-calendar"></i>
               </span>
               <span class="post-meta-item-text">发表于</span>
-              
 
-              <time title="创建时间：2022-11-24 17:37:09 / 修改时间：20:18:23" itemprop="dateCreated datePublished" datetime="2022-11-24T17:37:09+08:00">2022-11-24</time>
+              <time title="创建时间：2022-11-24 17:37:09" itemprop="dateCreated datePublished" datetime="2022-11-24T17:37:09+08:00">2022-11-24</time>
             </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2022-12-28 09:53:24" itemprop="dateModified" datetime="2022-12-28T09:53:24+08:00">2022-12-28</time>
+              </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
                 <i class="far fa-folder"></i>
@@ -272,11 +278,11 @@
 <p>由于java水平有限，写出来的东西基本上都是从网上东拼西凑出来的，超级缝合怪，但是不得不说我缝合的水平真是越来越好了，因为感觉就大家的内存马理论都学得很好，我学点皮毛能用就行了，所以就叫缝合笔记8</p>
 <p>3,2,1，开缝！</p>
 <h2 id="回显"><a href="#回显" class="headerlink" title="回显"></a>回显</h2><p>实际上要做的操作在本质上区别不大，都是找到tomcat下的某个对象，然后修改其属性之类的。</p>
-<p>回显的话就拿到request和response对象就可以了，所以操作起来简单一点，并且payload也短一些，在例如shiro等受到tomcatheader长度7300（听说的）的限制下能使用的几率更大<br>当然网上现在缩短payload的方法也一搜一堆，用javassist去行号之类的。或者直接反射改tomcat的最大长度限制之类的也行</p>
+<p>回显的话就拿到request和response对象就可以了，所以操作起来简单一点，并且payload也短一些，在例如shiro等受到tomcat header长度7300（听说的）的限制下能使用的几率更大<br>当然网上现在缩短payload的方法也一搜一堆，用javassist去行号之类的。或者直接反射改tomcat的最大长度限制之类的也行</p>
 <h3 id="spring回显"><a href="#spring回显" class="headerlink" title="spring回显"></a>spring回显</h3><p>回显似乎存在着更加通用的手法，因为ctf中的环境springboot居多，所以之前大多是用一个springboot的祖传回显进行的，spring下的回显似乎很稳定，从<code>org.springframework.web.context.request.RequestContextHolder</code>类中获取request和response，网上都有现成的，直接复制粘贴就打通一切了。</p>
-<h3 id="tomcat回显"><a href="#tomcat回显" class="headerlink" title="tomcat回显"></a>tomcat回显</h3><p>tomcat下就稍微麻烦一些。jsp的话本来就有request和response对象，当然这也不能加内存马了，就是直接的jsp木马，更多的是考虑反序列化等代码执行的情况下进行回显</p>
+<h3 id="tomcat回显"><a href="#tomcat回显" class="headerlink" title="tomcat回显"></a>tomcat回显</h3><p>tomcat下就稍微麻烦一些。jsp的话本来就有request和response对象，当然这也不能叫内存马了，就是直接的jsp木马，更多的是考虑反序列化等代码执行的情况下进行回显</p>
 <p>这里有一个注意点，tomcat从10开始讲<code>javax</code>转变为<code>jakarta</code>，并不知道有什么意义，但是对应的包名都需要重新修改一遍。</p>
-<p>网上流行的payload是一个经典的线程遍历，直接从currentThread往上拿到全部现场，然后一个个找线程拿到对应的request和response对象，据说这个操作是全版本通用的回显捏。后续的内存马操作有部分和这个类似，所以这里也就不着重讲</p>
+<p>网上流行的payload是一个经典的线程遍历，直接从currentThread往上拿到全部线程，然后一个个找线程拿到对应的request和response对象，据说这个操作是全版本通用的回显捏。后续的内存马操作有部分和这个类似，所以这里也就不着重讲</p>
 <p>不过说到底这些并不是今天的重点，回显用一次打一次还是有些不方便，不如直接一发内存马打进去一直用</p>
 <h2 id="内存马"><a href="#内存马" class="headerlink" title="内存马"></a>内存马</h2><p>在开始内存马之前，需要先掌握一些内存马相关的知识</p>
 <p>spring层面的内存马有controller和interceptor，而tomcat层面的则是serverlet，filter和listener</p>
@@ -389,7 +395,10 @@ StandardContext standardContext <span class="token operator">=</span> <span clas
     <a href="/CobaltStrike%20beacon%E4%BA%8C%E5%BC%80%E6%8C%87%E5%8D%97.html" rel="prev" title="CobaltStrike beacon二开指南">
       <i class="fa fa-chevron-left"></i> CobaltStrike beacon二开指南
     </a></div>
-      <div class="post-nav-item"></div>
+      <div class="post-nav-item">
+    <a href="/CS%20DNS%20beacon%E4%BA%8C%E6%AC%A1%E5%BC%80%E5%8F%91%E6%8C%87%E5%8C%97.html" rel="next" title="CS DNS beacon二次开发指北">
+      CS DNS beacon二次开发指北 <i class="fa fa-chevron-right"></i>
+    </a></div>
     </div>
       </footer>
     
@@ -464,7 +473,7 @@ StandardContext standardContext <span class="token operator">=</span> <span clas
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">171</span>
+          <span class="site-state-item-count">172</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
@@ -507,7 +516,7 @@ StandardContext standardContext <span class="token operator">=</span> <span clas
 <div class="copyright">
   
   &copy; 2019 – 
-  <span itemprop="copyrightYear">2022</span>
+  <span itemprop="copyrightYear">2023</span>
   <span class="with-love">
     <i class="fa fa-heart"></i>
   </span>

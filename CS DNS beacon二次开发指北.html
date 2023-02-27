@@ -1,0 +1,581 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 6.0.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"blog.z3ratu1.cn","root":"/","scheme":"Pisces","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"always","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":true},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+  </script>
+
+  <meta name="description" content="CS DNS beacon二次开发指北接上一篇CobaltStrike beacon二开指南，这次把DNS beacon的写法也简要的讲一下。感觉写的东西还是有点玩具，所以依照惯例，还是把指南改成指北吧。。。之前花了大功夫把geacon系列项目整的差不多了，感觉当初这么一个心血来潮的项目能整的这么成功，爽死了捏。当时的TODO上是写了实现DNS beacon的，但是感觉这个功能真的很拉跨加上流量特">
+<meta property="og:type" content="article">
+<meta property="og:title" content="CS DNS beacon二次开发指北">
+<meta property="og:url" content="https://blog.z3ratu1.cn/CS%20DNS%20beacon%E4%BA%8C%E6%AC%A1%E5%BC%80%E5%8F%91%E6%8C%87%E5%8C%97.html">
+<meta property="og:site_name" content="Z3ratu1&#39;s blog">
+<meta property="og:description" content="CS DNS beacon二次开发指北接上一篇CobaltStrike beacon二开指南，这次把DNS beacon的写法也简要的讲一下。感觉写的东西还是有点玩具，所以依照惯例，还是把指南改成指北吧。。。之前花了大功夫把geacon系列项目整的差不多了，感觉当初这么一个心血来潮的项目能整的这么成功，爽死了捏。当时的TODO上是写了实现DNS beacon的，但是感觉这个功能真的很拉跨加上流量特">
+<meta property="og:locale">
+<meta property="og:image" content="https://blog.z3ratu1.cn/images/CS_DNS_beacon%E4%BA%8C%E6%AC%A1%E5%BC%80%E5%8F%91%E6%8C%87%E5%8C%97/image-20230227151825201.png">
+<meta property="og:image" content="https://blog.z3ratu1.cn/images/CS_DNS_beacon%E4%BA%8C%E6%AC%A1%E5%BC%80%E5%8F%91%E6%8C%87%E5%8C%97/image-20230227153416189.png">
+<meta property="og:image" content="https://blog.z3ratu1.cn/images/CS_DNS_beacon%E4%BA%8C%E6%AC%A1%E5%BC%80%E5%8F%91%E6%8C%87%E5%8C%97/image-20230227160620700.png">
+<meta property="article:published_time" content="2023-02-27T08:36:13.000Z">
+<meta property="article:modified_time" content="2023-02-27T08:40:22.284Z">
+<meta property="article:author" content="Z3ratu1">
+<meta property="article:tag" content="CobaltStrike">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://blog.z3ratu1.cn/images/CS_DNS_beacon%E4%BA%8C%E6%AC%A1%E5%BC%80%E5%8F%91%E6%8C%87%E5%8C%97/image-20230227151825201.png">
+
+<link rel="canonical" href="https://blog.z3ratu1.cn/CS%20DNS%20beacon%E4%BA%8C%E6%AC%A1%E5%BC%80%E5%8F%91%E6%8C%87%E5%8C%97.html">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-Hans'
+  };
+</script>
+
+  <title>CS DNS beacon二次开发指北 | Z3ratu1's blog</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+<link rel="stylesheet" href="/css/prism-tomorrow.css" type="text/css"></head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">Z3ratu1's blog</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">Welcome</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>关于</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+        <li class="menu-item menu-item-links">
+
+    <a href="/links/" rel="section"><i class="fa fa-link fa-fw"></i>友链</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off" placeholder="搜索..." spellcheck="false" type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+  <a href="https://github.com/Z3ratu1" class="github-corner" title="Follow me on GitHub" aria-label="Follow me on GitHub" rel="external nofollow noopener noreferrer" target="_blank"><svg width="80" height="80" viewbox="0 0 250 250" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"/><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"/><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"/></svg></a>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
+    <link itemprop="mainEntityOfPage" href="https://blog.z3ratu1.cn/CS%20DNS%20beacon%E4%BA%8C%E6%AC%A1%E5%BC%80%E5%8F%91%E6%8C%87%E5%8C%97.html">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="https://q2.qlogo.cn/headimg_dl?dst_uin=1207039417&spec=160">
+      <meta itemprop="name" content="Z3ratu1">
+      <meta itemprop="description" content="与其感慨路难行，不如现在出发">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Z3ratu1's blog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          CS DNS beacon二次开发指北
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+              
+
+              <time title="创建时间：2023-02-27 16:36:13 / 修改时间：16:40:22" itemprop="dateCreated datePublished" datetime="2023-02-27T16:36:13+08:00">2023-02-27</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E6%B8%97%E9%80%8F/" itemprop="url" rel="index"><span itemprop="name">渗透</span></a>
+                </span>
+            </span>
+
+          
+            <span id="/CS%20DNS%20beacon%E4%BA%8C%E6%AC%A1%E5%BC%80%E5%8F%91%E6%8C%87%E5%8C%97.html" class="post-meta-item leancloud_visitors" data-flag-title="CS DNS beacon二次开发指北" title="阅读次数">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span class="leancloud-visitors-count"></span>
+            </span>
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="far fa-comment"></i>
+      </span>
+      <span class="post-meta-item-text">Valine：</span>
+    
+    <a title="valine" href="/CS%20DNS%20beacon%E4%BA%8C%E6%AC%A1%E5%BC%80%E5%8F%91%E6%8C%87%E5%8C%97.html#valine-comments" itemprop="discussionUrl">
+      <span class="post-comments-count valine-comment-count" data-xid="/CS%20DNS%20beacon%E4%BA%8C%E6%AC%A1%E5%BC%80%E5%8F%91%E6%8C%87%E5%8C%97.html" itemprop="commentCount"></span>
+    </a>
+  </span>
+  
+  
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h1 id="CS-DNS-beacon二次开发指北"><a href="#CS-DNS-beacon二次开发指北" class="headerlink" title="CS DNS beacon二次开发指北"></a>CS DNS beacon二次开发指北</h1><p>接上一篇<a href="/CobaltStrike%20beacon%E4%BA%8C%E5%BC%80%E6%8C%87%E5%8D%97.html">CobaltStrike beacon二开指南</a>，这次把DNS beacon的写法也简要的讲一下。感觉写的东西还是有点玩具，所以依照惯例，还是把指南改成指北吧。。。<br>之前花了大功夫把geacon系列项目整的差不多了，感觉当初这么一个心血来潮的项目能整的这么成功，爽死了捏。当时的TODO上是写了实现DNS beacon的，但是感觉这个功能真的很拉跨加上流量特征极其明显加上不出网环境上马本身就有点玄学，如果有边界机就上代理之后再上马也行，反正就是各种buff叠起来导致感觉鸡肋的很，以及在安全客上看到有人发布了一版实现过的版本，就一直没写，但是最近有点闲的，一起写geacon pro的好兄弟又一直和我提起这个事，就乱写两笔试试算了捏。</p>
+<p>写好的代码在<a target="_blank" rel="external nofollow noopener noreferrer" href="https://github.com/H4de5-7/geacon_pro/tree/dns">geacon_pro</a>的dns分支下，由于只是随手写的玩具，还有很多地方没修好，只测试了基本的命令执行，很多功能并未测试，以及很多功能也没实现，只是写出了一个实现的样例demon</p>
+<h2 id="碎碎念"><a href="#碎碎念" class="headerlink" title="碎碎念"></a>碎碎念</h2><p>距离上一次更新博客已经两个月了捏。放假就是让人没法好好的学习吗？感觉在家每天也有学东西，但是好像很少花时间去实践，很多时候就是找点东西看看原理然后把对应的工具star一下，总之就是很散，难得把得到的内容聚合成一篇文章。。。现在开学了就自主坐牢写点破烂，然后水一篇文章，给两个月不更新的博客刷一点活跃度。另：笔记本键盘用久了感觉快坏了，最近老是按一下空格就输入一堆空格，很烦</p>
+<p>以及，当初看到安全客上有人发DNS beacon的时候，准备上去学一下的，点开发现直接闭源+知识星球广告，回头看写的文章，协议关键点是一个都没透露，前面分析了半天在将开源的geacon，没做什么大事安全客连投四篇，鉴定为纯纯的噶韭菜。要分享就开源讲清楚一点大家共同学习，自己写的工具要私藏就别拿出来吹逼嗷。</p>
+<h2 id="协议分析"><a href="#协议分析" class="headerlink" title="协议分析"></a>协议分析</h2><p>好久没有去逆CS的jar包了，导致一度翻不到协议内容，不过网上有现成的逆向分析文章，配合之前写http beacon时通信数据组成的了解，再自己抓两个包，完全没有问题</p>
+<p>首先可以先确定一个点，DNS beacon受影响的只有通信模块，所以代码封装的好可以侵入性很低的扩展出一个DNS通信功能，原先项目的代码基本上不会有太大修改</p>
+<h3 id="基本运行原理"><a href="#基本运行原理" class="headerlink" title="基本运行原理"></a>基本运行原理</h3><p>首先还是看一下DNS beacon下的通信模式，如果找一个新一点版本的c2profile的话，可以看到如下几个entry</p>
+<pre><code>################################################
+## DNS beacons
+################################################
+## Description:
+##    Beacon that uses DNS for communication
+## Defaults:
+##    dns_idle: 0.0.0.0
+##    dns_max_txt: 252
+##    dns_sleep: 0
+##    dns_stager_prepend: N/A
+##    dns_stager_subhost: .stage.123456.
+##    dns_ttl: 1
+##    maxdns: 255
+##    beacon: N/A
+##    get_A:  cdn.
+##    get_AAAA: www6.
+##    get_TXT: api.
+##    put_metadata: www.
+##    put_output: post.
+##    ns_reponse: drop
+</code></pre>
+<p>这里面对应的几种beacon通信的模式，在http中，beacon通过get请求查询是否存在下发命令，通过post请求回传执行结果，在dns中，也可以分为A，AAAA，TXT三种查询模式，不过并非使用查询模式来区分获取命令和回传结果，而是通过域名前缀</p>
+<p>可以看到，A记录对应的前缀为cdn，AAAA记录对应的前缀为www6，而TXT记录对应的前缀为api，回传结果使用的前缀是post（默认使用A记录回传，大概），对于metadata回传，则使用www前缀</p>
+<p>接下来以上线checkin获取命令并回传作为一个完整流程介绍各部分通信协议的实现吧，本地搭建的环境，server的dns域名设置为<code>test.unknown</code></p>
+<h3 id="上线"><a href="#上线" class="headerlink" title="上线"></a>上线</h3><p>dns beacon有一个base domain，每次上线时生成一个特定的beaconID，组合成为<code>&lt;beaconID&gt;.&lt;baseDomain&gt;</code>作为请求的基础域名，向teamserver发起DNS A记录查询，若beaconID校验通过，则认为有效beacon上线</p>
+<p>beaconID为一个32位int，且要求<code>beaconID&amp;1202==1202</code>才会被识别为合法的DNS beacon。不同版本的CS对这个地方的校验不一样，需要手动去jar包里翻。位于<code>common.CommonUtils</code>类下的<code>isDNSBeacon</code>方法</p>
+<p>好像除了这个校验应该还有别的校验的。。。但是我没找着，也懒得翻了，结果就是这个马得平均跑个六七次才会生成一个 teamserver认为是合法的session</p>
+<p>beacon会持续发送上线请求等待server下发命令，该请求为A记录查询，server的可能返回值有多种，若为0.0.0.0则无命令下发，0.0.0.240-0.0.0.245表示存在下发命令并指定拉取命令的形式（A&#x2F;TXT&#x2F;AAAA)，偶数表示无需checkin，奇数表示需要checkin</p>
+<p><img src="/images/CS_DNS_beacon%E4%BA%8C%E6%AC%A1%E5%BC%80%E5%8F%91%E6%8C%87%E5%8C%97/image-20230227151825201.png" alt="image-20230227151825201"></p>
+<p>如图生成的beaconID为<code>6a2897ba</code>，<code>0.0.0.243</code>checkin并以TXT记录形式下发命令。</p>
+<p>需注意c2profile中的<code>dns_idle</code>项，<strong>任何情况下得到的A记录需与其进行异或得到结果（包括使用A记录获取命令等操作），此处为0.0.0.0故直接使用</strong></p>
+<h3 id="checkin"><a href="#checkin" class="headerlink" title="checkin"></a>checkin</h3><p>dns beacon和http beacon有所不同的一点，是dns beacon上线时，teamserver处只会出现一个没有任何属性的beacon条目，需要手动执行checkin命令或是下发其他命令，要求beacon回传metadata，才会变成http beacon中有用户名pid内网ip等属性的beacon。也就是说，http情况下，beacon每次get请求都会回传metadata，所以上线即获取全部信息，而dns情况下，只有server要求checkin时，才使用www前缀回传metadata。</p>
+<p>metadata的格式与http的完全一致，但是需要注意的是metadata中的beaconID需要与请求的域名中的beaconID一致，否则会被认为是另一个beacon上线。又因为DNS请求中查询的域名是有长度限制的，一个DNS查询并不能回传所有数据，故需要分段传输</p>
+<h4 id="分段传输方法"><a href="#分段传输方法" class="headerlink" title="分段传输方法"></a>分段传输方法</h4><p><strong>此节同样适用于后续对执行结果的回传</strong>。唯一区别在于metadata回传与执行结果回传的域名前缀不同，样例如下图</p>
+<p><img src="/images/CS_DNS_beacon%E4%BA%8C%E6%AC%A1%E5%BC%80%E5%8F%91%E6%8C%87%E5%8C%97/image-20230227153416189.png" alt="image-20230227153416189"></p>
+<p>首先，beacon需要再次生成一个32位整数，我暂且称之为transferID，用于标记本次传输的数据，此处为<code>5c2b1359</code>，以及生成一个从0开始的counter</p>
+<p>然后传输需要分为两部分，数据长度和数据内容，数据长度和数据内容均以16进制数的形式表示，由于DNS域名请求一次似乎能传两百多个字符（没确认过 ），而一级域名最多只能有64个字符（也没确认过），所以数据需要通过多级域名拼到一起传输，需要一个标记表示当前域名中有几级域名被用于传输数据。<br>第一个请求回传数据长度，RSA公钥加密后的metadata长度为128，转换为16进制0x80，显然两个字符远小于64个字符，故此处使用1表示只有一级域名被用于传输数据。接着拼接counter，transferID，beaconID和baseDomain，组成请求<br>即<code>&lt;prefix&gt;.&lt;token&gt;&lt;data&gt;.&lt;counter&gt;&lt;transferID&gt;.&lt;beaconID&gt;.&lt;baseDomain&gt;</code></p>
+<p>后续的两个请求被用于传递真正的metadata，可以观察到counter每次请求后加一，而第二个请求由于数据过长，使用了4级域名传输数据，即<code>www.</code>后的token为4</p>
+<h3 id="请求命令"><a href="#请求命令" class="headerlink" title="请求命令"></a>请求命令</h3><p>由于下发指令为243，意为checkin后以TXT请求拉取命令，A和AAAA流程类似，只是传输效率远不如TXT</p>
+<p>请求命令时应答的数据格式和http时也有点出入</p>
+<pre><code>4bytes data length
+base64 aes encode data&#123;
+        (4bytes cmd type
+        4bytes cmdlen
+        len bytes cmd)
+        ...
+&#125;
+</code></pre>
+<p>由于DNS请求传输带宽的问题，DNS这边就不支持http中data prefix，data suffix等冗余操作了，也就是返回一个length和剩下的数据</p>
+<p>同数据回传部分，需要生成一个transferID和一个counter，以<code>&lt;prefix&gt;.&lt;counter&gt;&lt;transferID&gt;.&lt;beaconID&gt;.&lt;baseDomain&gt;</code>的形式发起请求，但无论请求的格式是什么，第一个请求永远是A请求，得到的ipv4响应即为接下来命令数据的长度。接下来持续发起TXT请求，直到接收到对应长度的数据（此处的数据是被先AES加密再base64编码过的），传输的长度指代的是base64前的数据长度，注意处理。</p>
+<p><img src="/images/CS_DNS_beacon%E4%BA%8C%E6%AC%A1%E5%BC%80%E5%8F%91%E6%8C%87%E5%8C%97/image-20230227160620700.png" alt="image-20230227160620700"></p>
+<h3 id="结果回传"><a href="#结果回传" class="headerlink" title="结果回传"></a>结果回传</h3><p>与checkin时的 分段传输流程一致，但checkin时是直接把RSA加密的metadata传了回去，而此处显然不能直接将AES的执行结果回传，格式实际上还是和http时的较为一致</p>
+<pre><code>packet len
+aes encode data&#123;
+    4bytes counter
+    4bytes result len
+    4bytes callback type
+    reply content
+&#125;
+16bytes hash
+</code></pre>
+<p>同样的先一个单独的请求预示后面packet的长度，接下来将aes加密的数据和数据的hash通过上述分段传输方式回传</p>
+<p>总的来说，整体的实现并不是很复杂，只需要认真观察一下流量并且结合之前的知识就能搞定捏 。代码的侵入程度较低，对项目源代码只是稍微修改了一下beaconID的生成，以及回传时将packetlen单独提出来发送，剩下的全部放在一个全新的dns.go中实现</p>
+<h2 id="end"><a href="#end" class="headerlink" title="end"></a>end</h2><p>就这样8，其实实在没有什么太多的东西，但是感觉搜了一圈也没看到啥详细的解释，刚好好久没更新博客了，水一篇</p>
+<p>目前存在的问题是beacon上线还有一个检测点不知道是啥，懒得翻捏</p>
+<p>这篇翻译文章对实现这个功能给出了很大的帮助<br><a target="_blank" rel="external nofollow noopener noreferrer" href="https://www.freebuf.com/articles/system/334022.html">Cobalt Strike: 解密DNS流量 – Part 5</a></p>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/CobaltStrike/" rel="tag"># CobaltStrike</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/Java%E5%86%85%E5%AD%98%E9%A9%AC%E7%BC%9D%E5%90%88%E7%AC%94%E8%AE%B0.html" rel="prev" title="Java内存马缝合笔记">
+      <i class="fa fa-chevron-left"></i> Java内存马缝合笔记
+    </a></div>
+      <div class="post-nav-item"></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+    <div class="comments" id="valine-comments"></div>
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#CS-DNS-beacon%E4%BA%8C%E6%AC%A1%E5%BC%80%E5%8F%91%E6%8C%87%E5%8C%97"><span class="nav-number">1.</span> <span class="nav-text">CS DNS beacon二次开发指北</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%A2%8E%E7%A2%8E%E5%BF%B5"><span class="nav-number">1.1.</span> <span class="nav-text">碎碎念</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%8D%8F%E8%AE%AE%E5%88%86%E6%9E%90"><span class="nav-number">1.2.</span> <span class="nav-text">协议分析</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%9F%BA%E6%9C%AC%E8%BF%90%E8%A1%8C%E5%8E%9F%E7%90%86"><span class="nav-number">1.2.1.</span> <span class="nav-text">基本运行原理</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%B8%8A%E7%BA%BF"><span class="nav-number">1.2.2.</span> <span class="nav-text">上线</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#checkin"><span class="nav-number">1.2.3.</span> <span class="nav-text">checkin</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%88%86%E6%AE%B5%E4%BC%A0%E8%BE%93%E6%96%B9%E6%B3%95"><span class="nav-number">1.2.3.1.</span> <span class="nav-text">分段传输方法</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%AF%B7%E6%B1%82%E5%91%BD%E4%BB%A4"><span class="nav-number">1.2.4.</span> <span class="nav-text">请求命令</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%BB%93%E6%9E%9C%E5%9B%9E%E4%BC%A0"><span class="nav-number">1.2.5.</span> <span class="nav-text">结果回传</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#end"><span class="nav-number">1.3.</span> <span class="nav-text">end</span></a></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Z3ratu1" src="https://q2.qlogo.cn/headimg_dl?dst_uin=1207039417&spec=160">
+  <p class="site-author-name" itemprop="name">Z3ratu1</p>
+  <div class="site-description" itemprop="description">与其感慨路难行，不如现在出发</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">172</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">5</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">91</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+  <div class="beian"><a href="http://www.beian.miit.gov.cn/" rel="external nofollow noopener noreferrer" target="_blank">湘ICP备2020021580号 </a>
+      <img src="/./images/beian.png" style="display: inline-block;">
+  </div>
+
+<div class="copyright">
+  
+  &copy; 2019 – 
+  <span itemprop="copyrightYear">2023</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Z3ratu1</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="external nofollow noopener noreferrer" target="_blank">Hexo</a> & <a href="https://pisces.theme-next.org/" class="theme-link" rel="external nofollow noopener noreferrer" target="_blank">NexT.Pisces</a> 强力驱动
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+
+<script>
+NexT.utils.loadComments(document.querySelector('#valine-comments'), () => {
+  NexT.utils.getScript('https://cdn.jsdelivr.net/npm/valine@1.4.14/dist/Valine.min.js', () => {
+    var GUEST = ['nick', 'mail', 'link'];
+    var guest = 'nick,mail,link';
+    guest = guest.split(',').filter(item => {
+      return GUEST.includes(item);
+    });
+    new Valine({
+      el         : '#valine-comments',
+      verify     : false,
+      notify     : false,
+      appId      : '7H8kg0XdWO8IbhOcu4K1JaAT-gzGzoHsz',
+      appKey     : 'wPKQjkbVtvPaRR7gh2yjfLSi',
+      placeholder: "Just go go",
+      avatar     : 'mm',
+      meta       : guest,
+      pageSize   : '10' || 10,
+      visitor    : true,
+      lang       : '' || 'zh-cn',
+      path       : location.pathname,
+      recordIP   : false,
+      serverURLs : ''
+    });
+  }, window.Valine);
+});
+</script>
+
+</body>
+</html>
