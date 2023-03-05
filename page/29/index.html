@@ -196,6 +196,138 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
+    <link itemprop="mainEntityOfPage" href="https://blog.z3ratu1.cn/[GWCTF%202019]%E6%9E%AF%E7%87%A5%E7%9A%84%E6%8A%BD%E5%A5%96.html">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="https://q2.qlogo.cn/headimg_dl?dst_uin=1207039417&spec=160">
+      <meta itemprop="name" content="Z3ratu1">
+      <meta itemprop="description" content="与其感慨路难行，不如现在出发">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Z3ratu1's blog">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/%5BGWCTF%202019%5D%E6%9E%AF%E7%87%A5%E7%9A%84%E6%8A%BD%E5%A5%96.html" class="post-title-link" itemprop="url">[GWCTF_2019]枯燥的抽奖</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2020-07-11 20:41:12" itemprop="dateCreated datePublished" datetime="2020-07-11T20:41:12+08:00">2020-07-11</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2020-07-12 16:33:48" itemprop="dateModified" datetime="2020-07-12T16:33:48+08:00">2020-07-12</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E5%88%B7%E9%A2%98%E8%AE%B0%E5%BD%95/" itemprop="url" rel="index"><span itemprop="name">刷题记录</span></a>
+                </span>
+            </span>
+
+          
+            <span id="/%5BGWCTF%202019%5D%E6%9E%AF%E7%87%A5%E7%9A%84%E6%8A%BD%E5%A5%96.html" class="post-meta-item leancloud_visitors" data-flag-title="[GWCTF_2019]枯燥的抽奖" title="阅读次数">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span class="leancloud-visitors-count"></span>
+            </span>
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="far fa-comment"></i>
+      </span>
+      <span class="post-meta-item-text">Valine：</span>
+    
+    <a title="valine" href="/%5BGWCTF%202019%5D%E6%9E%AF%E7%87%A5%E7%9A%84%E6%8A%BD%E5%A5%96.html#valine-comments" itemprop="discussionUrl">
+      <span class="post-comments-count valine-comment-count" data-xid="/%5BGWCTF%202019%5D%E6%9E%AF%E7%87%A5%E7%9A%84%E6%8A%BD%E5%A5%96.html" itemprop="commentCount"></span>
+    </a>
+  </span>
+  
+  
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h1 id="GWCTF-2019-枯燥的抽奖"><a href="#GWCTF-2019-枯燥的抽奖" class="headerlink" title="[GWCTF 2019]枯燥的抽奖"></a>[GWCTF 2019]枯燥的抽奖</h1><p>伪随机数安全的一个题，通过php_mt_rand这个工具逆向出随机数种子，然后通过种子获取字符串</p>
+<p>贴一下源码</p>
+<pre class=" language-php"><code class="language-php"><span class="token delimiter">&lt;?php</span>
+<span class="token function">header</span><span class="token punctuation">(</span><span class="token string">"Content-Type: text/html;charset=utf-8"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token function">session_start</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token keyword">if</span><span class="token punctuation">(</span><span class="token operator">!</span><span class="token function">isset</span><span class="token punctuation">(</span><span class="token variable">$_SESSION</span><span class="token punctuation">[</span><span class="token string">'seed'</span><span class="token punctuation">]</span><span class="token punctuation">;</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">{</span>
+<span class="token variable">$_SESSION</span><span class="token punctuation">[</span><span class="token string">'seed'</span><span class="token punctuation">]</span><span class="token punctuation">;</span><span class="token operator">=</span><span class="token function">rand</span><span class="token punctuation">(</span><span class="token number">0</span><span class="token punctuation">,</span><span class="token number">999999999</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
+
+<span class="token function">mt_srand</span><span class="token punctuation">(</span><span class="token variable">$_SESSION</span><span class="token punctuation">[</span><span class="token string">'seed'</span><span class="token punctuation">]</span><span class="token punctuation">;</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token variable">$str_long1</span> <span class="token operator">=</span> <span class="token string">"abcdefghijklmnopqrstuvwxyz0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ"</span><span class="token punctuation">;</span>
+<span class="token variable">$str</span><span class="token operator">=</span><span class="token string">''</span><span class="token punctuation">;</span>
+<span class="token variable">$len1</span><span class="token operator">=</span><span class="token number">20</span><span class="token punctuation">;</span>
+<span class="token keyword">for</span> <span class="token punctuation">(</span> <span class="token variable">$i</span> <span class="token operator">=</span> <span class="token number">0</span><span class="token punctuation">;</span> <span class="token variable">$i</span> <span class="token operator">&lt;</span> <span class="token variable">$len1</span><span class="token punctuation">;</span> <span class="token variable">$i</span><span class="token operator">++</span> <span class="token punctuation">)</span><span class="token punctuation">{</span>
+    <span class="token variable">$str</span><span class="token punctuation">.</span><span class="token operator">=</span><span class="token function">substr</span><span class="token punctuation">(</span><span class="token variable">$str_long1</span><span class="token punctuation">,</span> <span class="token function">mt_rand</span><span class="token punctuation">(</span><span class="token number">0</span><span class="token punctuation">,</span> <span class="token function">strlen</span><span class="token punctuation">(</span><span class="token variable">$str_long1</span><span class="token punctuation">)</span> <span class="token operator">-</span> <span class="token number">1</span><span class="token punctuation">)</span><span class="token punctuation">,</span> <span class="token number">1</span><span class="token punctuation">)</span><span class="token punctuation">;</span>       
+<span class="token punctuation">}</span>
+<span class="token variable">$str_show</span> <span class="token operator">=</span> <span class="token function">substr</span><span class="token punctuation">(</span><span class="token variable">$str</span><span class="token punctuation">,</span> <span class="token number">0</span><span class="token punctuation">,</span> <span class="token number">10</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token keyword">echo</span> <span class="token string">"&lt;p id='p1'>"</span><span class="token punctuation">.</span><span class="token variable">$str_show</span><span class="token punctuation">.</span><span class="token string">"&lt;/p>"</span><span class="token punctuation">;</span>
+
+
+<span class="token keyword">if</span><span class="token punctuation">(</span><span class="token function">isset</span><span class="token punctuation">(</span><span class="token variable">$_POST</span><span class="token punctuation">[</span><span class="token string">'num'</span><span class="token punctuation">]</span><span class="token punctuation">;</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">{</span>
+    <span class="token keyword">if</span><span class="token punctuation">(</span><span class="token variable">$_POST</span><span class="token punctuation">[</span><span class="token string">'num'</span><span class="token punctuation">]</span><span class="token punctuation">;</span><span class="token operator">===</span><span class="token variable">$str</span><span class="token punctuation">)</span><span class="token punctuation">{</span>x
+        <span class="token keyword">echo</span> <span class="token string">"&lt;p id=flag>抽奖，就是那么枯燥且无味，给你flag{xxxxxxxxx}&lt;/p>"</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+    <span class="token keyword">else</span><span class="token punctuation">{</span>
+        <span class="token keyword">echo</span> <span class="token string">"&lt;p id=flag>没抽中哦，再试试吧&lt;/p>"</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+<span class="token punctuation">}</span>
+<span class="token function">show_source</span><span class="token punctuation">(</span><span class="token string">"check.php"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+</code></pre>
+<p>mt_rand(min,max)函数返回该区间内的任意一个数，通过如下脚本得到逆向所需数据，通过php_mt_rand工具爆破出种子</p>
+          <!--noindex-->
+            <div class="post-button">
+              <a class="btn" href="/%5BGWCTF%202019%5D%E6%9E%AF%E7%87%A5%E7%9A%84%E6%8A%BD%E5%A5%96.html#more" rel="contents">
+                阅读全文 &raquo;
+              </a>
+            </div>
+          <!--/noindex-->
+        
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
     <link itemprop="mainEntityOfPage" href="https://blog.z3ratu1.cn/[%E6%9E%81%E5%AE%A2%E5%A4%A7%E6%8C%91%E6%88%98]%20RCE%20ME.html">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -670,121 +802,6 @@
   
   
 
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
-    <link itemprop="mainEntityOfPage" href="https://blog.z3ratu1.cn/[HFCTF2020]JustEscape.html">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="https://q2.qlogo.cn/headimg_dl?dst_uin=1207039417&spec=160">
-      <meta itemprop="name" content="Z3ratu1">
-      <meta itemprop="description" content="与其感慨路难行，不如现在出发">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Z3ratu1's blog">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/%5BHFCTF2020%5DJustEscape.html" class="post-title-link" itemprop="url">HFCTF2020 JustEscape</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2020-07-10 11:10:00" itemprop="dateCreated datePublished" datetime="2020-07-10T11:10:00+08:00">2020-07-10</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="far fa-calendar-check"></i>
-                </span>
-                <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2020-07-12 16:33:48" itemprop="dateModified" datetime="2020-07-12T16:33:48+08:00">2020-07-12</time>
-              </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-folder"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/%E5%88%B7%E9%A2%98%E8%AE%B0%E5%BD%95/" itemprop="url" rel="index"><span itemprop="name">刷题记录</span></a>
-                </span>
-            </span>
-
-          
-            <span id="/%5BHFCTF2020%5DJustEscape.html" class="post-meta-item leancloud_visitors" data-flag-title="HFCTF2020 JustEscape" title="阅读次数">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-eye"></i>
-              </span>
-              <span class="post-meta-item-text">阅读次数：</span>
-              <span class="leancloud-visitors-count"></span>
-            </span>
-  
-  <span class="post-meta-item">
-    
-      <span class="post-meta-item-icon">
-        <i class="far fa-comment"></i>
-      </span>
-      <span class="post-meta-item-text">Valine：</span>
-    
-    <a title="valine" href="/%5BHFCTF2020%5DJustEscape.html#valine-comments" itemprop="discussionUrl">
-      <span class="post-comments-count valine-comment-count" data-xid="/%5BHFCTF2020%5DJustEscape.html" itemprop="commentCount"></span>
-    </a>
-  </span>
-  
-  
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <h1 id="HFCTF2020-JustEscape"><a href="#HFCTF2020-JustEscape" class="headerlink" title="[HFCTF2020]JustEscape"></a>[HFCTF2020]JustEscape</h1><p>JS的题，又欺负我不会JS，稍微记一下以后入门用</p>
-<h2 id="题解"><a href="#题解" class="headerlink" title="题解"></a>题解</h2><p>因为题目提示这可能不是一个PHP站，所以题目中run.php可能是一个故意设置的路由，简单测试之后发现报错完全不是PHP风格，猜测或为python或js。测着测着突然出现了一句<code>TypeError: Cannot read property &#39;toString&#39; of undefined</code>，js无误了<br>后来看别人的wp，js测试的话可以用Error().stack直接查看报错信息，还能获取更多的信息<br>得到输出</p>
-<pre class=" language-javascript"><code class="language-javascript">Error
-    at vm<span class="token punctuation">.</span>js<span class="token punctuation">:</span><span class="token number">1</span><span class="token punctuation">:</span><span class="token number">1</span>
-    at Script<span class="token punctuation">.</span>runInContext <span class="token punctuation">(</span>vm<span class="token punctuation">.</span>js<span class="token punctuation">:</span><span class="token number">131</span><span class="token punctuation">:</span><span class="token number">20</span><span class="token punctuation">)</span>
-    at VM<span class="token punctuation">.</span>run <span class="token punctuation">(</span><span class="token operator">/</span>app<span class="token operator">/</span>node_modules<span class="token operator">/</span>vm2<span class="token operator">/</span>lib<span class="token operator">/</span>main<span class="token punctuation">.</span>js<span class="token punctuation">:</span><span class="token number">219</span><span class="token punctuation">:</span><span class="token number">62</span><span class="token punctuation">)</span>
-    at <span class="token operator">/</span>app<span class="token operator">/</span>server<span class="token punctuation">.</span>js<span class="token punctuation">:</span><span class="token number">51</span><span class="token punctuation">:</span><span class="token number">33</span>
-    at Layer<span class="token punctuation">.</span>handle <span class="token punctuation">[</span><span class="token keyword">as</span> handle_request<span class="token punctuation">]</span> <span class="token punctuation">(</span><span class="token operator">/</span>app<span class="token operator">/</span>node_modules<span class="token operator">/</span>express<span class="token operator">/</span>lib<span class="token operator">/</span>router<span class="token operator">/</span>layer<span class="token punctuation">.</span>js<span class="token punctuation">:</span><span class="token number">95</span><span class="token punctuation">:</span><span class="token number">5</span><span class="token punctuation">)</span>
-    at next <span class="token punctuation">(</span><span class="token operator">/</span>app<span class="token operator">/</span>node_modules<span class="token operator">/</span>express<span class="token operator">/</span>lib<span class="token operator">/</span>router<span class="token operator">/</span>route<span class="token punctuation">.</span>js<span class="token punctuation">:</span><span class="token number">137</span><span class="token punctuation">:</span><span class="token number">13</span><span class="token punctuation">)</span>
-    at Route<span class="token punctuation">.</span>dispatch <span class="token punctuation">(</span><span class="token operator">/</span>app<span class="token operator">/</span>node_modules<span class="token operator">/</span>express<span class="token operator">/</span>lib<span class="token operator">/</span>router<span class="token operator">/</span>route<span class="token punctuation">.</span>js<span class="token punctuation">:</span><span class="token number">112</span><span class="token punctuation">:</span><span class="token number">3</span><span class="token punctuation">)</span>
-    at Layer<span class="token punctuation">.</span>handle <span class="token punctuation">[</span><span class="token keyword">as</span> handle_request<span class="token punctuation">]</span> <span class="token punctuation">(</span><span class="token operator">/</span>app<span class="token operator">/</span>node_modules<span class="token operator">/</span>express<span class="token operator">/</span>lib<span class="token operator">/</span>router<span class="token operator">/</span>layer<span class="token punctuation">.</span>js<span class="token punctuation">:</span><span class="token number">95</span><span class="token punctuation">:</span><span class="token number">5</span><span class="token punctuation">)</span>
-    at <span class="token operator">/</span>app<span class="token operator">/</span>node_modules<span class="token operator">/</span>express<span class="token operator">/</span>lib<span class="token operator">/</span>router<span class="token operator">/</span>index<span class="token punctuation">.</span>js<span class="token punctuation">:</span><span class="token number">281</span><span class="token punctuation">:</span><span class="token number">22</span>
-    at Function<span class="token punctuation">.</span>process_params <span class="token punctuation">(</span><span class="token operator">/</span>app<span class="token operator">/</span>node_modules<span class="token operator">/</span>express<span class="token operator">/</span>lib<span class="token operator">/</span>router<span class="token operator">/</span>index<span class="token punctuation">.</span>js<span class="token punctuation">:</span><span class="token number">335</span><span class="token punctuation">:</span><span class="token number">12</span><span class="token punctuation">)</span>
-</code></pre>
-          <!--noindex-->
-            <div class="post-button">
-              <a class="btn" href="/%5BHFCTF2020%5DJustEscape.html#more" rel="contents">
-                阅读全文 &raquo;
-              </a>
-            </div>
-          <!--/noindex-->
-        
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
 
   
   <nav class="pagination">
@@ -855,7 +872,7 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">172</span>
+          <span class="site-state-item-count">173</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
@@ -868,7 +885,7 @@
       <div class="site-state-item site-state-tags">
             <a href="/tags/">
           
-        <span class="site-state-item-count">91</span>
+        <span class="site-state-item-count">92</span>
         <span class="site-state-item-name">标签</span></a>
       </div>
   </nav>

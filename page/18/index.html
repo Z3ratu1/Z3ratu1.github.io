@@ -196,6 +196,111 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
+    <link itemprop="mainEntityOfPage" href="https://blog.z3ratu1.cn/[XCTF]%E5%8D%8E%E4%B8%BA%E7%AC%AC%E4%B8%89%E5%9C%BA.html">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="https://q2.qlogo.cn/headimg_dl?dst_uin=1207039417&spec=160">
+      <meta itemprop="name" content="Z3ratu1">
+      <meta itemprop="description" content="与其感慨路难行，不如现在出发">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Z3ratu1's blog">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/%5BXCTF%5D%E5%8D%8E%E4%B8%BA%E7%AC%AC%E4%B8%89%E5%9C%BA.html" class="post-title-link" itemprop="url">[XCTF]华为第三场</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2020-12-27 19:46:28" itemprop="dateCreated datePublished" datetime="2020-12-27T19:46:28+08:00">2020-12-27</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2020-12-29 21:44:28" itemprop="dateModified" datetime="2020-12-29T21:44:28+08:00">2020-12-29</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E5%88%B7%E9%A2%98%E8%AE%B0%E5%BD%95/" itemprop="url" rel="index"><span itemprop="name">刷题记录</span></a>
+                </span>
+            </span>
+
+          
+            <span id="/%5BXCTF%5D%E5%8D%8E%E4%B8%BA%E7%AC%AC%E4%B8%89%E5%9C%BA.html" class="post-meta-item leancloud_visitors" data-flag-title="[XCTF]华为第三场" title="阅读次数">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span class="leancloud-visitors-count"></span>
+            </span>
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="far fa-comment"></i>
+      </span>
+      <span class="post-meta-item-text">Valine：</span>
+    
+    <a title="valine" href="/%5BXCTF%5D%E5%8D%8E%E4%B8%BA%E7%AC%AC%E4%B8%89%E5%9C%BA.html#valine-comments" itemprop="discussionUrl">
+      <span class="post-comments-count valine-comment-count" data-xid="/%5BXCTF%5D%E5%8D%8E%E4%B8%BA%E7%AC%AC%E4%B8%89%E5%9C%BA.html" itemprop="commentCount"></span>
+    </a>
+  </span>
+  
+  
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h1 id="XCTF-华为第三场"><a href="#XCTF-华为第三场" class="headerlink" title="[XCTF]华为第三场"></a>[XCTF]华为第三场</h1><p>华为三连最后一场，web就两个题，一个题是nodejs模板注入，是一个完全不了解的领域<br>还有一个是PHP题，不知道出题人想表达什么<br>学了一天nodejs的hbs库的模板注入，不过还是没怎么懂，可能学的不够认真，也不知道怎么去调试，文档也没看几句，js的玄妙特性也不了解。。。</p>
+<h2 id="华为HCIE的第一课"><a href="#华为HCIE的第一课" class="headerlink" title="华为HCIE的第一课"></a>华为HCIE的第一课</h2><p>登录，进去之后有一个没有用的功能，进admin路由，403，发现f参数任意文件读取，先回上层目录读了app.js，获得目录结构之后读admin.js，util.js等文件<br>admin.js需要验证用户是否本地登录，不行就403，但是存在一个使用__proto__覆盖的机会</p>
+<pre class=" language-javascript"><code class="language-javascript">            user <span class="token operator">=</span> JSON<span class="token punctuation">.</span><span class="token function">parse</span><span class="token punctuation">(</span><span class="token template-string"><span class="token string">`{"name" : "</span><span class="token interpolation"><span class="token interpolation-punctuation punctuation">${</span>req<span class="token punctuation">.</span>session<span class="token punctuation">.</span>name<span class="token interpolation-punctuation punctuation">}</span></span><span class="token string">", "time" : "</span><span class="token interpolation"><span class="token interpolation-punctuation punctuation">${</span>Math<span class="token punctuation">.</span><span class="token function">ceil</span><span class="token punctuation">(</span><span class="token keyword">new</span> <span class="token class-name">Date</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">getTime</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">/</span> <span class="token number">1000</span><span class="token punctuation">)</span><span class="token interpolation-punctuation punctuation">}</span></span><span class="token string">", "ip" : "</span><span class="token interpolation"><span class="token interpolation-punctuation punctuation">${</span>req<span class="token punctuation">.</span>ip<span class="token interpolation-punctuation punctuation">}</span></span><span class="token string">"}`</span></span><span class="token punctuation">)</span>
+</code></pre>
+          <!--noindex-->
+            <div class="post-button">
+              <a class="btn" href="/%5BXCTF%5D%E5%8D%8E%E4%B8%BA%E7%AC%AC%E4%B8%89%E5%9C%BA.html#more" rel="contents">
+                阅读全文 &raquo;
+              </a>
+            </div>
+          <!--/noindex-->
+        
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
     <link itemprop="mainEntityOfPage" href="https://blog.z3ratu1.cn/[XCTF]%E5%8D%8E%E4%B8%BA%E7%AC%AC%E4%BA%8C%E5%9C%BA.html">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -657,104 +762,6 @@
   
   
 
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
-    <link itemprop="mainEntityOfPage" href="https://blog.z3ratu1.cn/[C1CTF2020]wp.html">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="https://q2.qlogo.cn/headimg_dl?dst_uin=1207039417&spec=160">
-      <meta itemprop="name" content="Z3ratu1">
-      <meta itemprop="description" content="与其感慨路难行，不如现在出发">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Z3ratu1's blog">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/%5BC1CTF2020%5Dwp.html" class="post-title-link" itemprop="url">[C1CTF2020]wp</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-              
-
-              <time title="创建时间：2020-12-09 15:15:03 / 修改时间：19:17:59" itemprop="dateCreated datePublished" datetime="2020-12-09T15:15:03+08:00">2020-12-09</time>
-            </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-folder"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/%E5%88%B7%E9%A2%98%E8%AE%B0%E5%BD%95/" itemprop="url" rel="index"><span itemprop="name">刷题记录</span></a>
-                </span>
-            </span>
-
-          
-            <span id="/%5BC1CTF2020%5Dwp.html" class="post-meta-item leancloud_visitors" data-flag-title="[C1CTF2020]wp" title="阅读次数">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-eye"></i>
-              </span>
-              <span class="post-meta-item-text">阅读次数：</span>
-              <span class="leancloud-visitors-count"></span>
-            </span>
-  
-  <span class="post-meta-item">
-    
-      <span class="post-meta-item-icon">
-        <i class="far fa-comment"></i>
-      </span>
-      <span class="post-meta-item-text">Valine：</span>
-    
-    <a title="valine" href="/%5BC1CTF2020%5Dwp.html#valine-comments" itemprop="discussionUrl">
-      <span class="post-comments-count valine-comment-count" data-xid="/%5BC1CTF2020%5Dwp.html" itemprop="commentCount"></span>
-    </a>
-  </span>
-  
-  
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <h1 id="C1CTF2020-wp"><a href="#C1CTF2020-wp" class="headerlink" title="[C1CTF2020]wp"></a>[C1CTF2020]wp</h1><p>合工大的萌新赛，我是超级垃圾呜呜呜，萌新赛都打的这么吃力<br>也学到不少东西</p>
-<h2 id="php-tricks"><a href="#php-tricks" class="headerlink" title="php_tricks"></a>php_tricks</h2><p>就是个基础反序列化入门，反序列化一个POST的data，然后还需要file_get_contents反序列化类里的一个成员的值符合条件<br>我是垃圾这都不会。。。一开始想的是php:&#x2F;&#x2F;input，但是这样显然和POST的数据冲突，查了很多奇怪的知识发现都不行，但是学到了一点，PHP只会在content-type为urlencode和一个什么的时候才把httpbody的数据放进POST里面，所以有时候忘加content-type打不通，最后发现file_get_content甚至可以用http协议读远程文件。。。。学习了</p>
-<h2 id="php-tricks’-revenge"><a href="#php-tricks’-revenge" class="headerlink" title="php_tricks’ revenge"></a>php_tricks’ revenge</h2>
-          <!--noindex-->
-            <div class="post-button">
-              <a class="btn" href="/%5BC1CTF2020%5Dwp.html#more" rel="contents">
-                阅读全文 &raquo;
-              </a>
-            </div>
-          <!--/noindex-->
-        
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
 
   
   <nav class="pagination">
@@ -825,7 +832,7 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">172</span>
+          <span class="site-state-item-count">173</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
@@ -838,7 +845,7 @@
       <div class="site-state-item site-state-tags">
             <a href="/tags/">
           
-        <span class="site-state-item-count">91</span>
+        <span class="site-state-item-count">92</span>
         <span class="site-state-item-name">标签</span></a>
       </div>
   </nav>
