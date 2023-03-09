@@ -32,7 +32,7 @@
 <meta property="og:image" content="https://blog.z3ratu1.cn/images/k8s%E5%85%A5%E9%97%A8/image-20230301222419106.png">
 <meta property="og:image" content="https://blog.z3ratu1.cn/images/k8s%E5%85%A5%E9%97%A8/image-20230302150735363.png">
 <meta property="article:published_time" content="2023-03-01T13:33:18.000Z">
-<meta property="article:modified_time" content="2023-03-05T08:47:38.183Z">
+<meta property="article:modified_time" content="2023-03-09T09:18:50.853Z">
 <meta property="article:author" content="Z3ratu1">
 <meta property="article:tag" content="docker">
 <meta property="article:tag" content="k8s">
@@ -236,7 +236,7 @@
                   <i class="far fa-calendar-check"></i>
                 </span>
                 <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2023-03-05 16:47:38" itemprop="dateModified" datetime="2023-03-05T16:47:38+08:00">2023-03-05</time>
+                <time title="修改时间：2023-03-09 17:18:50" itemprop="dateModified" datetime="2023-03-09T17:18:50+08:00">2023-03-09</time>
               </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -390,6 +390,128 @@ kubectl get secret sys-app-credentials -o yaml
 <p>StatefulSet主要是为了留存数据，所以其环境清理也复杂一点，直接删除statefulset是不会清理相关卷的，所以还需要单独把相关卷的声明给删掉<br><code>kubectl delete persistentvolumeclaim</code></p>
 <p>教程中的几个statefulSet的volume都是每个节点各自申请一份然后保证这个volume持续和对应pod绑定，并没有那种我想象中的一个volume多个节点共享以实现同步捏。。。<br>最后一个超长的zooKeeper教程（没有动手实践），也是每个pod挂载自己对应的volume，依靠zooKeeper自身的分布式同步功能对数据进行同步（但是我并不是很了解这个东西）</p>
 <p>最后还提到了隔离和腾空操作，这个可以主动将一个节点腾空，要求上面的pod迁移到其他的节点上，是直接把一个机器给禁用了，在机房需要分批维护的时候应该有很大的作用</p>
+<h2 id="动手实践"><a href="#动手实践" class="headerlink" title="动手实践"></a>动手实践</h2><p>搭了一个简单的flask app，用loadBalance负载均衡，有一个文件上传和下载功能，为了保证负载均衡后文件下载也能正常使用，还需要创建一个nfs作为持久卷，然后将nfs挂载到每个pod的上传目录</p>
+<h3 id="nfs-server-hostPath-volume"><a href="#nfs-server-hostPath-volume" class="headerlink" title="nfs server+hostPath volume"></a>nfs server+hostPath volume</h3><p>首先起一个nfs文件系统，同样使用k8s部署，但是nfs需要上privilege，nfs只需要一个，设置为stateful set，为了数据持久化，nfs server用于共享的目录也需要是一份持久卷，简单起见直接使用hostPath，绑定在对应的node上，但是一旦pod被调度，hostPath的数据就会丢失，所以还需要将pod绑定在对应的某个server上</p>
+<pre class=" language-yaml"><code class="language-yaml"><span class="token key atrule">apiVersion</span><span class="token punctuation">:</span> apps/v1
+<span class="token key atrule">kind</span><span class="token punctuation">:</span> StatefulSet
+<span class="token key atrule">metadata</span><span class="token punctuation">:</span>
+  <span class="token key atrule">name</span><span class="token punctuation">:</span> nfs<span class="token punctuation">-</span>server
+<span class="token key atrule">spec</span><span class="token punctuation">:</span>
+  <span class="token key atrule">replicas</span><span class="token punctuation">:</span> <span class="token number">1</span>
+  <span class="token key atrule">selector</span><span class="token punctuation">:</span>
+    <span class="token key atrule">matchLabels</span><span class="token punctuation">:</span>
+      <span class="token key atrule">app</span><span class="token punctuation">:</span> nfs<span class="token punctuation">-</span>server
+  <span class="token key atrule">template</span><span class="token punctuation">:</span>
+    <span class="token key atrule">metadata</span><span class="token punctuation">:</span>
+      <span class="token key atrule">labels</span><span class="token punctuation">:</span>
+        <span class="token key atrule">app</span><span class="token punctuation">:</span> nfs<span class="token punctuation">-</span>server
+    <span class="token key atrule">spec</span><span class="token punctuation">:</span>
+      <span class="token key atrule">nodeSelector</span><span class="token punctuation">:</span>
+        <span class="token key atrule">kubernetes.io/hostname</span><span class="token punctuation">:</span> dev<span class="token punctuation">-</span>worker
+      <span class="token key atrule">containers</span><span class="token punctuation">:</span>
+      <span class="token punctuation">-</span> <span class="token key atrule">name</span><span class="token punctuation">:</span> nfs<span class="token punctuation">-</span>server
+        <span class="token key atrule">image</span><span class="token punctuation">:</span> itsthenetwork/nfs<span class="token punctuation">-</span>server<span class="token punctuation">-</span>alpine<span class="token punctuation">:</span><span class="token number">12</span>
+        <span class="token key atrule">imagePullPolicy</span><span class="token punctuation">:</span> IfNotPresent
+        <span class="token key atrule">ports</span><span class="token punctuation">:</span>
+          <span class="token punctuation">-</span> <span class="token key atrule">name</span><span class="token punctuation">:</span> nfs
+            <span class="token key atrule">containerPort</span><span class="token punctuation">:</span> <span class="token number">2049</span>
+          <span class="token punctuation">-</span> <span class="token key atrule">name</span><span class="token punctuation">:</span> mountd
+            <span class="token key atrule">containerPort</span><span class="token punctuation">:</span> <span class="token number">20048</span>
+          <span class="token punctuation">-</span> <span class="token key atrule">name</span><span class="token punctuation">:</span> rpcbind
+            <span class="token key atrule">containerPort</span><span class="token punctuation">:</span> <span class="token number">111</span>
+        <span class="token key atrule">securityContext</span><span class="token punctuation">:</span>
+          <span class="token key atrule">privileged</span><span class="token punctuation">:</span> <span class="token boolean important">true</span>
+        <span class="token key atrule">env</span><span class="token punctuation">:</span>
+        <span class="token punctuation">-</span> <span class="token key atrule">name</span><span class="token punctuation">:</span> SHARED_DIRECTORY
+          <span class="token key atrule">value</span><span class="token punctuation">:</span> /nfsshare
+        <span class="token key atrule">volumeMounts</span><span class="token punctuation">:</span>
+        <span class="token punctuation">-</span> <span class="token key atrule">name</span><span class="token punctuation">:</span> upload<span class="token punctuation">-</span>data
+          <span class="token key atrule">mountPath</span><span class="token punctuation">:</span> /nfsshare
+  <span class="token key atrule">volumeClaimTemplates</span><span class="token punctuation">:</span>
+  <span class="token punctuation">-</span> <span class="token key atrule">metadata</span><span class="token punctuation">:</span>
+      <span class="token key atrule">name</span><span class="token punctuation">:</span> upload<span class="token punctuation">-</span>data
+    <span class="token key atrule">spec</span><span class="token punctuation">:</span>
+      <span class="token key atrule">accessModes</span><span class="token punctuation">:</span> <span class="token punctuation">[</span> <span class="token string">"ReadWriteOnce"</span> <span class="token punctuation">]</span>
+      <span class="token key atrule">resources</span><span class="token punctuation">:</span>
+        <span class="token key atrule">requests</span><span class="token punctuation">:</span>
+          <span class="token key atrule">storage</span><span class="token punctuation">:</span> 1Gi
+</code></pre>
+<p>没有指定storageClassName，默认为standard，使用的type为hostPath，可以<code>kubectl describe pv</code>看一下</p>
+<h3 id="nfs-service"><a href="#nfs-service" class="headerlink" title="nfs service"></a>nfs service</h3><p>其次需要将nfs server暴露出来，让其他node创建节点时可以访问到这个文件系统<br>一开始是按照官方的<a target="_blank" rel="external nofollow noopener noreferrer" href="https://github.com/kubernetes/examples/tree/master/staging/volumes/nfs">nfs example</a>，创建一个headless service，然后直接用pod在集群内的域名访问，顶级优雅，域名格式为<code>&lt;podname&gt;.&lt;namespace&gt;.svc.cluster.local</code>。但是我实际用起来的时候node是无法认出这个域名的，只有集群内部的pod能够使用该域名访问，感觉都是过的kube proxy对集群内部的网络进行处理，但是node本身执行这些命令是不会过proxy的，就跑不起来，一开始不知道什么情况乱按测试浪费了一晚上。。。最后看到了一个和我一模一样情况的issue，<a target="_blank" rel="external nofollow noopener noreferrer" href="https://github.com/kubernetes/examples/issues/390">NFS example with a cluster local service name only works on GKE but not for minikube&#x2F;kubeadm</a>，似乎是云服务的玄幻生产环境下可以用，自己部署的环境就用不了捏</p>
+<p>最后也是套了一个loadBalancer把nfs暴露出来，NodePort也行，但是都是暴露到公网，并且使用ip访问，还需要手动配置，都不如这个集群内域名优雅</p>
+<h3 id="制备pv-x2F-pvc"><a href="#制备pv-x2F-pvc" class="headerlink" title="制备pv&#x2F;pvc"></a>制备pv&#x2F;pvc</h3><p>pod使用持久卷似乎都需要通过pvc声明占有，然后pvc再去找对应的pv使用。这里有一点抽象，就是那个storageClass，好像能乱写名字？只要pv和pvc的能对应上就行，然后制备pv的时候在属性里面手动配置对应类中的字段即可。。。反正昨天问chatgpt给了我一堆垃圾回答，不能信。。。</p>
+<pre class=" language-yaml"><code class="language-yaml"><span class="token key atrule">apiVersion</span><span class="token punctuation">:</span> v1
+<span class="token key atrule">kind</span><span class="token punctuation">:</span> PersistentVolume
+<span class="token key atrule">metadata</span><span class="token punctuation">:</span>
+  <span class="token key atrule">name</span><span class="token punctuation">:</span> nfs<span class="token punctuation">-</span>volume
+<span class="token key atrule">spec</span><span class="token punctuation">:</span>
+  <span class="token key atrule">storageClassName</span><span class="token punctuation">:</span> <span class="token string">"nfs"</span>
+  <span class="token key atrule">capacity</span><span class="token punctuation">:</span>
+    <span class="token key atrule">storage</span><span class="token punctuation">:</span> 1Gi
+  <span class="token key atrule">accessModes</span><span class="token punctuation">:</span>
+    <span class="token punctuation">-</span> ReadWriteMany
+  <span class="token key atrule">nfs</span><span class="token punctuation">:</span>
+    <span class="token key atrule">server</span><span class="token punctuation">:</span> 172.18.255.201
+    <span class="token comment" spellcheck="true">#server: nfs-server.default.svc.cluster.local</span>
+    <span class="token key atrule">path</span><span class="token punctuation">:</span> <span class="token string">"/"</span>
+</code></pre>
+<pre class=" language-yaml"><code class="language-yaml"><span class="token key atrule">apiVersion</span><span class="token punctuation">:</span> v1
+<span class="token key atrule">kind</span><span class="token punctuation">:</span> PersistentVolumeClaim
+<span class="token key atrule">metadata</span><span class="token punctuation">:</span>
+  <span class="token key atrule">name</span><span class="token punctuation">:</span> nfs<span class="token punctuation">-</span>claim
+<span class="token key atrule">spec</span><span class="token punctuation">:</span>
+  <span class="token key atrule">volumeName</span><span class="token punctuation">:</span> nfs<span class="token punctuation">-</span>volume
+  <span class="token key atrule">storageClassName</span><span class="token punctuation">:</span> <span class="token string">"nfs"</span>
+  <span class="token key atrule">accessModes</span><span class="token punctuation">:</span>
+  <span class="token punctuation">-</span> ReadWriteMany
+  <span class="token key atrule">resources</span><span class="token punctuation">:</span>
+    <span class="token key atrule">requests</span><span class="token punctuation">:</span>
+      <span class="token key atrule">storage</span><span class="token punctuation">:</span> 1Gi
+</code></pre>
+<p>这里应该是静态制备，就先搓一个pv然后pvc靠storageClassName对上了，手写一个配置好的storageClass配好nfs相关属性，可能就可以不声明pv，直接用这个class自动创建pv了</p>
+<p><a target="_blank" rel="external nofollow noopener noreferrer" href="https://kubernetes.io/zh-cn/docs/concepts/storage/persistent-volumes/">持久卷</a></p>
+<blockquote>
+<p>如果管理员所创建的所有静态 PV 卷都无法与用户的 PersistentVolumeClaim 匹配， 集群可以尝试为该 PVC 申领动态制备一个存储卷。 这一制备操作是基于 StorageClass 来实现的：PVC 申领必须请求某个 存储类， 同时集群管理员必须已经创建并配置了该类，这样动态制备卷的动作才会发生。 如果 PVC 申领指定存储类为 “”，则相当于为自身禁止使用动态制备的卷。</p>
+</blockquote>
+<p>还可以看一下这个<br><a target="_blank" rel="external nofollow noopener noreferrer" href="https://boilingfrog.github.io/2021/07/01/k8s%E4%B8%AD%E7%9A%84PV%E5%92%8CPVC%E7%90%86%E8%A7%A3/">k8s中的PV和PVC理解</a></p>
+<h3 id="app-deployment"><a href="#app-deployment" class="headerlink" title="app deployment"></a>app deployment</h3><p>上述操作完成之后就可以部署app了<br>用的自己写的一个flask app，再起一个loadBalancer给他暴露出公网即可</p>
+<p>这里可以考虑使用initContainer对nfs服务进行等待之类的</p>
+<pre class=" language-yaml"><code class="language-yaml"><span class="token key atrule">apiVersion</span><span class="token punctuation">:</span> apps/v1
+<span class="token key atrule">kind</span><span class="token punctuation">:</span> Deployment
+<span class="token key atrule">metadata</span><span class="token punctuation">:</span>
+  <span class="token key atrule">name</span><span class="token punctuation">:</span> flask<span class="token punctuation">-</span>app
+<span class="token key atrule">spec</span><span class="token punctuation">:</span>
+  <span class="token key atrule">replicas</span><span class="token punctuation">:</span> <span class="token number">6</span>
+  <span class="token key atrule">selector</span><span class="token punctuation">:</span>
+    <span class="token key atrule">matchLabels</span><span class="token punctuation">:</span>
+      <span class="token key atrule">app</span><span class="token punctuation">:</span> flask<span class="token punctuation">-</span>app
+  <span class="token key atrule">template</span><span class="token punctuation">:</span>
+    <span class="token key atrule">metadata</span><span class="token punctuation">:</span>
+      <span class="token key atrule">labels</span><span class="token punctuation">:</span>
+        <span class="token key atrule">app</span><span class="token punctuation">:</span> flask<span class="token punctuation">-</span>app
+    <span class="token key atrule">spec</span><span class="token punctuation">:</span>
+      <span class="token key atrule">containers</span><span class="token punctuation">:</span>
+      <span class="token punctuation">-</span> <span class="token key atrule">name</span><span class="token punctuation">:</span> flask<span class="token punctuation">-</span>app
+        <span class="token key atrule">image</span><span class="token punctuation">:</span> docker.io/library/flask_app<span class="token punctuation">:</span>v1
+        <span class="token key atrule">imagePullPolicy</span><span class="token punctuation">:</span> IfNotPresent
+        <span class="token key atrule">ports</span><span class="token punctuation">:</span>
+        <span class="token punctuation">-</span> <span class="token key atrule">containerPort</span><span class="token punctuation">:</span> <span class="token number">8080</span>
+        <span class="token key atrule">resources</span><span class="token punctuation">:</span>
+          <span class="token key atrule">requests</span><span class="token punctuation">:</span>
+            <span class="token key atrule">memory</span><span class="token punctuation">:</span> <span class="token string">"128Mi"</span>
+            <span class="token key atrule">cpu</span><span class="token punctuation">:</span> <span class="token string">"100m"</span>
+          <span class="token key atrule">limits</span><span class="token punctuation">:</span>
+            <span class="token key atrule">memory</span><span class="token punctuation">:</span> <span class="token string">"256Mi"</span>
+            <span class="token key atrule">cpu</span><span class="token punctuation">:</span> <span class="token string">"200m"</span>
+        <span class="token key atrule">volumeMounts</span><span class="token punctuation">:</span>
+        <span class="token punctuation">-</span> <span class="token key atrule">mountPath</span><span class="token punctuation">:</span> /app/upload
+          <span class="token key atrule">name</span><span class="token punctuation">:</span> nfs<span class="token punctuation">-</span>volume
+      <span class="token key atrule">volumes</span><span class="token punctuation">:</span>
+      <span class="token punctuation">-</span> <span class="token key atrule">name</span><span class="token punctuation">:</span> nfs<span class="token punctuation">-</span>volume
+        <span class="token key atrule">persistentVolumeClaim</span><span class="token punctuation">:</span>
+          <span class="token key atrule">claimName</span><span class="token punctuation">:</span> nfs<span class="token punctuation">-</span>claim
+</code></pre>
+<p>跑起来的app共享同一个上传目录，负载均衡下上传的所有文件都能进行共享</p>
 <h2 id="end"><a href="#end" class="headerlink" title="end"></a>end</h2><p>感觉，上手之后不是很难，对着把命令都按一遍多操作几次就有一定的基础认知了，kind强力推荐，用docker起环境真的很节约资源，低配置下也能搭起来一个节点数还可以的集群，快进到扩展阅读容器安全<br><a target="_blank" rel="external nofollow noopener noreferrer" href="https://github.com/neargle/my-re0-k8s-security">neargle&#x2F;my-re0-k8s-security</a></p>
 
     </div>
@@ -473,7 +595,7 @@ kubectl get secret sys-app-credentials -o yaml
 
       <!--noindex-->
       <div class="post-toc-wrap sidebar-panel">
-          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#k8s%E5%85%A5%E9%97%A8"><span class="nav-number">1.</span> <span class="nav-text">k8s入门</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%90%8D%E8%AF%8D%E8%A7%A3%E9%87%8A"><span class="nav-number">1.1.</span> <span class="nav-text">名词解释</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#cluster"><span class="nav-number">1.1.1.</span> <span class="nav-text">cluster</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#node"><span class="nav-number">1.1.2.</span> <span class="nav-text">node</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#pod"><span class="nav-number">1.1.3.</span> <span class="nav-text">pod</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%8E%AF%E5%A2%83%E6%90%AD%E5%BB%BA"><span class="nav-number">1.2.</span> <span class="nav-text">环境搭建</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%9F%BA%E6%9C%AC%E6%93%8D%E4%BD%9C"><span class="nav-number">1.3.</span> <span class="nav-text">基本操作</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#pod-1"><span class="nav-number">1.3.1.</span> <span class="nav-text">pod</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#deployment"><span class="nav-number">1.3.2.</span> <span class="nav-text">deployment</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#replicas"><span class="nav-number">1.3.3.</span> <span class="nav-text">replicas</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#service"><span class="nav-number">1.3.4.</span> <span class="nav-text">service</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#pod%E6%9B%B4%E6%96%B0"><span class="nav-number">1.3.5.</span> <span class="nav-text">pod更新</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%BF%9B%E9%98%B6%E6%93%8D%E4%BD%9C%EF%BC%88%E5%A4%A7%E6%A6%82%EF%BC%89"><span class="nav-number">1.4.</span> <span class="nav-text">进阶操作（大概）</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#configMap"><span class="nav-number">1.4.1.</span> <span class="nav-text">configMap</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#volume"><span class="nav-number">1.4.2.</span> <span class="nav-text">volume</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#StatefulSet"><span class="nav-number">1.4.3.</span> <span class="nav-text">StatefulSet</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#end"><span class="nav-number">1.5.</span> <span class="nav-text">end</span></a></li></ol></li></ol></div>
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#k8s%E5%85%A5%E9%97%A8"><span class="nav-number">1.</span> <span class="nav-text">k8s入门</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%90%8D%E8%AF%8D%E8%A7%A3%E9%87%8A"><span class="nav-number">1.1.</span> <span class="nav-text">名词解释</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#cluster"><span class="nav-number">1.1.1.</span> <span class="nav-text">cluster</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#node"><span class="nav-number">1.1.2.</span> <span class="nav-text">node</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#pod"><span class="nav-number">1.1.3.</span> <span class="nav-text">pod</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%8E%AF%E5%A2%83%E6%90%AD%E5%BB%BA"><span class="nav-number">1.2.</span> <span class="nav-text">环境搭建</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%9F%BA%E6%9C%AC%E6%93%8D%E4%BD%9C"><span class="nav-number">1.3.</span> <span class="nav-text">基本操作</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#pod-1"><span class="nav-number">1.3.1.</span> <span class="nav-text">pod</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#deployment"><span class="nav-number">1.3.2.</span> <span class="nav-text">deployment</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#replicas"><span class="nav-number">1.3.3.</span> <span class="nav-text">replicas</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#service"><span class="nav-number">1.3.4.</span> <span class="nav-text">service</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#pod%E6%9B%B4%E6%96%B0"><span class="nav-number">1.3.5.</span> <span class="nav-text">pod更新</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%BF%9B%E9%98%B6%E6%93%8D%E4%BD%9C%EF%BC%88%E5%A4%A7%E6%A6%82%EF%BC%89"><span class="nav-number">1.4.</span> <span class="nav-text">进阶操作（大概）</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#configMap"><span class="nav-number">1.4.1.</span> <span class="nav-text">configMap</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#volume"><span class="nav-number">1.4.2.</span> <span class="nav-text">volume</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#StatefulSet"><span class="nav-number">1.4.3.</span> <span class="nav-text">StatefulSet</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%8A%A8%E6%89%8B%E5%AE%9E%E8%B7%B5"><span class="nav-number">1.5.</span> <span class="nav-text">动手实践</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#nfs-server-hostPath-volume"><span class="nav-number">1.5.1.</span> <span class="nav-text">nfs server+hostPath volume</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#nfs-service"><span class="nav-number">1.5.2.</span> <span class="nav-text">nfs service</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%88%B6%E5%A4%87pv-x2F-pvc"><span class="nav-number">1.5.3.</span> <span class="nav-text">制备pv&#x2F;pvc</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#app-deployment"><span class="nav-number">1.5.4.</span> <span class="nav-text">app deployment</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#end"><span class="nav-number">1.6.</span> <span class="nav-text">end</span></a></li></ol></li></ol></div>
       </div>
       <!--/noindex-->
 
