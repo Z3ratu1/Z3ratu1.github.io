@@ -196,6 +196,110 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
+    <link itemprop="mainEntityOfPage" href="https://blog.z3ratu1.cn/[SWPU2019]Web4.html">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="https://q2.qlogo.cn/headimg_dl?dst_uin=1207039417&spec=160">
+      <meta itemprop="name" content="Z3ratu1">
+      <meta itemprop="description" content="与其感慨路难行，不如现在出发">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Z3ratu1's blog">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/%5BSWPU2019%5DWeb4.html" class="post-title-link" itemprop="url">SWPU2019 Web4</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2020-07-11 15:21:00" itemprop="dateCreated datePublished" datetime="2020-07-11T15:21:00+08:00">2020-07-11</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2020-07-12 16:33:48" itemprop="dateModified" datetime="2020-07-12T16:33:48+08:00">2020-07-12</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E5%88%B7%E9%A2%98%E8%AE%B0%E5%BD%95/" itemprop="url" rel="index"><span itemprop="name">刷题记录</span></a>
+                </span>
+            </span>
+
+          
+            <span id="/%5BSWPU2019%5DWeb4.html" class="post-meta-item leancloud_visitors" data-flag-title="SWPU2019 Web4" title="阅读次数">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span class="leancloud-visitors-count"></span>
+            </span>
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="far fa-comment"></i>
+      </span>
+      <span class="post-meta-item-text">Valine：</span>
+    
+    <a title="valine" href="/%5BSWPU2019%5DWeb4.html#valine-comments" itemprop="discussionUrl">
+      <span class="post-comments-count valine-comment-count" data-xid="/%5BSWPU2019%5DWeb4.html" itemprop="commentCount"></span>
+    </a>
+  </span>
+  
+  
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h1 id="SWPU2019-Web4"><a href="#SWPU2019-Web4" class="headerlink" title="[SWPU2019]Web4"></a>[SWPU2019]Web4</h1><p>buu上的一分题，说实话这个难度我是不相信它只有一分的</p>
+<h2 id="题解"><a href="#题解" class="headerlink" title="题解"></a>题解</h2><p>打开是一个登录框，简单测试发现添加单引号会出现一个PHP的报错，而不是MySQL的报错，存在注入点，但不可使用报错注入<br>测了半天，感觉有关键词屏蔽，但是无论如何返回值就三种，登录成功，登录失败，PHP报错。那想直接查询回显也没机会了，只能盲注，并且登录成功啥也不给呜呜呜。<br>简单测一下发现select，sleep，or，逗号，大小于号，井号还有些七七八八的盲注需要的东西都给禁用了，但是另一个注释符–还能用，最主要的是回显根本没有帮助，完全不知道后台到底在干什么。<br>后来拿到源码之后看见了超级过滤<code>select|information|insert|union|ascii|,|like|outfile|join|&lt;|&gt;|and|substr|#|or|\|\||sleep|benchmark|if|&amp;&amp;</code><br>最后看wp说是堆叠注入，并且使用预处理将语句变为16进制表示，直接绕过超级过滤</p>
+<h3 id="MySQL堆叠注入预处理"><a href="#MySQL堆叠注入预处理" class="headerlink" title="MySQL堆叠注入预处理"></a>MySQL堆叠注入预处理</h3>
+          <!--noindex-->
+            <div class="post-button">
+              <a class="btn" href="/%5BSWPU2019%5DWeb4.html#more" rel="contents">
+                阅读全文 &raquo;
+              </a>
+            </div>
+          <!--/noindex-->
+        
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
     <link itemprop="mainEntityOfPage" href="https://blog.z3ratu1.cn/[HarekazeCTF2019]encode_and_encode.html">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -770,130 +874,6 @@
   
   
 
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
-    <link itemprop="mainEntityOfPage" href="https://blog.z3ratu1.cn/[HITCON%202017]SSRFme.html">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="https://q2.qlogo.cn/headimg_dl?dst_uin=1207039417&spec=160">
-      <meta itemprop="name" content="Z3ratu1">
-      <meta itemprop="description" content="与其感慨路难行，不如现在出发">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Z3ratu1's blog">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/%5BHITCON%202017%5DSSRFme.html" class="post-title-link" itemprop="url">HITCON 2017 SSRFme</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2020-05-06 12:15:00" itemprop="dateCreated datePublished" datetime="2020-05-06T12:15:00+08:00">2020-05-06</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="far fa-calendar-check"></i>
-                </span>
-                <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2020-07-12 16:33:48" itemprop="dateModified" datetime="2020-07-12T16:33:48+08:00">2020-07-12</time>
-              </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-folder"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/%E5%88%B7%E9%A2%98%E8%AE%B0%E5%BD%95/" itemprop="url" rel="index"><span itemprop="name">刷题记录</span></a>
-                </span>
-            </span>
-
-          
-            <span id="/%5BHITCON%202017%5DSSRFme.html" class="post-meta-item leancloud_visitors" data-flag-title="HITCON 2017 SSRFme" title="阅读次数">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-eye"></i>
-              </span>
-              <span class="post-meta-item-text">阅读次数：</span>
-              <span class="leancloud-visitors-count"></span>
-            </span>
-  
-  <span class="post-meta-item">
-    
-      <span class="post-meta-item-icon">
-        <i class="far fa-comment"></i>
-      </span>
-      <span class="post-meta-item-text">Valine：</span>
-    
-    <a title="valine" href="/%5BHITCON%202017%5DSSRFme.html#valine-comments" itemprop="discussionUrl">
-      <span class="post-comments-count valine-comment-count" data-xid="/%5BHITCON%202017%5DSSRFme.html" itemprop="commentCount"></span>
-    </a>
-  </span>
-  
-  
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <h1 id="HITCON-2017-SSRFme"><a href="#HITCON-2017-SSRFme" class="headerlink" title="[HITCON 2017]SSRFme"></a>[HITCON 2017]SSRFme</h1><p>buu上的一个老题，又是不会做看wp的一天</p>
-<p>给了源码</p>
-<pre class=" language-php"><code class="language-php"><span class="token delimiter">&lt;?php</span>
-    <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token function">isset</span><span class="token punctuation">(</span><span class="token variable">$_SERVER</span><span class="token punctuation">[</span><span class="token string">'HTTP_X_FORWARDED_FOR'</span><span class="token punctuation">]</span><span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
-        <span class="token variable">$http_x_headers</span> <span class="token operator">=</span> <span class="token function">explode</span><span class="token punctuation">(</span><span class="token string">','</span><span class="token punctuation">,</span> <span class="token variable">$_SERVER</span><span class="token punctuation">[</span><span class="token string">'HTTP_X_FORWARDED_FOR'</span><span class="token punctuation">]</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-        <span class="token variable">$_SERVER</span><span class="token punctuation">[</span><span class="token string">'REMOTE_ADDR'</span><span class="token punctuation">]</span> <span class="token operator">=</span> <span class="token variable">$http_x_headers</span><span class="token punctuation">[</span><span class="token number">0</span><span class="token punctuation">]</span><span class="token punctuation">;</span>
-    <span class="token punctuation">}</span>
-
-    <span class="token keyword">echo</span> <span class="token variable">$_SERVER</span><span class="token punctuation">[</span><span class="token string">"REMOTE_ADDR"</span><span class="token punctuation">]</span><span class="token punctuation">;</span>
-
-    <span class="token variable">$sandbox</span> <span class="token operator">=</span> <span class="token string">"sandbox/"</span> <span class="token punctuation">.</span> <span class="token function">md5</span><span class="token punctuation">(</span><span class="token string">"orange"</span> <span class="token punctuation">.</span> <span class="token variable">$_SERVER</span><span class="token punctuation">[</span><span class="token string">"REMOTE_ADDR"</span><span class="token punctuation">]</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-    @<span class="token function">mkdir</span><span class="token punctuation">(</span><span class="token variable">$sandbox</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-    @<span class="token function">chdir</span><span class="token punctuation">(</span><span class="token variable">$sandbox</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-
-    <span class="token variable">$data</span> <span class="token operator">=</span> <span class="token function">shell_exec</span><span class="token punctuation">(</span><span class="token string">"GET "</span> <span class="token punctuation">.</span> <span class="token function">escapeshellarg</span><span class="token punctuation">(</span><span class="token variable">$_GET</span><span class="token punctuation">[</span><span class="token string">"url"</span><span class="token punctuation">]</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-    <span class="token variable">$info</span> <span class="token operator">=</span> <span class="token function">pathinfo</span><span class="token punctuation">(</span><span class="token variable">$_GET</span><span class="token punctuation">[</span><span class="token string">"filename"</span><span class="token punctuation">]</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-    <span class="token variable">$dir</span>  <span class="token operator">=</span> <span class="token function">str_replace</span><span class="token punctuation">(</span><span class="token string">"."</span><span class="token punctuation">,</span> <span class="token string">""</span><span class="token punctuation">,</span> <span class="token function">basename</span><span class="token punctuation">(</span><span class="token variable">$info</span><span class="token punctuation">[</span><span class="token string">"dirname"</span><span class="token punctuation">]</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-    @<span class="token function">mkdir</span><span class="token punctuation">(</span><span class="token variable">$dir</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-    @<span class="token function">chdir</span><span class="token punctuation">(</span><span class="token variable">$dir</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-    @<span class="token function">file_put_contents</span><span class="token punctuation">(</span><span class="token function">basename</span><span class="token punctuation">(</span><span class="token variable">$info</span><span class="token punctuation">[</span><span class="token string">"basename"</span><span class="token punctuation">]</span><span class="token punctuation">)</span><span class="token punctuation">,</span> <span class="token variable">$data</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-    <span class="token function">highlight_file</span><span class="token punctuation">(</span><span class="token constant">__FILE__</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-</code></pre>
-<p>remote_addr就是用来创建一个沙盒的，然后用shell_exec执行一个GET命令，escapeshellarg会转义所有引号再在整个参数上加一个引号，防止了命令注入，就是说只能执行GET。<br>这个GET就是一个GET请求，可以使用file协议什么的，通过Perl实现（是我不懂的东西）<br>整体效果就是把GET请求到的东西写入我们对应的沙盒文件夹中。本来想写直接写一个PHP的shell的，但是靶机不能访问外网，并且估计也设置了沙盒中的PHP文件都不能解析之类的限制，而写文件的路径也被控制在了沙盒内，跳目录什么的也不太行</p>
-          <!--noindex-->
-            <div class="post-button">
-              <a class="btn" href="/%5BHITCON%202017%5DSSRFme.html#more" rel="contents">
-                阅读全文 &raquo;
-              </a>
-            </div>
-          <!--/noindex-->
-        
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
 
   
   <nav class="pagination">
@@ -964,7 +944,7 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">174</span>
+          <span class="site-state-item-count">175</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>

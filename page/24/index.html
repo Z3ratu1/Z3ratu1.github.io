@@ -196,6 +196,105 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
+    <link itemprop="mainEntityOfPage" href="https://blog.z3ratu1.cn/Linux%E5%86%85%E6%A0%B8%E8%BF%90%E8%A1%8C.html">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="https://q2.qlogo.cn/headimg_dl?dst_uin=1207039417&spec=160">
+      <meta itemprop="name" content="Z3ratu1">
+      <meta itemprop="description" content="与其感慨路难行，不如现在出发">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Z3ratu1's blog">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/Linux%E5%86%85%E6%A0%B8%E8%BF%90%E8%A1%8C.html" class="post-title-link" itemprop="url">Linux内核运行方式</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+              
+
+              <time title="创建时间：2020-09-07 19:44:28 / 修改时间：20:38:52" itemprop="dateCreated datePublished" datetime="2020-09-07T19:44:28+08:00">2020-09-07</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E7%AC%94%E8%AE%B0/" itemprop="url" rel="index"><span itemprop="name">笔记</span></a>
+                </span>
+            </span>
+
+          
+            <span id="/Linux%E5%86%85%E6%A0%B8%E8%BF%90%E8%A1%8C.html" class="post-meta-item leancloud_visitors" data-flag-title="Linux内核运行方式" title="阅读次数">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span class="leancloud-visitors-count"></span>
+            </span>
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="far fa-comment"></i>
+      </span>
+      <span class="post-meta-item-text">Valine：</span>
+    
+    <a title="valine" href="/Linux%E5%86%85%E6%A0%B8%E8%BF%90%E8%A1%8C.html#valine-comments" itemprop="discussionUrl">
+      <span class="post-comments-count valine-comment-count" data-xid="/Linux%E5%86%85%E6%A0%B8%E8%BF%90%E8%A1%8C.html" itemprop="commentCount"></span>
+    </a>
+  </span>
+  
+  
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h1 id="Linux内核运行方式"><a href="#Linux内核运行方式" class="headerlink" title="Linux内核运行方式"></a>Linux内核运行方式</h1><p>前两天被AA问了个问题，<strong>你觉得Linux的内核是一个进程吗</strong><br>第一反应自然是一个进程，但是接下来就被问到了内核是一个进程的话，进程调度是怎么实现的，以进程来管理进程吗之类的问题<br>所以首先应该能给出答案，<strong>Linux的内核并不是一个进程</strong><br>那么接下来就出现了第二个问题，内核并不是一个进程，那么如何做到进程调度，内存管理这些事情的呢</p>
+<p>为此查了一个下午各种各样的资料</p>
+<p>众所周知，一个进程拥有内核空间和用户空间两个空间，用户空间存放的就是进程自己的数据，代码，堆栈之类的东西，还有一个libc函数库，而内核空间则是映射到内核数据区。也就是说，内核数据在物理内存上只有一份，但是会在每个进程中映射一份，内核数据就是各个进程的进程控制块，操作系统的资源分配表，文件标识符之类的各种各样的资源，还有就是系统调用函数，以及一系列的内核相关函数。</p>
+<p>只有在系统刚启动时，内核可能表现的像一个进程，当启动完成后，内核会启动一部分线程，提供相应的服务，这些进程可以在ps里面看到，都由方括号包裹起来，标识为内核启动的线程。而更多的情况下，内核表现的更像是一个巨大的函数库，也可以说内核是运行在用户进程里的，当用户进程发起系统调用时，进入内核态，这并不是说内核开始运行，而是用户进程调用内核函数，去访问内核数据。</p>
+          <!--noindex-->
+            <div class="post-button">
+              <a class="btn" href="/Linux%E5%86%85%E6%A0%B8%E8%BF%90%E8%A1%8C.html#more" rel="contents">
+                阅读全文 &raquo;
+              </a>
+            </div>
+          <!--/noindex-->
+        
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
     <link itemprop="mainEntityOfPage" href="https://blog.z3ratu1.cn/[SUCTF2018]anonymous.html">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -643,110 +742,6 @@ payload <span class="token operator">=</span> <span class="token string">""</spa
   
   
 
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
-    <link itemprop="mainEntityOfPage" href="https://blog.z3ratu1.cn/[%E5%BC%BA%E7%BD%91%E6%9D%AF2020]web.html">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="https://q2.qlogo.cn/headimg_dl?dst_uin=1207039417&spec=160">
-      <meta itemprop="name" content="Z3ratu1">
-      <meta itemprop="description" content="与其感慨路难行，不如现在出发">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Z3ratu1's blog">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/%5B%E5%BC%BA%E7%BD%91%E6%9D%AF2020%5Dweb.html" class="post-title-link" itemprop="url">[强网杯2020] web</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2020-08-29 14:29:57" itemprop="dateCreated datePublished" datetime="2020-08-29T14:29:57+08:00">2020-08-29</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="far fa-calendar-check"></i>
-                </span>
-                <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2020-08-31 16:32:11" itemprop="dateModified" datetime="2020-08-31T16:32:11+08:00">2020-08-31</time>
-              </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-folder"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/%E5%88%B7%E9%A2%98%E8%AE%B0%E5%BD%95/" itemprop="url" rel="index"><span itemprop="name">刷题记录</span></a>
-                </span>
-            </span>
-
-          
-            <span id="/%5B%E5%BC%BA%E7%BD%91%E6%9D%AF2020%5Dweb.html" class="post-meta-item leancloud_visitors" data-flag-title="[强网杯2020] web" title="阅读次数">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-eye"></i>
-              </span>
-              <span class="post-meta-item-text">阅读次数：</span>
-              <span class="leancloud-visitors-count"></span>
-            </span>
-  
-  <span class="post-meta-item">
-    
-      <span class="post-meta-item-icon">
-        <i class="far fa-comment"></i>
-      </span>
-      <span class="post-meta-item-text">Valine：</span>
-    
-    <a title="valine" href="/%5B%E5%BC%BA%E7%BD%91%E6%9D%AF2020%5Dweb.html#valine-comments" itemprop="discussionUrl">
-      <span class="post-comments-count valine-comment-count" data-xid="/%5B%E5%BC%BA%E7%BD%91%E6%9D%AF2020%5Dweb.html" itemprop="commentCount"></span>
-    </a>
-  </span>
-  
-  
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <h1 id="强网杯2020-web"><a href="#强网杯2020-web" class="headerlink" title="[强网杯2020] web"></a>[强网杯2020] web</h1><p>太难了，除了强网先锋的题都做不出来，强网先锋部分简单题都不会</p>
-<p>web分类的题一个也不会，菜逼的眼神</p>
-<h2 id="主动"><a href="#主动" class="headerlink" title="主动"></a>主动</h2><p>命令注入，或者说直接就是命令执行吧，啥过滤都不给的，非常的主动啊</p>
-          <!--noindex-->
-            <div class="post-button">
-              <a class="btn" href="/%5B%E5%BC%BA%E7%BD%91%E6%9D%AF2020%5Dweb.html#more" rel="contents">
-                阅读全文 &raquo;
-              </a>
-            </div>
-          <!--/noindex-->
-        
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
 
   
   <nav class="pagination">
@@ -817,7 +812,7 @@ payload <span class="token operator">=</span> <span class="token string">""</spa
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">174</span>
+          <span class="site-state-item-count">175</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
