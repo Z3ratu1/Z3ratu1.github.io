@@ -196,6 +196,110 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
+    <link itemprop="mainEntityOfPage" href="https://blog.z3ratu1.cn/ProcessHollowing%E4%B8%8EReflectiveDll.html">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="https://q2.qlogo.cn/headimg_dl?dst_uin=1207039417&spec=160">
+      <meta itemprop="name" content="Z3ratu1">
+      <meta itemprop="description" content="与其感慨路难行，不如现在出发">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Z3ratu1's blog">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/ProcessHollowing%E4%B8%8EReflectiveDll.html" class="post-title-link" itemprop="url">ProcessHollowing与ReflectiveDLL</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2023-04-06 19:09:34" itemprop="dateCreated datePublished" datetime="2023-04-06T19:09:34+08:00">2023-04-06</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2023-04-08 12:13:56" itemprop="dateModified" datetime="2023-04-08T12:13:56+08:00">2023-04-08</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E7%AC%94%E8%AE%B0/" itemprop="url" rel="index"><span itemprop="name">笔记</span></a>
+                </span>
+            </span>
+
+          
+            <span id="/ProcessHollowing%E4%B8%8EReflectiveDll.html" class="post-meta-item leancloud_visitors" data-flag-title="ProcessHollowing与ReflectiveDLL" title="阅读次数">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span class="leancloud-visitors-count"></span>
+            </span>
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="far fa-comment"></i>
+      </span>
+      <span class="post-meta-item-text">Valine：</span>
+    
+    <a title="valine" href="/ProcessHollowing%E4%B8%8EReflectiveDll.html#valine-comments" itemprop="discussionUrl">
+      <span class="post-comments-count valine-comment-count" data-xid="/ProcessHollowing%E4%B8%8EReflectiveDll.html" itemprop="commentCount"></span>
+    </a>
+  </span>
+  
+  
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h1 id="ProcessHollowing与ReflectiveDLL"><a href="#ProcessHollowing与ReflectiveDLL" class="headerlink" title="ProcessHollowing与ReflectiveDLL"></a>ProcessHollowing与ReflectiveDLL</h1><p>前段时间稍微学了下进程镂空这个操作（ProcessHollowing），顺带就学了一点简单的windows PE结构，顺带复习了一下经典ReflectiveDll loader原理，理解了一下注入都是怎么做到的，最后扩展学习到了跨位数进程注入。。。</p>
+<h2 id="ProcessHollowing"><a href="#ProcessHollowing" class="headerlink" title="ProcessHollowing"></a>ProcessHollowing</h2><p>一个已经有五六年历史的技术了，我最近才听说。。。与进程注入类似，都是拉起一个傀儡进程后使其运行恶意代码，和进程注入较大的区别是不使用CreateRemoteThread等函数，并且可以直接将一个PE放进去跑，无需对其进行额外操作（如添加ReflectiveLoader）</p>
+<p>既然不使用CreateRemoteThread，那么必然得使用其他的危险函数，这里用的是<code>SetThreadContext</code>，具体思路其实很简单，读一个PE到内存中（可以不触碰磁盘），拉起傀儡进程，将傀儡进程的内存空间用<code>NtUnmapViewOfSection</code>一把释放掉，这样子这个进程里面就没有东西了，此时我们再将我们的PE文件填进去，就完成了一个套皮进程的运行，当然，在实现上还有很多需要考虑的地方</p>
+          <!--noindex-->
+            <div class="post-button">
+              <a class="btn" href="/ProcessHollowing%E4%B8%8EReflectiveDll.html#more" rel="contents">
+                阅读全文 &raquo;
+              </a>
+            </div>
+          <!--/noindex-->
+        
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
     <link itemprop="mainEntityOfPage" href="https://blog.z3ratu1.cn/pollution.html">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -643,115 +747,10 @@ app<span class="token punctuation">.</span><span class="token keyword">get</span
   
   
 
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
-    <link itemprop="mainEntityOfPage" href="https://blog.z3ratu1.cn/Java%E5%86%85%E5%AD%98%E9%A9%AC%E7%BC%9D%E5%90%88%E7%AC%94%E8%AE%B0.html">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="https://q2.qlogo.cn/headimg_dl?dst_uin=1207039417&spec=160">
-      <meta itemprop="name" content="Z3ratu1">
-      <meta itemprop="description" content="与其感慨路难行，不如现在出发">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Z3ratu1's blog">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/Java%E5%86%85%E5%AD%98%E9%A9%AC%E7%BC%9D%E5%90%88%E7%AC%94%E8%AE%B0.html" class="post-title-link" itemprop="url">Java内存马缝合笔记</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2022-11-24 17:37:09" itemprop="dateCreated datePublished" datetime="2022-11-24T17:37:09+08:00">2022-11-24</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="far fa-calendar-check"></i>
-                </span>
-                <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2023-03-15 21:09:19" itemprop="dateModified" datetime="2023-03-15T21:09:19+08:00">2023-03-15</time>
-              </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-folder"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/%E7%AC%94%E8%AE%B0/" itemprop="url" rel="index"><span itemprop="name">笔记</span></a>
-                </span>
-            </span>
-
-          
-            <span id="/Java%E5%86%85%E5%AD%98%E9%A9%AC%E7%BC%9D%E5%90%88%E7%AC%94%E8%AE%B0.html" class="post-meta-item leancloud_visitors" data-flag-title="Java内存马缝合笔记" title="阅读次数">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-eye"></i>
-              </span>
-              <span class="post-meta-item-text">阅读次数：</span>
-              <span class="leancloud-visitors-count"></span>
-            </span>
-  
-  <span class="post-meta-item">
-    
-      <span class="post-meta-item-icon">
-        <i class="far fa-comment"></i>
-      </span>
-      <span class="post-meta-item-text">Valine：</span>
-    
-    <a title="valine" href="/Java%E5%86%85%E5%AD%98%E9%A9%AC%E7%BC%9D%E5%90%88%E7%AC%94%E8%AE%B0.html#valine-comments" itemprop="discussionUrl">
-      <span class="post-comments-count valine-comment-count" data-xid="/Java%E5%86%85%E5%AD%98%E9%A9%AC%E7%BC%9D%E5%90%88%E7%AC%94%E8%AE%B0.html" itemprop="commentCount"></span>
-    </a>
-  </span>
-  
-  
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <h1 id="Java内存马缝合笔记"><a href="#Java内存马缝合笔记" class="headerlink" title="Java内存马缝合笔记"></a>Java内存马缝合笔记</h1><p>之前渗透的时候遇到了一个java站，tomcat8跑的，能上传jsp，有shiro但是打不通（打通之后看了一眼无敌高版本）<br>jsp上传之后会急速被删，可以条件竞争去抢，这样子的话打一个内存马就是最稳整的，但是我是java垃圾捏，不会打，幸好天哥最后给了个现成的内存马<br>还有一个远古tomcat6的站，有一个jndi注入，最后也是靠whj好兄弟缝出来了一个tomcat6的回显打通，所以这波结束之后还是决定稍微学一下，就算不能懂原理，起码要缝出来一套能应对各个版本的内存马。。。以及遇到问题的时候起码有一套调试环境能排错</p>
-<p>由于java水平有限，写出来的东西基本上都是从网上东拼西凑出来的，超级缝合怪，但是不得不说我缝合的水平真是越来越好了，因为感觉就大家的内存马理论都学得很好，我学点皮毛能用就行了，所以就叫缝合笔记8</p>
-<p>3,2,1，开缝！</p>
-<h2 id="回显"><a href="#回显" class="headerlink" title="回显"></a>回显</h2>
-          <!--noindex-->
-            <div class="post-button">
-              <a class="btn" href="/Java%E5%86%85%E5%AD%98%E9%A9%AC%E7%BC%9D%E5%90%88%E7%AC%94%E8%AE%B0.html#more" rel="contents">
-                阅读全文 &raquo;
-              </a>
-            </div>
-          <!--/noindex-->
-        
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
 
   
   <nav class="pagination">
-    <span class="page-number current">1</span><a class="page-number" href="/page/2/">2</a><a class="page-number" href="/page/3/">3</a><a class="page-number" href="/page/4/">4</a><span class="space">&hellip;</span><a class="page-number" href="/page/35/">35</a><a class="extend next" rel="next" href="/page/2/"><i class="fa fa-angle-right" aria-label="下一页"></i></a>
+    <span class="page-number current">1</span><a class="page-number" href="/page/2/">2</a><a class="page-number" href="/page/3/">3</a><a class="page-number" href="/page/4/">4</a><span class="space">&hellip;</span><a class="page-number" href="/page/36/">36</a><a class="extend next" rel="next" href="/page/2/"><i class="fa fa-angle-right" aria-label="下一页"></i></a>
   </nav>
 
 
@@ -818,7 +817,7 @@ app<span class="token punctuation">.</span><span class="token keyword">get</span
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">175</span>
+          <span class="site-state-item-count">176</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>

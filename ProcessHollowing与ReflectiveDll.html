@@ -1,0 +1,636 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 6.0.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"blog.z3ratu1.cn","root":"/","scheme":"Pisces","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"always","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":true},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+  </script>
+
+  <meta name="description" content="ProcessHollowing与ReflectiveDLL前段时间稍微学了下进程镂空这个操作（ProcessHollowing），顺带就学了一点简单的windows PE结构，顺带复习了一下经典ReflectiveDll loader原理，理解了一下注入都是怎么做到的，最后扩展学习到了跨位数进程注入。。。 ProcessHollowing一个已经有五六年历史的技术了，我最近才听说。。。与进程注入">
+<meta property="og:type" content="article">
+<meta property="og:title" content="ProcessHollowing与ReflectiveDLL">
+<meta property="og:url" content="https://blog.z3ratu1.cn/ProcessHollowing%E4%B8%8EReflectiveDll.html">
+<meta property="og:site_name" content="Z3ratu1&#39;s blog">
+<meta property="og:description" content="ProcessHollowing与ReflectiveDLL前段时间稍微学了下进程镂空这个操作（ProcessHollowing），顺带就学了一点简单的windows PE结构，顺带复习了一下经典ReflectiveDll loader原理，理解了一下注入都是怎么做到的，最后扩展学习到了跨位数进程注入。。。 ProcessHollowing一个已经有五六年历史的技术了，我最近才听说。。。与进程注入">
+<meta property="og:locale">
+<meta property="og:image" content="https://image-host-1304136909.cos.ap-shanghai.myqcloud.com/blog/ProcessHollowing%E4%B8%8EReflectiveDll/image-20230406194340240.png">
+<meta property="og:image" content="https://image-host-1304136909.cos.ap-shanghai.myqcloud.com/blog/ProcessHollowing%E4%B8%8EReflectiveDll/image-20230407120857163.png">
+<meta property="og:image" content="https://image-host-1304136909.cos.ap-shanghai.myqcloud.com/blog/ProcessHollowing%E4%B8%8EReflectiveDll/image-20230407120913253.png">
+<meta property="article:published_time" content="2023-04-06T11:09:34.000Z">
+<meta property="article:modified_time" content="2023-04-08T04:13:56.658Z">
+<meta property="article:author" content="Z3ratu1">
+<meta property="article:tag" content="pentest">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://image-host-1304136909.cos.ap-shanghai.myqcloud.com/blog/ProcessHollowing%E4%B8%8EReflectiveDll/image-20230406194340240.png">
+
+<link rel="canonical" href="https://blog.z3ratu1.cn/ProcessHollowing%E4%B8%8EReflectiveDll.html">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-Hans'
+  };
+</script>
+
+  <title>ProcessHollowing与ReflectiveDLL | Z3ratu1's blog</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+<link rel="stylesheet" href="/css/prism-tomorrow.css" type="text/css"></head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">Z3ratu1's blog</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">Welcome</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>关于</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+        <li class="menu-item menu-item-links">
+
+    <a href="/links/" rel="section"><i class="fa fa-link fa-fw"></i>友链</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off" placeholder="搜索..." spellcheck="false" type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+  <a href="https://github.com/Z3ratu1" class="github-corner" title="Follow me on GitHub" aria-label="Follow me on GitHub" rel="external nofollow noopener noreferrer" target="_blank"><svg width="80" height="80" viewbox="0 0 250 250" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"/><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"/><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"/></svg></a>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
+    <link itemprop="mainEntityOfPage" href="https://blog.z3ratu1.cn/ProcessHollowing%E4%B8%8EReflectiveDll.html">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="https://q2.qlogo.cn/headimg_dl?dst_uin=1207039417&spec=160">
+      <meta itemprop="name" content="Z3ratu1">
+      <meta itemprop="description" content="与其感慨路难行，不如现在出发">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Z3ratu1's blog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          ProcessHollowing与ReflectiveDLL
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2023-04-06 19:09:34" itemprop="dateCreated datePublished" datetime="2023-04-06T19:09:34+08:00">2023-04-06</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2023-04-08 12:13:56" itemprop="dateModified" datetime="2023-04-08T12:13:56+08:00">2023-04-08</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E7%AC%94%E8%AE%B0/" itemprop="url" rel="index"><span itemprop="name">笔记</span></a>
+                </span>
+            </span>
+
+          
+            <span id="/ProcessHollowing%E4%B8%8EReflectiveDll.html" class="post-meta-item leancloud_visitors" data-flag-title="ProcessHollowing与ReflectiveDLL" title="阅读次数">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span class="leancloud-visitors-count"></span>
+            </span>
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="far fa-comment"></i>
+      </span>
+      <span class="post-meta-item-text">Valine：</span>
+    
+    <a title="valine" href="/ProcessHollowing%E4%B8%8EReflectiveDll.html#valine-comments" itemprop="discussionUrl">
+      <span class="post-comments-count valine-comment-count" data-xid="/ProcessHollowing%E4%B8%8EReflectiveDll.html" itemprop="commentCount"></span>
+    </a>
+  </span>
+  
+  
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h1 id="ProcessHollowing与ReflectiveDLL"><a href="#ProcessHollowing与ReflectiveDLL" class="headerlink" title="ProcessHollowing与ReflectiveDLL"></a>ProcessHollowing与ReflectiveDLL</h1><p>前段时间稍微学了下进程镂空这个操作（ProcessHollowing），顺带就学了一点简单的windows PE结构，顺带复习了一下经典ReflectiveDll loader原理，理解了一下注入都是怎么做到的，最后扩展学习到了跨位数进程注入。。。</p>
+<h2 id="ProcessHollowing"><a href="#ProcessHollowing" class="headerlink" title="ProcessHollowing"></a>ProcessHollowing</h2><p>一个已经有五六年历史的技术了，我最近才听说。。。与进程注入类似，都是拉起一个傀儡进程后使其运行恶意代码，和进程注入较大的区别是不使用CreateRemoteThread等函数，并且可以直接将一个PE放进去跑，无需对其进行额外操作（如添加ReflectiveLoader）</p>
+<p>既然不使用CreateRemoteThread，那么必然得使用其他的危险函数，这里用的是<code>SetThreadContext</code>，具体思路其实很简单，读一个PE到内存中（可以不触碰磁盘），拉起傀儡进程，将傀儡进程的内存空间用<code>NtUnmapViewOfSection</code>一把释放掉，这样子这个进程里面就没有东西了，此时我们再将我们的PE文件填进去，就完成了一个套皮进程的运行，当然，在实现上还有很多需要考虑的地方</p>
+<p>代码github上抄下来然后魔改的，基本上和这个代码差距不大<br><a target="_blank" rel="external nofollow noopener noreferrer" href="https://github.com/abdullah2993/go-runpe">abdullah2993&#x2F;go-runpe</a><br>C++版本（这个版本我用go抄了一遍之后跑不起来。。。）<br><a target="_blank" rel="external nofollow noopener noreferrer" href="https://github.com/idiotc4t/ProcessHollow/blob/master/ProcessHollow/ProcessHollow.cpp">idiotc4t&#x2F;ProcessHollow</a></p>
+<p>首先是windows进程相关结构体，最主要的结构体就是TEB，这个结构体类似于linux下的task struct，放了一堆进程相关信息。TEB下有一个PEB，PEB中记录了进程加载的各种dll的基址，地狱之门等脱钩技术，以及手动寻找函数地址以减少IAT暴露的导入函数等方法，都是通过PEB下面这个<code>InMemoryOrderModuleList</code>对dll进行遍历实现的<br>如下是一篇获取PEB并解析DLL技术的完整解说<br><a target="_blank" rel="external nofollow noopener noreferrer" href="https://www.anquanke.com/post/id/267345">从学习Windows PEB到Hell’s Gate</a></p>
+<p>当然，上述内容和本操作似乎无关。。在本次代码中是通过rdx寄存器拿到某个结构体，并偏移16位拿到当前进程镜像基址，C++注释中说拿的是PEB，但没有资料说rdx指向PEB，并且PEB偏移16位也不是imageBase，表示怀疑，且未能寻找到相关资料</p>
+<p>拿到目标进程基址后，使用<code>NtUnmapViewOfSection</code>释放对应PE文件占用的内存，此处即为镂空，为我们即将载入的PE腾出空间。此处仅释放了PE对应的空间，原TEB仍然保留，所以IAT表仍然存在，无需进行重新导入模块等操作。</p>
+<p>golang中提供了PE库，可以不手写windows PEheader结构体对一个PE文件结构进行分析，一个PE文件的结果如下图所示：<br><img src="https://image-host-1304136909.cos.ap-shanghai.myqcloud.com/blog/ProcessHollowing%E4%B8%8EReflectiveDll/image-20230406194340240.png" alt="image-20230406194340240"></p>
+<p>可以看到文件在磁盘上的大小一般来说小于在内存中的大小，主要原因好像是各个节在内存中是需要按页对其的，而在磁盘上的对齐可能和内存上不一样？不过文件在磁盘上时，其PE header中写的各项大小以及偏移即为其装载到内存中的对应的大小和偏移，所以对着数据分配内存就行</p>
+<p>推荐阅读<br><a target="_blank" rel="external nofollow noopener noreferrer" href="https://zhuanlan.kanxue.com/article-10602.htm">PE文件格式详细解析（一）</a><br>开局的DOS头和DOS stub没什么用，用来兼容远古系统的，DOS头就是经典的那个MZ开头的魔数，然后还有一个<code>This program cannot be run in DOS mod</code>经典字符串，唯一作用是指明PE头在哪，PE头开头是PE魔数，以及一些相关属性，包含一个Option_header，包含了ImageBase，AddressOfEntryPoint等关键成员</p>
+<p>当然，golang pe库一键解析，这里了解一下大概结构即可。<br>不过这里的ImageBase不会被使用，我们就着原PE的baseaddr alloc分配空间，并填入内存，据说这样子可以不考虑重定向（原理未知）<br><a target="_blank" rel="external nofollow noopener noreferrer" href="https://3gstudent.github.io/%E5%82%80%E5%84%A1%E8%BF%9B%E7%A8%8B%E7%9A%84%E5%AE%9E%E7%8E%B0%E4%B8%8E%E6%A3%80%E6%B5%8B">傀儡进程的实现与检测</a></p>
+<p>先写header，把DOS&#x2F;PE header和各section header写到内存里，然后从各section header中解析出各段的地址，这个地址都是相当于基址的偏移，就着基址加一下写进去，最后将rcx寄存器改成当前镜像的EntryPoint，resumeThread就能完成劫持（这里一开始是抄的网上代码Alloc整个imageSize的内存并且是RWX，defender直接静态报毒，然后我改成了每个段独立分配并且写完之后按照段上的权限修改成RW或者RX之类的，就不报毒了，怎么回事捏）</p>
+<pre class=" language-go"><code class="language-go">    <span class="token keyword">for</span> <span class="token boolean">_</span><span class="token punctuation">,</span> section <span class="token operator">:=</span> <span class="token keyword">range</span> image<span class="token punctuation">.</span>Sections <span class="token punctuation">{</span>
+        <span class="token keyword">var</span> flag <span class="token builtin">uint32</span> <span class="token operator">=</span> <span class="token number">0</span>
+        <span class="token comment" spellcheck="true">// 0x20000000 可执行 0x40000000 可读 0x80000000 可写</span>
+        <span class="token comment" spellcheck="true">// 理论上来说所有段都是可读的，且不存在rwx三个一起，在可读基础上对可写可执行做判断</span>
+        fmt<span class="token punctuation">.</span><span class="token function">Printf</span><span class="token punctuation">(</span><span class="token string">"%s number of relocations: %d\n"</span><span class="token punctuation">,</span> section<span class="token punctuation">.</span>Name<span class="token punctuation">,</span> section<span class="token punctuation">.</span>NumberOfRelocations<span class="token punctuation">)</span>
+        <span class="token keyword">if</span> section<span class="token punctuation">.</span>Characteristics<span class="token operator">&amp;</span><span class="token number">0x40000000</span> <span class="token operator">==</span> <span class="token number">0x40000000</span> <span class="token punctuation">{</span>
+            fmt<span class="token punctuation">.</span><span class="token function">Printf</span><span class="token punctuation">(</span><span class="token string">"section %s is readable\n"</span><span class="token punctuation">,</span> section<span class="token punctuation">.</span>Name<span class="token punctuation">)</span>
+            <span class="token keyword">if</span> section<span class="token punctuation">.</span>Characteristics<span class="token operator">&amp;</span><span class="token number">0x20000000</span> <span class="token operator">==</span> <span class="token number">0x20000000</span> <span class="token punctuation">{</span>
+                fmt<span class="token punctuation">.</span><span class="token function">Printf</span><span class="token punctuation">(</span><span class="token string">"section %s is executable\n"</span><span class="token punctuation">,</span> section<span class="token punctuation">.</span>Name<span class="token punctuation">)</span>
+                flag <span class="token operator">=</span> windows<span class="token punctuation">.</span>PAGE_EXECUTE_READ
+            <span class="token punctuation">}</span> <span class="token keyword">else</span> <span class="token keyword">if</span> section<span class="token punctuation">.</span>Characteristics<span class="token operator">&amp;</span><span class="token number">0x80000000</span> <span class="token operator">==</span> <span class="token number">0x80000000</span> <span class="token punctuation">{</span>
+                fmt<span class="token punctuation">.</span><span class="token function">Printf</span><span class="token punctuation">(</span><span class="token string">"section %s is writeable\n"</span><span class="token punctuation">,</span> section<span class="token punctuation">.</span>Name<span class="token punctuation">)</span>
+                flag <span class="token operator">=</span> windows<span class="token punctuation">.</span>PAGE_READWRITE
+            <span class="token punctuation">}</span> <span class="token keyword">else</span> <span class="token punctuation">{</span>
+                flag <span class="token operator">=</span> windows<span class="token punctuation">.</span>PAGE_READONLY
+            <span class="token punctuation">}</span>
+        <span class="token punctuation">}</span> <span class="token keyword">else</span> <span class="token punctuation">{</span>
+            fmt<span class="token punctuation">.</span><span class="token function">Printf</span><span class="token punctuation">(</span><span class="token string">"not readable section %s"</span><span class="token punctuation">,</span> section<span class="token punctuation">.</span>Name<span class="token punctuation">)</span>
+        <span class="token punctuation">}</span>
+
+        sectionData<span class="token punctuation">,</span> err <span class="token operator">:=</span> section<span class="token punctuation">.</span><span class="token function">Data</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+        <span class="token keyword">if</span> err <span class="token operator">!=</span> <span class="token boolean">nil</span> <span class="token punctuation">{</span>
+            <span class="token function">panic</span><span class="token punctuation">(</span>fmt<span class="token punctuation">.</span><span class="token function">Sprintf</span><span class="token punctuation">(</span><span class="token string">"section.Data failed: %v"</span><span class="token punctuation">,</span> err<span class="token punctuation">)</span><span class="token punctuation">)</span>
+
+        <span class="token punctuation">}</span>
+        <span class="token keyword">if</span> <span class="token function">len</span><span class="token punctuation">(</span>sectionData<span class="token punctuation">)</span> <span class="token operator">!=</span> <span class="token number">0</span> <span class="token punctuation">{</span>
+            <span class="token comment" spellcheck="true">//先写再改，不然有的只读段会出错</span>
+            err <span class="token operator">=</span> windows<span class="token punctuation">.</span><span class="token function">WriteProcessMemory</span><span class="token punctuation">(</span>hProcess<span class="token punctuation">,</span> allocAddr<span class="token operator">+</span><span class="token function">uintptr</span><span class="token punctuation">(</span>section<span class="token punctuation">.</span>VirtualAddress<span class="token punctuation">)</span><span class="token punctuation">,</span> <span class="token operator">&amp;</span>sectionData<span class="token punctuation">[</span><span class="token number">0</span><span class="token punctuation">]</span><span class="token punctuation">,</span> <span class="token function">uintptr</span><span class="token punctuation">(</span>section<span class="token punctuation">.</span>Size<span class="token punctuation">)</span><span class="token punctuation">,</span> <span class="token boolean">nil</span><span class="token punctuation">)</span>
+            <span class="token keyword">if</span> err <span class="token operator">!=</span> <span class="token boolean">nil</span> <span class="token punctuation">{</span>
+                <span class="token function">panic</span><span class="token punctuation">(</span>fmt<span class="token punctuation">.</span><span class="token function">Sprintf</span><span class="token punctuation">(</span><span class="token string">"WriteProcessMemory failed: %v"</span><span class="token punctuation">,</span> err<span class="token punctuation">)</span><span class="token punctuation">)</span>
+
+            <span class="token punctuation">}</span>
+            <span class="token keyword">var</span> oldProtect <span class="token builtin">uint32</span>
+            err <span class="token operator">=</span> windows<span class="token punctuation">.</span><span class="token function">VirtualProtectEx</span><span class="token punctuation">(</span>hProcess<span class="token punctuation">,</span> allocAddr<span class="token operator">+</span><span class="token function">uintptr</span><span class="token punctuation">(</span>section<span class="token punctuation">.</span>VirtualAddress<span class="token punctuation">)</span><span class="token punctuation">,</span> <span class="token function">uintptr</span><span class="token punctuation">(</span>section<span class="token punctuation">.</span>Size<span class="token punctuation">)</span><span class="token punctuation">,</span> flag<span class="token punctuation">,</span> <span class="token operator">&amp;</span>oldProtect<span class="token punctuation">)</span>
+            <span class="token keyword">if</span> err <span class="token operator">!=</span> <span class="token boolean">nil</span> <span class="token punctuation">{</span>
+                <span class="token function">panic</span><span class="token punctuation">(</span>fmt<span class="token punctuation">.</span><span class="token function">Sprintf</span><span class="token punctuation">(</span><span class="token string">"VirtualProtectEx failed: %v"</span><span class="token punctuation">,</span> err<span class="token punctuation">)</span><span class="token punctuation">)</span>
+
+            <span class="token punctuation">}</span>
+        <span class="token punctuation">}</span>
+    <span class="token punctuation">}</span>
+</code></pre>
+<p>其中有几个想不太通的地方，如果稍微调试一下就会发现原image的baseAddr和header中的初始BaseAddr是会有区别的，这样子会牵扯到PE中绝对地址的重定向，所有需要被重定向的绝对地址会位于<code>.reloc</code>节中，在pe加载进内存时应当计算出header中基址与实际装载基址的差将reloc节中的每一项中对应的内容改掉，有一些示例代码中也给出了对应的修改代码，但是我复现的时候以及抄的代码里是可以去掉重定向环节的。section header中有一项<code>NumberOfRelocations</code>，调试的时候发现每一个节的值均为0，是因为现代二进制程序都是PIE吗，是不是现在全都用地址无关码了？但是每个文件的reloc节也不是空的，都有万吧个字节内容，不懂捏</p>
+<p>再一个是入口点修改，网上的资料大多是说入口为eax（32位，如果64位应该对应rax），而这里改的是rcx，即context中rax后面一个寄存器，C++代码中的注释写的是修改rax，但代码中是rcx，抽象。以及一开始提到的从rdx寄存器中找镜像基址。。。</p>
+<p>综上所述，这个操作暂时只理解了流程，未理解深入原理，并且存在一系列未解之谜。。。</p>
+<p>顺便比较一下三个注入方案，CreateRemoteThread创建远程线程，QueueUserAPC的好处在于劫持已存在线程，没有创建环节，ProcessHollowing可以直接注入一个原始pe进去，没有新的线程启动，调用的方法为SetThreadContext</p>
+<h2 id="ReflectiveDLL"><a href="#ReflectiveDLL" class="headerlink" title="ReflectiveDLL"></a>ReflectiveDLL</h2><p>考虑一下注入类型的操作，如果注入的只是简单的shellcode的话，啥也不用考虑，注进去直接从头执行就可以了，然而如果注入的是一个拥有众多功能的木马，一般来说就跑不起来，关键点在于注入的木马大多是依赖于外部的动态链接库的，即使你说你是顶级静态编译打包一切，windows的ntdll等操作系统级别的基础库也是打包不进去的。正常的程序在加载时操作系统会通过PE loader为其创建好对应的IAT表，而我们注入进去的代码可就一无所有了。</p>
+<p>如果对比进程镂空与反射dll的话，进程镂空真的比反射Dll方便很多，因为镂空的进程保留了原TEB，可以就着旧进程的IAT表，这样子ntdll等基础模块的函数是天生就能使用的，自己需要的函数也可以用现成的LoadLibrary和GetProcAddress等方法临时加载（胡言乱语中），而当我们CreateRemoteThread的时候，注入进去的新线程可没有人给你填IAT，最基础的ntdll函数都没有，就完全没法运行了。这也就是reflective loader的作用，手动寻找当前进程中ntdll的位置，手动提取LoadLibrary等方法，然后遍历PE的导入表，手动修复IAT<br><a target="_blank" rel="external nofollow noopener noreferrer" href="https://paper.seebug.org/1855">深入理解反射式 dll 注入技术</a><br><a target="_blank" rel="external nofollow noopener noreferrer" href="https://github.com/stephenfewer/ReflectiveDLLInjection/blob/master/dll/src/ReflectiveLoader.c">ReflectiveLoader.c</a></p>
+<p>因此，reflective loader就是一段不依赖任何外部函数的shellcode般的代码，充当PE loader的角色还原一个程序需要运行时的环境<br>reflective loader就做这么几个工作：</p>
+<ol start="0">
+<li><p>通过caller()函数找到当前reflective loader()函数地址，然后向前寻找，直到找到<code>MZ</code>这个DOS头，找到image基址。（注意到我们注入reflective dll的时候都是直接将文件注入进去的，而非进程镂空一样解析PE格式按段写入）</p>
+</li>
+<li><p>使用汇编<code>__readgsqword</code>读取gs寄存器偏移0x60位的数据，amd64机器下gs寄存器指向TEB，偏移0x60位即为指向PEB的指针，PEB中有一个LDR_DATA结构体，里面存储了人见人爱的<code>InMemoryOrderModuleList</code>，根据windows上的加载惯例，第一个module是PE本身，第二个是ntdll，第三个是kernel32，通过遍历这个链表，就能够拿到内存中已加载的各个Dll的基址。接下来遍历Dll的导出表，翻出我们需要的函数的地址。（实际上，很多相关操作都是这样获取到常见函数并进行直接调用的）</p>
+</li>
+</ol>
+<p><img src="https://image-host-1304136909.cos.ap-shanghai.myqcloud.com/blog/ProcessHollowing%E4%B8%8EReflectiveDll/image-20230407120857163.png" alt="image-20230407120857163"></p>
+<p><img src="https://image-host-1304136909.cos.ap-shanghai.myqcloud.com/blog/ProcessHollowing%E4%B8%8EReflectiveDll/image-20230407120913253.png" alt="image-20230407120913253"></p>
+<ol start="2">
+<li>接下来Alloc一个新的空间，正式将注入的dll以其内存中的格式分配进去，由于上一步里面只解析了VirtualAlloc，LoadLibrary等函数，这里的写入是手动偏移然后一个字节一个字节复制进去的，同样为了方便起见，Alloc的时候直接上的RDX，感觉是一个很明显的特征。。。不过由于没有提取VirtualProtect，所以也没法改</li>
+<li>从PE头中找import table，把需要导入的dll和函数分别用之前从kernel32里翻出来的LoadLibrary和GetProcAddress加载进来，填入IAT，提供完整的运行环境。这一步是根据导入表中的name来寻找函数的，所以之前写reflective dll注入的时候，可以通过直接将dll中的<code>ExitProcess</code>改成<code>ExitThread\x00</code>来更改调用的函数</li>
+<li>通过reloc节将所有需要重定向的位置进行重定向</li>
+<li>调用dllMain，完成利用</li>
+</ol>
+<h2 id="pe2shellcode"><a href="#pe2shellcode" class="headerlink" title="pe2shellcode"></a>pe2shellcode</h2><p>类似的，可以通过上述的原理直接在内存中装载pe，同样的添加一段shellcode类型的loader完成模块导入和重定向等技术即可<br><a target="_blank" rel="external nofollow noopener noreferrer" href="https://cloud.tencent.com/developer/article/1597696">无文件执行：一切皆是shellcode</a></p>
+<p>有一个地方没有很想通，按照上述情况讨论，CreateRemoteThread启动的应该是一个全新的环境，起码没有继承原进程的PEB，所以需要自己找ntdll里的方法然后恢复导入表，但是正常使用CreateRemoteThread时，不可能也是一个裸环境吧，但是我确实没有写过正常的CreateRemoteThread的应用。。。不是很清楚具体用法。然后搜了一下感觉全是调用LoadLibrary注入dll的操作。。。</p>
+<p>对于dll注入那种调用远程LoadLibrary的CreateRemoteThread操作能够成功也是很玄学的，因为windows奇怪的机制，每个进程的ntdll和kernel32的地址在每次开机后都是一样的，所以可以直接提供当前进程的LoadLibrary地址去调用远程（但是LoadLibrary难道不依赖任何其他函数吗？）</p>
+<p>PE2Shellcode这个项目里面还有一个有意思的issue，注入到wow64进程时，他的PEB应该是32位的还是64位的呢？Stack Overflow上有一个<a target="_blank" rel="external nofollow noopener noreferrer" href="https://stackoverflow.com/questions/72674069/how-can-a-wow64-program-overwrite-its-command-line-arguments-as-seen-by-wmi">回答</a>说wow64有两个peb，一个32位一个64位，并且不同的应用交互的时候看的PEB还不一样。。。</p>
+<h2 id="wow64与x64跨位数注入"><a href="#wow64与x64跨位数注入" class="headerlink" title="wow64与x64跨位数注入"></a>wow64与x64跨位数注入</h2><p>算是看到那个issue后继续搜索得到的一个附加项？lrj之前去面试的时候也被问到过对应的问题，32位进程和64位进程互相注入应该怎么操作呢？当时他没答上来，我认为wow64会进行系统调用转换，以为只要payload的位数和目标进程一致，注入就能成功，即使位数不同数据结构不同，但是对应位数的payload本身就被设计在对应数据结构下运行，所以也没有问题，不过没有手动实践过，然后这个文章指出我的想法不对<br><a target="_blank" rel="external nofollow noopener noreferrer" href="http://www.corsix.org/content/dll-injection-and-wow64">DLL Injection and WoW64</a><br>这里指出问题在于x86的CreateRemoteThread无法成功在64位进程上生效（我猜是虽然转换了调用格式但是x86的远程线程也是32位的，无法在64位进程中运行？），而x86的进程只加载了64位的ntdll，没法调用64位的kernel32里的CreateRemoteThread</p>
+<p>自己写了个demo try了一下，shellcode用的msfvenom生成的calc，32位和64位各一份，配合process hacker看具体情况，由于go在x86下不能调试，只能用这种<code>Press enter to continue</code>的办法手动停下来</p>
+<pre class=" language-go"><code class="language-go">    err <span class="token operator">:=</span> windows<span class="token punctuation">.</span><span class="token function">CreateProcess</span><span class="token punctuation">(</span>windows<span class="token punctuation">.</span><span class="token function">StringToUTF16Ptr</span><span class="token punctuation">(</span><span class="token string">"C:\\Windows\\sysnative\\notepad.exe"</span><span class="token punctuation">)</span><span class="token punctuation">,</span> <span class="token boolean">nil</span><span class="token punctuation">,</span> <span class="token boolean">nil</span><span class="token punctuation">,</span> <span class="token boolean">nil</span><span class="token punctuation">,</span> <span class="token boolean">false</span><span class="token punctuation">,</span> <span class="token number">0</span><span class="token punctuation">,</span> <span class="token boolean">nil</span><span class="token punctuation">,</span> <span class="token boolean">nil</span><span class="token punctuation">,</span> <span class="token operator">&amp;</span>si<span class="token punctuation">,</span> <span class="token operator">&amp;</span>pi<span class="token punctuation">)</span>
+    <span class="token keyword">if</span> err <span class="token operator">!=</span> <span class="token boolean">nil</span> <span class="token operator">&amp;&amp;</span> err <span class="token operator">!=</span> windows<span class="token punctuation">.</span>ERROR_SUCCESS <span class="token punctuation">{</span>
+        <span class="token function">panic</span><span class="token punctuation">(</span>err<span class="token punctuation">)</span>
+    <span class="token punctuation">}</span>
+    fmt<span class="token punctuation">.</span><span class="token function">Print</span><span class="token punctuation">(</span><span class="token string">"Press enter to continue..."</span><span class="token punctuation">)</span>
+    bufio<span class="token punctuation">.</span><span class="token function">NewReader</span><span class="token punctuation">(</span>os<span class="token punctuation">.</span>Stdin<span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">ReadBytes</span><span class="token punctuation">(</span><span class="token string">'\n'</span><span class="token punctuation">)</span>
+    hProcess <span class="token operator">:=</span> pi<span class="token punctuation">.</span>Process
+    <span class="token keyword">defer</span> windows<span class="token punctuation">.</span><span class="token function">CloseHandle</span><span class="token punctuation">(</span>hProcess<span class="token punctuation">)</span>
+    kernel32 <span class="token operator">:=</span> windows<span class="token punctuation">.</span><span class="token function">NewLazySystemDLL</span><span class="token punctuation">(</span><span class="token string">"kernel32.dll"</span><span class="token punctuation">)</span>
+    procVirtualAllocEx <span class="token operator">:=</span> kernel32<span class="token punctuation">.</span><span class="token function">NewProc</span><span class="token punctuation">(</span><span class="token string">"VirtualAllocEx"</span><span class="token punctuation">)</span>
+    addr<span class="token punctuation">,</span> <span class="token boolean">_</span><span class="token punctuation">,</span> err <span class="token operator">:=</span> procVirtualAllocEx<span class="token punctuation">.</span><span class="token function">Call</span><span class="token punctuation">(</span><span class="token function">uintptr</span><span class="token punctuation">(</span>hProcess<span class="token punctuation">)</span><span class="token punctuation">,</span> <span class="token number">0</span><span class="token punctuation">,</span> <span class="token function">uintptr</span><span class="token punctuation">(</span><span class="token function">len</span><span class="token punctuation">(</span>calc<span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">,</span> windows<span class="token punctuation">.</span>MEM_COMMIT<span class="token operator">|</span>windows<span class="token punctuation">.</span>MEM_RESERVE<span class="token punctuation">,</span> windows<span class="token punctuation">.</span>PAGE_EXECUTE_READWRITE<span class="token punctuation">)</span>
+    <span class="token keyword">if</span> err <span class="token operator">!=</span> <span class="token boolean">nil</span> <span class="token operator">&amp;&amp;</span> err <span class="token operator">!=</span> windows<span class="token punctuation">.</span>ERROR_SUCCESS <span class="token punctuation">{</span>
+        <span class="token function">panic</span><span class="token punctuation">(</span>err<span class="token punctuation">)</span>
+    <span class="token punctuation">}</span>
+
+    fmt<span class="token punctuation">.</span><span class="token function">Println</span><span class="token punctuation">(</span><span class="token string">"alloc addr: "</span><span class="token punctuation">,</span> addr<span class="token punctuation">)</span>
+
+    err <span class="token operator">=</span> windows<span class="token punctuation">.</span><span class="token function">WriteProcessMemory</span><span class="token punctuation">(</span>hProcess<span class="token punctuation">,</span> addr<span class="token punctuation">,</span> <span class="token operator">&amp;</span>calc<span class="token punctuation">[</span><span class="token number">0</span><span class="token punctuation">]</span><span class="token punctuation">,</span> <span class="token function">uintptr</span><span class="token punctuation">(</span><span class="token function">len</span><span class="token punctuation">(</span>calc<span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">,</span> <span class="token boolean">nil</span><span class="token punctuation">)</span>
+    <span class="token keyword">if</span> err <span class="token operator">!=</span> <span class="token boolean">nil</span> <span class="token operator">&amp;&amp;</span> err <span class="token operator">!=</span> windows<span class="token punctuation">.</span>ERROR_SUCCESS <span class="token punctuation">{</span>
+        <span class="token function">panic</span><span class="token punctuation">(</span>err<span class="token punctuation">)</span>
+    <span class="token punctuation">}</span>
+    fmt<span class="token punctuation">.</span><span class="token function">Print</span><span class="token punctuation">(</span><span class="token string">"Press enter to continue..."</span><span class="token punctuation">)</span>
+    bufio<span class="token punctuation">.</span><span class="token function">NewReader</span><span class="token punctuation">(</span>os<span class="token punctuation">.</span>Stdin<span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">ReadBytes</span><span class="token punctuation">(</span><span class="token string">'\n'</span><span class="token punctuation">)</span>
+    procCreateRemoteThread <span class="token operator">:=</span> kernel32<span class="token punctuation">.</span><span class="token function">NewProc</span><span class="token punctuation">(</span><span class="token string">"CreateRemoteThread"</span><span class="token punctuation">)</span>
+    hThread<span class="token punctuation">,</span> <span class="token boolean">_</span><span class="token punctuation">,</span> err <span class="token operator">:=</span> procCreateRemoteThread<span class="token punctuation">.</span><span class="token function">Call</span><span class="token punctuation">(</span><span class="token function">uintptr</span><span class="token punctuation">(</span>hProcess<span class="token punctuation">)</span><span class="token punctuation">,</span> <span class="token number">0</span><span class="token punctuation">,</span> <span class="token number">0</span><span class="token punctuation">,</span> addr<span class="token punctuation">,</span> <span class="token number">0</span><span class="token punctuation">,</span> <span class="token number">0</span><span class="token punctuation">,</span> <span class="token number">0</span><span class="token punctuation">)</span>
+    <span class="token keyword">defer</span> windows<span class="token punctuation">.</span><span class="token function">CloseHandle</span><span class="token punctuation">(</span>windows<span class="token punctuation">.</span><span class="token function">Handle</span><span class="token punctuation">(</span>hThread<span class="token punctuation">)</span><span class="token punctuation">)</span>
+    <span class="token keyword">if</span> err <span class="token operator">!=</span> <span class="token boolean">nil</span> <span class="token operator">&amp;&amp;</span> err <span class="token operator">!=</span> windows<span class="token punctuation">.</span>ERROR_SUCCESS <span class="token punctuation">{</span>
+        <span class="token function">panic</span><span class="token punctuation">(</span>err<span class="token punctuation">)</span>
+    <span class="token punctuation">}</span>
+    fmt<span class="token punctuation">.</span><span class="token function">Print</span><span class="token punctuation">(</span><span class="token string">"Press enter to continue..."</span><span class="token punctuation">)</span>
+    bufio<span class="token punctuation">.</span><span class="token function">NewReader</span><span class="token punctuation">(</span>os<span class="token punctuation">.</span>Stdin<span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">ReadBytes</span><span class="token punctuation">(</span><span class="token string">'\n'</span><span class="token punctuation">)</span>
+    windows<span class="token punctuation">.</span><span class="token function">WaitForSingleObject</span><span class="token punctuation">(</span>windows<span class="token punctuation">.</span><span class="token function">Handle</span><span class="token punctuation">(</span>hThread<span class="token punctuation">)</span><span class="token punctuation">,</span> windows<span class="token punctuation">.</span>INFINITE<span class="token punctuation">)</span>
+</code></pre>
+<p>显然，x86注入x86 shellcode到x86进程和x64注入x64 shellcode到x64进程是毫无问题的，同时，注入的shellcode与目标的架构不一致也是绝对不行的</p>
+<p>然而，x64进程是可以顺利的将x86 shellcode注入到x86进程中并顺利运行的，而x86进程却无法将x64 shellcode注入到x64进程中成功运行，前两步创建x64进程以及virtualAlloc和writeProcessMemory都是成功的，但是CreateRemoteThread直接返回一个access denied就挂掉了，与前文观察到的现象一致</p>
+<p>最好的解决方案可能是直接在32位进程里调用64位api，有作者提出了名为天堂之门(Heaven’s Gate)的技术，<a target="_blank" rel="external nofollow noopener noreferrer" href="http://blog.rewolf.pl/blog/?p=102">Mixing x86 with x64 code</a><br>作者在文章中指出：</p>
+<blockquote>
+<p>Summing things up, for every process (x86 &amp; x64) running on 64-bits Windows there are allocated two code segments<br>cs &#x3D; 0x23 -&gt; x86 mode<br>cs &#x3D; 0x33 -&gt; x64 mode</p>
+</blockquote>
+<p>简单的说，就是直接改寄存器让运行在x86下的进程切换到x64状态下调用x64函数，完成了再切回x86。<br>windows使用了两套代码分别实现32位和64位的系统调用，想要在32位和64位间切换，只需要修改段寄存器，使用对应的代码段即可。虽然说起来好像很简单，但实际上使用还是很复杂的。因为LoadLibrary等函数位于kernel32，而32位进程默认只加载ntdll.dll,wow64.dll,wow64cpu.dll以及wow64win.dll，手动实现LoadLibrary很复杂并且他失败了。所以最后又使用了经典从寄存器拿TEB，最后从PEB里面拿<code>InMemoryOrderModuleList</code>最后遍历模块的方式，这样子就能调用64位ntdll里面的部分方法了，然后再手搓汇编在32位下进行64位函数调用。缺陷在于能够调用的函数仅限于ntdll，因为真的加载不上其他dll。。。<a target="_blank" rel="external nofollow noopener noreferrer" href="https://github.com/rwfpl/rewolf-wow64ext/blob/master/doc/wow64ext.txt">这里</a>写了能调用的一部分函数，没有QueueUserAPC和CreateRemoteThread等方法，但是有SetThreadContext，可以考虑用进程镂空的方法进行注入</p>
+<p>综上所述，据我目前可知的搜索结果（实践次数0），跨位数的进程注入是较难实现的，x86对x64的进程操作并不能简单的认为通过wow64进行转换即可正常使用，手动切换CPU上下文在x86进程中发起x64调用由于内存中只有64位ntdll，能够调用的方法也较为有限，不知道x64切到x86倒是没啥问题。但是由于主要的研究目标还是32位通杀32和64，这样子32位和64位机器都能跑起来，毕竟64位注32位意义不是很大。。。</p>
+<p>但实际上，我们能32位注32位，64位注64位在实际使用中就已经很足够了，就这样8，周末开始玩耍</p>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/pentest/" rel="tag"># pentest</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/pollution.html" rel="prev" title="pollution here, pollution there, pollution everywhere">
+      <i class="fa fa-chevron-left"></i> pollution here, pollution there, pollution everywhere
+    </a></div>
+      <div class="post-nav-item"></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+    <div class="comments" id="valine-comments"></div>
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#ProcessHollowing%E4%B8%8EReflectiveDLL"><span class="nav-number">1.</span> <span class="nav-text">ProcessHollowing与ReflectiveDLL</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#ProcessHollowing"><span class="nav-number">1.1.</span> <span class="nav-text">ProcessHollowing</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#ReflectiveDLL"><span class="nav-number">1.2.</span> <span class="nav-text">ReflectiveDLL</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#pe2shellcode"><span class="nav-number">1.3.</span> <span class="nav-text">pe2shellcode</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#wow64%E4%B8%8Ex64%E8%B7%A8%E4%BD%8D%E6%95%B0%E6%B3%A8%E5%85%A5"><span class="nav-number">1.4.</span> <span class="nav-text">wow64与x64跨位数注入</span></a></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Z3ratu1" src="https://q2.qlogo.cn/headimg_dl?dst_uin=1207039417&spec=160">
+  <p class="site-author-name" itemprop="name">Z3ratu1</p>
+  <div class="site-description" itemprop="description">与其感慨路难行，不如现在出发</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">176</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">5</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">92</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+  <div class="beian"><a href="http://www.beian.miit.gov.cn/" rel="external nofollow noopener noreferrer" target="_blank">湘ICP备2020021580号 </a>
+      <img src="/./images/beian.png" style="display: inline-block;">
+  </div>
+
+<div class="copyright">
+  
+  &copy; 2019 – 
+  <span itemprop="copyrightYear">2023</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Z3ratu1</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="external nofollow noopener noreferrer" target="_blank">Hexo</a> & <a href="https://pisces.theme-next.org/" class="theme-link" rel="external nofollow noopener noreferrer" target="_blank">NexT.Pisces</a> 强力驱动
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+
+<script>
+NexT.utils.loadComments(document.querySelector('#valine-comments'), () => {
+  NexT.utils.getScript('https://cdn.jsdelivr.net/npm/valine@1.4.14/dist/Valine.min.js', () => {
+    var GUEST = ['nick', 'mail', 'link'];
+    var guest = 'nick,mail,link';
+    guest = guest.split(',').filter(item => {
+      return GUEST.includes(item);
+    });
+    new Valine({
+      el         : '#valine-comments',
+      verify     : false,
+      notify     : false,
+      appId      : '7H8kg0XdWO8IbhOcu4K1JaAT-gzGzoHsz',
+      appKey     : 'wPKQjkbVtvPaRR7gh2yjfLSi',
+      placeholder: "Just go go",
+      avatar     : 'mm',
+      meta       : guest,
+      pageSize   : '10' || 10,
+      visitor    : true,
+      lang       : '' || 'zh-cn',
+      path       : location.pathname,
+      recordIP   : false,
+      serverURLs : ''
+    });
+  }, window.Valine);
+});
+</script>
+
+</body>
+</html>
