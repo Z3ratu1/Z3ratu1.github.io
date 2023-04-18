@@ -1,0 +1,638 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 6.0.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"blog.z3ratu1.cn","root":"/","scheme":"Pisces","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"always","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":true},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+  </script>
+
+  <meta name="description" content="从烂土豆开始的土豆家族入门对.NET和COM一窍不通，代码一行都没写过，全篇内容由读各种文章+自行想象完成，不保证准确性，若发现错误请及时联系我更改 windows在远古版本前，各种服务都是以最高权限SYSTEM跑起来的，那个时候mssql的一个xp_cmdshell就可以一键打到底，而在某个版本后，添加了local service用户，之后iis或者mssql就被降权为了networkservi">
+<meta property="og:type" content="article">
+<meta property="og:title" content="从烂土豆开始的土豆家族入门">
+<meta property="og:url" content="https://blog.z3ratu1.cn/%E4%BB%8E%E7%83%82%E5%9C%9F%E8%B1%86%E5%BC%80%E5%A7%8B%E7%9A%84%E5%9C%9F%E8%B1%86%E5%AE%B6%E6%97%8F%E5%85%A5%E9%97%A8.html">
+<meta property="og:site_name" content="Z3ratu1&#39;s blog">
+<meta property="og:description" content="从烂土豆开始的土豆家族入门对.NET和COM一窍不通，代码一行都没写过，全篇内容由读各种文章+自行想象完成，不保证准确性，若发现错误请及时联系我更改 windows在远古版本前，各种服务都是以最高权限SYSTEM跑起来的，那个时候mssql的一个xp_cmdshell就可以一键打到底，而在某个版本后，添加了local service用户，之后iis或者mssql就被降权为了networkservi">
+<meta property="og:locale">
+<meta property="og:image" content="https://jlajara.gitlab.io/assets/images/posts/20201122/Diagram_1.png">
+<meta property="og:image" content="https://jlajara.gitlab.io/assets/images/posts/20201122/Diagram_2.png">
+<meta property="og:image" content="https://image-host-1304136909.cos.ap-shanghai.myqcloud.com/blog/%E4%BB%8E%E7%83%82%E5%9C%9F%E8%B1%86%E5%BC%80%E5%A7%8B%E7%9A%84%E5%9C%9F%E8%B1%86%E5%AE%B6%E6%97%8F%E5%85%A5%E9%97%A8/image2.png">
+<meta property="og:image" content="https://jlajara.gitlab.io/assets/images/posts/20201122/Diagram_3.png">
+<meta property="og:image" content="https://image-host-1304136909.cos.ap-shanghai.myqcloud.com/blog/%E4%BB%8E%E7%83%82%E5%9C%9F%E8%B1%86%E5%BC%80%E5%A7%8B%E7%9A%84%E5%9C%9F%E8%B1%86%E5%AE%B6%E6%97%8F%E5%85%A5%E9%97%A8/image5.png">
+<meta property="article:published_time" content="2023-04-11T03:54:20.000Z">
+<meta property="article:modified_time" content="2023-04-18T02:07:44.246Z">
+<meta property="article:author" content="Z3ratu1">
+<meta property="article:tag" content="pentest">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://jlajara.gitlab.io/assets/images/posts/20201122/Diagram_1.png">
+
+<link rel="canonical" href="https://blog.z3ratu1.cn/%E4%BB%8E%E7%83%82%E5%9C%9F%E8%B1%86%E5%BC%80%E5%A7%8B%E7%9A%84%E5%9C%9F%E8%B1%86%E5%AE%B6%E6%97%8F%E5%85%A5%E9%97%A8.html">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-Hans'
+  };
+</script>
+
+  <title>从烂土豆开始的土豆家族入门 | Z3ratu1's blog</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+<link rel="stylesheet" href="/css/prism-tomorrow.css" type="text/css"></head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">Z3ratu1's blog</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">Welcome</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>关于</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+        <li class="menu-item menu-item-links">
+
+    <a href="/links/" rel="section"><i class="fa fa-link fa-fw"></i>友链</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off" placeholder="搜索..." spellcheck="false" type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+  <a href="https://github.com/Z3ratu1" class="github-corner" title="Follow me on GitHub" aria-label="Follow me on GitHub" rel="external nofollow noopener noreferrer" target="_blank"><svg width="80" height="80" viewbox="0 0 250 250" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"/><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"/><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"/></svg></a>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
+    <link itemprop="mainEntityOfPage" href="https://blog.z3ratu1.cn/%E4%BB%8E%E7%83%82%E5%9C%9F%E8%B1%86%E5%BC%80%E5%A7%8B%E7%9A%84%E5%9C%9F%E8%B1%86%E5%AE%B6%E6%97%8F%E5%85%A5%E9%97%A8.html">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="https://q2.qlogo.cn/headimg_dl?dst_uin=1207039417&spec=160">
+      <meta itemprop="name" content="Z3ratu1">
+      <meta itemprop="description" content="与其感慨路难行，不如现在出发">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Z3ratu1's blog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          从烂土豆开始的土豆家族入门
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2023-04-11 11:54:20" itemprop="dateCreated datePublished" datetime="2023-04-11T11:54:20+08:00">2023-04-11</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2023-04-18 10:07:44" itemprop="dateModified" datetime="2023-04-18T10:07:44+08:00">2023-04-18</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E7%AC%94%E8%AE%B0/" itemprop="url" rel="index"><span itemprop="name">笔记</span></a>
+                </span>
+            </span>
+
+          
+            <span id="/%E4%BB%8E%E7%83%82%E5%9C%9F%E8%B1%86%E5%BC%80%E5%A7%8B%E7%9A%84%E5%9C%9F%E8%B1%86%E5%AE%B6%E6%97%8F%E5%85%A5%E9%97%A8.html" class="post-meta-item leancloud_visitors" data-flag-title="从烂土豆开始的土豆家族入门" title="阅读次数">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span class="leancloud-visitors-count"></span>
+            </span>
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="far fa-comment"></i>
+      </span>
+      <span class="post-meta-item-text">Valine：</span>
+    
+    <a title="valine" href="/%E4%BB%8E%E7%83%82%E5%9C%9F%E8%B1%86%E5%BC%80%E5%A7%8B%E7%9A%84%E5%9C%9F%E8%B1%86%E5%AE%B6%E6%97%8F%E5%85%A5%E9%97%A8.html#valine-comments" itemprop="discussionUrl">
+      <span class="post-comments-count valine-comment-count" data-xid="/%E4%BB%8E%E7%83%82%E5%9C%9F%E8%B1%86%E5%BC%80%E5%A7%8B%E7%9A%84%E5%9C%9F%E8%B1%86%E5%AE%B6%E6%97%8F%E5%85%A5%E9%97%A8.html" itemprop="commentCount"></span>
+    </a>
+  </span>
+  
+  
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h1 id="从烂土豆开始的土豆家族入门"><a href="#从烂土豆开始的土豆家族入门" class="headerlink" title="从烂土豆开始的土豆家族入门"></a>从烂土豆开始的土豆家族入门</h1><p><strong>对.NET和COM一窍不通，代码一行都没写过，全篇内容由读各种文章+自行想象完成，不保证准确性，若发现错误请及时联系我更改</strong></p>
+<p>windows在远古版本前，各种服务都是以最高权限SYSTEM跑起来的，那个时候mssql的一个xp_cmdshell就可以一键打到底，而在某个版本后，添加了local service用户，之后iis或者mssql就被降权为了networkservice之类的账户，权限很低，直接操作几乎啥也干不了，但由于这些账户本身作为服务账户，也需要在特定的情况下拥有高权限，微软是允许这些账户进行提权的，而如果我们能对这些情况进行滥用，同样的也就可以将networkservice账户恢复到system</p>
+<p>土豆系列提权的核心是NTLM中继，通过欺骗运行在高权限（Administrator&#x2F;SYSTEM）的账户进行ntlm认证，同时作为中间人对认证过程进行劫持和重放，最后调用本地认证接口使用高权限账号的ntml认证获取一个高权限token，只要当前进程拥有<code>SeImpersonatePrivilege</code>或<code>SeAssignPrimaryToken</code>权限即可进行令牌模仿，即可取得对应权限（同理，对于直接的令牌窃取利用也需要拥有<code>SeImpersonatePrivilege</code>权限，感觉一般只用于Administrator提到SYSTEM，其他的用户一般来说要么没有这个权限，要么没法直接open高权限账户的token</p>
+<h2 id="hot-potato"><a href="#hot-potato" class="headerlink" title="hot potato"></a>hot potato</h2><p>最初的土豆，需要通过叫做NBNS欺骗的方法欺骗本地主机和攻击者构造的虚假WPAD服务器交互，进而实现NTLM重放，这个不能一打就通还得等待windows update触发，并且NBNS欺骗还需要大量发包进行投毒，总之就是不实用，不学</p>
+<p>利用流程如下图<br><img src="https://jlajara.gitlab.io/assets/images/posts/20201122/Diagram_1.png" alt="Image Diagram 1"></p>
+<p>本文该风格图片来源为<a target="_blank" rel="external nofollow noopener noreferrer" href="https://jlajara.gitlab.io/Potatoes_Windows_Privesc">Potatoes - Windows Privilege Escalation</a></p>
+<h3 id="修复情况"><a href="#修复情况" class="headerlink" title="修复情况"></a>修复情况</h3><p>该漏洞在16年就被修了（虽然实际上遇到的机器比16年老的比比皆是）</p>
+<blockquote>
+<p>Microsoft patched this (MS16-075) by disallowing same-protocol NTLM authentication using a challenge that is already in flight. What this means is that SMB-&gt;SMB NTLM relay from one host back to itself will no longer work. MS16-077 WPAD Name Resolution will not use NetBIOS (CVE-2016-3213) and does not send credential when requesting the PAC file(CVE-2016-3236). WAPD MITM Attack is patched</p>
+</blockquote>
+<p>阻止了SMB协议到SMB协议的NTLM中继，并且修了对WAPD的中间人攻击</p>
+<h2 id="前置知识"><a href="#前置知识" class="headerlink" title="前置知识"></a>前置知识</h2><p>土豆攻击感觉一定程度上是.NET反序列化，不过这里反序列化的利用链和其他语言的利用环节并不一致，由于是凭证窃取，所以是在反序列化过程中引诱高权限进程与恶意服务进程交互，从而完成提权</p>
+<blockquote>
+<p>The key feature that the exploit abused is standard COM marshaling. Specifically when a COM object is marshaled so that it can be used by a different process or host, the COM runtime generates an OBJREF structure, most commonly the OBJREF_STANDARD form. This structure contains all the information necessary to establish a connection between a COM client and the original object in the COM server.</p>
+</blockquote>
+<h2 id="Rotten-Potato"><a href="#Rotten-Potato" class="headerlink" title="Rotten Potato"></a>Rotten Potato</h2><h3 id="tl-dr"><a href="#tl-dr" class="headerlink" title="tl;dr"></a>tl;dr</h3><p>简单的说，就是远程加载一个引用对象，然后解析引用对象的时候需要去其指定的OXID resolver找，然后COM server在和远程服务器（这里直接开在本地的一个端口上）的交互过程中需要进行认证，导致NTLM中继。（总觉得有一点像jndi注入里的远程reference）</p>
+<h3 id="详解"><a href="#详解" class="headerlink" title="详解"></a>详解</h3><p>最经典的土豆，强烈推荐阅读原作者博客，讲得非常清楚<br><a target="_blank" rel="external nofollow noopener noreferrer" href="https://foxglovesecurity.com/2016/09/26/rotten-potato-privilege-escalation-from-service-accounts-to-system/">Rotten Potato – Privilege Escalation from Service Accounts to SYSTEM</a></p>
+<p>NTLM中继流程可以参考如下图片</p>
+<p><img src="https://jlajara.gitlab.io/assets/images/posts/20201122/Diagram_2.png" alt="Image Diagram 2"></p>
+<ol>
+<li>对以SYSTEM权限运行的COM组件调用<code>CoGetInstanceFromIStorage</code>，该函数会尝试和攻击者启动的6666端口进行NTLM认证</li>
+<li>（图中步骤2&#x2F;3）对交互过程进行中继，当COM组件发起NTLM negotiate时，除了将该请求中继到135端口外，同时提取出其中的NTLM协商部分，发起<code>AcceptSecurityContext</code>调用，将截获的NTLM协商发送过去。</li>
+<li>（图中步骤4&#x2F;5&#x2F;6）收到NTLM challenge，此时收到的challenge有两个，中继到135端口的challenge和调用<code>AcceptSecurityContext</code>得到的challenge，此时需要将5中的challenge返回给服务端，这样子才能使服务端应答的是<code>AcceptSecurityContext</code>的challenge</li>
+<li>将NTLM Auth重放，最终<code>AcceptSecurityContext</code>会给出一个安全上下文，通过<code>QuerySecurityContextToken</code>可以获取该上下文的token（此处为SYSTEM），利用Impersonate权限提权到SYSTEM</li>
+</ol>
+<p>讲一点从<code>CoGetInstanceFromIStorage</code>到NTLM认证的具体环节。</p>
+<blockquote>
+<p>CoGetInstanceFromIStorage是一个Windows API函数，用于从一个存储对象中获取COM对象的实例。它可以通过指定服务器信息、类标识符、外部接口、上下文环境和存储对象来创建一个新的COM对象实例，并通过指定接口标识符来返回该实例。它可以用于在应用程序中访问和使用存储在存储对象中的COM对象。</p>
+</blockquote>
+<p>为了让对象能够在进程和主机间传播，COM需要对对象进行序列化(marsharl)，序列化时会创建的OBJREF会包含OXID，OID等恢复该对象所需的标识符，如下是从project zero博文中copy出来的从OBJREF中恢复原对象的过程</p>
+<blockquote>
+<p>Connecting to the original object from the OBJREF is a two part process:</p>
+<ol>
+<li>The client extracts the Object Exporter ID (OXID) from the structure and contacts the OXID resolver service specified by the RPC binding information in the OBJREF.</li>
+<li>The client uses the OXID resolver service to find the RPC binding information of the COM server which hosts the object and establishes a connection to the RPC endpoint to access the object’s interfaces.</li>
+</ol>
+</blockquote>
+<p>这里利用的是过程1，在序列化时手搓数据，将OBJREF中的RPC binding information中的指定为启动在6666端口上的中继服务，当COM server上来访问我们的PRC server时进行NTLM认证实现中继</p>
+<p>抄一个project zero的图</p>
+<p><img src="https://image-host-1304136909.cos.ap-shanghai.myqcloud.com/blog/%E4%BB%8E%E7%83%82%E5%9C%9F%E8%B1%86%E5%BC%80%E5%A7%8B%E7%9A%84%E5%9C%9F%E8%B1%86%E5%AE%B6%E6%97%8F%E5%85%A5%E9%97%A8/image2.png" alt="image2"></p>
+<h3 id="juicy-potato"><a href="#juicy-potato" class="headerlink" title="juicy potato"></a>juicy potato</h3><p>作者的介绍 <a target="_blank" rel="external nofollow noopener noreferrer" href="http://ohpe.it/juicy-potato/">Juicy Potato</a><br>不是新的利用手法，而是对Rotten Potato的强化版本，也是最广为流传的利用版本。Rotten Potato默认使用的是windows的BITS服务作为发起认证的服务端，并且默认在6666端口上，然后微软把BITS服务默认关掉就跑不起来了。</p>
+<p>但实际上任意一个运行在Administrator&#x2F;SYSTEM权限下且实现了<code>IMarshal</code>接口的服务均可作为利用目标，同时这个COM服务需要可以被当前用户实例化（我感觉既然是一个被提供出来的服务应该都可以实例化吧。。。）</p>
+<p>利用手法和烂土豆一致，但是提供了一系列武器化的工具，给出了一个<code>GetCLSID.ps1</code>，可以查找当前机器上可用的CLSID，还有一个<code>test_clsid.bat</code>，可以对classID进行批量测试，将可利用的classID、空闲的端口和对应的token输出出来，最后使用juicypotota.exe一键打通</p>
+<p>作者为了稳妥起见，还使用的低权限local service账户进行搜索，使用如下命令可以启动一个local service权限的终端，需以administrator权限运行</p>
+<pre class=" language-cmd"><code class="language-cmd">.\PsExec64.exe -i -u "nt authority\local service" cmd.exe
+</code></pre>
+<p>不过我试了一下在winserver2008和另一个啥机子上（好像是win7？）ps脚本跑起来报错。。。</p>
+<h3 id="修复情况-1"><a href="#修复情况-1" class="headerlink" title="修复情况"></a>修复情况</h3><p><a target="_blank" rel="external nofollow noopener noreferrer" href="https://decoder.cloud/2018/10/29/no-more-rotten-juicy-potato/">No more rotten&#x2F;juicy potato?</a>中指出了修复情况，微软不允许指定OXID resolver的端口，如果指定了端口就会直接挂掉，只能使用默认的135端口，这样子就不能将请求劫持到自定义的恶意listener上了，如果在其他机器的135端口上部署一个listener，虽然可以发出请求，但是由于host指定为远程机器，身份认证的时候使用的是匿名登录，导致利用失效。</p>
+<p>截止到versions &gt;&#x3D; Windows 10 1809 &amp; Windows Server 2019无法利用（实际上是打了补丁的版本低一点的机器也不能用）</p>
+<h3 id="WinRM利用"><a href="#WinRM利用" class="headerlink" title="WinRM利用"></a>WinRM利用</h3><p><a target="_blank" rel="external nofollow noopener noreferrer" href="https://decoder.cloud/2019/12/06/we-thought-they-were-potatoes-but-they-were-beans/">We thought they were potatoes but they were beans</a><br>decoder的又一篇博客，在上述修复出现后，他们测试时发现，正常启动bits服务时，其会对5985端口上的winrm服务发起NTLM认证，而在windows10上winrm是默认关闭的，此时可以在5985端口上启动一个listener完成NTLM中转</p>
+<p>然而这个攻击的条件限制较多，win server上winrm通常默认开启，只有win10上面默认关闭，BITS服务只在启动时会连接winrm，所以如果bits服务已经在运行则无法触发</p>
+<h3 id="题外话"><a href="#题外话" class="headerlink" title="题外话"></a>题外话</h3><p>今天装了个winserver12的虚拟机进行测试，由于winserver12装VMware tools有奇怪的bug，网上搜了一圈需要装一系列补丁，装完之后还要手动添加CD驱动器才能挂载VMware tools装上</p>
+<p>然后发现装完补丁的winserver12也不会被烂土豆打通了，等于说微软也做了向前兼容，老一点的操作系统如果补丁够齐可能也不会被打烂</p>
+<h2 id="RoguePotato"><a href="#RoguePotato" class="headerlink" title="RoguePotato"></a>RoguePotato</h2><h3 id="tl-dr-1"><a href="#tl-dr-1" class="headerlink" title="tl;dr"></a>tl;dr</h3><p>简单的说，就是微软禁止了OBJREF解析时可以任意指定端口，且指定远程机器时进行匿名登录，这个时候就不能在OXID resolver环节打通了，但是可以将resolve的结果再指向某个用户可控的服务，在那个服务中完成后续利用</p>
+<h3 id="详解-1"><a href="#详解-1" class="headerlink" title="详解"></a>详解</h3><p>juicyPotato的修复为利用添加了一系列的限制，禁止在OBJREF中指定端口，默认访问135端口，而访问远程的135端口又会导致不是local authorization无法利用，作者提出了通过fake OXIDresolver解析RPCss服务连接本地命名管道的方式再次完成利用</p>
+<p>直接Ctrl C&#x2F;V原作者的内容</p>
+<blockquote>
+<ul>
+<li>You try to initialize a DCOM object identified by a particular CLSID from an “IStorage Object” via standard marshalling (OBJREF_STANDARD)</li>
+<li>The “IStorage” object contains, among other things, the OXID, OID, and IPID parameters needed for the OXID resolution in order to get the needed bindings to connect to our DCOM object interfaces. Think about it like sort of DNS query</li>
+<li>From “Inside COM+: Base Services”: The OXID Resolver is a service that runs on every machine that supports COM+. It performs two important duties:<ul>
+<li>It stores the RPC string bindings that are necessary to connect with remote objects and provides them to local clients.</li>
+<li>It sends ping messages to remote objects for which the local machine has clients and receives ping messages for objects running on the local machine. This aspect of the OXID Resolver supports the COM+ garbage collection mechanism.</li>
+</ul>
+</li>
+<li>OXID resolver is part of “rpcss” service and runs on port 135. Starting from Windows 10 1809 &amp; Windows Server 2019, its no more possible to query the OXID resolver on a port different than 135</li>
+<li>OXID resolutions are normally authenticated.  We are only interested in the authentication part, which occurs via NTLM in order to steal the token, so we can specify in our case for OXID, OID and IPID just 32 random bytes.</li>
+<li>If you specify a remote OXID resolver, the request will be processed with an “ANONYMOUS LOGON“.</li>
+</ul>
+</blockquote>
+<p>根据如上内容可知，在先前的攻击中，通过<code>CoGetInstanceFromIStorage</code>，通过构造引用对象使指定CLSID的COM组件连接恶意服务端进行认证，这里访问的服务端就是OXID resolver，其会解析需要加载的<code>Instance</code> bind在什么地方，在这个访问环节中存在NTLM认证，Rotten potato就是在和OXID resolver交互的过程中进行NTLM中继，但是由于微软的修复，不能指定135以外的端口+访问远程使用匿名登录，烂土豆失效。rogue potato的想法就是不在查询环节进行利用，而是通过更改查询的结果，通过实现<code>ResolveOxid2</code>方法对解析结果进行控制，将COM组件（或者说rpcss？）再次重定向回本地的恶意服务</p>
+<p>而回到本地后有两个利用手法：</p>
+<ol>
+<li>回复RPC server地址，使rpcss对RPC server的<code>IRemUnknown2</code>接口进行查询，这会导致一个RPC调用，使用<code>RpcImpersonateClient</code>对其进行模仿（这个方法在BITS上失败了，具体原因后面会说）</li>
+<li>回复命名管道，rpcss会与命名管道进行交互，通过<code>ImpersonateNamedPipeClient</code>对其进行模仿</li>
+</ol>
+<p>具体为什么让rpcss连接到自己的恶意命名管道就能提权，需要阅读如下内容<br><a target="_blank" rel="external nofollow noopener noreferrer" href="https://decoder.cloud/2020/05/04/from-network-service-to-system/">From NETWORK SERVICE to SYSTEM</a><br>递归学习<a target="_blank" rel="external nofollow noopener noreferrer" href="https://www.tiraniddo.dev/2020/04/sharing-logon-session-little-too-much.html">Sharing a Logon Session a Little Too Much</a></p>
+<p><a target="_blank" rel="external nofollow noopener noreferrer" href="https://itm4n.github.io/printspoofer-abusing-impersonate-privileges/">PrintSpoofer - Abusing Impersonation Privileges on Windows 10 and Server 2019</a><br>这篇文章解释了windows的奇怪特性，RPC server和named pipe server分别可以通过<code>RpcImpersonateClient</code>和<code>ImpersonateNamedPipeClient</code>分别模仿调用&#x2F;连接的客户端，前者是为了RPC调用中降权，防止client利用高权限下运行的RPC进行恶意操作，至于后者为什么会有这个功能就完全不能理解了捏，并且后者需要客户端连接并写入才能生效，当然，两个函数都需要<code>SeImpersonatePrivilege</code></p>
+<p>最终的结论如下</p>
+<blockquote>
+<p>if you can trick the “Network Service” account to write to a named pipe over the “network” and are able to impersonate the pipe, you can access the tokens stored in RPCSS service</p>
+</blockquote>
+<p>具体方式如下：</p>
+<ol>
+<li>触发COM服务连接远程机器135端口</li>
+<li>在远程机器的135端口上设置一个端口转发，将所有流量转发到部署的fake OXIDresolver上（resolver可以部署在远程机器上，既然如此为什么不直接让resolver监听135端口？）</li>
+<li>OXID resolver将目标解析到本地恶意named pipe上</li>
+<li>然后rpcss会连上我们的named pipe然后写入，简单看了一眼代码，这里就是调用<code>ImpersonateNamedPipeClient</code>拿到rpcss的token，这是一个network service token，但是可以通过这个token遍历rpcss内的handle拿到system token</li>
+</ol>
+<p>不过这个操作就是直接偷token了，和之前土豆的NTLM中继有点出入</p>
+<p><img src="https://jlajara.gitlab.io/assets/images/posts/20201122/Diagram_3.png" alt="Image Diagram 3"></p>
+<p>也抄一个project zero的图</p>
+<p><img src="https://image-host-1304136909.cos.ap-shanghai.myqcloud.com/blog/%E4%BB%8E%E7%83%82%E5%9C%9F%E8%B1%86%E5%BC%80%E5%A7%8B%E7%9A%84%E5%9C%9F%E8%B1%86%E5%AE%B6%E6%97%8F%E5%85%A5%E9%97%A8/image5.png" alt="image5"></p>
+<p>不过rpcss连接的命名管道的名称是固定的，如果名字不对会拒绝连接，但是这里使用了一个技巧，如果提供的路径中在主机名后添加<code>/</code>分隔路径，可以通过管道名的check，而在实际连接时又会将其转化为管道名的一部分，如<code>\\HOST/path[\pipe\aaa]</code>会变为<code>\\HOST[\past\pipe\aaa]</code>，以此将其控制到用户可控管道且通过检查</p>
+<h3 id="利用限制"><a href="#利用限制" class="headerlink" title="利用限制"></a>利用限制</h3><p>需要出网，或者在内网中存在一台可控且135端口未被占用的机器</p>
+<p>自己测试的时候因为没有公网windows，用linux做了个frp端口转发再转一层回来，但是跑起来的时候远程135根本没收到流量，wireshark抓一下有135端口的流量，但是全是报错tcp retransmission。不懂</p>
+<p>但是这个只要能重定向回pipe就能直接获取完全权限的话，那么任意满足rotten potato的类均可进行利用，比后续几个potato适用于部分类会更普适一些</p>
+<h2 id="PrintSpoofer-x2F-BadPotato"><a href="#PrintSpoofer-x2F-BadPotato" class="headerlink" title="PrintSpoofer&#x2F;BadPotato"></a>PrintSpoofer&#x2F;BadPotato</h2><p>rouge potato的上位替代品，也是其利用的思路来源<br>由<a target="_blank" rel="external nofollow noopener noreferrer" href="https://github.com/BeichenDream/BadPotato">BeichenDream</a>师傅实现了一版利用工具后命名为BadPotato<br>原理详见<a target="_blank" rel="external nofollow noopener noreferrer" href="https://itm4n.github.io/printspoofer-abusing-impersonate-privileges/#getting-a-system-token">PrintSpoofer - Abusing Impersonation Privileges on Windows 10 and Server 2019</a><br>利用了一个打印机bug，通过调用<code>RpcRemoteFindFirstPrinterChangeNotificationEx</code>让打印机服务通过命名管道发送通知，强行使SYSTEM连接到目标命名管道，然后通过如上介绍的方法直接获取到SYSTEM权限</p>
+<p>这里管道名同样是需要经过check的，同样使用上述方法绕过。这里itm4n提到了该方法的防御手段，在使用CreateFile打开命名管道时，可以添加<code>SECURITY_IDENTIFICATION</code> flag使得模仿时得到的token是<code>identification token</code>。是否rogue potato用rpc调用时打不通也是这个原因呢？</p>
+<p>这是对很多年Service Tracing的利用的修补方案，Service Tracing在用户修改注册表一个项之后，系统服务会将日志写到注册表中指定的路径，然后注册表填一个命名管道打通，微软通过添加了这个flag使得连上去也打不通。但是后来微软再遇到这种洞就不修了，并表示从拥有Impersonate权限的进程提升到SYSTEM是符合预期的行为。</p>
+<p>说起来potato应该是指通过NTLM中继进行认证授权实现的攻击手法，这里算是一种token窃取，是不是应该归类为potato我不好说</p>
+<h3 id="修复手段"><a href="#修复手段" class="headerlink" title="修复手段"></a>修复手段</h3><p>额，修不好就关机运维，微软说这个不是洞不修，但是这个奇怪的打印机服务一般情况也没人用，所以把这个关了就行了</p>
+<h2 id="PrintNotifyPotato-x2F-JuicyPotatoNG"><a href="#PrintNotifyPotato-x2F-JuicyPotatoNG" class="headerlink" title="PrintNotifyPotato&#x2F;JuicyPotatoNG"></a>PrintNotifyPotato&#x2F;JuicyPotatoNG</h2><p>这两个名字也是一个东西，只不过一个是<a target="_blank" rel="external nofollow noopener noreferrer" href="https://github.com/BeichenDream/PrintNotifyPotato">BeichenDream</a>师傅的C#实现，一个是<a target="_blank" rel="external nofollow noopener noreferrer" href="https://github.com/antonioCoco/JuicyPotatoNG">antonioCoco</a>的C++实现</p>
+<h3 id="发展"><a href="#发展" class="headerlink" title="发展"></a>发展</h3><p>顺着decoder的博客继续衍生得到的更为广泛的potato家族<br>在<a target="_blank" rel="external nofollow noopener noreferrer" href="https://decoder.cloud/2020/05/30/the-impersonation-game/">The impersonation game</a>中解释了为什么RPC调用中得到的token是<code>identification token</code>，确实是发起RPC调用时设定好的，并通过寻找注册表，发现了一个名为<code>PrintNotify</code>的服务，其注册表中的<code>Impersonation level</code>为<code>impersonation</code>，使用该CLSID对fake OXID resolver进行查询，重定向到本地evil RPC server后，在第一次RPC远程调用得到anonymous logon后，由查询<code>IremUnknown2</code>触发的回调成功拿到了SYSTEM，然而这个组件需要用户在<code>INTERACTIVE</code>组中才能完全利用。<br>后续在<a target="_blank" rel="external nofollow noopener noreferrer" href="https://decoder.cloud/2022/09/21/giving-juicypotato-a-second-chance-juicypotatong/">Giving JuicyPotato a second chance: JuicyPotatoNG</a>中给出了更完整的利用，使用<code>LogonUser</code>函数进行登录，由于使用的是<code>LogonNewCredentials</code>，LSASS会直接给这个token加一个<code>INTERACTIVE</code>，由于这个token只适用于远程网络认证，所以随便填一个用户名密码均可成功。</p>
+<h3 id="实现"><a href="#实现" class="headerlink" title="实现"></a>实现</h3><p>然而，你就算再好用，这里还是有一个最大的限制，出网。难道就不能讲所有利用只在本地完成吗？</p>
+<p>谷歌的project zero团队提出了解决方案：<a target="_blank" rel="external nofollow noopener noreferrer" href="https://googleprojectzero.blogspot.com/2021/10/windows-exploitation-tricks-relaying.html">Windows Exploitation Tricks: Relaying DCOM Authentication</a></p>
+<blockquote>
+<p>Note that the string bindings in the OBJREF are only for binding to the OXID resolver, not the COM server itself.</p>
+</blockquote>
+<p>看起来一个普通的OBJREF已经无法满足我们的需求，所以其将OBJREF变为了一个<code>objref moniker</code>，这个像是给OBJREF再套了一层，正常情况下OXIDresolver解析这一步就能够确定对应的obj位于哪个机器上，然后对其进行RPC调用就可以获取句柄，这种情况下是无法resolve到我们的恶意服务上的，但是<code>objref moniker</code>就可以再指定一次，使其连接到恶意的COM server</p>
+<p>moniker是通过name进行加载的，展示出来是一个形如<code>OBJREF:xxxx</code>一堆base64的数据，其他进程可以使用这个name调用<code>BindToMoniker</code>方法从name中加载moniker引用的对象</p>
+<p>后续的利用有一点些许的抽象，似乎为了让client能连上我们的COM server，需要对该服务进行注册，而不是监听端口手写TCP。当目标Client尝试解析OXID时，COM Runtime会调用<code>UseProtSeq</code>让我们的COM server随机监听一个端口让client链接，但是这个是要求监听全网卡，这样子会触发经典defender的是否允许其在网络上活动的那个弹窗，但实际利用只需要监听本地就行了，但是这样子client最后会认为COM server不可达。最后是一通fuzz加分析找RPCSS怎么判断端口通不通，最后得出结论是靠PEB中的module name，并且fuzz出System这个名字可以通过，改PEB内容实现绕过</p>
+<p>也有提到COM Server的那个端口会由RPC  runtime绑定上，这时是无法再使用自己的其他代码去使用那个端口的（大概是规范了那个端口必须绑定对应的服务？）</p>
+<p>解决方案1是写一堆黑魔法去抢占那个端口，解决方案2是直接hook交互过程中的函数，方案2hook更加稳定并且直接从交互过程中偷，更加成功</p>
+<p>虽然这里是hook住<code>AcceptSecurityContext</code>，但是并不是复现的rotten potato的NTLM中继，而是直接偷token，只能说是rogue potato的本地优化版</p>
+<h3 id="衍生"><a href="#衍生" class="headerlink" title="衍生"></a>衍生</h3><p>除了<code>PrintNotify</code>，通过遍历全CLSID，有一个<code>ActiveX Installer Service</code>可以利用，但是在winserver上默认关闭，剩下的COM组件可以获取当前系统上的活跃用户，虽说有用但仍然有点鸡肋，实际利用时需要临时找</p>
+<h3 id="修复"><a href="#修复" class="headerlink" title="修复"></a>修复</h3><p>最为通用的<code>PrintNotify</code>需要使用<code>LogonUser</code>虚假登录获得<code>INTERACTIVE</code>组权限，所以微软把这个地方修了，具体修复普及程度不明（我本机win10最新更新后仍然可以利用）</p>
+<h2 id="GodPotato"><a href="#GodPotato" class="headerlink" title="GodPotato"></a>GodPotato</h2><p><a target="_blank" rel="external nofollow noopener noreferrer" href="https://github.com/BeichenDream/GodPotato">BeichenDream</a>师傅的最新一版potato，但是没给分析文章，360 noah lab上有一篇之前的<code>PrintNotifyPotato</code>的分析文章<br><a target="_blank" rel="external nofollow noopener noreferrer" href="https://blog.noah.360.net/coman-quan-xin-xing-tu-dou-ti-quan-di-yi-bu-fen/">COM安全 新型土豆提权 第一部分</a>，去年12月发的第一部分，今年四月了第二部分还没发。。。</p>
+<p>C#垃圾也不太看得懂代码，不过看到了rogue potato中的那个经典name pipe，猜测是可以直接诱导RPCSS连接命名管道进而提权，这样子就是顶级通杀了，怪不得敢命名为GodPotato</p>
+<p>不过我感觉只要微软把那个pipe名字解析洞修了就无敌防御了。。。</p>
+<h2 id="其他思考"><a href="#其他思考" class="headerlink" title="其他思考"></a>其他思考</h2><p>为什么土豆中的NTLM中继不能在域里面中继一下？看完了利用之后发现，只有最老的potato是真的在中继NTLM，靠后的potato都是通过诱导RPCSS访问命名管道或者发起RPC调用的环节进行token窃取，自然无法进行哈希传递，而对于烂土豆的哈希传递，由于认证的是当前机器的SYSTEM，并不是域内通用账户，自然就不能用一台机器的SYSTEM登录其他机器<br>（上述内容来自脑补，不保证准确性）</p>
+<h2 id="参考链接"><a href="#参考链接" class="headerlink" title="参考链接"></a>参考链接</h2><p>给大家表演一个递归式学习<br>project zero的博客是最后看的，但是感觉是最详细的。。。建议先看<br><a target="_blank" rel="external nofollow noopener noreferrer" href="https://foxglovesecurity.com/2016/09/26/rotten-potato-privilege-escalation-from-service-accounts-to-system/">Rotten Potato – Privilege Escalation from Service Accounts to SYSTEM</a><br><a target="_blank" rel="external nofollow noopener noreferrer" href="https://decoder.cloud/2018/10/29/no-more-rotten-juicy-potato/">No more rotten&#x2F;juicy potato?</a><br><a target="_blank" rel="external nofollow noopener noreferrer" href="https://decoder.cloud/2019/12/06/we-thought-they-were-potatoes-but-they-were-beans/">We thought they were potatoes but they were beans</a><br><a target="_blank" rel="external nofollow noopener noreferrer" href="https://decoder.cloud/2020/05/04/from-network-service-to-system/">From NETWORK SERVICE to SYSTEM</a><br><a target="_blank" rel="external nofollow noopener noreferrer" href="https://www.tiraniddo.dev/2020/04/sharing-logon-session-little-too-much.html">Sharing a Logon Session a Little Too Much</a><br><a target="_blank" rel="external nofollow noopener noreferrer" href="https://itm4n.github.io/printspoofer-abusing-impersonate-privileges/#getting-a-system-token">PrintSpoofer - Abusing Impersonation Privileges on Windows 10 and Server 2019</a><br><a target="_blank" rel="external nofollow noopener noreferrer" href="https://decoder.cloud/2020/05/30/the-impersonation-game/">The impersonation game</a><br><a target="_blank" rel="external nofollow noopener noreferrer" href="https://decoder.cloud/2022/09/21/giving-juicypotato-a-second-chance-juicypotatong/">Giving JuicyPotato a second chance: JuicyPotatoNG</a><br><a target="_blank" rel="external nofollow noopener noreferrer" href="https://blog.noah.360.net/coman-quan-xin-xing-tu-dou-ti-quan-di-yi-bu-fen/">COM安全 新型土豆提权 第一部分</a><br>强烈推荐project zero的博文<br><a target="_blank" rel="external nofollow noopener noreferrer" href="https://googleprojectzero.blogspot.com/2021/10/windows-exploitation-tricks-relaying.html">Windows Exploitation Tricks: Relaying DCOM Authentication</a></p>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/pentest/" rel="tag"># pentest</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/ProcessHollowing%E4%B8%8EReflectiveDll.html" rel="prev" title="ProcessHollowing与ReflectiveDLL">
+      <i class="fa fa-chevron-left"></i> ProcessHollowing与ReflectiveDLL
+    </a></div>
+      <div class="post-nav-item"></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+    <div class="comments" id="valine-comments"></div>
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E4%BB%8E%E7%83%82%E5%9C%9F%E8%B1%86%E5%BC%80%E5%A7%8B%E7%9A%84%E5%9C%9F%E8%B1%86%E5%AE%B6%E6%97%8F%E5%85%A5%E9%97%A8"><span class="nav-number">1.</span> <span class="nav-text">从烂土豆开始的土豆家族入门</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#hot-potato"><span class="nav-number">1.1.</span> <span class="nav-text">hot potato</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BF%AE%E5%A4%8D%E6%83%85%E5%86%B5"><span class="nav-number">1.1.1.</span> <span class="nav-text">修复情况</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%89%8D%E7%BD%AE%E7%9F%A5%E8%AF%86"><span class="nav-number">1.2.</span> <span class="nav-text">前置知识</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Rotten-Potato"><span class="nav-number">1.3.</span> <span class="nav-text">Rotten Potato</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#tl-dr"><span class="nav-number">1.3.1.</span> <span class="nav-text">tl;dr</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%AF%A6%E8%A7%A3"><span class="nav-number">1.3.2.</span> <span class="nav-text">详解</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#juicy-potato"><span class="nav-number">1.3.3.</span> <span class="nav-text">juicy potato</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BF%AE%E5%A4%8D%E6%83%85%E5%86%B5-1"><span class="nav-number">1.3.4.</span> <span class="nav-text">修复情况</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#WinRM%E5%88%A9%E7%94%A8"><span class="nav-number">1.3.5.</span> <span class="nav-text">WinRM利用</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E9%A2%98%E5%A4%96%E8%AF%9D"><span class="nav-number">1.3.6.</span> <span class="nav-text">题外话</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#RoguePotato"><span class="nav-number">1.4.</span> <span class="nav-text">RoguePotato</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#tl-dr-1"><span class="nav-number">1.4.1.</span> <span class="nav-text">tl;dr</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%AF%A6%E8%A7%A3-1"><span class="nav-number">1.4.2.</span> <span class="nav-text">详解</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%88%A9%E7%94%A8%E9%99%90%E5%88%B6"><span class="nav-number">1.4.3.</span> <span class="nav-text">利用限制</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#PrintSpoofer-x2F-BadPotato"><span class="nav-number">1.5.</span> <span class="nav-text">PrintSpoofer&#x2F;BadPotato</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BF%AE%E5%A4%8D%E6%89%8B%E6%AE%B5"><span class="nav-number">1.5.1.</span> <span class="nav-text">修复手段</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#PrintNotifyPotato-x2F-JuicyPotatoNG"><span class="nav-number">1.6.</span> <span class="nav-text">PrintNotifyPotato&#x2F;JuicyPotatoNG</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%8F%91%E5%B1%95"><span class="nav-number">1.6.1.</span> <span class="nav-text">发展</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%AE%9E%E7%8E%B0"><span class="nav-number">1.6.2.</span> <span class="nav-text">实现</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%A1%8D%E7%94%9F"><span class="nav-number">1.6.3.</span> <span class="nav-text">衍生</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BF%AE%E5%A4%8D"><span class="nav-number">1.6.4.</span> <span class="nav-text">修复</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#GodPotato"><span class="nav-number">1.7.</span> <span class="nav-text">GodPotato</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%85%B6%E4%BB%96%E6%80%9D%E8%80%83"><span class="nav-number">1.8.</span> <span class="nav-text">其他思考</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%8F%82%E8%80%83%E9%93%BE%E6%8E%A5"><span class="nav-number">1.9.</span> <span class="nav-text">参考链接</span></a></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Z3ratu1" src="https://q2.qlogo.cn/headimg_dl?dst_uin=1207039417&spec=160">
+  <p class="site-author-name" itemprop="name">Z3ratu1</p>
+  <div class="site-description" itemprop="description">与其感慨路难行，不如现在出发</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">177</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">5</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">92</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+  <div class="beian"><a href="http://www.beian.miit.gov.cn/" rel="external nofollow noopener noreferrer" target="_blank">湘ICP备2020021580号 </a>
+      <img src="/./images/beian.png" style="display: inline-block;">
+  </div>
+
+<div class="copyright">
+  
+  &copy; 2019 – 
+  <span itemprop="copyrightYear">2023</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Z3ratu1</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="external nofollow noopener noreferrer" target="_blank">Hexo</a> & <a href="https://pisces.theme-next.org/" class="theme-link" rel="external nofollow noopener noreferrer" target="_blank">NexT.Pisces</a> 强力驱动
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+
+<script>
+NexT.utils.loadComments(document.querySelector('#valine-comments'), () => {
+  NexT.utils.getScript('https://cdn.jsdelivr.net/npm/valine@1.4.14/dist/Valine.min.js', () => {
+    var GUEST = ['nick', 'mail', 'link'];
+    var guest = 'nick,mail,link';
+    guest = guest.split(',').filter(item => {
+      return GUEST.includes(item);
+    });
+    new Valine({
+      el         : '#valine-comments',
+      verify     : false,
+      notify     : false,
+      appId      : '7H8kg0XdWO8IbhOcu4K1JaAT-gzGzoHsz',
+      appKey     : 'wPKQjkbVtvPaRR7gh2yjfLSi',
+      placeholder: "Just go go",
+      avatar     : 'mm',
+      meta       : guest,
+      pageSize   : '10' || 10,
+      visitor    : true,
+      lang       : '' || 'zh-cn',
+      path       : location.pathname,
+      recordIP   : false,
+      serverURLs : ''
+    });
+  }, window.Valine);
+});
+</script>
+
+</body>
+</html>
