@@ -31,7 +31,7 @@
 <meta property="og:image" content="https://image-host-1304136909.cos.ap-shanghai.myqcloud.com/blog/ProcessHollowing%E4%B8%8EReflectiveDll/image-20230407120857163.png">
 <meta property="og:image" content="https://image-host-1304136909.cos.ap-shanghai.myqcloud.com/blog/ProcessHollowing%E4%B8%8EReflectiveDll/image-20230407120913253.png">
 <meta property="article:published_time" content="2023-04-06T11:09:34.000Z">
-<meta property="article:modified_time" content="2023-04-08T04:13:56.658Z">
+<meta property="article:modified_time" content="2023-04-24T08:42:45.140Z">
 <meta property="article:author" content="Z3ratu1">
 <meta property="article:tag" content="pentest">
 <meta name="twitter:card" content="summary">
@@ -234,7 +234,7 @@
                   <i class="far fa-calendar-check"></i>
                 </span>
                 <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2023-04-08 12:13:56" itemprop="dateModified" datetime="2023-04-08T12:13:56+08:00">2023-04-08</time>
+                <time title="修改时间：2023-04-24 16:42:45" itemprop="dateModified" datetime="2023-04-24T16:42:45+08:00">2023-04-24</time>
               </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -398,8 +398,16 @@
 <p>Summing things up, for every process (x86 &amp; x64) running on 64-bits Windows there are allocated two code segments<br>cs &#x3D; 0x23 -&gt; x86 mode<br>cs &#x3D; 0x33 -&gt; x64 mode</p>
 </blockquote>
 <p>简单的说，就是直接改寄存器让运行在x86下的进程切换到x64状态下调用x64函数，完成了再切回x86。<br>windows使用了两套代码分别实现32位和64位的系统调用，想要在32位和64位间切换，只需要修改段寄存器，使用对应的代码段即可。虽然说起来好像很简单，但实际上使用还是很复杂的。因为LoadLibrary等函数位于kernel32，而32位进程默认只加载ntdll.dll,wow64.dll,wow64cpu.dll以及wow64win.dll，手动实现LoadLibrary很复杂并且他失败了。所以最后又使用了经典从寄存器拿TEB，最后从PEB里面拿<code>InMemoryOrderModuleList</code>最后遍历模块的方式，这样子就能调用64位ntdll里面的部分方法了，然后再手搓汇编在32位下进行64位函数调用。缺陷在于能够调用的函数仅限于ntdll，因为真的加载不上其他dll。。。<a target="_blank" rel="external nofollow noopener noreferrer" href="https://github.com/rwfpl/rewolf-wow64ext/blob/master/doc/wow64ext.txt">这里</a>写了能调用的一部分函数，没有QueueUserAPC和CreateRemoteThread等方法，但是有SetThreadContext，可以考虑用进程镂空的方法进行注入</p>
-<p>综上所述，据我目前可知的搜索结果（实践次数0），跨位数的进程注入是较难实现的，x86对x64的进程操作并不能简单的认为通过wow64进行转换即可正常使用，手动切换CPU上下文在x86进程中发起x64调用由于内存中只有64位ntdll，能够调用的方法也较为有限，不知道x64切到x86倒是没啥问题。但是由于主要的研究目标还是32位通杀32和64，这样子32位和64位机器都能跑起来，毕竟64位注32位意义不是很大。。。</p>
-<p>但实际上，我们能32位注32位，64位注64位在实际使用中就已经很足够了，就这样8，周末开始玩耍</p>
+<h3 id="2023-x2F-4-x2F-24-update"><a href="#2023-x2F-4-x2F-24-update" class="headerlink" title="2023&#x2F;4&#x2F;24 update"></a>2023&#x2F;4&#x2F;24 update</h3><p>今天lrj给我发了一篇<a target="_blank" rel="external nofollow noopener noreferrer" href="https://mp.weixin.qq.com/s/ew13ir5IrEYDR2VOM1ZRmQ">微信公众号</a>，里面提到了32位注入64位，并且公众号里写的是通过段寄存器切换执行远程注入，也就是天堂之门技术，然而这和上述讨论的可调用的函数范围有悖，所以进行了简单研究</p>
+<p>首先lrj和我说ntdll里面有一堆undocumented api，其中的<code>NtCreateThreadEx</code>是可以直接创建远程线程的，所以只要遍历Ntdll找到这个函数理论上就可以实现远程注入（真不太熟，我是windows垃圾。。。）</p>
+<p>由于不想碰C，所以网上找到了一个go实现的天堂之门，赞美光明<br><a target="_blank" rel="external nofollow noopener noreferrer" href="https://github.com/aus/gopherheaven">Gopher Heaven</a></p>
+<p>使用方式非常简单，开箱即用，能够直接拿到64位ntdll然后找对应的函数地址<br>最后一句调用完成</p>
+<pre class=" language-go"><code class="language-go"><span class="token boolean">_</span><span class="token punctuation">,</span> err <span class="token operator">=</span> heaven<span class="token punctuation">.</span><span class="token function">Syscall</span><span class="token punctuation">(</span>NtCreateThreadEx<span class="token punctuation">,</span> <span class="token function">uint64</span><span class="token punctuation">(</span><span class="token function">uintptr</span><span class="token punctuation">(</span>unsafe<span class="token punctuation">.</span><span class="token function">Pointer</span><span class="token punctuation">(</span><span class="token operator">&amp;</span>hThread<span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">,</span> windows<span class="token punctuation">.</span>GENERIC_EXECUTE<span class="token punctuation">,</span> <span class="token number">0</span><span class="token punctuation">,</span> <span class="token function">uint64</span><span class="token punctuation">(</span>hProcess<span class="token punctuation">)</span><span class="token punctuation">,</span> <span class="token function">uint64</span><span class="token punctuation">(</span>addr<span class="token punctuation">)</span><span class="token punctuation">,</span> <span class="token function">uint64</span><span class="token punctuation">(</span>addr<span class="token punctuation">)</span><span class="token punctuation">,</span> <span class="token number">0</span><span class="token punctuation">,</span> <span class="token number">0</span><span class="token punctuation">,</span> <span class="token number">0</span><span class="token punctuation">,</span> <span class="token number">0</span><span class="token punctuation">,</span> <span class="token number">0</span><span class="token punctuation">)</span>
+</code></pre>
+<p>由于是undocumented api，想找个调用范例还挺难的，搜也搜不到什么详细的参数解释，导致一开始第一个入参hThread我没转成地址，结果调用就一直出错，我还以为这个库写的有问题。。。</p>
+<p>既然是创建远程线程的函数，就应该有一个地方返回创建的线程，所以第一个参数就是作为输出的thread handle，因此需要传一个指针过去</p>
+<p>接下来结果参数也看不懂，但是很明显的hProcess就是一个process handle，指明要注入的进程，addr是shellcode在目标进程里的地址，为什么重复两遍不清楚，反正这么写能用，剩下的全部default填0</p>
+<p>为什么又研究这个玩意，主要是因为公众号里说32位跳64位注入64位shellcode可能在一定程度上能够绕过检测。<br>虽然我不知道他说的对不对，但是我先写一版能用的以备不时之需</p>
 
     </div>
 
@@ -484,7 +492,7 @@
 
       <!--noindex-->
       <div class="post-toc-wrap sidebar-panel">
-          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#ProcessHollowing%E4%B8%8EReflectiveDLL"><span class="nav-number">1.</span> <span class="nav-text">ProcessHollowing与ReflectiveDLL</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#ProcessHollowing"><span class="nav-number">1.1.</span> <span class="nav-text">ProcessHollowing</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#ReflectiveDLL"><span class="nav-number">1.2.</span> <span class="nav-text">ReflectiveDLL</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#pe2shellcode"><span class="nav-number">1.3.</span> <span class="nav-text">pe2shellcode</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#wow64%E4%B8%8Ex64%E8%B7%A8%E4%BD%8D%E6%95%B0%E6%B3%A8%E5%85%A5"><span class="nav-number">1.4.</span> <span class="nav-text">wow64与x64跨位数注入</span></a></li></ol></li></ol></div>
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#ProcessHollowing%E4%B8%8EReflectiveDLL"><span class="nav-number">1.</span> <span class="nav-text">ProcessHollowing与ReflectiveDLL</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#ProcessHollowing"><span class="nav-number">1.1.</span> <span class="nav-text">ProcessHollowing</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#ReflectiveDLL"><span class="nav-number">1.2.</span> <span class="nav-text">ReflectiveDLL</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#pe2shellcode"><span class="nav-number">1.3.</span> <span class="nav-text">pe2shellcode</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#wow64%E4%B8%8Ex64%E8%B7%A8%E4%BD%8D%E6%95%B0%E6%B3%A8%E5%85%A5"><span class="nav-number">1.4.</span> <span class="nav-text">wow64与x64跨位数注入</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#2023-x2F-4-x2F-24-update"><span class="nav-number">1.4.1.</span> <span class="nav-text">2023&#x2F;4&#x2F;24 update</span></a></li></ol></li></ol></li></ol></div>
       </div>
       <!--/noindex-->
 
