@@ -31,7 +31,7 @@
 <meta property="og:image" content="https://image-host-1304136909.cos.ap-shanghai.myqcloud.com/blog/ProcessHollowing%E4%B8%8EReflectiveDll/image-20230407120857163.png">
 <meta property="og:image" content="https://image-host-1304136909.cos.ap-shanghai.myqcloud.com/blog/ProcessHollowing%E4%B8%8EReflectiveDll/image-20230407120913253.png">
 <meta property="article:published_time" content="2023-04-06T11:09:34.000Z">
-<meta property="article:modified_time" content="2023-04-24T08:42:45.140Z">
+<meta property="article:modified_time" content="2023-04-24T10:14:13.216Z">
 <meta property="article:author" content="Z3ratu1">
 <meta property="article:tag" content="pentest">
 <meta name="twitter:card" content="summary">
@@ -234,7 +234,7 @@
                   <i class="far fa-calendar-check"></i>
                 </span>
                 <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2023-04-24 16:42:45" itemprop="dateModified" datetime="2023-04-24T16:42:45+08:00">2023-04-24</time>
+                <time title="修改时间：2023-04-24 18:14:13" itemprop="dateModified" datetime="2023-04-24T18:14:13+08:00">2023-04-24</time>
               </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -393,13 +393,13 @@
 </code></pre>
 <p>显然，x86注入x86 shellcode到x86进程和x64注入x64 shellcode到x64进程是毫无问题的，同时，注入的shellcode与目标的架构不一致也是绝对不行的</p>
 <p>然而，x64进程是可以顺利的将x86 shellcode注入到x86进程中并顺利运行的，而x86进程却无法将x64 shellcode注入到x64进程中成功运行，前两步创建x64进程以及virtualAlloc和writeProcessMemory都是成功的，但是CreateRemoteThread直接返回一个access denied就挂掉了，与前文观察到的现象一致</p>
-<p>最好的解决方案可能是直接在32位进程里调用64位api，有作者提出了名为天堂之门(Heaven’s Gate)的技术，<a target="_blank" rel="external nofollow noopener noreferrer" href="http://blog.rewolf.pl/blog/?p=102">Mixing x86 with x64 code</a><br>作者在文章中指出：</p>
+<p>最好的解决方案可能是直接在32位进程里调用64位api，有人提出了名为天堂之门(Heaven’s Gate)的技术，<a target="_blank" rel="external nofollow noopener noreferrer" href="http://blog.rewolf.pl/blog/?p=102">Mixing x86 with x64 code</a><br>这篇文章中指出：</p>
 <blockquote>
 <p>Summing things up, for every process (x86 &amp; x64) running on 64-bits Windows there are allocated two code segments<br>cs &#x3D; 0x23 -&gt; x86 mode<br>cs &#x3D; 0x33 -&gt; x64 mode</p>
 </blockquote>
 <p>简单的说，就是直接改寄存器让运行在x86下的进程切换到x64状态下调用x64函数，完成了再切回x86。<br>windows使用了两套代码分别实现32位和64位的系统调用，想要在32位和64位间切换，只需要修改段寄存器，使用对应的代码段即可。虽然说起来好像很简单，但实际上使用还是很复杂的。因为LoadLibrary等函数位于kernel32，而32位进程默认只加载ntdll.dll,wow64.dll,wow64cpu.dll以及wow64win.dll，手动实现LoadLibrary很复杂并且他失败了。所以最后又使用了经典从寄存器拿TEB，最后从PEB里面拿<code>InMemoryOrderModuleList</code>最后遍历模块的方式，这样子就能调用64位ntdll里面的部分方法了，然后再手搓汇编在32位下进行64位函数调用。缺陷在于能够调用的函数仅限于ntdll，因为真的加载不上其他dll。。。<a target="_blank" rel="external nofollow noopener noreferrer" href="https://github.com/rwfpl/rewolf-wow64ext/blob/master/doc/wow64ext.txt">这里</a>写了能调用的一部分函数，没有QueueUserAPC和CreateRemoteThread等方法，但是有SetThreadContext，可以考虑用进程镂空的方法进行注入</p>
 <h3 id="2023-x2F-4-x2F-24-update"><a href="#2023-x2F-4-x2F-24-update" class="headerlink" title="2023&#x2F;4&#x2F;24 update"></a>2023&#x2F;4&#x2F;24 update</h3><p>今天lrj给我发了一篇<a target="_blank" rel="external nofollow noopener noreferrer" href="https://mp.weixin.qq.com/s/ew13ir5IrEYDR2VOM1ZRmQ">微信公众号</a>，里面提到了32位注入64位，并且公众号里写的是通过段寄存器切换执行远程注入，也就是天堂之门技术，然而这和上述讨论的可调用的函数范围有悖，所以进行了简单研究</p>
-<p>首先lrj和我说ntdll里面有一堆undocumented api，其中的<code>NtCreateThreadEx</code>是可以直接创建远程线程的，所以只要遍历Ntdll找到这个函数理论上就可以实现远程注入（真不太熟，我是windows垃圾。。。）</p>
+<p>首先lrj和我说ntdll里面有一堆undocumented api，其中的<code>NtCreateThreadEx</code>是可以直接创建远程线程的，所以只要遍历Ntdll找到这个函数理论上就可以实现远程注入（真不太熟，我是windows垃圾。。。），以及ntdll里面有一个叫<code>LdrLoadLibrary</code>的方法，似乎能够通过这个函数加载dll，所以实际上ntdll里面好像应有尽有，只是我不知道罢了。。。。<br>不过下述文章中也提到这个加载有bug，在不同的windows版本上不一定都能跑通<br><a target="_blank" rel="external nofollow noopener noreferrer" href="https://bbs.kanxue.com/thread-270153.htm">天堂之门 (Heaven’s Gate) C语言实现</a></p>
 <p>由于不想碰C，所以网上找到了一个go实现的天堂之门，赞美光明<br><a target="_blank" rel="external nofollow noopener noreferrer" href="https://github.com/aus/gopherheaven">Gopher Heaven</a></p>
 <p>使用方式非常简单，开箱即用，能够直接拿到64位ntdll然后找对应的函数地址<br>最后一句调用完成</p>
 <pre class=" language-go"><code class="language-go"><span class="token boolean">_</span><span class="token punctuation">,</span> err <span class="token operator">=</span> heaven<span class="token punctuation">.</span><span class="token function">Syscall</span><span class="token punctuation">(</span>NtCreateThreadEx<span class="token punctuation">,</span> <span class="token function">uint64</span><span class="token punctuation">(</span><span class="token function">uintptr</span><span class="token punctuation">(</span>unsafe<span class="token punctuation">.</span><span class="token function">Pointer</span><span class="token punctuation">(</span><span class="token operator">&amp;</span>hThread<span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">,</span> windows<span class="token punctuation">.</span>GENERIC_EXECUTE<span class="token punctuation">,</span> <span class="token number">0</span><span class="token punctuation">,</span> <span class="token function">uint64</span><span class="token punctuation">(</span>hProcess<span class="token punctuation">)</span><span class="token punctuation">,</span> <span class="token function">uint64</span><span class="token punctuation">(</span>addr<span class="token punctuation">)</span><span class="token punctuation">,</span> <span class="token function">uint64</span><span class="token punctuation">(</span>addr<span class="token punctuation">)</span><span class="token punctuation">,</span> <span class="token number">0</span><span class="token punctuation">,</span> <span class="token number">0</span><span class="token punctuation">,</span> <span class="token number">0</span><span class="token punctuation">,</span> <span class="token number">0</span><span class="token punctuation">,</span> <span class="token number">0</span><span class="token punctuation">)</span>
@@ -507,7 +507,7 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">177</span>
+          <span class="site-state-item-count">178</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
@@ -520,7 +520,7 @@
       <div class="site-state-item site-state-tags">
             <a href="/tags/">
           
-        <span class="site-state-item-count">92</span>
+        <span class="site-state-item-count">93</span>
         <span class="site-state-item-name">标签</span></a>
       </div>
   </nav>
