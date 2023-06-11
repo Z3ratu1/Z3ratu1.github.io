@@ -1,0 +1,691 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 6.0.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"blog.z3ratu1.cn","root":"/","scheme":"Pisces","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"always","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":true},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+  </script>
+
+  <meta name="description" content="域渗透入门2.0很多年以前由于科恩的任务简单的对域进行了基础的了解，但是学的很浅，网上抄的环境也很垃圾，上来就直接拿到了域管，并且自带永恒之蓝等一系列一键system的洞，加上实战一次域都没遇上过，所以实际上学的很差。最近打了一个小护网，遇到了一个无敌防御的域，这下才知道之前学的东西全是臭鱼烂虾，一点派不上用场。所以重新入门，把以前没有很搞清楚的概念再强化一下 常用命令常用的三个工具：自带的net">
+<meta property="og:type" content="article">
+<meta property="og:title" content="域渗透入门2.0">
+<meta property="og:url" content="https://blog.z3ratu1.cn/%E5%9F%9F%E6%B8%97%E9%80%8F%E5%85%A5%E9%97%A82.0.html">
+<meta property="og:site_name" content="Z3ratu1&#39;s blog">
+<meta property="og:description" content="域渗透入门2.0很多年以前由于科恩的任务简单的对域进行了基础的了解，但是学的很浅，网上抄的环境也很垃圾，上来就直接拿到了域管，并且自带永恒之蓝等一系列一键system的洞，加上实战一次域都没遇上过，所以实际上学的很差。最近打了一个小护网，遇到了一个无敌防御的域，这下才知道之前学的东西全是臭鱼烂虾，一点派不上用场。所以重新入门，把以前没有很搞清楚的概念再强化一下 常用命令常用的三个工具：自带的net">
+<meta property="og:locale">
+<meta property="og:image" content="https://image-host-1304136909.cos.ap-shanghai.myqcloud.com/blog/%E5%9F%9F%E6%B8%97%E9%80%8F%E5%85%A5%E9%97%A82.0/image-20230608204109629.png">
+<meta property="og:image" content="https://image-host-1304136909.cos.ap-shanghai.myqcloud.com/blog/%E5%9F%9F%E6%B8%97%E9%80%8F%E5%85%A5%E9%97%A82.0/image-20230608204249327.png">
+<meta property="og:image" content="https://image-host-1304136909.cos.ap-shanghai.myqcloud.com/blog/%E5%9F%9F%E6%B8%97%E9%80%8F%E5%85%A5%E9%97%A82.0/image-20230610122214139.png">
+<meta property="og:image" content="https://image-host-1304136909.cos.ap-shanghai.myqcloud.com/blog/%E5%9F%9F%E6%B8%97%E9%80%8F%E5%85%A5%E9%97%A82.0/image-20230610122414603.png">
+<meta property="og:image" content="https://image-host-1304136909.cos.ap-shanghai.myqcloud.com/blog/%E5%9F%9F%E6%B8%97%E9%80%8F%E5%85%A5%E9%97%A82.0/image-20230610142952365.png">
+<meta property="article:published_time" content="2023-05-27T09:07:36.000Z">
+<meta property="article:modified_time" content="2023-06-11T01:50:19.314Z">
+<meta property="article:author" content="Z3ratu1">
+<meta property="article:tag" content="pentest">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://image-host-1304136909.cos.ap-shanghai.myqcloud.com/blog/%E5%9F%9F%E6%B8%97%E9%80%8F%E5%85%A5%E9%97%A82.0/image-20230608204109629.png">
+
+<link rel="canonical" href="https://blog.z3ratu1.cn/%E5%9F%9F%E6%B8%97%E9%80%8F%E5%85%A5%E9%97%A82.0.html">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-Hans'
+  };
+</script>
+
+  <title>域渗透入门2.0 | Z3ratu1's blog</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+<link rel="stylesheet" href="/css/prism-tomorrow.css" type="text/css"></head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">Z3ratu1's blog</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">Welcome</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>关于</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+        <li class="menu-item menu-item-links">
+
+    <a href="/links/" rel="section"><i class="fa fa-link fa-fw"></i>友链</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off" placeholder="搜索..." spellcheck="false" type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+  <a href="https://github.com/Z3ratu1" class="github-corner" title="Follow me on GitHub" aria-label="Follow me on GitHub" rel="external nofollow noopener noreferrer" target="_blank"><svg width="80" height="80" viewbox="0 0 250 250" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"/><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"/><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"/></svg></a>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
+    <link itemprop="mainEntityOfPage" href="https://blog.z3ratu1.cn/%E5%9F%9F%E6%B8%97%E9%80%8F%E5%85%A5%E9%97%A82.0.html">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="https://q2.qlogo.cn/headimg_dl?dst_uin=1207039417&spec=160">
+      <meta itemprop="name" content="Z3ratu1">
+      <meta itemprop="description" content="与其感慨路难行，不如现在出发">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Z3ratu1's blog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          域渗透入门2.0
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2023-05-27 17:07:36" itemprop="dateCreated datePublished" datetime="2023-05-27T17:07:36+08:00">2023-05-27</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2023-06-11 09:50:19" itemprop="dateModified" datetime="2023-06-11T09:50:19+08:00">2023-06-11</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E6%B8%97%E9%80%8F/" itemprop="url" rel="index"><span itemprop="name">渗透</span></a>
+                </span>
+            </span>
+
+          
+            <span id="/%E5%9F%9F%E6%B8%97%E9%80%8F%E5%85%A5%E9%97%A82.0.html" class="post-meta-item leancloud_visitors" data-flag-title="域渗透入门2.0" title="阅读次数">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span class="leancloud-visitors-count"></span>
+            </span>
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="far fa-comment"></i>
+      </span>
+      <span class="post-meta-item-text">Valine：</span>
+    
+    <a title="valine" href="/%E5%9F%9F%E6%B8%97%E9%80%8F%E5%85%A5%E9%97%A82.0.html#valine-comments" itemprop="discussionUrl">
+      <span class="post-comments-count valine-comment-count" data-xid="/%E5%9F%9F%E6%B8%97%E9%80%8F%E5%85%A5%E9%97%A82.0.html" itemprop="commentCount"></span>
+    </a>
+  </span>
+  
+  
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h1 id="域渗透入门2-0"><a href="#域渗透入门2-0" class="headerlink" title="域渗透入门2.0"></a>域渗透入门2.0</h1><p>很多年以前由于科恩的任务简单的对域进行了基础的了解，但是学的很浅，网上抄的环境也很垃圾，上来就直接拿到了域管，并且自带永恒之蓝等一系列一键system的洞，加上实战一次域都没遇上过，所以实际上学的很差。最近打了一个小护网，遇到了一个无敌防御的域，这下才知道之前学的东西全是臭鱼烂虾，一点派不上用场。<br>所以重新入门，把以前没有很搞清楚的概念再强化一下</p>
+<h2 id="常用命令"><a href="#常用命令" class="headerlink" title="常用命令"></a>常用命令</h2><p>常用的三个工具：自带的net，powerview.ps1，adfind.exe，adfind的最大缺点是exe基本上不免杀了，得rdp之类的上去关了杀软再操作</p>
+<p>powerview这里有一个很完整的document，可以直接查这个，查询后面接<code>| select name</code>可以只显示对应的字段，并且字段支持通配符<br><a target="_blank" rel="external nofollow noopener noreferrer" href="https://powersploit.readthedocs.io/en/latest/Recon/">powerview doc</a></p>
+<pre class=" language-cmd"><code class="language-cmd">net user xxx /domain
+</code></pre>
+<p>看一个人的具体信息，有点用的就是看其组成员吧，可能是本地的administrator之类的，也可以看密码过期策略，不过我感觉密码永不过期实际上看了也没什么用。。。<br>密码永不过期是用户属性中的<code>userAccountControl</code>的一位，可以改这个数字去查其他属性，<code>-dn</code>是只返回DN</p>
+<pre class=" language-cmd"><code class="language-cmd">Adfind.exe -b dc=god,dc=org -f "(userAccountControl:AND:=65536)" -bit -dn
+</code></pre>
+<p>偷wifi密码的命令。。。可能在钓鱼之后可以通过wifi密码推导其他密码？</p>
+<pre class=" language-cmd"><code class="language-cmd">for /f "skip=9 tokens=1,2 delims=:" %i in ('netsh wlan show profiles')  do @echo %j | findstr -i -v echo |  netsh wlan show profiles %j key=clear
+</code></pre>
+<p>域控</p>
+<pre class=" language-cmd"><code class="language-cmd">net group "domain controllers" /domain
+</code></pre>
+<p>域管</p>
+<pre class=" language-cmd"><code class="language-cmd">net group "domain admins" /domain
+</code></pre>
+<p>域内管理员，这个组是包含了域管的，这里的localgroup不是指本地管理员，而是本地组，本地组就是只在当前域内发挥作用的组，administrators中包含了<code>Domain admins</code>和<code>Enterprise Admins</code>两个域管组，实际上这个组里的号也基本等价于域管了</p>
+<pre class=" language-cmd"><code class="language-cmd">net localgroup administrators /domain
+</code></pre>
+<p>查域内机器，看完之后可以再ping或者nslookup查ip</p>
+<pre class=" language-cmd"><code class="language-cmd">net group "domain computers" /domain
+</code></pre>
+<p>看有没有用户在线，非常好用，以防rdp上去给管理员挤掉了的尴尬场面，但是给出的登录时间总感觉是乱写的，以及似乎只有server上有这个命令？也不是，好像是家庭版没有？win10家庭版没有，win7专业版有<br>然而并不能防止自己操作到一半后管理员突然登录发现桌面花花绿绿的尴尬场面</p>
+<pre class=" language-cmd"><code class="language-cmd">query user
+</code></pre>
+<p>查看目标机器远程共享文件夹</p>
+<pre class=" language-cmd"><code class="language-cmd">net view COMPUTER
+</code></pre>
+<p>开关远程桌面，1开0关</p>
+<pre class=" language-cmd"><code class="language-cmd">wmic RDTOGGLE WHERE ServerName='%COMPUTERNAME%' call SetAllowTSConnections 1
+</code></pre>
+<p>设置远程桌面端口</p>
+<pre class=" language-cmd"><code class="language-cmd">reg add "HKLM\System\CurrentControlSet\Control\Terminal Server\WinStations\RDP-Tcp" /t REG_DWORD /v portnumber /d 3389 /f
+</code></pre>
+<p>查看当前机器上的票据（pass the ticket环节可能用的上，或者mmkz也可以抓票据出来）</p>
+<pre><code>klist
+</code></pre>
+<p>不知道有什么用的查看保存凭据的命令，好像是记录远程桌面时保存的密码之类的东西</p>
+<pre><code>cmdkey /list
+</code></pre>
+<h2 id="LDAP"><a href="#LDAP" class="headerlink" title="LDAP"></a>LDAP</h2><p>Active Directory是微软对目录数据库的实现，而LDAP协议就是用来对这个数据库进行访问的协议<br>AD中存储了域内所有用户计算机等实体相关的信息，域内ACL那一套权限都是通过LDAP存储的，经典的powerview和adfind也都是通过LDAP进行域内信息的查询</p>
+<p>域使用LDAP协议对数据进行查询，然后存在一些对应的名词，在用powerview等工具的时候会遇到<br>DN（distinguish name，标识名称）域内描述某个对象的唯一标识符，应该是指用来查询的完整语句，如<code>CN=xxx,DC=z33,DC=cn</code>这种<br>CN（Common Name，通用名称），大部分的对象最后都会有一个通用名称，而这里不单指对象，组或者其他的对象都可以用CN描述<br>OU（organization unit，组织单元），用于被管理的一个分组<br>DC（Domain Component，域组件），就是把域名一个一个拆下来</p>
+<p>LDAP的语法也有点玄学，支持与或非（<code>&amp;|!</code>）三个经典运算加上等于和通配符<code>*</code>，adfind.exe就是使用这个语法进行查询的<br>其中与或非操作的位置是在两个运算的前面而非中间，如<code>(|(uid=1)(uid=2))</code>指代uid为1或2的项</p>
+<h3 id="ACL相关"><a href="#ACL相关" class="headerlink" title="ACL相关"></a>ACL相关</h3><p>ACL就是用来配置权限的，不过这里需要首先明确的一点是，对于一个对象的ACL来说，限定的是其他对象对当前对象的访问权限，而非当前对象对其他对象的访问权限。</p>
+<p>powerview下命令，查看对用户zhang拥有完全控制权限的acl项，结果中的<code>SecurityIdentifier</code>项表示了对查询用户拥有完全控制权限对象的SID，还需要解析出这个SID对应的是谁。。。<code>-ResolveGUIDs</code>说是能解析GUID成可读的形式，但这里面也没有GUID啊，全是SID。。。</p>
+<pre><code>Get-ObjectAcl -SamAccountName test -ResolveGUIDs | ? &#123;$_.ActiveDirectoryRights -eq &quot;GenericAll&quot;&#125;
+</code></pre>
+<p>可以用如下命令查看用户的SID</p>
+<pre class=" language-powershell"><code class="language-powershell">Get<span class="token operator">-</span>NetUser <span class="token punctuation">|</span> <span class="token function">select</span> samaccountname<span class="token punctuation">,</span>ObjectSID
+</code></pre>
+<p>然后套一层SID查询查某个对象对另一个对象的ACL</p>
+<pre class=" language-powershell"><code class="language-powershell">Get<span class="token operator">-</span>ObjectAcl <span class="token operator">-</span>SamAccountName test <span class="token operator">-</span>ResolveGUIDs <span class="token punctuation">|</span> ? <span class="token punctuation">{</span><span class="token variable">$_</span><span class="token punctuation">.</span>SecurityIdentifier <span class="token operator">-eq</span> <span class="token string">"&lt;sid>"</span> <span class="token operator">-and</span> <span class="token variable">$_</span><span class="token punctuation">.</span>ActiveDirectoryRights <span class="token operator">-eq</span> <span class="token string">"GenericAll"</span><span class="token punctuation">}</span>
+</code></pre>
+<p>sid的前面那一长串是域的id，只有最后面这个数字和当前用户关联，域id可以用<code>Get-DomainSID</code>查询，当前用户的</p>
+<p>推荐阅读，介绍了几个不同权限的利用方法<br><a target="_blank" rel="external nofollow noopener noreferrer" href="https://www.anquanke.com/post/id/212163">AD域中的ACL攻防探索</a><br><a target="_blank" rel="external nofollow noopener noreferrer" href="https://wald0.com/?p=112">BloodHound 1.3 – The ACL Attack Path Update</a><br><a target="_blank" rel="external nofollow noopener noreferrer" href="https://www.ired.team/offensive-security-experiments/active-directory-kerberos-abuse/abusing-active-directory-acls-aces">Abusing Active Directory ACLs&#x2F;ACEs</a></p>
+<p>乱点的时候发现everyone对域内的每个账户都有修改密码(Change Password)的权限，还以为是什么顶级配置错误，后来发现修改密码是指知道原密码的情况下修改。。。无视条件改密码那个叫重置密码(Reset Password)。但是试了一下单独添加一个重置密码权限是不能重置密码的。。。至少需要重置密码，写入全部属性和修改权限三个权限才行，其中后面两个属性是在特殊属性里面。网上有文章说有一个属性叫<code>Force Reset Password</code>，但是图形界面这边好像没看见这种属性</p>
+<h3 id="组"><a href="#组" class="headerlink" title="组"></a>组</h3><p>组是权限的集合，组内成员会拥有组内的权限，而组分为域本地组，通用组和全局组。后面这两个是在和林交互的时候有特殊的规则，域本地组就是单个域内生效的组。<br>域管理员的组为Administrators(本地组)，而该组下包含两个实际的组，Domain Admins（全局组）和Enterprise Admin（通用组），默认情况下，Domain Admins会被加入域内所有 机器的本地管理员组<br>Domain Users这个组也是全局组，改组默认情况下会被加入域内所有机器的本地用户组，所以可以到处登录<br>机器用户是位于Domain Computers，所以不能随意登录，机器用户的用户名是当前机器名后加<code>$</code>，当发现机器在域内而该机器上没法拿到域内用户时，提权到system就可以用机器用户去进行域内的访问</p>
+<p>当然，不排除有奇怪的配置把机器用户配的到处能登录，或者安全拉满限定哪些用户能登录哪些机器或者哪些机器可以被某个用户登录<br><a target="_blank" rel="external nofollow noopener noreferrer" href="https://www.freebuf.com/articles/network/283767.html">域用户和机器用户</a><br><a target="_blank" rel="external nofollow noopener noreferrer" href="https://daiker.gitbook.io/windows-protocol/ldap-pian/10">域用户和计算机用户介绍</a></p>
+<h3 id="OU"><a href="#OU" class="headerlink" title="OU"></a>OU</h3><p>OU中文名组织单元，是用于被管理的组，组策略一般就被应用于OU之上，对OU的完全控制可以延伸为对OU下所有对象的完全控制，只要目标对象支持从父项中继承权限（例外会在AdminSDHolder中提到）。这里是我朋友给我的一个例子，其中ou和user要替换可完全控制的OU和想添加权限的用户（需引入powerview后执行）</p>
+<pre class=" language-powershell"><code class="language-powershell"><span class="token variable">$Guids</span> = Get<span class="token operator">-</span>DomainGUIDMap<span class="token punctuation">;</span> 
+<span class="token variable">$AllObjectsPropertyGuid</span> = <span class="token variable">$Guids</span><span class="token punctuation">.</span>GetEnumerator<span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">|</span> ?<span class="token punctuation">{</span><span class="token variable">$_</span><span class="token punctuation">.</span>value <span class="token operator">-eq</span> <span class="token string">'All'</span><span class="token punctuation">}</span> <span class="token punctuation">|</span> <span class="token function">select</span> <span class="token operator">-</span>ExpandProperty name<span class="token punctuation">;</span>
+<span class="token variable">$ACE</span> = New<span class="token operator">-</span>ADObjectAccessControlEntry <span class="token operator">-</span>Verbose <span class="token operator">-</span>PrincipalIdentity &lt;user> <span class="token operator">-</span>Right GenericAll <span class="token operator">-</span>AccessControlType Allow <span class="token operator">-</span>InheritanceType All <span class="token operator">-</span>InheritedObjectType <span class="token variable">$AllObjectsPropertyGuid</span><span class="token punctuation">;</span>
+<span class="token variable">$OU</span> = Get<span class="token operator">-</span>DomainOU <span class="token operator">-</span>Raw &lt;ou><span class="token punctuation">;</span> 
+<span class="token variable">$DsEntry</span> = <span class="token variable">$OU</span><span class="token punctuation">.</span>GetDirectoryEntry<span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token variable">$dsEntry</span><span class="token punctuation">.</span>PsBase<span class="token punctuation">.</span>Options<span class="token punctuation">.</span>SecurityMasks = <span class="token string">'Dacl'</span><span class="token punctuation">;</span>
+<span class="token variable">$dsEntry</span><span class="token punctuation">.</span>PsBase<span class="token punctuation">.</span>ObjectSecurity<span class="token punctuation">.</span>AddAccessRule<span class="token punctuation">(</span><span class="token variable">$ACE</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token variable">$dsEntry</span><span class="token punctuation">.</span>PsBase<span class="token punctuation">.</span>CommitChanges<span class="token punctuation">(</span><span class="token punctuation">)</span>
+</code></pre>
+<h3 id="AdminSDHolder"><a href="#AdminSDHolder" class="headerlink" title="AdminSDHolder"></a>AdminSDHolder</h3><p>一个用于保护特权组的对象，众所周知，每个对象都会有一组ACL，描述其他对象对它的访问权限，而AdminSDHolder的ACL，和受保护组（windows内置的一组特权组）的ACL是一致的，AdminSDHolder中的ACL，即为受保护组的ACL，这组权限每隔60分钟会通过一个叫做<code>SDProp</code>的进程同步到受保护的特权组中，保持特权组的同步。所以网上的文章大多专注于获取域管权限后，通过AdminSDHolder留存后门，位于保护组的对象在用户属性中会有一项<code>admincount</code>为1。但除此之外，关于AdminSDHolder和保护组还有更多的东西可以学</p>
+<p>如下是使用adfind和powerview查看特权组的方法</p>
+<pre><code>Adfind.exe -f &quot;&amp;(objectcategory=group)(admincount=1)&quot; -dn
+Adfind.exe -f &quot;&amp;(objectcategory=user)(admincount=1)&quot; -dn
+Get-NetUser -AdminCount |select samaccountname    //只显示用户名
+Get-NetGroup -AdminCount
+Get-NetUser -AdminCount
+</code></pre>
+<p>但是如果一个对象曾经在保护组中后来又被移除，这个值也不会改变，仍然是1</p>
+<p>微软文档中有这么一段 </p>
+<blockquote>
+<p>First, the permissions applied to users belonging to protected groups are more stringent than the default permissions applied onto other user accounts. Next, the default behaviour is that inheritance is disabled on these privileged accounts, ensuring that permissions applied at the parent level aren’t inherited by the protected objects, regardless of where they reside. Finally, the background process running every 60 minutes identifies manual modifications to an ACL and overwrites them so that the ACL matches the ACL on the AdminSDHolder object.</p>
+</blockquote>
+<p><a target="_blank" rel="external nofollow noopener noreferrer" href="https://learn.microsoft.com/en-us/previous-versions/technet-magazine/ee361593(v=msdn.10)">AdminSDHolder, Protected Groups and SDPROP</a><br><a target="_blank" rel="external nofollow noopener noreferrer" href="https://social.technet.microsoft.com/wiki/contents/articles/22331.adminsdholder-protected-groups-and-security-descriptor-propagator.aspx">AdminSDHolder, Protected Groups and Security Descriptor Propagator</a></p>
+<p>即保护组的成员默认拥有更强的安全限制，并且设置上不允许继承来自上层的权限，权限被修改的情况下也会每半个小时重新同步</p>
+<p>这次就遇到了一个域，然后域内配置了一个everyone对某个OU拥有generic all的权限，而这个OU下是有管理员账户的，当时朋友用上面的powershell操作给OU及其全部后代加了个generic all的权限，结果普通账户可控，域管仍然不可控，百思不得其解，今天自己搭环境复现才发现是这么回事。对上级容器的完全控制<strong>应该</strong>可以延伸到子级对象，除非子级对象拒绝继承权限。</p>
+<p>如下图，test账户左下角有一个小勾，内容为<code>包括可从该对象父对象继承的权限</code>，而被选中的内容即为从其所在的OU继承的，normal用户对其的完全控制权限，而AdminSDHolder项中该对勾没有被选中，也可以看到所有的权限中继承与这一列均为<code>不是继承的</code>。不过没有翻到怎么查这个地方勾没勾上的语法，不然还可以过滤一下组下面哪些账户能直接控制（BloodHound里有admincount那个属性，可以自己写个查询）</p>
+<p><img src="https://image-host-1304136909.cos.ap-shanghai.myqcloud.com/blog/%E5%9F%9F%E6%B8%97%E9%80%8F%E5%85%A5%E9%97%A82.0/image-20230608204109629.png" alt="image-20230608204109629"></p>
+<p><img src="https://image-host-1304136909.cos.ap-shanghai.myqcloud.com/blog/%E5%9F%9F%E6%B8%97%E9%80%8F%E5%85%A5%E9%97%A82.0/image-20230608204249327.png" alt="image-20230608204249327"></p>
+<h3 id="GPO"><a href="#GPO" class="headerlink" title="GPO"></a>GPO</h3><p>组策略对象，组策略主要由GPO，OU和GPLink组成，GPO 规定策略内容，OU是组策略应用的目标，而GPLink将组策略和OU关联起来。</p>
+<pre><code>Get-DomainGPO | select name,displayname
+</code></pre>
+<p>组策略中，这个查询只能查到组策略的名字相关的属性，具体的内容需要连到域控的网络共享上面才能看，路径是<code>\\&lt;DomainController&gt;\SYSVOL\&lt;DomainName&gt;\\Policies\\&lt;name&gt;</code></p>
+<p>name是用花括号包裹起来的一个uuid，但是这个不是唯一的，有另一个叫objectid的属性才是全局唯一的。组策略默认是继承的，即应用到一个OU上的组策略会应用到其所有子OU上。gplink被存储在gpo应用到的对象上，属性为gplink，其最后面的数字1表示该策略强制生效，否则不强制</p>
+<p>可以使用<code>net view &lt;computerName&gt;</code>来查看目标机器的网络共享有哪些，一般来说SYSVOL是开启的</p>
+<blockquote>
+<ul>
+<li>If a GpLink is <em>enforced</em>, the associated GPO will apply to the linked OU and all child objects, regardless of whether any OU in that tree <em>blocks inheritance</em>.</li>
+<li>If a GpLink is <strong>not</strong> <em>enforced</em>, the associated GPO will apply to the linked OU and all child  objects, <strong>unless</strong> any OU within that tree <em>blocks inheritance</em>.</li>
+</ul>
+</blockquote>
+<p>也就是说组策略是一定会生效的，是否允许继承只会在组策略非强制部署的情况下阻断继承</p>
+<blockquote>
+<blockquote>
+<p>Reminder: GPOs can only apply to users and computers, not security groups.</p>
+</blockquote>
+</blockquote>
+<p>也就是说如果OU下面有组的话，组对象下的对象是不会受GPO影响的咯？</p>
+<p>GPO这边推荐用powerview的<code>New-GPOImmediateTask</code>，可以直接powershell一键上线之类的，或者加两个用户进本地管理员。组策略目测是用目标机器的机器用户运行的，直接是system权限。但是滥用的前提是给用户提供了修改组策略的权限，而这个权限一般只有域管有。。。所以还是实战看情况吧</p>
+<p><a target="_blank" rel="external nofollow noopener noreferrer" href="https://blog.harmj0y.net/redteaming/abusing-gpo-permissions/">Abusing GPO Permissions</a><br><a target="_blank" rel="external nofollow noopener noreferrer" href="https://wald0.com/?p=179">A Red Teamer’s Guide to GPOs and OUs</a></p>
+<h2 id="kerberos回顾"><a href="#kerberos回顾" class="headerlink" title="kerberos回顾"></a>kerberos回顾</h2><p>以前学过，然后忘了，做简单回顾</p>
+<p>kerberos的特点就是服务过程中有三方认证，其中KDC中包括了AS和TGS，提供服务的server单独一边</p>
+<p>认证过程为用户先向AS发起一个身份认证，若身份认证通过，AS返回一个TGT，该票据可用于识别用户身份。TGT使用krbtgt账号的hash进行加密，TGT里面会包含一个PAC，用于标识用户（似乎在哪提到过TGT是不常更新的，下发一个之后用户可以长时间不用再认证？）<br>当用户想访问某个服务时，需将TGT发送给TGS，TGS验证TGT正确后，会签发一份TGS票据，TGS票据由对应服务的hash进行加密（该票据无论用户是否有权访问服务都会签发）<br>最后用户将获得的TGS提交给server，server会把PAC解密出来再次去KDC验证是否该用户具有服务访问提供权限并提供服务</p>
+<p>攻击中的黄金票据就是能够拿到KDC中的krbtgt的hash，这样子这样子就可以自己签发TGT，伪装成任意用户，并使用该TGT申请一切服务</p>
+<p>白银票据则是获取了对应服务的hash，这样子可以签对应服务的TGS，响应的就只能伪造出对该服务的任意访问权限，但是PAC只能由KDC签出来，利用的前提是该服务不进行PAC校验</p>
+<p>暂时只做粗糙的回顾，具体细节可参见<a target="_blank" rel="external nofollow noopener noreferrer" href="https://daiker.gitbook.io/windows-protocol/kerberos">windows protocol kerberos篇</a></p>
+<h3 id="非约束委派"><a href="#非约束委派" class="headerlink" title="非约束委派"></a>非约束委派</h3><p>这边想学的一个点是非约束委派攻击。</p>
+<p>委派是指一个用户可以将权限委派给另一个用户（通常是服务类用户）展开活动，那么非约束委派就是指没用任何限制条件的委派了咯</p>
+<p>由于委派使得被委派对象可以使用委派对象的权能，那么这其中就一定有某种形式的凭证传递。而这里传递的凭证就是用户的TGT。假设用户想通过service a访问service b，用户会先去AS申请TGT，再申请对service a的TGS，并将TGT附在TGS中访问service a，接下来service a会从中提取出TGT再从KDC处申请对service b的TGS，并使用该TGS代表用户对service b发起请求。</p>
+<p>由于用户将TGT发送给了service a，service a会将TGT存在LSASS中，如果能将其dump出来就等于是获得了用户的TGT</p>
+<p>完成该攻击有两个前置条件，1. 获得非约束委派机器的权限（用于dump TGT），2. 发起委派的用户需未设定不能委派属性</p>
+<p>接下来只需要使需要获取权限的账户对非约束委派机器发起访问，即可获得对应的账户权限。等待管理员账户访问是不太现实的，所以比较合理的方案是利用经典的打印机bug，强制机器用户（比如域控机器）发起远程认证，进而获取其凭证。获取凭证后用mimikatz pass the tickle使用经典DCSync一键dump所有hash</p>
+<p>非约束委派的账户的UserAccount属性会设定TRUSTED_FOR_DELEGATION位，值为0x80000，转成十进制524288，在powerview中可以使用如下语句查询，BloodHound也有内置的一键查询</p>
+<pre><code>Get-NetComputer -Unconstrained -Domain z33.com
+Get-NetUser -Unconstrained -Domain z33.com | select name
+</code></pre>
+<p><a target="_blank" rel="external nofollow noopener noreferrer" href="https://www.cnblogs.com/yokan/p/16164761.html">域委派攻击详解</a></p>
+<h3 id="约束委派"><a href="#约束委派" class="headerlink" title="约束委派"></a>约束委派</h3><p>约束委派并不是限制了可以发起委派的用户，而是限制了委派后可以访问的服务。约束委派需要域管理员权限才能设置，设置后不需要用户交互就可以模仿用户权限。流程为用户按kerberos协议签出一个访问约束委派服务的TGS发给约束委派账户，然后约束委派可以用这个TGS去KDC再签出一个访问对应服务的TGS，并以用户的身份访问对应服务</p>
+<p>由于这个过程中没有用户的TGT，用户访问约束委派的TGS本身就是用约束委派自身的hash加密的，所以不能偷域控TGT签黄金票据，但也使得利用也变得简单了起来。因为不需要用户来认证，也就不需要打印机bug之类的来诱导访问，只要拿下了约束委派的账户，就可以直接签任意TGS以任意身份访问可委派的服务，但后续只能根据委派的服务进行利用的分类讨论</p>
+<p>下图即为约束委派和费约束委派的选项框</p>
+<p><img src="https://image-host-1304136909.cos.ap-shanghai.myqcloud.com/blog/%E5%9F%9F%E6%B8%97%E9%80%8F%E5%85%A5%E9%97%A82.0/image-20230610122214139.png" alt="image-20230610122214139"></p>
+<h3 id="基于资源的约束委派"><a href="#基于资源的约束委派" class="headerlink" title="基于资源的约束委派"></a>基于资源的约束委派</h3><p>上述两个委派的缺点在于需要域管理员配置才能进行，而基于资源的约束委派只需要对对应资源具有控制权即可进行。基于资源的约束委派与普通的约束委派相反，前者是在服务B上定义了服务B对服务A的信任，让A能以任何身份进行委派，而后者则是在服务A上定义了允许A传入B的委派。<br>是在windows server2012上引入的，所以当域控低于该版本的时候不能用</p>
+<p>比如这台windows server2008 R2，就没有用于配置基于资源的约束委派所需的<code>AllowedToActOnBehalfOfOtherIdentity</code></p>
+<p><img src="https://image-host-1304136909.cos.ap-shanghai.myqcloud.com/blog/%E5%9F%9F%E6%B8%97%E9%80%8F%E5%85%A5%E9%97%A82.0/image-20230610122414603.png" alt="image-20230610122414603"></p>
+<p>当我们对一个计算机对象拥有写权限的时候，可以通过基于资源的约束委派，设置他信任我们自己添加的机器账户委派任何用户，然后使用该账户模仿域控控制目标机器<br><a target="_blank" rel="external nofollow noopener noreferrer" href="https://www.ired.team/offensive-security-experiments/active-directory-kerberos-abuse/resource-based-constrained-delegation-ad-computer-object-take-over-and-privilged-code-execution">Kerberos Resource-based Constrained Delegation: Computer Object Takeover</a></p>
+<blockquote>
+<p>In unconstrained and constrained Kerberos delegation, a computer&#x2F;user is told what resources it can delegate authentications to;<br>In resource based Kerberos delegation, computers (resources) specify who they trust and who can delegate authentications to them.</p>
+</blockquote>
+<p><a target="_blank" rel="external nofollow noopener noreferrer" href="https://book.hacktricks.xyz/windows-hardening/active-directory-methodology/resource-based-constrained-delegation">Resource-based Constrained Delegation</a></p>
+<p>但是在利用的时候需要注意模仿的账户是否可以被委派，在用户属性里有这么一条配置，不过默认好像是不会被勾选的</p>
+<p><img src="https://image-host-1304136909.cos.ap-shanghai.myqcloud.com/blog/%E5%9F%9F%E6%B8%97%E9%80%8F%E5%85%A5%E9%97%A82.0/image-20230610142952365.png" alt="image-20230610142952365"></p>
+<h3 id="ms14-068"><a href="#ms14-068" class="headerlink" title="ms14 068"></a>ms14 068</h3><p>一个关于PAC的漏洞，允许任意用户被提升至域管。<br>PAC包含了用户的sid和gid，由于PAC由KDC生成，并用hash进行签名，用户在无法获得krbtgt的hash的情况下理论上是不能伪造PAC的，但是实现上出现了一点小问题，在签名校验时，可以指定任意的算法，比如md5，这样子就不需要任何hash简单的签一个md5就能伪造出一个PAC，然后伪造的PAC中修改gid，添加域管组到用户的gid中，用户就被提升到了域管</p>
+<p>当然，PAC是包含在TGT里面的，不能制作TGT也就不能往里面塞PAC，那具体怎么操作就有其他的巧妙办法了，我是脚本小子，不学。只要知道有一个历史洞一键域内用户升到域管即可</p>
+<h2 id="NTLM-hash"><a href="#NTLM-hash" class="headerlink" title="NTLM hash"></a>NTLM hash</h2><p>windows里面不用密码进行交互，走的都是hash，hash分为LM hash和NTLM hash，每次mimikatz之类的运行出来形如<code>admin:500:aad3xxxx:xxxxx</code>的结果中，aad3开头的就是LM hash，后面那个是NTLM hash，其中由于LM hash的强度太低，基本上已被弃用，aad3开头的这个值就是弃用后空密码加密出来的内容。</p>
+<p>LM hash支持的最长密码是14位，且不区分大小写，在加密的时候还要把密码分成两个长度为7的部分分开加密，导致暴力破解的成功率极高<br>NTLM hash是用md4算法算的</p>
+<p>感觉kerberos是用来进行服务鉴权的，NTLM是用来进行身份认证的？</p>
+<p>NTLM采用的是挑战应答机制进行鉴权，client先向server发起请求，然后server会回复一个challenge，client使用hash对challenge进行加密，作为response返回，server对response进行校验，如果和challenge符合则通过，其中NTLM hash就是用来加密的hash，而发送的response一般被称为net ntlm hash</p>
+<h3 id="net-NTLM获取"><a href="#net-NTLM获取" class="headerlink" title="net NTLM获取"></a>net NTLM获取</h3><p>如果获取了用户的hash，就可以直接pass the hash为所欲为，但如果只是拿到一个net ntlm hash的话，就得上比较复杂的ntlm relay了。一般来说工作组中relay是没有用的，除非两个电脑的密码一样，但是域内的话域用户一般可以登录各种机器。那么对于非域的情况，可以考虑进行一个reflect，也就是将得到的net  ntlm relay到自己，可惜微软通过一个补丁修了smb relay到smb的reflect，只能跨协议relay，比如smb到http之类的</p>
+<p>那么如何让目标进行一个ntlm的认证呢，最简单的方法是让用户访问一个UNC路径，这样会发起一个smb的ntlm认证。当然，被动的攻击技术当然不怎么好用，放个什么UNC相关的文件上去等管理员访问之类的，就很难利用，一般来说是mysql可以load file，或者服务本身有xxe，ssrf之类的支持UNC路径。</p>
+<p>比较好用的应该是那个经典的打印机bug，只要是域内的用户就可以使启动了对应服务的机器对用户提供的机器发起NTLM认证，并且这个是微软的feature，不会修复</p>
+<h3 id="net-NTLM破解"><a href="#net-NTLM破解" class="headerlink" title="net NTLM破解"></a>net NTLM破解</h3><p>分版本号，如果用的及其远古的LM hash的话，会使用v1的版本，密码会被限制到14的长度还分成两个7，只需要控制模板机器对攻击者发起认证，控制challenge的值，就可以做彩虹表来获取真正 的hash。</p>
+<h3 id="ntlm-relay"><a href="#ntlm-relay" class="headerlink" title="ntlm relay"></a>ntlm relay</h3><p>impacket下面的几个py文件，不知道好不好用。。。没用过，理论上能够控制目标机器向攻击者发起认证请求就可以完成relay？不过如果是打印机bug发起的认证，由于机器用户默认情况下是不能登录到其他机器的，所以只能考虑relay到其他服务上</p>
+<p>如果权限很高的话可以考虑relay回LDAP服务，就可以对域内用户权限 进行修改，比如加个域管什么的。不过域控的smb默认是要求签名的，没法直接relay，LDAP好像也会有签名要求，不是很清楚</p>
+<p>加上微软对MS08-068的顶级修复，也不能smb relay回自身</p>
+<p>机器用户不能登录远程，普通用户难以让其发起ntlm认证。总的来说感觉利用面不广。这里提到了可以用域控机器用户添加基于资源的约束委派然后接管机器用户，由于是域管机器然后dcsync完成利用</p>
+<p>主要是实战没利用过，不知道好不好用</p>
+<h2 id="BloodHound"><a href="#BloodHound" class="headerlink" title="BloodHound"></a>BloodHound</h2><p>感觉应该是域内信息一把梭的最优工具，能用这个的话能大概的先对整个域的情况有一个了解，不然powerview一点点看还是有点坐牢了<br>真挺好用的，并且是C#的应用，可以内存运行，免杀性能++<br>一般来说应该使用<code>SharpHound.exe -c All</code>尽可能的收集信息，启动neo4j的时候建议改一下设置把内存拉到4G以上，跑起来<strong>可能会</strong>快一点<br>大哥的大哥说Bloodhound的ldap流量很难被抓，随便按。但是网上也有人说这个动静大，按了之后域控上面一万行日志。最大的缺点是BloodHound只支持.net 4.6以上，遇到低版本的机器跑不起来。。。以及neo4j有时候真的很慢，并且发生情况不规律，属于玄学问题。。。我觉得我的电脑性能应该不会这么差，以前用tabby的时候就觉得他有点问题</p>
+<blockquote>
+<p>SharpHound is designed targeting .Net 4.6.2. SharpHound must be run from the context of a domain user, either directly through a logon or through another method such as RUNAS.</p>
+</blockquote>
+<p>建议是直接从BloodHound自带的命令里点点点，然后自定义查询的话。。。要不问问ChatGPT辅助一下？<br>比如查询所有已被控制的节点（需要先手动标记节点被控制）</p>
+<pre class=" language-sql"><code class="language-sql"><span class="token keyword">MATCH</span> <span class="token punctuation">(</span>n<span class="token punctuation">)</span>
+<span class="token keyword">WHERE</span> n<span class="token punctuation">.</span>owned<span class="token operator">=</span><span class="token boolean">True</span>
+<span class="token keyword">RETURN</span> n
+</code></pre>
+<p>如果在图形界面里看的话，被控制的属性名为<code>Compomised</code>，然而实际上没有这个属性，我edit node才看见那个属性叫<code>owned</code>。。。</p>
+<p>设置里面有一个query debug mode，开了之后可以看到点点点时对应的查询语句，然后自行修改</p>
+<p>在nodeinfo处有节点的基础信息，其中包含了组成员关系，对外的控制权，外部对当前目标的控制权，本地管理权限等，可以到处点来往外查看控制权限</p>
+<h2 id="一些乱七八糟的杂项内容"><a href="#一些乱七八糟的杂项内容" class="headerlink" title="一些乱七八糟的杂项内容"></a>一些乱七八糟的杂项内容</h2><p>mssql可以走本地认证?如果有一个本地的mssql就算不知道数据库账号密码也可以走本地管理员身份认证进行访问？</p>
+<p>远程执行命令的方法：psexec，这个走445端口，wmi走135端口并且没有回显，还有一个winrm是5895&#x2F;5896端口。</p>
+<p>其中psexec好像是因为走ipc，所以无论是pass the hash还是pass the ticket，只要能建立起连接就能用<br>wmi目前手上的工具支持pass the hash。winrm没用过，不过搜索结果中也有可以pass the hash的。pass the ticket其实没怎么用过，不甚熟练，另一个问题是pass the ticket是kerberos里面和服务交互的方法，一般的攻击感觉都是走的ntlm的认证所以都是pass the hash。</p>
+<p>域内登录指定用户名有两种方式，一个是<code>域名\用户名</code>,另一个是<code>用户名@域名</code>，理论上来说老机器用前者，但实际上都可以用前者</p>
+<p>原来普通域用户默认是不能直接登录域控的啊，不过net share什么的还是可以看的</p>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/pentest/" rel="tag"># pentest</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/sliver%E7%AE%80%E6%98%93%E5%85%A5%E9%97%A8.html" rel="prev" title="sliver简易入门">
+      <i class="fa fa-chevron-left"></i> sliver简易入门
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/JustCTF023.html" rel="next" title="JustCTF2023">
+      JustCTF2023 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+    <div class="comments" id="valine-comments"></div>
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%9F%9F%E6%B8%97%E9%80%8F%E5%85%A5%E9%97%A82-0"><span class="nav-number">1.</span> <span class="nav-text">域渗透入门2.0</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%B8%B8%E7%94%A8%E5%91%BD%E4%BB%A4"><span class="nav-number">1.1.</span> <span class="nav-text">常用命令</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#LDAP"><span class="nav-number">1.2.</span> <span class="nav-text">LDAP</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#ACL%E7%9B%B8%E5%85%B3"><span class="nav-number">1.2.1.</span> <span class="nav-text">ACL相关</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%BB%84"><span class="nav-number">1.2.2.</span> <span class="nav-text">组</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#OU"><span class="nav-number">1.2.3.</span> <span class="nav-text">OU</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#AdminSDHolder"><span class="nav-number">1.2.4.</span> <span class="nav-text">AdminSDHolder</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#GPO"><span class="nav-number">1.2.5.</span> <span class="nav-text">GPO</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#kerberos%E5%9B%9E%E9%A1%BE"><span class="nav-number">1.3.</span> <span class="nav-text">kerberos回顾</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E9%9D%9E%E7%BA%A6%E6%9D%9F%E5%A7%94%E6%B4%BE"><span class="nav-number">1.3.1.</span> <span class="nav-text">非约束委派</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%BA%A6%E6%9D%9F%E5%A7%94%E6%B4%BE"><span class="nav-number">1.3.2.</span> <span class="nav-text">约束委派</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%9F%BA%E4%BA%8E%E8%B5%84%E6%BA%90%E7%9A%84%E7%BA%A6%E6%9D%9F%E5%A7%94%E6%B4%BE"><span class="nav-number">1.3.3.</span> <span class="nav-text">基于资源的约束委派</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#ms14-068"><span class="nav-number">1.3.4.</span> <span class="nav-text">ms14 068</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#NTLM-hash"><span class="nav-number">1.4.</span> <span class="nav-text">NTLM hash</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#net-NTLM%E8%8E%B7%E5%8F%96"><span class="nav-number">1.4.1.</span> <span class="nav-text">net NTLM获取</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#net-NTLM%E7%A0%B4%E8%A7%A3"><span class="nav-number">1.4.2.</span> <span class="nav-text">net NTLM破解</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#ntlm-relay"><span class="nav-number">1.4.3.</span> <span class="nav-text">ntlm relay</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#BloodHound"><span class="nav-number">1.5.</span> <span class="nav-text">BloodHound</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%80%E4%BA%9B%E4%B9%B1%E4%B8%83%E5%85%AB%E7%B3%9F%E7%9A%84%E6%9D%82%E9%A1%B9%E5%86%85%E5%AE%B9"><span class="nav-number">1.6.</span> <span class="nav-text">一些乱七八糟的杂项内容</span></a></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Z3ratu1" src="https://q2.qlogo.cn/headimg_dl?dst_uin=1207039417&spec=160">
+  <p class="site-author-name" itemprop="name">Z3ratu1</p>
+  <div class="site-description" itemprop="description">与其感慨路难行，不如现在出发</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">180</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">5</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">93</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+  <div class="beian"><a href="http://www.beian.miit.gov.cn/" rel="external nofollow noopener noreferrer" target="_blank">湘ICP备2020021580号 </a>
+      <img src="/./images/beian.png" style="display: inline-block;">
+  </div>
+
+<div class="copyright">
+  
+  &copy; 2019 – 
+  <span itemprop="copyrightYear">2023</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Z3ratu1</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="external nofollow noopener noreferrer" target="_blank">Hexo</a> & <a href="https://pisces.theme-next.org/" class="theme-link" rel="external nofollow noopener noreferrer" target="_blank">NexT.Pisces</a> 强力驱动
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+
+<script>
+NexT.utils.loadComments(document.querySelector('#valine-comments'), () => {
+  NexT.utils.getScript('https://cdn.jsdelivr.net/npm/valine@1.4.14/dist/Valine.min.js', () => {
+    var GUEST = ['nick', 'mail', 'link'];
+    var guest = 'nick,mail,link';
+    guest = guest.split(',').filter(item => {
+      return GUEST.includes(item);
+    });
+    new Valine({
+      el         : '#valine-comments',
+      verify     : false,
+      notify     : false,
+      appId      : '7H8kg0XdWO8IbhOcu4K1JaAT-gzGzoHsz',
+      appKey     : 'wPKQjkbVtvPaRR7gh2yjfLSi',
+      placeholder: "Just go go",
+      avatar     : 'mm',
+      meta       : guest,
+      pageSize   : '10' || 10,
+      visitor    : true,
+      lang       : '' || 'zh-cn',
+      path       : location.pathname,
+      recordIP   : false,
+      serverURLs : ''
+    });
+  }, window.Valine);
+});
+</script>
+
+</body>
+</html>
