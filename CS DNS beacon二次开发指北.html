@@ -31,7 +31,7 @@
 <meta property="og:image" content="https://blog.z3ratu1.cn/images/CS_DNS_beacon%E4%BA%8C%E6%AC%A1%E5%BC%80%E5%8F%91%E6%8C%87%E5%8C%97/image-20230227153416189.png">
 <meta property="og:image" content="https://blog.z3ratu1.cn/images/CS_DNS_beacon%E4%BA%8C%E6%AC%A1%E5%BC%80%E5%8F%91%E6%8C%87%E5%8C%97/image-20230227160620700.png">
 <meta property="article:published_time" content="2023-02-27T08:36:13.000Z">
-<meta property="article:modified_time" content="2023-02-27T08:40:22.284Z">
+<meta property="article:modified_time" content="2023-06-30T02:34:49.691Z">
 <meta property="article:author" content="Z3ratu1">
 <meta property="article:tag" content="CobaltStrike">
 <meta name="twitter:card" content="summary">
@@ -226,10 +226,16 @@
                 <i class="far fa-calendar"></i>
               </span>
               <span class="post-meta-item-text">发表于</span>
-              
 
-              <time title="创建时间：2023-02-27 16:36:13 / 修改时间：16:40:22" itemprop="dateCreated datePublished" datetime="2023-02-27T16:36:13+08:00">2023-02-27</time>
+              <time title="创建时间：2023-02-27 16:36:13" itemprop="dateCreated datePublished" datetime="2023-02-27T16:36:13+08:00">2023-02-27</time>
             </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2023-06-30 10:34:49" itemprop="dateModified" datetime="2023-06-30T10:34:49+08:00">2023-06-30</time>
+              </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
                 <i class="far fa-folder"></i>
@@ -273,9 +279,10 @@
 
       
         <h1 id="CS-DNS-beacon二次开发指北"><a href="#CS-DNS-beacon二次开发指北" class="headerlink" title="CS DNS beacon二次开发指北"></a>CS DNS beacon二次开发指北</h1><p>接上一篇<a href="/CobaltStrike%20beacon%E4%BA%8C%E5%BC%80%E6%8C%87%E5%8D%97.html">CobaltStrike beacon二开指南</a>，这次把DNS beacon的写法也简要的讲一下。感觉写的东西还是有点玩具，所以依照惯例，还是把指南改成指北吧。。。<br>之前花了大功夫把geacon系列项目整的差不多了，感觉当初这么一个心血来潮的项目能整的这么成功，爽死了捏。当时的TODO上是写了实现DNS beacon的，但是感觉这个功能真的很拉跨加上流量特征极其明显加上不出网环境上马本身就有点玄学，如果有边界机就上代理之后再上马也行，反正就是各种buff叠起来导致感觉鸡肋的很，以及在安全客上看到有人发布了一版实现过的版本，就一直没写，但是最近有点闲的，一起写geacon pro的好兄弟又一直和我提起这个事，就乱写两笔试试算了捏。</p>
-<p>写好的代码在<a target="_blank" rel="external nofollow noopener noreferrer" href="https://github.com/H4de5-7/geacon_pro/tree/dns">geacon_pro</a>的dns分支下，由于只是随手写的玩具，还有很多地方没修好，只测试了基本的命令执行，很多功能并未测试，以及很多功能也没实现，只是写出了一个实现的样例demon</p>
+<p><del>写好的代码在<a target="_blank" rel="external nofollow noopener noreferrer" href="https://github.com/H4de5-7/geacon_pro/tree/dns">geacon_pro</a>的dns分支下，由于只是随手写的玩具，还有很多地方没修好，只测试了基本的命令执行，很多功能并未测试，以及很多功能也没实现，只是写出了一个实现的样例demon</del></p>
+<p>pro转私有了，虽然网上可能能找到fork，但是有师傅提到了这个问题，就顺便缝合了一下也缝进plus了，顺便修了点之前的小问题。具体代码整个都在packet&#x2F;dns.go下，外部代码没改啥，通信处有区别的地方加一个if判断改一下就行</p>
 <h2 id="碎碎念"><a href="#碎碎念" class="headerlink" title="碎碎念"></a>碎碎念</h2><p>距离上一次更新博客已经两个月了捏。放假就是让人没法好好的学习吗？感觉在家每天也有学东西，但是好像很少花时间去实践，很多时候就是找点东西看看原理然后把对应的工具star一下，总之就是很散，难得把得到的内容聚合成一篇文章。。。现在开学了就自主坐牢写点破烂，然后水一篇文章，给两个月不更新的博客刷一点活跃度。另：笔记本键盘用久了感觉快坏了，最近老是按一下空格就输入一堆空格，很烦</p>
-<p>以及，当初看到安全客上有人发DNS beacon的时候，准备上去学一下的，点开发现直接闭源+知识星球广告，回头看写的文章，协议关键点是一个都没透露，前面分析了半天在将开源的geacon，没做什么大事安全客连投四篇，鉴定为纯纯的噶韭菜。要分享就开源讲清楚一点大家共同学习，自己写的工具要私藏就别拿出来吹逼嗷。</p>
+<p>以及，当初看到安全客上有人发DNS beacon的时候，准备上去学一下的，点开发现直接闭源+知识星球广告，回头看写的文章，协议关键点是一个都没透露，前面分析了半天开源的geacon，没做什么大事安全客连投四篇，鉴定为纯纯的噶韭菜。要分享就开源讲清楚一点大家共同学习，自己写的工具要私藏就别拿出来吹逼嗷。</p>
 <h2 id="协议分析"><a href="#协议分析" class="headerlink" title="协议分析"></a>协议分析</h2><p>好久没有去逆CS的jar包了，导致一度翻不到协议内容，不过网上有现成的逆向分析文章，配合之前写http beacon时通信数据组成的了解，再自己抓两个包，完全没有问题</p>
 <p>首先可以先确定一个点，DNS beacon受影响的只有通信模块，所以代码封装的好可以侵入性很低的扩展出一个DNS通信功能，原先项目的代码基本上不会有太大修改</p>
 <h3 id="基本运行原理"><a href="#基本运行原理" class="headerlink" title="基本运行原理"></a>基本运行原理</h3><p>首先还是看一下DNS beacon下的通信模式，如果找一个新一点版本的c2profile的话，可以看到如下几个entry</p>
@@ -305,7 +312,7 @@
 <p>接下来以上线checkin获取命令并回传作为一个完整流程介绍各部分通信协议的实现吧，本地搭建的环境，server的dns域名设置为<code>test.unknown</code></p>
 <h3 id="上线"><a href="#上线" class="headerlink" title="上线"></a>上线</h3><p>dns beacon有一个base domain，每次上线时生成一个特定的beaconID，组合成为<code>&lt;beaconID&gt;.&lt;baseDomain&gt;</code>作为请求的基础域名，向teamserver发起DNS A记录查询，若beaconID校验通过，则认为有效beacon上线</p>
 <p>beaconID为一个32位int，且要求<code>beaconID&amp;1202==1202</code>才会被识别为合法的DNS beacon。不同版本的CS对这个地方的校验不一样，需要手动去jar包里翻。位于<code>common.CommonUtils</code>类下的<code>isDNSBeacon</code>方法</p>
-<p>好像除了这个校验应该还有别的校验的。。。但是我没找着，也懒得翻了，结果就是这个马得平均跑个六七次才会生成一个 teamserver认为是合法的session</p>
+<p><del>好像除了这个校验应该还有别的校验的。。。但是我没找着，也懒得翻了，结果就是这个马得平均跑个六七次才会生成一个 teamserver认为是合法的session</del><br>原因是beacon id的范围，beacon id的有效范围是0x00000000到0x7fffffff，之前设置的是0xffffffff，导致运气不好就没法上线，改到这个范围就可以了</p>
 <p>beacon会持续发送上线请求等待server下发命令，该请求为A记录查询，server的可能返回值有多种，若为0.0.0.0则无命令下发，0.0.0.240-0.0.0.245表示存在下发命令并指定拉取命令的形式（A&#x2F;TXT&#x2F;AAAA)，偶数表示无需checkin，奇数表示需要checkin</p>
 <p><img src="/images/CS_DNS_beacon%E4%BA%8C%E6%AC%A1%E5%BC%80%E5%8F%91%E6%8C%87%E5%8C%97/image-20230227151825201.png" alt="image-20230227151825201"></p>
 <p>如图生成的beaconID为<code>6a2897ba</code>，<code>0.0.0.243</code>checkin并以TXT记录形式下发命令。</p>
@@ -343,7 +350,6 @@ aes encode data&#123;
 <p>同样的先一个单独的请求预示后面packet的长度，接下来将aes加密的数据和数据的hash通过上述分段传输方式回传</p>
 <p>总的来说，整体的实现并不是很复杂，只需要认真观察一下流量并且结合之前的知识就能搞定捏 。代码的侵入程度较低，对项目源代码只是稍微修改了一下beaconID的生成，以及回传时将packetlen单独提出来发送，剩下的全部放在一个全新的dns.go中实现</p>
 <h2 id="end"><a href="#end" class="headerlink" title="end"></a>end</h2><p>就这样8，其实实在没有什么太多的东西，但是感觉搜了一圈也没看到啥详细的解释，刚好好久没更新博客了，水一篇</p>
-<p>目前存在的问题是beacon上线还有一个检测点不知道是啥，懒得翻捏</p>
 <p>这篇翻译文章对实现这个功能给出了很大的帮助<br><a target="_blank" rel="external nofollow noopener noreferrer" href="https://www.freebuf.com/articles/system/334022.html">Cobalt Strike: 解密DNS流量 – Part 5</a></p>
 
     </div>
