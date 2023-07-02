@@ -196,6 +196,107 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
+    <link itemprop="mainEntityOfPage" href="https://blog.z3ratu1.cn/nacosRCE%E5%88%B0Springboot%E9%80%9A%E6%9D%80.html">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="https://q2.qlogo.cn/headimg_dl?dst_uin=1207039417&spec=160">
+      <meta itemprop="name" content="Z3ratu1">
+      <meta itemprop="description" content="与其感慨路难行，不如现在出发">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Z3ratu1's blog">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/nacosRCE%E5%88%B0Springboot%E9%80%9A%E6%9D%80.html" class="post-title-link" itemprop="url">nacosRCE到Springboot通杀</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+              
+
+              <time title="创建时间：2023-07-02 16:40:54 / 修改时间：16:41:25" itemprop="dateCreated datePublished" datetime="2023-07-02T16:40:54+08:00">2023-07-02</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E7%AC%94%E8%AE%B0/" itemprop="url" rel="index"><span itemprop="name">笔记</span></a>
+                </span>
+            </span>
+
+          
+            <span id="/nacosRCE%E5%88%B0Springboot%E9%80%9A%E6%9D%80.html" class="post-meta-item leancloud_visitors" data-flag-title="nacosRCE到Springboot通杀" title="阅读次数">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span class="leancloud-visitors-count"></span>
+            </span>
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="far fa-comment"></i>
+      </span>
+      <span class="post-meta-item-text">Valine：</span>
+    
+    <a title="valine" href="/nacosRCE%E5%88%B0Springboot%E9%80%9A%E6%9D%80.html#valine-comments" itemprop="discussionUrl">
+      <span class="post-comments-count valine-comment-count" data-xid="/nacosRCE%E5%88%B0Springboot%E9%80%9A%E6%9D%80.html" itemprop="commentCount"></span>
+    </a>
+  </span>
+  
+  
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h1 id="nacosRCE到Springboot通杀"><a href="#nacosRCE到Springboot通杀" class="headerlink" title="nacosRCE到Springboot通杀"></a>nacosRCE到Springboot通杀</h1><p>标题党文章捏，这个通杀要看一定的运气（虽然我本地猛通猛通，但是实际上还是需要一点运气成分的），本文的起因是wjh和我说springboot通杀这么牛逼的技术怎么感觉都没什么反响，然后天哥说这个不是很通杀，有概率问题，进而导致了疑惑，从而对该方法是否通杀以及其原因进行的研究。（实际上是好久没跟博客了感觉这个稍微有点内容能水一下）</p>
+<p>最近nacos rce好像很火，然后有一天whj好兄弟给我发了知名Java卷王y4er的文章里的一句话<br><a target="_blank" rel="external nofollow noopener noreferrer" href="https://y4er.com/posts/nacos-hessian-rce/">Nacos Hessian 反序列化 RCE</a>（说起来这篇文章里面居然还引了我这个不知名Java垃圾的文章。我不好说）</p>
+<blockquote>
+<p>于是和@X1r0z讨论了一下，nacos是springboot，内置了jackson，可以用jndi lookup配合jackson POJONode的gadget打rce</p>
+</blockquote>
+<p>看这意思，jndi lookup是打本地链，jackson的POJONODE能直接RCE。springboot自带jackson，那还要什么nacos，言外之意不是springboot有一个反序列化就直接走POJONode直接通？</p>
+          <!--noindex-->
+            <div class="post-button">
+              <a class="btn" href="/nacosRCE%E5%88%B0Springboot%E9%80%9A%E6%9D%80.html#more" rel="contents">
+                阅读全文 &raquo;
+              </a>
+            </div>
+          <!--/noindex-->
+        
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
     <link itemprop="mainEntityOfPage" href="https://blog.z3ratu1.cn/%E5%8D%9A%E5%AE%A2%E8%BF%81%E7%A7%BB2.0.html">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -597,111 +698,6 @@
   
   
 
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
-    <link itemprop="mainEntityOfPage" href="https://blog.z3ratu1.cn/%E4%BB%8E%E7%83%82%E5%9C%9F%E8%B1%86%E5%BC%80%E5%A7%8B%E7%9A%84%E5%9C%9F%E8%B1%86%E5%AE%B6%E6%97%8F%E5%85%A5%E9%97%A8.html">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="https://q2.qlogo.cn/headimg_dl?dst_uin=1207039417&spec=160">
-      <meta itemprop="name" content="Z3ratu1">
-      <meta itemprop="description" content="与其感慨路难行，不如现在出发">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Z3ratu1's blog">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/%E4%BB%8E%E7%83%82%E5%9C%9F%E8%B1%86%E5%BC%80%E5%A7%8B%E7%9A%84%E5%9C%9F%E8%B1%86%E5%AE%B6%E6%97%8F%E5%85%A5%E9%97%A8.html" class="post-title-link" itemprop="url">从烂土豆开始的土豆家族入门</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2023-04-11 11:54:20" itemprop="dateCreated datePublished" datetime="2023-04-11T11:54:20+08:00">2023-04-11</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="far fa-calendar-check"></i>
-                </span>
-                <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2023-04-18 10:07:44" itemprop="dateModified" datetime="2023-04-18T10:07:44+08:00">2023-04-18</time>
-              </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-folder"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/%E7%AC%94%E8%AE%B0/" itemprop="url" rel="index"><span itemprop="name">笔记</span></a>
-                </span>
-            </span>
-
-          
-            <span id="/%E4%BB%8E%E7%83%82%E5%9C%9F%E8%B1%86%E5%BC%80%E5%A7%8B%E7%9A%84%E5%9C%9F%E8%B1%86%E5%AE%B6%E6%97%8F%E5%85%A5%E9%97%A8.html" class="post-meta-item leancloud_visitors" data-flag-title="从烂土豆开始的土豆家族入门" title="阅读次数">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-eye"></i>
-              </span>
-              <span class="post-meta-item-text">阅读次数：</span>
-              <span class="leancloud-visitors-count"></span>
-            </span>
-  
-  <span class="post-meta-item">
-    
-      <span class="post-meta-item-icon">
-        <i class="far fa-comment"></i>
-      </span>
-      <span class="post-meta-item-text">Valine：</span>
-    
-    <a title="valine" href="/%E4%BB%8E%E7%83%82%E5%9C%9F%E8%B1%86%E5%BC%80%E5%A7%8B%E7%9A%84%E5%9C%9F%E8%B1%86%E5%AE%B6%E6%97%8F%E5%85%A5%E9%97%A8.html#valine-comments" itemprop="discussionUrl">
-      <span class="post-comments-count valine-comment-count" data-xid="/%E4%BB%8E%E7%83%82%E5%9C%9F%E8%B1%86%E5%BC%80%E5%A7%8B%E7%9A%84%E5%9C%9F%E8%B1%86%E5%AE%B6%E6%97%8F%E5%85%A5%E9%97%A8.html" itemprop="commentCount"></span>
-    </a>
-  </span>
-  
-  
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <h1 id="从烂土豆开始的土豆家族入门"><a href="#从烂土豆开始的土豆家族入门" class="headerlink" title="从烂土豆开始的土豆家族入门"></a>从烂土豆开始的土豆家族入门</h1><p><strong>对.NET和COM一窍不通，代码一行都没写过，全篇内容由读各种文章+自行想象完成，不保证准确性，若发现错误请及时联系我更改</strong></p>
-<p>windows在远古版本前，各种服务都是以最高权限SYSTEM跑起来的，那个时候mssql的一个xp_cmdshell就可以一键打到底，而在某个版本后，添加了local service用户，之后iis或者mssql就被降权为了networkservice之类的账户，权限很低，直接操作几乎啥也干不了，但由于这些账户本身作为服务账户，也需要在特定的情况下拥有高权限，微软是允许这些账户进行提权的，而如果我们能对这些情况进行滥用，同样的也就可以将networkservice账户恢复到system</p>
-<p>土豆系列提权的核心是NTLM中继，通过欺骗运行在高权限（Administrator&#x2F;SYSTEM）的账户进行ntlm认证，同时作为中间人对认证过程进行劫持和重放，最后调用本地认证接口使用高权限账号的ntml认证获取一个高权限token，只要当前进程拥有<code>SeImpersonatePrivilege</code>或<code>SeAssignPrimaryToken</code>权限即可进行令牌模仿，即可取得对应权限（同理，对于直接的令牌窃取利用也需要拥有<code>SeImpersonatePrivilege</code>权限，感觉一般只用于Administrator提到SYSTEM，其他的用户一般来说要么没有这个权限，要么没法直接open高权限账户的token</p>
-<h2 id="hot-potato"><a href="#hot-potato" class="headerlink" title="hot potato"></a>hot potato</h2>
-          <!--noindex-->
-            <div class="post-button">
-              <a class="btn" href="/%E4%BB%8E%E7%83%82%E5%9C%9F%E8%B1%86%E5%BC%80%E5%A7%8B%E7%9A%84%E5%9C%9F%E8%B1%86%E5%AE%B6%E6%97%8F%E5%85%A5%E9%97%A8.html#more" rel="contents">
-                阅读全文 &raquo;
-              </a>
-            </div>
-          <!--/noindex-->
-        
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
 
   
   <nav class="pagination">
@@ -772,7 +768,7 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">181</span>
+          <span class="site-state-item-count">182</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>

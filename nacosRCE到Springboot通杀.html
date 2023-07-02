@@ -1,0 +1,576 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 6.0.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"blog.z3ratu1.cn","root":"/","scheme":"Pisces","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"always","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":true},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+  </script>
+
+  <meta name="description" content="nacosRCE到Springboot通杀标题党文章捏，这个通杀要看一定的运气（虽然我本地猛通猛通，但是实际上还是需要一点运气成分的），本文的起因是wjh和我说springboot通杀这么牛逼的技术怎么感觉都没什么反响，然后天哥说这个不是很通杀，有概率问题，进而导致了疑惑，从而对该方法是否通杀以及其原因进行的研究。（实际上是好久没跟博客了感觉这个稍微有点内容能水一下） 最近nacos rce好像很">
+<meta property="og:type" content="article">
+<meta property="og:title" content="nacosRCE到Springboot通杀">
+<meta property="og:url" content="https://blog.z3ratu1.cn/nacosRCE%E5%88%B0Springboot%E9%80%9A%E6%9D%80.html">
+<meta property="og:site_name" content="Z3ratu1&#39;s blog">
+<meta property="og:description" content="nacosRCE到Springboot通杀标题党文章捏，这个通杀要看一定的运气（虽然我本地猛通猛通，但是实际上还是需要一点运气成分的），本文的起因是wjh和我说springboot通杀这么牛逼的技术怎么感觉都没什么反响，然后天哥说这个不是很通杀，有概率问题，进而导致了疑惑，从而对该方法是否通杀以及其原因进行的研究。（实际上是好久没跟博客了感觉这个稍微有点内容能水一下） 最近nacos rce好像很">
+<meta property="og:locale">
+<meta property="og:image" content="https://image-host-1304136909.cos.ap-shanghai.myqcloud.com/blog/nacosRCE%E5%88%B0Springboot%E9%80%9A%E6%9D%80/image-20230701184506361.png">
+<meta property="og:image" content="https://image-host-1304136909.cos.ap-shanghai.myqcloud.com/blog/nacosRCE%E5%88%B0Springboot%E9%80%9A%E6%9D%80/image-20230701185031911.png">
+<meta property="og:image" content="https://image-host-1304136909.cos.ap-shanghai.myqcloud.com/blog/nacosRCE%E5%88%B0Springboot%E9%80%9A%E6%9D%80/image-20230701190003725.png">
+<meta property="og:image" content="https://image-host-1304136909.cos.ap-shanghai.myqcloud.com/blog/nacosRCE%E5%88%B0Springboot%E9%80%9A%E6%9D%80/image-20230701190453895.png">
+<meta property="og:image" content="https://image-host-1304136909.cos.ap-shanghai.myqcloud.com/blog/nacosRCE%E5%88%B0Springboot%E9%80%9A%E6%9D%80/image-20230701190926403.png">
+<meta property="og:image" content="https://image-host-1304136909.cos.ap-shanghai.myqcloud.com/blog/nacosRCE%E5%88%B0Springboot%E9%80%9A%E6%9D%80/image-20230702161433705.png">
+<meta property="article:published_time" content="2023-07-02T08:40:54.000Z">
+<meta property="article:modified_time" content="2023-07-02T08:41:25.045Z">
+<meta property="article:author" content="Z3ratu1">
+<meta property="article:tag" content="Java">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://image-host-1304136909.cos.ap-shanghai.myqcloud.com/blog/nacosRCE%E5%88%B0Springboot%E9%80%9A%E6%9D%80/image-20230701184506361.png">
+
+<link rel="canonical" href="https://blog.z3ratu1.cn/nacosRCE%E5%88%B0Springboot%E9%80%9A%E6%9D%80.html">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-Hans'
+  };
+</script>
+
+  <title>nacosRCE到Springboot通杀 | Z3ratu1's blog</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+<link rel="stylesheet" href="/css/prism-tomorrow.css" type="text/css"></head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">Z3ratu1's blog</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">Welcome</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>关于</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+        <li class="menu-item menu-item-links">
+
+    <a href="/links/" rel="section"><i class="fa fa-link fa-fw"></i>友链</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off" placeholder="搜索..." spellcheck="false" type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+  <a href="https://github.com/Z3ratu1" class="github-corner" title="Follow me on GitHub" aria-label="Follow me on GitHub" rel="external nofollow noopener noreferrer" target="_blank"><svg width="80" height="80" viewbox="0 0 250 250" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"/><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"/><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"/></svg></a>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
+    <link itemprop="mainEntityOfPage" href="https://blog.z3ratu1.cn/nacosRCE%E5%88%B0Springboot%E9%80%9A%E6%9D%80.html">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="https://q2.qlogo.cn/headimg_dl?dst_uin=1207039417&spec=160">
+      <meta itemprop="name" content="Z3ratu1">
+      <meta itemprop="description" content="与其感慨路难行，不如现在出发">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Z3ratu1's blog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          nacosRCE到Springboot通杀
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+              
+
+              <time title="创建时间：2023-07-02 16:40:54 / 修改时间：16:41:25" itemprop="dateCreated datePublished" datetime="2023-07-02T16:40:54+08:00">2023-07-02</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E7%AC%94%E8%AE%B0/" itemprop="url" rel="index"><span itemprop="name">笔记</span></a>
+                </span>
+            </span>
+
+          
+            <span id="/nacosRCE%E5%88%B0Springboot%E9%80%9A%E6%9D%80.html" class="post-meta-item leancloud_visitors" data-flag-title="nacosRCE到Springboot通杀" title="阅读次数">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span class="leancloud-visitors-count"></span>
+            </span>
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="far fa-comment"></i>
+      </span>
+      <span class="post-meta-item-text">Valine：</span>
+    
+    <a title="valine" href="/nacosRCE%E5%88%B0Springboot%E9%80%9A%E6%9D%80.html#valine-comments" itemprop="discussionUrl">
+      <span class="post-comments-count valine-comment-count" data-xid="/nacosRCE%E5%88%B0Springboot%E9%80%9A%E6%9D%80.html" itemprop="commentCount"></span>
+    </a>
+  </span>
+  
+  
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h1 id="nacosRCE到Springboot通杀"><a href="#nacosRCE到Springboot通杀" class="headerlink" title="nacosRCE到Springboot通杀"></a>nacosRCE到Springboot通杀</h1><p>标题党文章捏，这个通杀要看一定的运气（虽然我本地猛通猛通，但是实际上还是需要一点运气成分的），本文的起因是wjh和我说springboot通杀这么牛逼的技术怎么感觉都没什么反响，然后天哥说这个不是很通杀，有概率问题，进而导致了疑惑，从而对该方法是否通杀以及其原因进行的研究。（实际上是好久没跟博客了感觉这个稍微有点内容能水一下）</p>
+<p>最近nacos rce好像很火，然后有一天whj好兄弟给我发了知名Java卷王y4er的文章里的一句话<br><a target="_blank" rel="external nofollow noopener noreferrer" href="https://y4er.com/posts/nacos-hessian-rce/">Nacos Hessian 反序列化 RCE</a>（说起来这篇文章里面居然还引了我这个不知名Java垃圾的文章。我不好说）</p>
+<blockquote>
+<p>于是和@X1r0z讨论了一下，nacos是springboot，内置了jackson，可以用jndi lookup配合jackson POJONode的gadget打rce</p>
+</blockquote>
+<p>看这意思，jndi lookup是打本地链，jackson的POJONODE能直接RCE。springboot自带jackson，那还要什么nacos，言外之意不是springboot有一个反序列化就直接走POJONode直接通？</p>
+<p>反手就是一个搜索，这个点在前不久的阿里云CTF中出现过，我当时也去坐牢了，不过因为Java居多所以没干啥事。。。哈哈做出来的题没什么意义就没写wp，当时的bypass1这个题似乎就是裸Springboot反序列化rce。当时我都没注意到，现在想想这个通杀不是小无敌，可以非预期一堆Java题了（以前的Java题）</p>
+<p>贴两个链接，就不具体展开了<br><a target="_blank" rel="external nofollow noopener noreferrer" href="https://boogipop.com/2023/05/16/Jackson%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96%E9%80%9A%E6%9D%80Web%E9%A2%98/">Jackson反序列化通杀Web题(过时)</a><br><a target="_blank" rel="external nofollow noopener noreferrer" href="https://xz.aliyun.com/t/12509">从bypassit1了解POJONode#toString调用getter方法原理</a></p>
+<p>类似于fastjson的原生反序列化利用，jackson也可以进行原生反序列化利用。触发toString方法时调用对应的getter，所以思路也很简单，从<code>BadAttributeValueExpException</code>直接调用<code>POJONode</code>的<code>toString</code>，此时会将该node中的对象转换成字符串，自然就会对各属性调用getter，能rce且jdk自带的getter就是我们人见人爱的<code>TemplatesImpl</code>的<code>getOutputProperties</code>了</p>
+<p>具体利用时在序列化POJONode时，需要重写一个<code>writeReplace</code>方法，该方法不删掉会导致序列化的时候出错，因为是序列化时的修改，所以该改动可以直接在攻击者方完成，并不影响利用。</p>
+<p>至于怎么删方法，比较推荐的是直接javassist该字节码</p>
+<pre class=" language-java"><code class="language-java">CtClass pojoClass <span class="token operator">=</span> ClassPool<span class="token punctuation">.</span><span class="token function">getDefault</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">get</span><span class="token punctuation">(</span><span class="token string">"com.fasterxml.jackson.databind.node.BaseJsonNode"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+CtMethod writeReplace <span class="token operator">=</span> pojoClass<span class="token punctuation">.</span><span class="token function">getDeclaredMethod</span><span class="token punctuation">(</span><span class="token string">"writeReplace"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+pojoClass<span class="token punctuation">.</span><span class="token function">removeMethod</span><span class="token punctuation">(</span>writeReplace<span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token comment" spellcheck="true">// 将修改后的CtClass加载至当前线程的上下文类加载器中</span>
+pojoClass<span class="token punctuation">.</span><span class="token function">toClass</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+</code></pre>
+<p>总之，本文的内容并非讨论POJONode的具体利用，所以从POJONode的toString是怎么到getter的具体流程也不会说。重点在于，这个方法通杀吗，如果是或不是，为什么？</p>
+<h2 id="通杀？"><a href="#通杀？" class="headerlink" title="通杀？"></a>通杀？</h2><p>看起来该方法是稳定通杀的，jackson springboot自带，用来触发的<code>BadAttributeValueExpException</code>和<code>TemplatesImpl</code>也是jdk自带，全套都可用。然而天哥和我说这个利用是不稳定的，因为jackson调用getter的顺序是<strong>随机</strong>的，如果先调用其他的getter并抛出了错误，就会导致反序列化在还没调用到<code>getOutputProperties</code>就终止。并且由于缓存的存在，第一次调用后后续就会直接使用缓存，顺序也不会变动，所以是一个需要运气的利用，并非通杀。</p>
+<p>怎么会有这么奇怪的东西，随机顺序调用getter呢？这不太符合代码的稳定性，设计上也不应如此，那就只能开调了。</p>
+<p>首先找到调用getter的地方，位于serializeFields方法，部分调用栈如下</p>
+<pre><code>serializeFields:774, BeanSerializerBase (com.fasterxml.jackson.databind.ser.std)
+serialize:178, BeanSerializer (com.fasterxml.jackson.databind.ser)
+defaultSerializeValue:1142, SerializerProvider (com.fasterxml.jackson.databind)
+serialize:115, POJONode (com.fasterxml.jackson.databind.node)
+serialize:39, SerializableSerializer (com.fasterxml.jackson.databind.ser.std)
+serialize:20, SerializableSerializer (com.fasterxml.jackson.databind.ser.std)
+</code></pre>
+<p>在<code>prop.serializeAsField</code>方法中，对prop反射调用了getter方法，继续寻找props的来源</p>
+<p><img src="https://image-host-1304136909.cos.ap-shanghai.myqcloud.com/blog/nacosRCE%E5%88%B0Springboot%E9%80%9A%E6%9D%80/image-20230701184506361.png" alt="image-20230701184506361"></p>
+<p>寻找this的来源，往上退两层栈，this来自于<code>defaultSerializeValue</code>中的<code>findTypedValueSerializer</code></p>
+<p><img src="https://image-host-1304136909.cos.ap-shanghai.myqcloud.com/blog/nacosRCE%E5%88%B0Springboot%E9%80%9A%E6%9D%80/image-20230701185031911.png" alt="image-20230701185031911"></p>
+<pre><code>defaultSerializeValue:1142, SerializerProvider (com.fasterxml.jackson.databind)
+serialize:115, POJONode (com.fasterxml.jackson.databind.node)
+serialize:39, SerializableSerializer (com.fasterxml.jackson.databind.ser.std)
+serialize:20, SerializableSerializer (com.fasterxml.jackson.databind.ser.std)
+</code></pre>
+<p>从<code>defaultSerializeValue</code>往下走过一堆ser的创建函数，到<code>_createSerializer2</code></p>
+<pre><code>_createSerializer2:224, BeanSerializerFactory (com.fasterxml.jackson.databind.ser)
+createSerializer:173, BeanSerializerFactory (com.fasterxml.jackson.databind.ser)
+_createUntypedSerializer:1495, SerializerProvider (com.fasterxml.jackson.databind)
+_createAndCacheUntypedSerializer:1443, SerializerProvider (com.fasterxml.jackson.databind)
+findValueSerializer:544, SerializerProvider (com.fasterxml.jackson.databind)
+findTypedValueSerializer:822, SerializerProvider (com.fasterxml.jackson.databind)
+defaultSerializeValue:1142, SerializerProvider (com.fasterxml.jackson.databind)
+</code></pre>
+<p>在<code>ser = this.findSerializerByAnnotations(prov, type, beanDesc);</code>中，beacDesc被赋值了props，并在<code>ser = this.findBeanOrAddOnSerializer(prov, type, beanDesc, staticTyping);</code>中，最后将beanDesc的props赋值给了ser<br><img src="https://image-host-1304136909.cos.ap-shanghai.myqcloud.com/blog/nacosRCE%E5%88%B0Springboot%E9%80%9A%E6%9D%80/image-20230701190003725.png" alt="image-20230701190003725"></p>
+<p>先跟进<code>findSerializerByAnnotations</code>最后会进入<code>collectAll</code>中，通过field和method添加props。要是一直往下翻，能翻到是用的经典<code>getDeclaredFields</code>和<code>getDeclaredMethods</code>，然后再逐个迭代，使用一些逻辑进行筛选。此处的this是beanDesc下的<code>_propCollector</code>成员</p>
+<p><img src="https://image-host-1304136909.cos.ap-shanghai.myqcloud.com/blog/nacosRCE%E5%88%B0Springboot%E9%80%9A%E6%9D%80/image-20230701190453895.png" alt="image-20230701190453895"></p>
+<p>再进入<code>findBeanOrAddOnSerializer</code>，进一步到<code>constructBeanOrAddOnSerializer</code>中，该函数先通过<code>findBeanProperties</code>从beanDesc中取出props</p>
+<p><img src="https://image-host-1304136909.cos.ap-shanghai.myqcloud.com/blog/nacosRCE%E5%88%B0Springboot%E9%80%9A%E6%9D%80/image-20230701190926403.png" alt="image-20230701190926403"></p>
+<p>在这之前，props一直是一个hashmap，而经过了该函数的调用，变成了一个List，一直往下跟，最后会走到<code>getProperties</code>方法，此处将hashmap转换成了ArrayList</p>
+<p><img src="https://image-host-1304136909.cos.ap-shanghai.myqcloud.com/blog/nacosRCE%E5%88%B0Springboot%E9%80%9A%E6%9D%80/image-20230702161433705.png" alt="image-20230702161433705"></p>
+<p>回到<code>constructBeanOrAddOnSerializer</code>中，调用<code>builder.setProperties(props);</code>给builder设置props属性，最后调用<code>builder.build()</code>创建出ser。</p>
+<p>prop后续的处理都是用iter对数据进行迭代，进行删改，理论上不会影响顺序，那么props的顺序就只可能由hashmap生成时或hashmap转List时确定。</p>
+<p>一开始以为是hashmap转list的时候可能会出现的问题，但是仔细一想也不对，无论是直接按字典序排列，还是通过计算哈希排列，不可能出现同一份数据在不同情况下计算出的顺序不一致的情况。</p>
+<p>所以最后的问题是出在hashmap的生成上，但实际上这里的hashmap是LinkedHashMap，也是一个链表一样的存在，按理说往里面添加数据的时候也不会产生乱序。但实际上，Java真的并未保证数据的稳定性，在Java文档中有提到，getDeclaredFields和getDeclaredMethods</p>
+<blockquote>
+<p>The elements in the returned array are not sorted and are not in any particular order</p>
+</blockquote>
+<p><a target="_blank" rel="external nofollow noopener noreferrer" href="https://docs.oracle.com/javase/8/docs/api/java/lang/Class.html#getDeclaredFields--">JavaDoc getDeclaredFields</a></p>
+<p>搜一下getDeclaredFields顺序之类的关键字，也能找到一大把解释。。。<br>这就是一切随机的罪魁祸首，在一开始的props生成的时候，Java可能会随机的返回字段的顺序，进而导致最后调用getter的顺序变得随机。（虽然话是这么说，但是我本地无论怎么重启顺序都是固定的。。。？但是确实其他人环境下偶尔会出现顺序错误的问题）不过我直接对POJONode进行测试，和套一层springboot环境再测试时，props的初始顺序有所变化，但是经过一系列的处理后，getOutputProperties还是在最前面，可以稳定利用。</p>
+<p>一次运行环境中理论上来说jvm的状态就是固定的，所以即使没有缓存，如果一次利用不成功，应该就意味着之后的利用都不会成功了，即本次运行的<code>getDeclaredFields</code>顺序不支持利用。</p>
+<h2 id="结论"><a href="#结论" class="headerlink" title="结论"></a>结论</h2><p>POJONode在toString时会对Node中的Object的各prop调用getter，而props是由getDeclaredFields等反射方法生成的，该函数不保证返回值的顺序，因此造成了getter随机调用的假象，导致该利用没有百分百的稳定性。（虽然在我的机器上是百分百的稳定性）</p>
+<p>该顺序问题可以通过重启应用进行刷新，也许之前打不通的重启一下就又通了，但由于缓存和java运行时状态的问题，如果一次攻击不通那么后续攻击也不会通。</p>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/Java/" rel="tag"># Java</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/%E5%8D%9A%E5%AE%A2%E8%BF%81%E7%A7%BB2.0.html" rel="prev" title="博客迁移2.0">
+      <i class="fa fa-chevron-left"></i> 博客迁移2.0
+    </a></div>
+      <div class="post-nav-item"></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+    <div class="comments" id="valine-comments"></div>
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#nacosRCE%E5%88%B0Springboot%E9%80%9A%E6%9D%80"><span class="nav-number">1.</span> <span class="nav-text">nacosRCE到Springboot通杀</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E9%80%9A%E6%9D%80%EF%BC%9F"><span class="nav-number">1.1.</span> <span class="nav-text">通杀？</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%BB%93%E8%AE%BA"><span class="nav-number">1.2.</span> <span class="nav-text">结论</span></a></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Z3ratu1" src="https://q2.qlogo.cn/headimg_dl?dst_uin=1207039417&spec=160">
+  <p class="site-author-name" itemprop="name">Z3ratu1</p>
+  <div class="site-description" itemprop="description">与其感慨路难行，不如现在出发</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">182</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">5</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">93</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+  <div class="beian"><a href="http://www.beian.miit.gov.cn/" rel="external nofollow noopener noreferrer" target="_blank">湘ICP备2020021580号 </a>
+      <img src="/./images/beian.png" style="display: inline-block;">
+  </div>
+
+<div class="copyright">
+  
+  &copy; 2019 – 
+  <span itemprop="copyrightYear">2023</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Z3ratu1</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="external nofollow noopener noreferrer" target="_blank">Hexo</a> & <a href="https://pisces.theme-next.org/" class="theme-link" rel="external nofollow noopener noreferrer" target="_blank">NexT.Pisces</a> 强力驱动
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+
+<script>
+NexT.utils.loadComments(document.querySelector('#valine-comments'), () => {
+  NexT.utils.getScript('https://cdn.jsdelivr.net/npm/valine@1.4.14/dist/Valine.min.js', () => {
+    var GUEST = ['nick', 'mail', 'link'];
+    var guest = 'nick,mail,link';
+    guest = guest.split(',').filter(item => {
+      return GUEST.includes(item);
+    });
+    new Valine({
+      el         : '#valine-comments',
+      verify     : false,
+      notify     : false,
+      appId      : '7H8kg0XdWO8IbhOcu4K1JaAT-gzGzoHsz',
+      appKey     : 'wPKQjkbVtvPaRR7gh2yjfLSi',
+      placeholder: "Just go go",
+      avatar     : 'mm',
+      meta       : guest,
+      pageSize   : '10' || 10,
+      visitor    : true,
+      lang       : '' || 'zh-cn',
+      path       : location.pathname,
+      recordIP   : false,
+      serverURLs : ''
+    });
+  }, window.Valine);
+});
+</script>
+
+</body>
+</html>

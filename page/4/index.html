@@ -196,6 +196,110 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
+    <link itemprop="mainEntityOfPage" href="https://blog.z3ratu1.cn/0CTF2022%E5%A4%8D%E7%8E%B0.html">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="https://q2.qlogo.cn/headimg_dl?dst_uin=1207039417&spec=160">
+      <meta itemprop="name" content="Z3ratu1">
+      <meta itemprop="description" content="与其感慨路难行，不如现在出发">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Z3ratu1's blog">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/0CTF2022%E5%A4%8D%E7%8E%B0.html" class="post-title-link" itemprop="url">0CTF2022复现</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2022-09-22 20:22:03" itemprop="dateCreated datePublished" datetime="2022-09-22T20:22:03+08:00">2022-09-22</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2022-10-06 10:05:22" itemprop="dateModified" datetime="2022-10-06T10:05:22+08:00">2022-10-06</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E5%88%B7%E9%A2%98%E8%AE%B0%E5%BD%95/" itemprop="url" rel="index"><span itemprop="name">刷题记录</span></a>
+                </span>
+            </span>
+
+          
+            <span id="/0CTF2022%E5%A4%8D%E7%8E%B0.html" class="post-meta-item leancloud_visitors" data-flag-title="0CTF2022复现" title="阅读次数">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span class="leancloud-visitors-count"></span>
+            </span>
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="far fa-comment"></i>
+      </span>
+      <span class="post-meta-item-text">Valine：</span>
+    
+    <a title="valine" href="/0CTF2022%E5%A4%8D%E7%8E%B0.html#valine-comments" itemprop="discussionUrl">
+      <span class="post-comments-count valine-comment-count" data-xid="/0CTF2022%E5%A4%8D%E7%8E%B0.html" itemprop="commentCount"></span>
+    </a>
+  </span>
+  
+  
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h1 id="0CTF2022复现"><a href="#0CTF2022复现" class="headerlink" title="0CTF2022复现"></a>0CTF2022复现</h1><p>嗯，究极挨打，只做了一个被全场秒烂了的go，由于剩下的都是java，然后就摆了。然后看着天哥他们ak 0ctf的web，自闭了捏</p>
+<h2 id="ohf"><a href="#ohf" class="headerlink" title="ohf"></a>ohf</h2><p>被秒烂的go题，抓包看路由可以看到终端那边给了个go的序列化数据，less路由一开始没看懂，一开始以为是linux那个less读文件的，按了半天没反应，然后隔壁的好哥哥和我说这个是写css的东西，可以把他的格式转换成css。然后可以从p神的文章中获知这个less有一个任意文件读取<br><a target="_blank" rel="external nofollow noopener noreferrer" href="https://www.leavesongs.com/PENETRATION/flarum-rce-tour.html">从偶遇Flarum开始的RCE之旅</a></p>
+<p>读到源码之后可以看到一个go的反序列化，然后序列化数据的version字段会进一个第三方库的eval，这个库感觉也不是沙箱，就是个直接的eval，但是阉割了模块<br><a target="_blank" rel="external nofollow noopener noreferrer" href="https://github.com/traefik/yaegi">traefik&#x2F;yaegi</a></p>
+          <!--noindex-->
+            <div class="post-button">
+              <a class="btn" href="/0CTF2022%E5%A4%8D%E7%8E%B0.html#more" rel="contents">
+                阅读全文 &raquo;
+              </a>
+            </div>
+          <!--/noindex-->
+        
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
     <link itemprop="mainEntityOfPage" href="https://blog.z3ratu1.cn/BalsnCTF2022web%20wp.html">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -609,112 +713,6 @@
   
   
 
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
-    <link itemprop="mainEntityOfPage" href="https://blog.z3ratu1.cn/rCore_Tutorial_CP2.html">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="https://q2.qlogo.cn/headimg_dl?dst_uin=1207039417&spec=160">
-      <meta itemprop="name" content="Z3ratu1">
-      <meta itemprop="description" content="与其感慨路难行，不如现在出发">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Z3ratu1's blog">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/rCore_Tutorial_CP2.html" class="post-title-link" itemprop="url">rCore_Tutorial_CP2</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2022-07-19 13:25:46" itemprop="dateCreated datePublished" datetime="2022-07-19T13:25:46+08:00">2022-07-19</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="far fa-calendar-check"></i>
-                </span>
-                <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2022-07-24 10:23:11" itemprop="dateModified" datetime="2022-07-24T10:23:11+08:00">2022-07-24</time>
-              </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-folder"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/%E7%AC%94%E8%AE%B0/" itemprop="url" rel="index"><span itemprop="name">笔记</span></a>
-                </span>
-            </span>
-
-          
-            <span id="/rCore_Tutorial_CP2.html" class="post-meta-item leancloud_visitors" data-flag-title="rCore_Tutorial_CP2" title="阅读次数">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-eye"></i>
-              </span>
-              <span class="post-meta-item-text">阅读次数：</span>
-              <span class="leancloud-visitors-count"></span>
-            </span>
-  
-  <span class="post-meta-item">
-    
-      <span class="post-meta-item-icon">
-        <i class="far fa-comment"></i>
-      </span>
-      <span class="post-meta-item-text">Valine：</span>
-    
-    <a title="valine" href="/rCore_Tutorial_CP2.html#valine-comments" itemprop="discussionUrl">
-      <span class="post-comments-count valine-comment-count" data-xid="/rCore_Tutorial_CP2.html" itemprop="commentCount"></span>
-    </a>
-  </span>
-  
-  
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <h1 id="rCore-Tutorial-CP2"><a href="#rCore-Tutorial-CP2" class="headerlink" title="rCore_Tutorial_CP2"></a>rCore_Tutorial_CP2</h1><p>这一章的文件结构略微的复杂了一点，需要开始之前先稍微强化一下对rust mod use等关键字的认知。。。</p>
-<h2 id="rust-mod-x2F-use-x2F-extern"><a href="#rust-mod-x2F-use-x2F-extern" class="headerlink" title="rust mod&#x2F;use&#x2F;extern"></a>rust mod&#x2F;use&#x2F;extern</h2><p><a target="_blank" rel="external nofollow noopener noreferrer" href="https://doc.rust-lang.org/book/ch07-01-packages-and-crates.html">Packages and Crates</a> rust认为src下的main.rs是二进制crate的主文件，而lib.rs则是库crate的主文件，所以这里的lib.rs是主文件，和cargo.toml中的name赋值为<code>user_lib</code>并无关联。。。</p>
-<blockquote>
-<p>When we entered the command, Cargo created a Cargo.toml file, giving us a package. Looking at the contents of Cargo.toml, there’s no mention of src&#x2F;main.rs because Cargo follows a convention that src&#x2F;main.rs is the crate root of a binary crate with the same name as the package. Likewise, Cargo knows that if the package directory contains src&#x2F;lib.rs, the package contains a library crate with the same name as the package, and src&#x2F;lib.rs is its crate root. Cargo passes the crate root files to rustc to build the library or binary.</p>
-</blockquote>
-          <!--noindex-->
-            <div class="post-button">
-              <a class="btn" href="/rCore_Tutorial_CP2.html#more" rel="contents">
-                阅读全文 &raquo;
-              </a>
-            </div>
-          <!--/noindex-->
-        
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
 
   
   <nav class="pagination">
@@ -785,7 +783,7 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">181</span>
+          <span class="site-state-item-count">182</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
