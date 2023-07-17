@@ -196,6 +196,112 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
+    <link itemprop="mainEntityOfPage" href="https://blog.z3ratu1.cn/[TCTF2021%20final]%E5%A4%8D%E7%8E%B0.html">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="https://q2.qlogo.cn/headimg_dl?dst_uin=1207039417&spec=160">
+      <meta itemprop="name" content="Z3ratu1">
+      <meta itemprop="description" content="与其感慨路难行，不如现在出发">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Z3ratu1's blog">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/%5BTCTF2021%20final%5D%E5%A4%8D%E7%8E%B0.html" class="post-title-link" itemprop="url">[TCTF2021 final]复现</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2021-09-28 16:45:34" itemprop="dateCreated datePublished" datetime="2021-09-28T16:45:34+08:00">2021-09-28</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2021-10-15 21:36:25" itemprop="dateModified" datetime="2021-10-15T21:36:25+08:00">2021-10-15</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E5%88%B7%E9%A2%98%E8%AE%B0%E5%BD%95/" itemprop="url" rel="index"><span itemprop="name">刷题记录</span></a>
+                </span>
+            </span>
+
+          
+            <span id="/%5BTCTF2021%20final%5D%E5%A4%8D%E7%8E%B0.html" class="post-meta-item leancloud_visitors" data-flag-title="[TCTF2021 final]复现" title="阅读次数">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span class="leancloud-visitors-count"></span>
+            </span>
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="far fa-comment"></i>
+      </span>
+      <span class="post-meta-item-text">Valine：</span>
+    
+    <a title="valine" href="/%5BTCTF2021%20final%5D%E5%A4%8D%E7%8E%B0.html#valine-comments" itemprop="discussionUrl">
+      <span class="post-comments-count valine-comment-count" data-xid="/%5BTCTF2021%20final%5D%E5%A4%8D%E7%8E%B0.html" itemprop="commentCount"></span>
+    </a>
+  </span>
+  
+  
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h1 id="TCTF2021-final-复现"><a href="#TCTF2021-final-复现" class="headerlink" title="[TCTF2021 final]复现"></a>[TCTF2021 final]复现</h1><p>作为垃圾选手在TCTF qual中被暴打，居然还能被邀请参加决赛，谢谢腾讯给我一个机会，被打的很惨，有机会的话明年还想来挨打。web一题没出，完全不会，赛后环境也急速关闭跑路了，只能根据附件和wp进行复现尝试</p>
+<h2 id="eeeenginx"><a href="#eeeenginx" class="headerlink" title="eeeenginx"></a>eeeenginx</h2><p>唯一做出来的一个题，还是个misc。。。<br>给了一个nginx搭建的服务，有一个任意文件下载。<br>乱翻是翻不到东西的，尝试读cmdline，读&#x2F;proc&#x2F;self&#x2F;cmdline只读到是nginx的work进程，没用。再次复习老国王的读proc之术<br>先读<code>/sys/fs/cgroup/systemd/tasks</code>，能拿到所有的进程号，就能用<code>/proc/pid/cmdline</code>来看有什么内容了，看了一下，一号进程是nginx主进程，剩下的全是子进程，但是主进程中的cmdline是这样的</p>
+<pre><code>nginx: master process
+/usr/local/openresty/nginx/sbin/nginx -p /work/ -c conf/nginx.conf -g daemon off;
+</code></pre>
+          <!--noindex-->
+            <div class="post-button">
+              <a class="btn" href="/%5BTCTF2021%20final%5D%E5%A4%8D%E7%8E%B0.html#more" rel="contents">
+                阅读全文 &raquo;
+              </a>
+            </div>
+          <!--/noindex-->
+        
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
     <link itemprop="mainEntityOfPage" href="https://blog.z3ratu1.cn/%E7%AC%AC%E4%BA%94%E7%A9%BA%E9%97%B42021%20wp.html">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -609,104 +715,6 @@
   
   
 
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
-    <link itemprop="mainEntityOfPage" href="https://blog.z3ratu1.cn/[NCTF2019]phar%20matches%20everything.html">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="https://q2.qlogo.cn/headimg_dl?dst_uin=1207039417&spec=160">
-      <meta itemprop="name" content="Z3ratu1">
-      <meta itemprop="description" content="与其感慨路难行，不如现在出发">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Z3ratu1's blog">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/%5BNCTF2019%5Dphar%20matches%20everything.html" class="post-title-link" itemprop="url">[NCTF2019]phar matches everything</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-              
-
-              <time title="创建时间：2021-08-20 11:12:58 / 修改时间：12:16:15" itemprop="dateCreated datePublished" datetime="2021-08-20T11:12:58+08:00">2021-08-20</time>
-            </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-folder"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/%E5%88%B7%E9%A2%98%E8%AE%B0%E5%BD%95/" itemprop="url" rel="index"><span itemprop="name">刷题记录</span></a>
-                </span>
-            </span>
-
-          
-            <span id="/%5BNCTF2019%5Dphar%20matches%20everything.html" class="post-meta-item leancloud_visitors" data-flag-title="[NCTF2019]phar matches everything" title="阅读次数">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-eye"></i>
-              </span>
-              <span class="post-meta-item-text">阅读次数：</span>
-              <span class="leancloud-visitors-count"></span>
-            </span>
-  
-  <span class="post-meta-item">
-    
-      <span class="post-meta-item-icon">
-        <i class="far fa-comment"></i>
-      </span>
-      <span class="post-meta-item-text">Valine：</span>
-    
-    <a title="valine" href="/%5BNCTF2019%5Dphar%20matches%20everything.html#valine-comments" itemprop="discussionUrl">
-      <span class="post-comments-count valine-comment-count" data-xid="/%5BNCTF2019%5Dphar%20matches%20everything.html" itemprop="commentCount"></span>
-    </a>
-  </span>
-  
-  
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <h1 id="NCTF2019-phar-matches-everything"><a href="#NCTF2019-phar-matches-everything" class="headerlink" title="[NCTF2019]phar matches everything"></a>[NCTF2019]phar matches everything</h1><p>BUU继续重拳出击，总觉得刷题的意义正在逐渐消失，不想这么单纯的刷体了，感觉只能让我成为一个赛棍。应该学点什么，以后水一点的题就不记了，起码要学到一点点东西再说</p>
-<h2 id="题解"><a href="#题解" class="headerlink" title="题解"></a>题解</h2><p>buu上给出了源码，两个关键文件，一个文件上传，一个反序列化，文件上传限制了后缀和文件名，反序列化处有一个经典用phar来触发的操作，反序列化的结果就是一次curl</p>
-<p>反序列化的操作非常简单不在赘述，稍微要考虑一下的就是文件上传。检测后缀对phar来说并没有什么问题，因为phar协议指定去读一个文件也不管他是什么后缀。唯一要过的点就是那个imagesize函数的检测，也很简单，用那个经典的<code>#define width 1</code>就能过，就放在那个压缩进phar的文件里就行，要另起一行才能正确识别</p>
-          <!--noindex-->
-            <div class="post-button">
-              <a class="btn" href="/%5BNCTF2019%5Dphar%20matches%20everything.html#more" rel="contents">
-                阅读全文 &raquo;
-              </a>
-            </div>
-          <!--/noindex-->
-        
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
 
   
   <nav class="pagination">
@@ -777,7 +785,7 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">182</span>
+          <span class="site-state-item-count">183</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
