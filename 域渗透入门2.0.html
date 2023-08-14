@@ -33,7 +33,7 @@
 <meta property="og:image" content="https://image-host-1304136909.cos.ap-shanghai.myqcloud.com/blog/%E5%9F%9F%E6%B8%97%E9%80%8F%E5%85%A5%E9%97%A82.0/image-20230610122414603.png">
 <meta property="og:image" content="https://image-host-1304136909.cos.ap-shanghai.myqcloud.com/blog/%E5%9F%9F%E6%B8%97%E9%80%8F%E5%85%A5%E9%97%A82.0/image-20230610142952365.png">
 <meta property="article:published_time" content="2023-05-27T09:07:36.000Z">
-<meta property="article:modified_time" content="2023-07-03T10:44:22.574Z">
+<meta property="article:modified_time" content="2023-08-04T09:30:41.003Z">
 <meta property="article:author" content="Z3ratu1">
 <meta property="article:tag" content="pentest">
 <meta name="twitter:card" content="summary">
@@ -236,7 +236,7 @@
                   <i class="far fa-calendar-check"></i>
                 </span>
                 <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2023-07-03 18:44:22" itemprop="dateModified" datetime="2023-07-03T18:44:22+08:00">2023-07-03</time>
+                <time title="修改时间：2023-08-04 17:30:41" itemprop="dateModified" datetime="2023-08-04T17:30:41+08:00">2023-08-04</time>
               </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -303,11 +303,14 @@
 <p>查域内机器，看完之后可以再ping或者nslookup查ip</p>
 <pre class=" language-cmd"><code class="language-cmd">net group "domain computers" /domain
 </code></pre>
-<p>看有没有用户在线，非常好用，以防rdp上去给管理员挤掉了的尴尬场面，但是给出的登录时间总感觉是乱写的，以及似乎只有server上有这个命令？也不是，好像是家庭版没有？win10家庭版没有，win7专业版有<br>然而并不能防止自己操作到一半后管理员突然登录发现桌面花花绿绿的尴尬场面</p>
+<p>看有没有用户在线，非常好用，以防rdp上去给管理员挤掉了的尴尬场面，但是给出的登录时间总感觉是乱写的，以及似乎只有server上有这个命令？也不是，好像是家庭版没有？win10家庭版没有，win7专业版有<br>然而并不能防止自己操作到一半后管理员突然登录发现桌面花花绿绿的尴尬场面，以及似乎并非非常准确，似乎用户锁屏了也会显示Active？</p>
 <pre class=" language-cmd"><code class="language-cmd">query user
 </code></pre>
-<p>查看目标机器远程共享文件夹（测试之后发现好像并不完整，似乎所有机器默认都是开了C$，IPC$，ADMIN$这几个目录的，但是用net view不一定能看到），以及减少在powershell中使用该命令，而是在cmd中使用，否则可能会出现奇怪的转义问题。。。<br>本机可以使用net share来查看自己分享出去的文件夹，默认应该是有上述值的，但是我遇到了net view查看不到的情形，不是很懂。</p>
-<pre class=" language-cmd"><code class="language-cmd">net view COMPUTER
+<p>验证凭据有效性。直接用凭据去连接远程计算机，只要凭据对就能连上，但如果不是本地管理员权限的话psexec，smbexec等一套命令都用不了。在连上去之后可以尝试通过<code>dir \\ip\$C</code>等命令观察自己是不是本地管理员</p>
+<pre class=" language-cmd"><code class="language-cmd">net use
+</code></pre>
+<p>查看目标机器远程共享文件夹<br>默认应该是会分享出去C$，IPC$和ADMIN$，所有用户都能连接IPC$，不过只有本地管理员才能访问C$和ADMIN$，才能用psexec一类的执行命令</p>
+<pre class=" language-cmd"><code class="language-cmd">net view COMPUTER /all
 </code></pre>
 <p>开关远程桌面，1开0关</p>
 <pre class=" language-cmd"><code class="language-cmd">wmic RDTOGGLE WHERE ServerName='%COMPUTERNAME%' call SetAllowTSConnections 1
@@ -452,8 +455,18 @@ Get-NetUser -Unconstrained -Domain z33.com | select name
 <p>如果在图形界面里看的话，被控制的属性名为<code>Compomised</code>，然而实际上没有这个属性，我edit node才看见那个属性叫<code>owned</code>。。。</p>
 <p>设置里面有一个query debug mode，开了之后可以看到点点点时对应的查询语句，然后自行修改</p>
 <p>在nodeinfo处有节点的基础信息，其中包含了组成员关系，对外的控制权，外部对当前目标的控制权，本地管理权限等，可以到处点来往外查看控制权限</p>
+<p>BloodHound支持域外信息查询，所以目标机器跑不了的话可以考虑偷一个凭证出来用自己电脑接个网进去跑</p>
+<h2 id="域外命令执行"><a href="#域外命令执行" class="headerlink" title="域外命令执行"></a>域外命令执行</h2><p>如果通过mimikatz或者其他方法dump哈希，在域外的机器上发现了rdp到域内机器的凭证的情况，可以考虑尝试使用该凭证进入域内</p>
+<h3 id="impacket套件"><a href="#impacket套件" class="headerlink" title="impacket套件"></a>impacket套件</h3><p>impacket是最好用的套件，因为本身是域外执行，所以可以直接攻击者自己电脑接网进去打。impacket提供了一套exec，ps&#x2F;smb&#x2F;wmi等一应俱全。psexec就和那个exe一样，动静较大，后面两个会稍微隐蔽一点点</p>
+<p>但是利用的先决条件是获取到的用户是目标机器的<strong>本地管理员</strong>，一开始不知道这回事，拿了个凭据猛梭结果屁用没有。。。</p>
+<p>因为这些操作都是要写共享文件夹中的C$或ADMIN$的，只有本地管理员才会拥有这些目录的写权限。机器默认会共享出IPC$，C$，ADMIN$三个文件夹，IPC是个人就能连，可以用来验证口令的有效性。</p>
+<p>WMIHACKER好像和wmiexec没什么区别。。。</p>
+<p>这里有两篇exec系列的介绍文章<br><a target="_blank" rel="external nofollow noopener noreferrer" href="https://medium.com/@allypetitt/windows-remoting-difference-between-psexec-wmiexec-atexec-exec-bf7d1edb5986">Windows Remoting: Difference between psexec, wmiexec, atexec, *exec</a><br><a target="_blank" rel="external nofollow noopener noreferrer" href="https://kylemistele.medium.com/impacket-deep-dives-vol-1-command-execution-abb0144a351d">Impacket Deep Dives Vol. 1: Command Execution</a></p>
+<h3 id="域外信息搜集"><a href="#域外信息搜集" class="headerlink" title="域外信息搜集"></a>域外信息搜集</h3><p>bloodhound也是支持域外使用的，并且信息查询只要一个普通用户权限就可以进行了，所以很是方便</p>
+<p>adfind.exe也支持域外信息搜集，相比之下，powerview好像就没有这个功能？<br>贴一个adfind的链接<br><a target="_blank" rel="external nofollow noopener noreferrer" href="http://www.nooemotion.com/2023/02/20/%E5%9F%9F%E6%B8%97%E9%80%8F%E7%AC%94%E8%AE%B0-%E5%B7%A5%E5%85%B7%E4%BD%BF%E7%94%A8-adfind/">域渗透笔记-工具使用-Adfind</a></p>
+<p>域外域控定位，感觉就是嗯扫，smb扫出来的时候会显示机器的名字，一般来说正常人都会把域控带上dc，或者看端口，域控要提供dns，ldap等服务，会开53,389那几个端口</p>
 <h2 id="一些乱七八糟的杂项内容"><a href="#一些乱七八糟的杂项内容" class="headerlink" title="一些乱七八糟的杂项内容"></a>一些乱七八糟的杂项内容</h2><p>mssql可以走本地认证?如果有一个本地的mssql就算不知道数据库账号密码也可以走本地管理员身份认证进行访问？</p>
-<p>远程执行命令的方法：psexec，这个走445端口，wmi走135端口并且没有回显，还有一个winrm是5895&#x2F;5896端口。</p>
+<p>远程执行命令的方法：psexec&#x2F;smbexec，这个走445端口，wmi走135端口并且没有回显，还有一个winrm是5895&#x2F;5896端口。winrm的缺点是一般来说不开，并且开了还只接受配置过的trust host的命令，感觉很难用上？</p>
 <p>其中psexec好像是因为走ipc，所以无论是pass the hash还是pass the ticket，只要能建立起连接就能用<br>wmi目前手上的工具支持pass the hash。winrm没用过，不过搜索结果中也有可以pass the hash的。pass the ticket其实没怎么用过，不甚熟练，另一个问题是pass the ticket是kerberos里面和服务交互的方法，一般的攻击感觉都是走的ntlm的认证所以都是pass the hash。</p>
 <p>域内登录指定用户名有两种方式，一个是<code>域名\用户名</code>,另一个是<code>用户名@域名</code>，理论上来说老机器用前者，但实际上都可以用前者</p>
 <p>原来普通域用户默认是不能直接登录域控的啊，不过net share什么的还是可以看的</p>
@@ -541,7 +554,7 @@ Get-NetUser -Unconstrained -Domain z33.com | select name
 
       <!--noindex-->
       <div class="post-toc-wrap sidebar-panel">
-          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%9F%9F%E6%B8%97%E9%80%8F%E5%85%A5%E9%97%A82-0"><span class="nav-number">1.</span> <span class="nav-text">域渗透入门2.0</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%B8%B8%E7%94%A8%E5%91%BD%E4%BB%A4"><span class="nav-number">1.1.</span> <span class="nav-text">常用命令</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#LDAP"><span class="nav-number">1.2.</span> <span class="nav-text">LDAP</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#ACL%E7%9B%B8%E5%85%B3"><span class="nav-number">1.2.1.</span> <span class="nav-text">ACL相关</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%BB%84"><span class="nav-number">1.2.2.</span> <span class="nav-text">组</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#OU"><span class="nav-number">1.2.3.</span> <span class="nav-text">OU</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#AdminSDHolder"><span class="nav-number">1.2.4.</span> <span class="nav-text">AdminSDHolder</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#GPO"><span class="nav-number">1.2.5.</span> <span class="nav-text">GPO</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#kerberos%E5%9B%9E%E9%A1%BE"><span class="nav-number">1.3.</span> <span class="nav-text">kerberos回顾</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E9%9D%9E%E7%BA%A6%E6%9D%9F%E5%A7%94%E6%B4%BE"><span class="nav-number">1.3.1.</span> <span class="nav-text">非约束委派</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%BA%A6%E6%9D%9F%E5%A7%94%E6%B4%BE"><span class="nav-number">1.3.2.</span> <span class="nav-text">约束委派</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%9F%BA%E4%BA%8E%E8%B5%84%E6%BA%90%E7%9A%84%E7%BA%A6%E6%9D%9F%E5%A7%94%E6%B4%BE"><span class="nav-number">1.3.3.</span> <span class="nav-text">基于资源的约束委派</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%88%A9%E7%94%A8%E7%BB%86%E8%8A%82"><span class="nav-number">1.3.3.1.</span> <span class="nav-text">利用细节</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#ms14-068"><span class="nav-number">1.3.4.</span> <span class="nav-text">ms14 068</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#NTLM-hash"><span class="nav-number">1.4.</span> <span class="nav-text">NTLM hash</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#net-NTLM%E8%8E%B7%E5%8F%96"><span class="nav-number">1.4.1.</span> <span class="nav-text">net NTLM获取</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#net-NTLM%E7%A0%B4%E8%A7%A3"><span class="nav-number">1.4.2.</span> <span class="nav-text">net NTLM破解</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#ntlm-relay"><span class="nav-number">1.4.3.</span> <span class="nav-text">ntlm relay</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#BloodHound"><span class="nav-number">1.5.</span> <span class="nav-text">BloodHound</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%80%E4%BA%9B%E4%B9%B1%E4%B8%83%E5%85%AB%E7%B3%9F%E7%9A%84%E6%9D%82%E9%A1%B9%E5%86%85%E5%AE%B9"><span class="nav-number">1.6.</span> <span class="nav-text">一些乱七八糟的杂项内容</span></a></li></ol></li></ol></div>
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%9F%9F%E6%B8%97%E9%80%8F%E5%85%A5%E9%97%A82-0"><span class="nav-number">1.</span> <span class="nav-text">域渗透入门2.0</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%B8%B8%E7%94%A8%E5%91%BD%E4%BB%A4"><span class="nav-number">1.1.</span> <span class="nav-text">常用命令</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#LDAP"><span class="nav-number">1.2.</span> <span class="nav-text">LDAP</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#ACL%E7%9B%B8%E5%85%B3"><span class="nav-number">1.2.1.</span> <span class="nav-text">ACL相关</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%BB%84"><span class="nav-number">1.2.2.</span> <span class="nav-text">组</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#OU"><span class="nav-number">1.2.3.</span> <span class="nav-text">OU</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#AdminSDHolder"><span class="nav-number">1.2.4.</span> <span class="nav-text">AdminSDHolder</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#GPO"><span class="nav-number">1.2.5.</span> <span class="nav-text">GPO</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#kerberos%E5%9B%9E%E9%A1%BE"><span class="nav-number">1.3.</span> <span class="nav-text">kerberos回顾</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E9%9D%9E%E7%BA%A6%E6%9D%9F%E5%A7%94%E6%B4%BE"><span class="nav-number">1.3.1.</span> <span class="nav-text">非约束委派</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%BA%A6%E6%9D%9F%E5%A7%94%E6%B4%BE"><span class="nav-number">1.3.2.</span> <span class="nav-text">约束委派</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%9F%BA%E4%BA%8E%E8%B5%84%E6%BA%90%E7%9A%84%E7%BA%A6%E6%9D%9F%E5%A7%94%E6%B4%BE"><span class="nav-number">1.3.3.</span> <span class="nav-text">基于资源的约束委派</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%88%A9%E7%94%A8%E7%BB%86%E8%8A%82"><span class="nav-number">1.3.3.1.</span> <span class="nav-text">利用细节</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#ms14-068"><span class="nav-number">1.3.4.</span> <span class="nav-text">ms14 068</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#NTLM-hash"><span class="nav-number">1.4.</span> <span class="nav-text">NTLM hash</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#net-NTLM%E8%8E%B7%E5%8F%96"><span class="nav-number">1.4.1.</span> <span class="nav-text">net NTLM获取</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#net-NTLM%E7%A0%B4%E8%A7%A3"><span class="nav-number">1.4.2.</span> <span class="nav-text">net NTLM破解</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#ntlm-relay"><span class="nav-number">1.4.3.</span> <span class="nav-text">ntlm relay</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#BloodHound"><span class="nav-number">1.5.</span> <span class="nav-text">BloodHound</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%9F%9F%E5%A4%96%E5%91%BD%E4%BB%A4%E6%89%A7%E8%A1%8C"><span class="nav-number">1.6.</span> <span class="nav-text">域外命令执行</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#impacket%E5%A5%97%E4%BB%B6"><span class="nav-number">1.6.1.</span> <span class="nav-text">impacket套件</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%9F%9F%E5%A4%96%E4%BF%A1%E6%81%AF%E6%90%9C%E9%9B%86"><span class="nav-number">1.6.2.</span> <span class="nav-text">域外信息搜集</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%80%E4%BA%9B%E4%B9%B1%E4%B8%83%E5%85%AB%E7%B3%9F%E7%9A%84%E6%9D%82%E9%A1%B9%E5%86%85%E5%AE%B9"><span class="nav-number">1.7.</span> <span class="nav-text">一些乱七八糟的杂项内容</span></a></li></ol></li></ol></div>
       </div>
       <!--/noindex-->
 
@@ -556,7 +569,7 @@ Get-NetUser -Unconstrained -Domain z33.com | select name
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">184</span>
+          <span class="site-state-item-count">185</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
@@ -592,9 +605,6 @@ Get-NetUser -Unconstrained -Domain z33.com | select name
         
 
         
-  <div class="beian"><a href="http://www.beian.miit.gov.cn/" rel="external nofollow noopener noreferrer" target="_blank">湘ICP备2020021580号 </a>
-      <img src="/./images/beian.png" style="display: inline-block;">
-  </div>
 
 <div class="copyright">
   

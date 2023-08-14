@@ -1,0 +1,554 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 6.0.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"blog.z3ratu1.cn","root":"/","scheme":"Pisces","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"always","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":true},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+  </script>
+
+  <meta name="description" content="HackBrowserDataManual开发日记最近写的玩具，实际上感觉实战基本上用不到。。。我打的攻防还没有这么前沿，但是因为最近好久都没更新博客了。闲来无事水一篇 项目地址HackBrowserDataManual 首先full credit to HackBrowserData，主体框架都是从这抄的，也是从这个的代码学的大概的还原浏览器数据的逻辑。 该项目是为了解决HackerBrowse">
+<meta property="og:type" content="article">
+<meta property="og:title" content="HackBrowserDataManual开发日记">
+<meta property="og:url" content="https://blog.z3ratu1.cn/HackBrowserDataManual%E5%BC%80%E5%8F%91%E6%97%A5%E8%AE%B0.html">
+<meta property="og:site_name" content="Z3ratu1&#39;s blog">
+<meta property="og:description" content="HackBrowserDataManual开发日记最近写的玩具，实际上感觉实战基本上用不到。。。我打的攻防还没有这么前沿，但是因为最近好久都没更新博客了。闲来无事水一篇 项目地址HackBrowserDataManual 首先full credit to HackBrowserData，主体框架都是从这抄的，也是从这个的代码学的大概的还原浏览器数据的逻辑。 该项目是为了解决HackerBrowse">
+<meta property="og:locale">
+<meta property="article:published_time" content="2023-08-13T14:55:01.000Z">
+<meta property="article:modified_time" content="2023-08-14T05:41:23.199Z">
+<meta property="article:author" content="Z3ratu1">
+<meta property="article:tag" content="pentest">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="https://blog.z3ratu1.cn/HackBrowserDataManual%E5%BC%80%E5%8F%91%E6%97%A5%E8%AE%B0.html">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-Hans'
+  };
+</script>
+
+  <title>HackBrowserDataManual开发日记 | Z3ratu1's blog</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+<link rel="stylesheet" href="/css/prism-tomorrow.css" type="text/css"></head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">Z3ratu1's blog</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">Welcome</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>关于</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+        <li class="menu-item menu-item-links">
+
+    <a href="/links/" rel="section"><i class="fa fa-link fa-fw"></i>友链</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off" placeholder="搜索..." spellcheck="false" type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+  <a href="https://github.com/Z3ratu1" class="github-corner" title="Follow me on GitHub" aria-label="Follow me on GitHub" rel="external nofollow noopener noreferrer" target="_blank"><svg width="80" height="80" viewbox="0 0 250 250" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"/><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"/><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"/></svg></a>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
+    <link itemprop="mainEntityOfPage" href="https://blog.z3ratu1.cn/HackBrowserDataManual%E5%BC%80%E5%8F%91%E6%97%A5%E8%AE%B0.html">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="http://thirdqq.qlogo.cn/g?b=sdk&k=LSKHut5Wmfic1emlMT4FpuA&kti=ZMCGFwAAAAI&s=640&t=1673848139">
+      <meta itemprop="name" content="Z3ratu1">
+      <meta itemprop="description" content="与其感慨路难行，不如现在出发">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Z3ratu1's blog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          HackBrowserDataManual开发日记
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2023-08-13 22:55:01" itemprop="dateCreated datePublished" datetime="2023-08-13T22:55:01+08:00">2023-08-13</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2023-08-14 13:41:23" itemprop="dateModified" datetime="2023-08-14T13:41:23+08:00">2023-08-14</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E7%AC%94%E8%AE%B0/" itemprop="url" rel="index"><span itemprop="name">笔记</span></a>
+                </span>
+            </span>
+
+          
+            <span id="/HackBrowserDataManual%E5%BC%80%E5%8F%91%E6%97%A5%E8%AE%B0.html" class="post-meta-item leancloud_visitors" data-flag-title="HackBrowserDataManual开发日记" title="阅读次数">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span class="leancloud-visitors-count"></span>
+            </span>
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="far fa-comment"></i>
+      </span>
+      <span class="post-meta-item-text">Valine：</span>
+    
+    <a title="valine" href="/HackBrowserDataManual%E5%BC%80%E5%8F%91%E6%97%A5%E8%AE%B0.html#valine-comments" itemprop="discussionUrl">
+      <span class="post-comments-count valine-comment-count" data-xid="/HackBrowserDataManual%E5%BC%80%E5%8F%91%E6%97%A5%E8%AE%B0.html" itemprop="commentCount"></span>
+    </a>
+  </span>
+  
+  
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h1 id="HackBrowserDataManual开发日记"><a href="#HackBrowserDataManual开发日记" class="headerlink" title="HackBrowserDataManual开发日记"></a>HackBrowserDataManual开发日记</h1><p>最近写的玩具，实际上感觉实战基本上用不到。。。我打的攻防还没有这么前沿，但是因为最近好久都没更新博客了。闲来无事水一篇</p>
+<p>项目地址<a target="_blank" rel="external nofollow noopener noreferrer" href="https://github.com/Z3ratu1/HackBrowserDataManual">HackBrowserDataManual</a></p>
+<p>首先full credit to <a target="_blank" rel="external nofollow noopener noreferrer" href="https://github.com/moonD4rk/HackBrowserData">HackBrowserData</a>，主体框架都是从这抄的，也是从这个的代码学的大概的还原浏览器数据的逻辑。</p>
+<p>该项目是为了解决HackerBrowserData在目标机器上存在高强度edr防护时无法利用的情况。其实绕过的想法也很简单，并且已经到了高级对抗，实现的方法也还可以有很多，也可以针对特定规则搓出特定的方案，这里只是给出一个可能且稍微具有一点泛用性的一个例子。</p>
+<p>顺便练习了一下用go的interface写面向对象的操作（非常坐牢）。</p>
+<p>该程序仅在win10和win11上测试通过。（理论上可以运行在linux和mac上，但实际应用感觉基本上都是抓windows密码加上没有环境就没测）</p>
+<p>下文均默认以在windows平台上运行进行叙述，本文均使用chrome称呼浏览器，内容可扩展到chromium内核实现的浏览器上</p>
+<h2 id="原理"><a href="#原理" class="headerlink" title="原理"></a>原理</h2><p>chrome浏览器，或者chromium内核的浏览器，使用sqlite对数据进行存储。这里仅挑选出常用的cookie，password和history三个数据进行提取。</p>
+<h3 id="数据存储位置"><a href="#数据存储位置" class="headerlink" title="数据存储位置"></a>数据存储位置</h3><p>默认情况下，用户数据目录为<code>homeDir + &quot;/AppData/Local/Google/Chrome/User Data/&quot;</code>，用户的默认profile文件为<code>Default</code>，该目录下存储着浏览器的各种数据库文件。</p>
+<p>其中主密钥文件位于数据目录下的<code>Local State</code>文件中，password和cookie两个数据库被该密钥加密，history无需解密可明文读取，各文件具体位置可以在本项目的item文件夹下查看。</p>
+<h3 id="加解密还原"><a href="#加解密还原" class="headerlink" title="加解密还原"></a>加解密还原</h3><p>windows平台下密码和cookie的加密并非直接的aes或rsa等加密，而是使用了DPAPI，DPAPI实现了用户层面的加密，即只有同一个用户调用该api时可以恢复对应的数据。而chrome这里的主密钥是经过dpapi加密的，因此只能在目标机器以对应用户的身份还原。将文件外带后本地还原是行不通的。</p>
+<p>这也是部分情况下攻击者获取了system权限后，HackBrowserData无法还原数据的原因（另一个原因是其默认情况下是根据用户家目录搜寻数据的，system的家目录下自然没有东西）</p>
+<p>当然，dpapi的加密依赖于用户口令，如果攻击者直接是administrator及以上层级，能够mimikatz一把梭恢复出用户口令hash的话，也可以进行本地还原。如下就是一个类似的例子<br><a target="_blank" rel="external nofollow noopener noreferrer" href="https://xz.aliyun.com/t/6508">通过Dpapi获取Windows身份凭证</a></p>
+<h3 id="devtools-protocol绕过edr"><a href="#devtools-protocol绕过edr" class="headerlink" title="devtools protocol绕过edr"></a>devtools protocol绕过edr</h3><p>如果只有前面这两部分，显然是无法作为一个新的东西拿出来的。因为edr只允许浏览器访问自己的数据，那我就用浏览器去做。chrome的devtools协议长期被用来操纵浏览器进行自动化任务，比较有名的项目有puppeteer等。控制浏览器访问file协议，以及进行文件下载自然也在其中。而edr只会检测位于对应位置的数据文件，控制chrome对其进行读取和转存即可绕过这一限制。</p>
+<p>可以先看看谷歌的完整文档<a target="_blank" rel="external nofollow noopener noreferrer" href="https://chromedevtools.github.io/devtools-protocol/">Chrome DevTools Protocol</a><br>在这里面就已经可以看到一个有意思的功能了，一键获取所有的cookie。不过仔细翻了几遍也没翻到其他内容，如password自动填充和历史记录之类的。有一个database模块，瞬间联想到所有数据都是sqlite形式存储的，但是官方文档对这个模块的描述过于抽象，并且也没有提供列举数据库的函数，所以暂时放弃。<br><a target="_blank" rel="external nofollow noopener noreferrer" href="https://chromedevtools.github.io/devtools-protocol/tot/Storage/#method-getCookies">Storage.getCookies</a></p>
+<p>可以很轻松的找到谷歌官方在go方面的devtools支持<a target="_blank" rel="external nofollow noopener noreferrer" href="https://github.com/chromedp/chromedp">chromedp</a>，并给出了简单的例子，接下来只需要一顿缝合实现下载功能即可。具体代码自行参看项目内实现</p>
+<p>此处有一个需要注意的地方，若使用devtools protocol直接获取用户cookie，则需要指定用户数据目录，否则chrome会使用一个临时目录启动实例，类似于匿名模式启动。并且chrome在实现时做出了奇怪的限制，若存在chrome实例，cookie文件就无法访问，甚至不支持只读打开。故无论是devtool协议还是下载文件对cookie进行窃取均仅能在当前用户未启动chrome实例时使用，或是强行关闭对应进程后使用。</p>
+<p>为此提供了–kill选项，遍历进程关闭当前用户的chrome实例。关闭实例有两种办法，使用terminalProcess强杀，和发送信号。（go似乎没实现windows下的发送信号，但是用任务管理器杀似乎是发送信号类型的杀进程）两者的区别在于，前者会导致chrome重启时显示浏览器异常关闭，而后者则不会。关闭后均可使用<code>--restore-last-session</code>选项恢复之前的页面，可以有效地防止用户发现浏览器被关了。</p>
+<p>下载数据文件则需要使用两种方法，当浏览器使用file协议访问本地文件时，存在两种情况：1. 文件为文本文件，此时chrome不会将文件进行下载，而是直接呈现，2. 二进制文件，此时chrome会将文件下载到指定目录中去。chrome的主密钥文件是json格式的文本文件，而数据库均为sqlite的二进制文件，故对应这两个情况需要分别处理</p>
+<p>文本文件可以直接navigate到对应url下，执行<code>document.body.innerText</code>获取内容，而二进制文件则需要设置下载路径等行为。可以直接抄chromedp项目中的example魔改实现。</p>
+<h2 id="碎碎念"><a href="#碎碎念" class="headerlink" title="碎碎念"></a>碎碎念</h2><p>着实被go的垃圾面向对象支持恶心了。。。下文中的类均指代实现了对应方法的结构体，按照面向对象的习惯使用类对其进行描述</p>
+<p>一开始的设计思路是写两个类，一个browser类处理各种chromium内核的浏览器，一个data类负责写入各种数据。经典的继承与多态</p>
+<p>data类写的比较轻松，先写一个接口，然后写一个父类实现写入等公有方法，并用一个any类型存储数据，各子类实现其解析方法即可。能够写出类似于多态和继承的操作</p>
+<p>然而，browser类写的就很坐牢，因为data中write是统一的，而parse方法则是各写各的，父类函数中不会调用子类的函数。而browser类中如果想封装的好一点，那么必然会在父类函数中调用子类的方法，以browser.initPath为例</p>
+<pre class=" language-go"><code class="language-go"><span class="token keyword">func</span> <span class="token punctuation">(</span>b <span class="token operator">*</span>Browser<span class="token punctuation">)</span> <span class="token function">InitPath</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token keyword">if</span> b<span class="token punctuation">.</span>MasterKeyFile <span class="token operator">==</span> <span class="token string">""</span> <span class="token operator">&amp;&amp;</span> b<span class="token punctuation">.</span>Action <span class="token operator">!=</span> item<span class="token punctuation">.</span>History <span class="token punctuation">{</span>
+        b<span class="token punctuation">.</span>MasterKeyFile <span class="token operator">=</span> b<span class="token punctuation">.</span><span class="token function">getUserDir</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">+</span> item<span class="token punctuation">.</span>ChromiumKey
+    <span class="token punctuation">}</span>
+    <span class="token operator">...</span><span class="token operator">...</span>
+<span class="token punctuation">}</span>
+</code></pre>
+<p>该函数的流程是固定的，但是对应不同的浏览器，其文件路径不同，需要调用子类的方法来解析对应的路径。对于成熟的面向对象语言，父类中<code>getUserDir()</code>可以留空，然后子类进行实现，子类无需重复实现InitPath，而是继承父类。这种情况下子类对象调用InitPath方法时会调用父类的方法，但<code>getUserDir()</code>会使用子类的实现，非常合理的多态。但是go不支持。。。<br>使用如下的伪代码进行操作，会调用Browser类中留空的<code>getUserDir()</code>方法导致程序原地爆炸</p>
+<pre class=" language-go"><code class="language-go"><span class="token keyword">var</span> browser IBrowser
+browser <span class="token operator">=</span> <span class="token operator">&amp;</span>Chrome<span class="token punctuation">{</span><span class="token punctuation">}</span>
+browser<span class="token punctuation">.</span><span class="token function">InitPath</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+</code></pre>
+<p>如果还是要强行写类思路的话，有两个方案，第一个是完全放弃继承，直接这个函数每个子类里面复制一遍，显然顶级不优雅。方案2是进行传参，即在<code>InitPath()</code>中添加一个参数IBrowser，将调用形式变为<code>browser.InitPath(browser)</code>，然后在函数体中使用传入的参数调用<code>getUserDir()</code>。是一个略微可行的方法，但仍然不够优雅，并且由于传入的参数是IBrowser类型，导致一些本来可以藏在类内部的方法必须暴露在接口中，还得反向去给接口加方法。（其实还有第三个方案，反射，但我觉得在开发流程中，能不使用反射就应当尽量去避免使用）</p>
+<p>说到底，go的这个结构体写出来的类，并不是继承关系，而是组合关系，可以在Browser类和Chrome类中各自实现接口的部分函数，再拼到一起就变成了实现该接口。这里的Chrome类”继承”了Browser类，实际上只是将Browser类组合了进来，然后再实现自己的方法去覆盖掉Browser类的方法。如果一开始的调用入口是Browser类的话，后续的处理也就是按照Browser类去做的，无法做到真正的面向对象的多态与继承。</p>
+<p>网上搜了一大串都没有更加优秀的解决方案，但是看到了类似的需求，以及下面的答复：</p>
+<blockquote>
+<p>考虑用接口实现，别总想着继承。</p>
+</blockquote>
+<p>最后我直接不写继承和多态了，我直接将Browser类作为一个实例我，也不用基础接口，而是在里面添加一个接口去实现各个浏览器下的具体功能，原本应当是子类浏览器实例继承父类浏览器的方法，并实现其具体逻辑，而我现在反过来，浏览器直接实现主体框架，而其中添加一个浏览器实例的接口，应对不同浏览器情况下的特殊情形。</p>
+<p>应当使用接口去实现不同功能，即<code>browser.ChromeInterface.func</code>，而不是Chrome继承Browser后调用<code>Chrome.func</code>。</p>
+<h2 id="后记"><a href="#后记" class="headerlink" title="后记"></a>后记</h2><p>我有一个朋友的电脑上上了顶级火绒规则防御，这里需要解决的只允许chrome访问其配置文件就是其中一条，我写完这个之后让他试试，自然，chrome访问配置文件是可以通过的。然而他这里存在着第二条规则，只允许特定进程调用chrome程序。那么该程序自然无法绕过这条规则。而他的规则顶级严格，能够访问chrome数据文件的只有chrome进程，也就是说他自己去访问也会触发报警，需要手动放行，感觉有点无敌防御了</p>
+<p>一个可能的绕过方案是进程注入chrome，或者注入explorer去拉起chrome，然而进程注入也会有相应的防护规则，到了这个地步只能是针对每一种特殊情况去具体解决了。</p>
+<p>不过我看他的防护规则中是对二进制的名字进行检测，那么我自己直接改名成chrome.exe也许有绕过可能？不过这样子应该还是会触发其他程序调用chrome.exe的报警，不过要是我有3389的话上去就可以。或者说有命令行调用explorer启动其他程序的方法？（搞不好又有对explorer的防护规则，开始无限套娃）</p>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/pentest/" rel="tag"># pentest</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/zer0ptsCTF2023.html" rel="prev" title="zer0ptsCTF2023">
+      <i class="fa fa-chevron-left"></i> zer0ptsCTF2023
+    </a></div>
+      <div class="post-nav-item"></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+    <div class="comments" id="valine-comments"></div>
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#HackBrowserDataManual%E5%BC%80%E5%8F%91%E6%97%A5%E8%AE%B0"><span class="nav-number">1.</span> <span class="nav-text">HackBrowserDataManual开发日记</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%8E%9F%E7%90%86"><span class="nav-number">1.1.</span> <span class="nav-text">原理</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%95%B0%E6%8D%AE%E5%AD%98%E5%82%A8%E4%BD%8D%E7%BD%AE"><span class="nav-number">1.1.1.</span> <span class="nav-text">数据存储位置</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%8A%A0%E8%A7%A3%E5%AF%86%E8%BF%98%E5%8E%9F"><span class="nav-number">1.1.2.</span> <span class="nav-text">加解密还原</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#devtools-protocol%E7%BB%95%E8%BF%87edr"><span class="nav-number">1.1.3.</span> <span class="nav-text">devtools protocol绕过edr</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%A2%8E%E7%A2%8E%E5%BF%B5"><span class="nav-number">1.2.</span> <span class="nav-text">碎碎念</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%90%8E%E8%AE%B0"><span class="nav-number">1.3.</span> <span class="nav-text">后记</span></a></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Z3ratu1" src="http://thirdqq.qlogo.cn/g?b=sdk&k=LSKHut5Wmfic1emlMT4FpuA&kti=ZMCGFwAAAAI&s=640&t=1673848139">
+  <p class="site-author-name" itemprop="name">Z3ratu1</p>
+  <div class="site-description" itemprop="description">与其感慨路难行，不如现在出发</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">185</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">5</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">93</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 2019 – 
+  <span itemprop="copyrightYear">2023</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Z3ratu1</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="external nofollow noopener noreferrer" target="_blank">Hexo</a> & <a href="https://pisces.theme-next.org/" class="theme-link" rel="external nofollow noopener noreferrer" target="_blank">NexT.Pisces</a> 强力驱动
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+
+<script>
+NexT.utils.loadComments(document.querySelector('#valine-comments'), () => {
+  NexT.utils.getScript('https://cdn.jsdelivr.net/npm/valine@1.4.14/dist/Valine.min.js', () => {
+    var GUEST = ['nick', 'mail', 'link'];
+    var guest = 'nick,mail,link';
+    guest = guest.split(',').filter(item => {
+      return GUEST.includes(item);
+    });
+    new Valine({
+      el         : '#valine-comments',
+      verify     : false,
+      notify     : false,
+      appId      : '7H8kg0XdWO8IbhOcu4K1JaAT-gzGzoHsz',
+      appKey     : 'wPKQjkbVtvPaRR7gh2yjfLSi',
+      placeholder: "Just go go",
+      avatar     : 'mm',
+      meta       : guest,
+      pageSize   : '10' || 10,
+      visitor    : true,
+      lang       : '' || 'zh-cn',
+      path       : location.pathname,
+      recordIP   : false,
+      serverURLs : ''
+    });
+  }, window.Valine);
+});
+</script>
+
+</body>
+</html>

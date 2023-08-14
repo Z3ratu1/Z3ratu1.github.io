@@ -31,7 +31,7 @@
 <meta property="og:image" content="https://blog.z3ratu1.cn/images/JavaRMI%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96%E5%85%A5%E9%97%A8/unmarshalValue.png">
 <meta property="og:image" content="https://blog.z3ratu1.cn/images/JavaRMI%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96%E5%85%A5%E9%97%A8/isPrimitive.png">
 <meta property="article:published_time" content="2021-04-13T11:57:58.000Z">
-<meta property="article:modified_time" content="2022-11-22T11:22:25.390Z">
+<meta property="article:modified_time" content="2023-07-30T06:43:56.269Z">
 <meta property="article:author" content="Z3ratu1">
 <meta property="article:tag" content="Java">
 <meta property="article:tag" content="RMI">
@@ -236,7 +236,7 @@
                   <i class="far fa-calendar-check"></i>
                 </span>
                 <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2022-11-22 19:22:25" itemprop="dateModified" datetime="2022-11-22T19:22:25+08:00">2022-11-22</time>
+                <time title="修改时间：2023-07-30 14:43:56" itemprop="dateModified" datetime="2023-07-30T14:43:56+08:00">2023-07-30</time>
               </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -390,7 +390,11 @@
 <p>上文提到的白名单绕过，就是使用JRMP Client绕过白名单，让目标对攻击者服务器发送RMI连接（调用lookup函数），此时绕过了对JEP290反序列化类的限制，再从无限制的RMI方法调用中返回真正的payload打穿。<br>JRMP Listener在RMI连接可控时，能稳定打一个反序列化，其可以通过返回一个ExceptionalReturn状态，在Client处理该状态时，会直接对返回的数据进行反序列化，从而打通。<br>这个方案不仅适用于lookup函数，在client进行远程方法调用等场合，无论返回值为何种类型，均可以返回该异常类型进行反序列化</p>
 <p>然后在之后的版本中<code>UnicastRef</code>类也被修了，JRMP就打不通了，不过好像说有一个用<code>UnicastRemoteObject</code>继续打的，然后在8u241被修了</p>
 <p>做了下yxxx师傅的<a target="_blank" rel="external nofollow noopener noreferrer" href="https://github.com/waderwu/javaDeserializeLabs">javaDeserializeLabs</a>，里面weblogic那一套JRMP反序列化就是这段的内容，不过在lab7的时候踩了一个坑，jdk在启动的时候指定了<code>-Djdk.serialFilter=!javax.management.BadAttributeValueExpException</code>，把这个类ban了，但是我感觉无影响，CC5用的这个，我换CC6&#x2F;7就是了，结果yso起了个JRMPListener之后打过去还是报这个错。。。然后仔细一看才发现，yso不知道为什么把反序列化的payload外面又套了一层<code>BadAttributeValueExpException</code>，重新缝一下把这句删掉就能打通了。<br>看了一下<a target="_blank" rel="external nofollow noopener noreferrer" href="https://xz.aliyun.com/t/7932">针对RMI服务的九重攻击</a>，原来是反序列化这里是把错误对象反序列化，先写了returnType和ID，然后就是object，当returnType是exception的时候就会把object反序列化，但实际上这里的object不是Exception类也无所谓</p>
-<p>越来越搞不懂rmi和jrmp的关系了。。。</p>
+<p>越来越搞不懂rmi和jrmp的关系了。。。<br>在一篇文章中看到了这个说法</p>
+<blockquote>
+<p>JRMP是DGC和RMI底层通讯层，DGC和RMI的最终调用都回到JRMP这一层来</p>
+</blockquote>
+<p>感觉rmi这套攻击主要是rmi中的client，server和registry直接bind，lookup时进行数据交换的漏洞，而这一系列的修补除了影响他们间的互相攻击外，也同时影响了JRMPClient&#x2F;Server这两条利用链，这两条链也是rmi的一部分所以在修的时候一并修掉了。</p>
 <h3 id="registry攻击client"><a href="#registry攻击client" class="headerlink" title="registry攻击client"></a>registry攻击client</h3><p>同样也能打服务端，但是基本上注册中心和服务端都是一台机子，所以就不多说了。<br>其实从上面也能看出来，只要两个机器远程交互的时候传递了序列化的对象，那接受的机器基本上就没跑的会把序列化的对象给反序列化出来，只要目标机器上确实存在这个链，就能一键打通。<br>使用ysoserial可以生成一个恶意的注册中心，只要服务端调用注册中心的方法，就给你返回一个执行命令的Object给你反序列化</p>
 <h3 id="client攻击server"><a href="#client攻击server" class="headerlink" title="client攻击server"></a>client攻击server</h3><p>服务端对传递过来的参数放进了一个<code>unmarshalValue</code>函数进行处理，该方法在参数不是基本类型的情况下会对传入数据进行readObject，所以客户端提交给服务端的数据里得有一个Object，也就是服务端提供的函数调用中，至少得有一个函数接受的参数是一个Object，<strong>至少得不是一个primitive type才能触发readObject</strong>，才能发一个恶意对象过去进行利用<br>如图<br><img src="/images/JavaRMI%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96%E5%85%A5%E9%97%A8/unmarshalValue.png" alt="unmarshalValue.png"><br>这里可以看到服务端对传过来的类进行了一个类型判断，只要不是primitive type的类就直接进行readObject反序列化，而再来看一下primitive type有哪些<br><img src="/images/JavaRMI%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96%E5%85%A5%E9%97%A8/isPrimitive.png" alt="isPrimitive.png"><br>这意味着string也不是基础类型，服务端如果接受的是string也能打通</p>
 <p>把这个复现一下</p>
@@ -412,6 +416,7 @@
 <p>也学会了一些调试的方法，比如什么在方法处下断点，跟着报错的调用栈几十层几十层的进之类的。。。</p>
 <h3 id="server攻击client"><a href="#server攻击client" class="headerlink" title="server攻击client"></a>server攻击client</h3><p>刚才说了，只要信息交换过程中给了序列化数据十有八九就会反序列化，所以当客户端调用服务端方法的时候，同样可以让服务端返回一个Object，只需要让客户端调用一个返回值是Object的方法，返回一个恶意的Object就可以把客户端打穿，因此在你攻击其他人的时候，也有可能反手被其他人攻击</p>
 <h2 id="JNDI注入"><a href="#JNDI注入" class="headerlink" title="JNDI注入"></a>JNDI注入</h2><p>JNDI注入的关键是在用户进行远程方法调用时返回的stub是一个reference类型的对象，且用户本地CLASSPATH不存在该类字节码，导致用户需要加载reference类的字节码，直接返回恶意类字节码命令执行</p>
+<p>RMI的漏洞大多情况下还是攻击网络中的registry，虽然在这个过程中可能产生对client的反打，但整体感觉出现的频率不高。<br>更常见的则是RMI在JNDI查询时的反序列化。JNDI是一种查询的规范（大概），而RMI就是其下的一个实现。这个漏洞被归于JNDI下，是RMI协议遵循JNDI查询时导致的漏洞，与上述rmi攻击环境中双方沟通信息传递参数的漏洞不同，自然也不受到JEP290及其后续修复的影响</p>
 <h3 id="JNDI"><a href="#JNDI" class="headerlink" title="JNDI"></a>JNDI</h3><p><del>没什么用的名词介绍环节</del><br>Java Naming and Directory Interface，Java命名和目录接口，通过调用JNDI的API应用程序可以定位资源和其他程序对象，现在JNDI能访问的服务有：JDBC、LDAP、RMI、DNS、NIS、CORBA。</p>
 <p>其提供如下三种服务：<br>Naming Service 命名服务：<br>命名服务将名称和对象进行关联，提供通过名称找到对象的操作，例如：DNS系统将计算机名和IP地址进行关联、文件系统将文件名和文件句柄进行关联等等。</p>
 <p>Directory Service 目录服务：<br>目录服务是命名服务的扩展，除了提供名称和对象的关联，还允许对象具有属性。目录服务中的对象称之为目录对象。目录服务提供创建、添加、删除目录对象以及修改目录对象属性等操作。</p>
@@ -547,7 +552,7 @@ String value<span class="token punctuation">;</span>
 <h4 id="2"><a href="#2" class="headerlink" title="#2"></a>#2</h4><p>在2021天翼杯这个比赛中见识到了（说起来应该不难，但是我真的不太会java）<br>用JNDI去连LDAP服务，而LDAP服务存的java对象，除了能Reference对象外，也可以存序列化的对象，只要在返回的对象中存在javaSerializedData这个属性，客户端就会对该属性进行反序列化，通过反序列化用户本地存在的链子进行命令执行</p>
 <p>这次的比赛就是这样，给了一个jackson的反序列化，同时还安装了<code>ch.qos.logback</code>和<code>Common-Collection3</code>依赖。我由于完全没有积累，并不知道这个类可以进行JNDI注入，所以只搜到了一个配合h2库进行数据库操作RCE的攻击方式，而题目环境中并未含有此依赖，无法攻击</p>
 <p>但是<code>ch.qos.logback</code>这个库还有一个JNDI功能，利用此功能可以进行命令执行<br>攻击方式较为简单，直接生成cc链反序列化的类字节码，放到LDAP服务中返回的<code>javaSerializedData</code>属性中即可<br>至于起一个LDAP服务的话，从网上抄一段代码<br><a target="_blank" rel="external nofollow noopener noreferrer" href="https://github.com/kxcode/JNDI-Exploit-Bypass-Demo">JNDI-Exploit-Bypass-Demo</a><br>还有一个神仙写的基于yso的ysomap工具也能用，做的好高级，和msf的使用方式比较像，就是这个cc8和9是什么东西？好像是把CC再排列组合了一下？功能还蛮多，慢慢看都有啥好玩的<br><a target="_blank" rel="external nofollow noopener noreferrer" href="https://github.com/wh1t3p1g/ysomap/releases/tag/0.0.1-RLEASE">YSOMAP</a></p>
-<h2 id="参考链接"><a href="#参考链接" class="headerlink" title="参考链接"></a>参考链接</h2><p><a target="_blank" rel="external nofollow noopener noreferrer" href="https://blog.0kami.cn/2020/02/06/java/rmi-registry-security-problem/">浅谈Java RMI Registry安全问题</a><br><a target="_blank" rel="external nofollow noopener noreferrer" href="https://xz.aliyun.com/t/8706">JAVA RMI 反序列化攻击 &amp; JEP290 Bypass分析</a><br><a target="_blank" rel="external nofollow noopener noreferrer" href="https://xz.aliyun.com/t/6660">RMI反序列化</a><br><a target="_blank" rel="external nofollow noopener noreferrer" href="https://xz.aliyun.com/t/8214">JNDI注入学习</a><br><a target="_blank" rel="external nofollow noopener noreferrer" href="https://paper.seebug.org/942/">如何绕过高版本JDK的限制进行JNDI注入利用</a><br><a target="_blank" rel="external nofollow noopener noreferrer" href="https://www.xmanblog.net/java-rmi-rce/">深入理解Java RMI反序列化漏洞</a><br><a target="_blank" rel="external nofollow noopener noreferrer" href="https://www.cnblogs.com/nice0e3/p/13927460.html">Java安全之RMI反序列化</a><br><a target="_blank" rel="external nofollow noopener noreferrer" href="https://rickgray.me/2016/08/19/jndi-injection-from-theory-to-apply-blackhat-review/">BlackHat 2016 回顾之 JNDI 注入简单解析</a><br><a target="_blank" rel="external nofollow noopener noreferrer" href="https://zhuanlan.zhihu.com/p/347364636">Java安全之ysoserial-JRMP模块分析（一）</a><br><a target="_blank" rel="external nofollow noopener noreferrer" href="https://hg.openjdk.java.net/jdk8u/jdk8u/jdk/rev/033462472c28">openjdk8u242有关readObject的更新</a></p>
+<h2 id="参考链接"><a href="#参考链接" class="headerlink" title="参考链接"></a>参考链接</h2><p><a target="_blank" rel="external nofollow noopener noreferrer" href="https://blog.0kami.cn/2020/02/06/java/rmi-registry-security-problem/">浅谈Java RMI Registry安全问题</a><br><a target="_blank" rel="external nofollow noopener noreferrer" href="https://xz.aliyun.com/t/8706">JAVA RMI 反序列化攻击 &amp; JEP290 Bypass分析</a><br><a target="_blank" rel="external nofollow noopener noreferrer" href="https://xz.aliyun.com/t/6660">RMI反序列化</a><br><a target="_blank" rel="external nofollow noopener noreferrer" href="https://xz.aliyun.com/t/8214">JNDI注入学习</a><br><a target="_blank" rel="external nofollow noopener noreferrer" href="https://paper.seebug.org/942/">如何绕过高版本JDK的限制进行JNDI注入利用</a><br><a target="_blank" rel="external nofollow noopener noreferrer" href="https://www.xmanblog.net/java-rmi-rce/">深入理解Java RMI反序列化漏洞</a><br><a target="_blank" rel="external nofollow noopener noreferrer" href="https://www.cnblogs.com/nice0e3/p/13927460.html">Java安全之RMI反序列化</a><br><a target="_blank" rel="external nofollow noopener noreferrer" href="https://rickgray.me/2016/08/19/jndi-injection-from-theory-to-apply-blackhat-review/">BlackHat 2016 回顾之 JNDI 注入简单解析</a><br><a target="_blank" rel="external nofollow noopener noreferrer" href="https://zhuanlan.zhihu.com/p/347364636">Java安全之ysoserial-JRMP模块分析（一）</a><br><a target="_blank" rel="external nofollow noopener noreferrer" href="https://hg.openjdk.java.net/jdk8u/jdk8u/jdk/rev/033462472c28">openjdk8u242有关readObject的更新</a><br><a target="_blank" rel="external nofollow noopener noreferrer" href="https://lalajun.github.io/2020/06/22/RMI%20%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96-%E6%B7%B1%E5%85%A5-%E4%B8%8B/">RMI-反序列化-深入-下</a><br><a target="_blank" rel="external nofollow noopener noreferrer" href="https://blog.0kami.cn/blog/2020/jndi-with-rmi-20200209/">JNDI with RMI</a></p>
 <p>两篇关于JNDI注入BeanFactory利用<br><a target="_blank" rel="external nofollow noopener noreferrer" href="http://www.yulegeyu.com/2019/01/11/Exploitng-JNDI-Injection-In-Java/">Exploiting JNDI Injection In Java</a><br><a target="_blank" rel="external nofollow noopener noreferrer" href="https://www.veracode.com/blog/research/exploiting-jndi-injections-java">Exploiting JNDI Injections in Java</a></p>
 
     </div>
@@ -650,7 +655,7 @@ String value<span class="token punctuation">;</span>
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">184</span>
+          <span class="site-state-item-count">185</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
@@ -686,9 +691,6 @@ String value<span class="token punctuation">;</span>
         
 
         
-  <div class="beian"><a href="http://www.beian.miit.gov.cn/" rel="external nofollow noopener noreferrer" target="_blank">湘ICP备2020021580号 </a>
-      <img src="/./images/beian.png" style="display: inline-block;">
-  </div>
 
 <div class="copyright">
   
