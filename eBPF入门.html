@@ -1,0 +1,684 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 6.0.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"blog.z3ratu1.cn","root":"/","scheme":"Pisces","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"always","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":true},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+  </script>
+
+  <meta name="description" content="EBFP入门记录一下最近入门eBPF的笔记，用于加强印象（以及偶尔点开博客发现又有一个月没有更新了），国庆肯定是有点小混了，然后就是感觉有很多东西也懒得记了，难得学点东西，并且感觉是一个比较新的技术，稍微写点。 学到目前主要是靠Isovalent家的这本Learning eBPF，写的脉络也可能也就大致和书的脉络一致。 基本概念什么是ebpf，应该不会有人什么都不会就依赖我的博客入门的吧？本文所有">
+<meta property="og:type" content="article">
+<meta property="og:title" content="EBFP入门">
+<meta property="og:url" content="https://blog.z3ratu1.cn/eBPF%E5%85%A5%E9%97%A8.html">
+<meta property="og:site_name" content="Z3ratu1&#39;s blog">
+<meta property="og:description" content="EBFP入门记录一下最近入门eBPF的笔记，用于加强印象（以及偶尔点开博客发现又有一个月没有更新了），国庆肯定是有点小混了，然后就是感觉有很多东西也懒得记了，难得学点东西，并且感觉是一个比较新的技术，稍微写点。 学到目前主要是靠Isovalent家的这本Learning eBPF，写的脉络也可能也就大致和书的脉络一致。 基本概念什么是ebpf，应该不会有人什么都不会就依赖我的博客入门的吧？本文所有">
+<meta property="og:locale">
+<meta property="og:image" content="https://ebpf.io/static/99c69bbff092c35b9c83f00a80fed240/b14d5/hook-overview.png">
+<meta property="og:image" content="https://ebpf.io/static/def942c66b8c7565f0cfeab1c1017a80/b14d5/bcc.png">
+<meta property="og:image" content="https://ebpf.io/static/1a1bb6f1e64b1ad5597f57dc17cf1350/b14d5/go.png">
+<meta property="og:image" content="https://image-host-1304136909.cos.ap-shanghai.myqcloud.com/blog/eBPF%E5%85%A5%E9%97%A8/image-20231015114807831.png">
+<meta property="article:published_time" content="2023-10-14T07:47:01.000Z">
+<meta property="article:modified_time" content="2023-10-16T02:25:53.946Z">
+<meta property="article:author" content="Z3ratu1">
+<meta property="article:tag" content="ebpf">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://ebpf.io/static/99c69bbff092c35b9c83f00a80fed240/b14d5/hook-overview.png">
+
+<link rel="canonical" href="https://blog.z3ratu1.cn/eBPF%E5%85%A5%E9%97%A8.html">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-Hans'
+  };
+</script>
+
+  <title>EBFP入门 | Z3ratu1's blog</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+<link rel="stylesheet" href="/css/prism-tomorrow.css" type="text/css"></head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">Z3ratu1's blog</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">Welcome</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>关于</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+        <li class="menu-item menu-item-links">
+
+    <a href="/links/" rel="section"><i class="fa fa-link fa-fw"></i>友链</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off" placeholder="搜索..." spellcheck="false" type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+  <a href="https://github.com/Z3ratu1" class="github-corner" title="Follow me on GitHub" aria-label="Follow me on GitHub" rel="external nofollow noopener noreferrer" target="_blank"><svg width="80" height="80" viewbox="0 0 250 250" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"/><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"/><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"/></svg></a>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
+    <link itemprop="mainEntityOfPage" href="https://blog.z3ratu1.cn/eBPF%E5%85%A5%E9%97%A8.html">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="https://thirdqq.qlogo.cn/g?b=sdk&k=LSKHut5Wmfic1emlMT4FpuA&kti=ZMCGFwAAAAI&s=640&t=1673848139">
+      <meta itemprop="name" content="Z3ratu1">
+      <meta itemprop="description" content="与其感慨路难行，不如现在出发">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Z3ratu1's blog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          EBFP入门
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2023-10-14 15:47:01" itemprop="dateCreated datePublished" datetime="2023-10-14T15:47:01+08:00">2023-10-14</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2023-10-16 10:25:53" itemprop="dateModified" datetime="2023-10-16T10:25:53+08:00">2023-10-16</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E7%AC%94%E8%AE%B0/" itemprop="url" rel="index"><span itemprop="name">笔记</span></a>
+                </span>
+            </span>
+
+          
+            <span id="/eBPF%E5%85%A5%E9%97%A8.html" class="post-meta-item leancloud_visitors" data-flag-title="EBFP入门" title="阅读次数">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span class="leancloud-visitors-count"></span>
+            </span>
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="far fa-comment"></i>
+      </span>
+      <span class="post-meta-item-text">Valine：</span>
+    
+    <a title="valine" href="/eBPF%E5%85%A5%E9%97%A8.html#valine-comments" itemprop="discussionUrl">
+      <span class="post-comments-count valine-comment-count" data-xid="/eBPF%E5%85%A5%E9%97%A8.html" itemprop="commentCount"></span>
+    </a>
+  </span>
+  
+  
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h1 id="EBFP入门"><a href="#EBFP入门" class="headerlink" title="EBFP入门"></a>EBFP入门</h1><p>记录一下最近入门eBPF的笔记，用于加强印象（以及偶尔点开博客发现又有一个月没有更新了），国庆肯定是有点小混了，然后就是感觉有很多东西也懒得记了，难得学点东西，并且感觉是一个比较新的技术，稍微写点。</p>
+<p>学到目前主要是靠Isovalent家的这本<a target="_blank" rel="external nofollow noopener noreferrer" href="https://isovalent.com/books/learning-ebpf/">Learning eBPF</a>，写的脉络也可能也就大致和书的脉络一致。</p>
+<h2 id="基本概念"><a href="#基本概念" class="headerlink" title="基本概念"></a>基本概念</h2><p>什么是ebpf，应该不会有人什么都不会就依赖我的博客入门的吧？本文所有内容均默认读者拥有最基础的基础，不会对太简单的东西进行过分的解释。</p>
+<p>就我个人理解，ebpf是linux内核提供的一个扩展接口，允许用户以较低的开发成本对内核行为进行监控和修改，相较于内核模块的不稳定和对各版本内核需要单独维护，ebpf提供了较为统一的接口，使得一定情况下ebpf甚至能做到一次编译，四处运行（CORE）。</p>
+<p>ebpf程序运行在内核的虚拟机中，其安全性在一定程度上拥有保障，且ebpf程序在加载进内核前会受到verifier的检查，以确保该程序的安全性。网上经常会说，该技术就之于内核就像javascript之于浏览器，提供了一种用户自行开发运行代码的接口。并且ebpf也具有热拔插，及时更新，在内核中没有上下文切换开销等一系列优点，总而言之，就是非常先进。</p>
+<p>以及，ebpf的能力已经远远突破了bpf所谓的包过滤，所以这就是单纯的一个名字，而非字面意义上的扩展的伯克利包过滤器</p>
+<p>cilium中有一张图给出了ebpf可以在内核插桩的各种位置<br><img src="https://ebpf.io/static/99c69bbff092c35b9c83f00a80fed240/b14d5/hook-overview.png" alt="Hook overview"></p>
+<p>可以看到，ebpf可以附着在系统调用发生前后，网络事件，文件系统事件，甚至直接附着到网卡等硬件设备上。除此之外，即使预定义的hook不存在，ebpf也可以通过创建内核探针(kernel probe)的手段附着在几乎内核的任何地方</p>
+<h3 id="ebpf应用结构"><a href="#ebpf应用结构" class="headerlink" title="ebpf应用结构"></a>ebpf应用结构</h3><p>一个完整的ebpf程序分为两部分，用户态程序和内核态程序，其中内核态程序又可以分为program和map两部分。program可以附着（attach）到内核运行的各个阶段，对内核中的事件进行观测响应，并通过map与用户态程序进行数据传递。下图也是从cilium处拿到的BCC框架的运行示意图</p>
+<p><img src="https://ebpf.io/static/def942c66b8c7565f0cfeab1c1017a80/b14d5/bcc.png" alt="bcc"></p>
+<p>ebpf的内核态程序一般是由BPF字节码构成的，当ebpf程序被加载进内核时，内核再使用即时编译（JIT）将ebpf程序转换为机器码，在内核中运行。就目前的情况而言，开发ebpf的内核态程序的语言仅有c和rust，仅这两个语言的编译器支持将目标代码编译到ebpf字节码。（一开始还以为可以用go开发全部，呜呜）</p>
+<h3 id="开发框架"><a href="#开发框架" class="headerlink" title="开发框架"></a>开发框架</h3><p>用户态程序的开发选项却很多，比如上图所示的的BCC，可以用python开发用户态程序，并且还优化了一点写C的逻辑，添加了一些新的Marco，可以写一些有点伪C的代码，最后BCC在编译的时候会优化为正常C代码。go写的ebpf go则是纯go实现的ebpf库，不过同样的，也只能写用户态程序。</p>
+<p><img src="https://ebpf.io/static/1a1bb6f1e64b1ad5597f57dc17cf1350/b14d5/go.png" alt="Go"></p>
+<p>框架的作用是封装好了与bpf系统调用的交互，让用户可以直接对bpf程序进行加载，同时对ebpf map的数据结构进行解析，能够方便的直接使用map与ebpf程序进行交互。如上图，ebpf go使用clang将C源码编译到ebpf字节码，同时从中提取出ebpf program和map，开发者就可以直接使用解析到go数据结构的program和map进行操作，进一步降低开发难度。（但是C源码还是得自己写。。）</p>
+<p>由于上述框架均需要最终将C代码编译成ebpf字节码，因此还是依赖于clang和llvm，llvm的版本区别在一定程度上可能会影响生成的ebpf字节码的兼容性。</p>
+<h2 id="ebpf程序"><a href="#ebpf程序" class="headerlink" title="ebpf程序"></a>ebpf程序</h2><p>先从一个类似hello world的例子开始，虽然不是很HelloWorld。。。</p>
+<p>接下来的代码都是抄的，代码不出意外的话应该大部分抄自<a target="_blank" rel="external nofollow noopener noreferrer" href="https://github.com/lizrice/learning-ebpf">learning-ebpf</a>，虽然目前这份代码是从<a target="_blank" rel="external nofollow noopener noreferrer" href="https://ebpf-go.dev/guides/getting-started/">ebpf-go</a>的文档里抄的。。。使用的开发框架即为ebpf go</p>
+<h3 id="内核程序"><a href="#内核程序" class="headerlink" title="内核程序"></a>内核程序</h3><p>如下为一份ebpf内核程序的C代码，不包含用户程序</p>
+<pre class=" language-C"><code class="language-C">//go:build ignore
+
+#include <linux bpf.h>
+#include <bpf bpf_helpers.h>
+
+struct {
+    __uint(type, BPF_MAP_TYPE_ARRAY); 
+    __type(key, __u32);
+    __type(value, __u64);
+    __uint(max_entries, 1);
+} pkt_count SEC(".maps"); 
+
+// count_packets atomically increases a packet counter on every invocation.
+SEC("xdp") 
+int count_packets() {
+    __u32 key    = 0; 
+    __u64 *count = bpf_map_lookup_elem(&pkt_count, &key); 
+    if (count) { 
+        __sync_fetch_and_add(count, 1); 
+    }
+
+    return XDP_PASS; 
+}
+
+char __license[] SEC("license") = "Dual MIT/GPL"; 
+</bpf></linux></code></pre>
+<p>之前有提到过，ebpf程序是分为program和map两部分的，而对于这段C代码，pkt_count即为map，而count_packets即为program。一个源文件中如果定义了多个函数，那么该文件编译出来的ebpf字节码就包含多个program，同理，也可以包含多个map。</p>
+<h4 id="ebpf-program"><a href="#ebpf-program" class="headerlink" title="ebpf program"></a>ebpf program</h4><p>实际上，并非一个C文件编译出来的ebpf字节码被称为一个program，而是其中的一个函数会被成为一个program，然后用户再选择将该program attach到内核的哪个位置。如果划细一点，可以认为文件中的一个函数是一个program。也就意味着，一份ebpf的C源码可以包含多个ebpf程序，然后用户也可以将其attach到内核的不同位置<br>比如这里count_packets上的Marco <code>SEC(&quot;xdp&quot;)</code>，意味着将该ebpf program attach到xdp上，在网络报文抵达时进行处理。</p>
+<p>可以使用bpftool对当前机器上的ebpf程序进行观测，<code>bpftool prog list</code>会展示当前所有的ebpf程序，每个程序在加载时会被分配一个id，然后可以使用<code>bpftool prog show id &lt;id&gt; --pretty</code>展示对应程序的详细信息。<br>一个可能的信息如下所示</p>
+<pre class=" language-json"><code class="language-json"><span class="token punctuation">{</span>
+    <span class="token property">"id"</span><span class="token operator">:</span> <span class="token number">540</span><span class="token punctuation">,</span>
+    <span class="token property">"type"</span><span class="token operator">:</span> <span class="token string">"xdp"</span><span class="token punctuation">,</span>
+    <span class="token property">"name"</span><span class="token operator">:</span> <span class="token string">"hello"</span><span class="token punctuation">,</span>
+    <span class="token property">"tag"</span><span class="token operator">:</span> <span class="token string">"d35b94b4c0c10efb"</span><span class="token punctuation">,</span>
+    <span class="token property">"gpl_compatible"</span><span class="token operator">:</span> <span class="token boolean">true</span><span class="token punctuation">,</span>
+    <span class="token property">"loaded_at"</span><span class="token operator">:</span> <span class="token number">1659461987</span><span class="token punctuation">,</span>
+    <span class="token property">"uid"</span><span class="token operator">:</span> <span class="token number">0</span><span class="token punctuation">,</span>
+    <span class="token property">"bytes_xlated"</span><span class="token operator">:</span> <span class="token number">96</span><span class="token punctuation">,</span>
+    <span class="token property">"jited"</span><span class="token operator">:</span> <span class="token boolean">true</span><span class="token punctuation">,</span>
+    <span class="token property">"bytes_jited"</span><span class="token operator">:</span> <span class="token number">148</span><span class="token punctuation">,</span>
+    <span class="token property">"bytes_memlock"</span><span class="token operator">:</span> <span class="token number">4096</span><span class="token punctuation">,</span>
+    <span class="token property">"map_ids"</span><span class="token operator">:</span> <span class="token punctuation">[</span><span class="token number">165</span><span class="token punctuation">,</span><span class="token number">166</span>
+    <span class="token punctuation">]</span><span class="token punctuation">,</span>
+    <span class="token property">"btf_id"</span><span class="token operator">:</span> <span class="token number">254</span>
+<span class="token punctuation">}</span>
+</code></pre>
+<p>需要注意的是，同一个ebpf程序是可以被多次加载进内核的，其名称也可以相同，所以一般使用id对ebpf程序进行唯一识别。uid是指加载该程序的用户id，type指该程序被attach到了什么地方，map_ids保存了这个程序所引用的bpf map，tag是程序的哈希，因此同一个程序多次装载进内核时也会拥有相同的tag。</p>
+<h4 id="ebpf-map"><a href="#ebpf-map" class="headerlink" title="ebpf map"></a>ebpf map</h4><p>ebpf map是内核程序与用户程序沟通的桥梁，用户程序可以往map中写入数据以调整内核程序的设置，内核程序也可以将得到的数据交由用户程序进行处理或输出。</p>
+<p>ebpf map有多种数据类型，常见的如array数组，hash表（字典），ring buffer等。<br>从如上代码中使用<code>SEC(&quot;.maps&quot;)</code>宏定义了一个map数据结构，并设置了其为一个array，名为pkt_count。ebpf map可以用<code>bpftool map list</code>命令进行枚举，可能的值如下</p>
+<pre class=" language-shell"><code class="language-shell">254: hash  flags 0x0
+        key 8B  value 8B  max_entries 4096  memlock 331776B
+255: perf_event_array  name printf  flags 0x0
+        key 4B  value 4B  max_entries 2  memlock 4096B
+</code></pre>
+<p>类似的，map也会在创建的时候分配唯一的id，然后是他的类型，key和value的大小，条目数量之类的数据。</p>
+<p>ebpf program和ebpf map并不是绑定的，从之前的开发框架图中也可以看到，ebpf map在内核中是单独放置在一个位置的。一个map可以被多个program引用，一个program也可以引用多个map。ebpf程序需要使用内核提供的helper函数去访问map，而不能像一个成员变量一样去直接访问。用户态程序则可以使用系统调用发起指定map的访问。</p>
+<h3 id="用户程序"><a href="#用户程序" class="headerlink" title="用户程序"></a>用户程序</h3><pre class=" language-go"><code class="language-go"><span class="token keyword">package</span> main
+
+<span class="token keyword">import</span> <span class="token punctuation">(</span>
+    <span class="token string">"log"</span>
+    <span class="token string">"net"</span>
+    <span class="token string">"os"</span>
+    <span class="token string">"os/signal"</span>
+    <span class="token string">"time"</span>
+
+    <span class="token string">"github.com/cilium/ebpf/link"</span>
+    <span class="token string">"github.com/cilium/ebpf/rlimit"</span>
+<span class="token punctuation">)</span>
+
+<span class="token keyword">func</span> <span class="token function">main</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token comment" spellcheck="true">// Remove resource limits for kernels &lt;5.11.</span>
+    <span class="token keyword">if</span> err <span class="token operator">:=</span> rlimit<span class="token punctuation">.</span><span class="token function">RemoveMemlock</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span> err <span class="token operator">!=</span> <span class="token boolean">nil</span> <span class="token punctuation">{</span> 
+        log<span class="token punctuation">.</span><span class="token function">Fatal</span><span class="token punctuation">(</span><span class="token string">"Removing memlock:"</span><span class="token punctuation">,</span> err<span class="token punctuation">)</span>
+    <span class="token punctuation">}</span>
+
+    <span class="token comment" spellcheck="true">// Load the compiled eBPF ELF and load it into the kernel.</span>
+    <span class="token keyword">var</span> objs counterObjects 
+    <span class="token keyword">if</span> err <span class="token operator">:=</span> <span class="token function">loadCounterObjects</span><span class="token punctuation">(</span><span class="token operator">&amp;</span>objs<span class="token punctuation">,</span> <span class="token boolean">nil</span><span class="token punctuation">)</span><span class="token punctuation">;</span> err <span class="token operator">!=</span> <span class="token boolean">nil</span> <span class="token punctuation">{</span>
+        log<span class="token punctuation">.</span><span class="token function">Fatal</span><span class="token punctuation">(</span><span class="token string">"Loading eBPF objects:"</span><span class="token punctuation">,</span> err<span class="token punctuation">)</span>
+    <span class="token punctuation">}</span>
+    <span class="token keyword">defer</span> objs<span class="token punctuation">.</span><span class="token function">Close</span><span class="token punctuation">(</span><span class="token punctuation">)</span> 
+
+    ifname <span class="token operator">:=</span> <span class="token string">"eth0"</span> <span class="token comment" spellcheck="true">// Change this to an interface on your machine.</span>
+    iface<span class="token punctuation">,</span> err <span class="token operator">:=</span> net<span class="token punctuation">.</span><span class="token function">InterfaceByName</span><span class="token punctuation">(</span>ifname<span class="token punctuation">)</span>
+    <span class="token keyword">if</span> err <span class="token operator">!=</span> <span class="token boolean">nil</span> <span class="token punctuation">{</span>
+        log<span class="token punctuation">.</span><span class="token function">Fatalf</span><span class="token punctuation">(</span><span class="token string">"Getting interface %s: %s"</span><span class="token punctuation">,</span> ifname<span class="token punctuation">,</span> err<span class="token punctuation">)</span>
+    <span class="token punctuation">}</span>
+
+    <span class="token comment" spellcheck="true">// Attach count_packets to the network interface.</span>
+    link<span class="token punctuation">,</span> err <span class="token operator">:=</span> link<span class="token punctuation">.</span><span class="token function">AttachXDP</span><span class="token punctuation">(</span>link<span class="token punctuation">.</span>XDPOptions<span class="token punctuation">{</span> 
+        Program<span class="token punctuation">:</span>   objs<span class="token punctuation">.</span>CountPackets<span class="token punctuation">,</span>
+        Interface<span class="token punctuation">:</span> iface<span class="token punctuation">.</span>Index<span class="token punctuation">,</span>
+    <span class="token punctuation">}</span><span class="token punctuation">)</span>
+    <span class="token keyword">if</span> err <span class="token operator">!=</span> <span class="token boolean">nil</span> <span class="token punctuation">{</span>
+        log<span class="token punctuation">.</span><span class="token function">Fatal</span><span class="token punctuation">(</span><span class="token string">"Attaching XDP:"</span><span class="token punctuation">,</span> err<span class="token punctuation">)</span>
+    <span class="token punctuation">}</span>
+    <span class="token keyword">defer</span> link<span class="token punctuation">.</span><span class="token function">Close</span><span class="token punctuation">(</span><span class="token punctuation">)</span> 
+
+    log<span class="token punctuation">.</span><span class="token function">Printf</span><span class="token punctuation">(</span><span class="token string">"Counting incoming packets on %s.."</span><span class="token punctuation">,</span> ifname<span class="token punctuation">)</span>
+
+    <span class="token comment" spellcheck="true">// Periodically fetch the packet counter from PktCount,</span>
+    <span class="token comment" spellcheck="true">// exit the program when interrupted.</span>
+    tick <span class="token operator">:=</span> time<span class="token punctuation">.</span><span class="token function">Tick</span><span class="token punctuation">(</span>time<span class="token punctuation">.</span>Second<span class="token punctuation">)</span>
+    stop <span class="token operator">:=</span> <span class="token function">make</span><span class="token punctuation">(</span><span class="token keyword">chan</span> os<span class="token punctuation">.</span>Signal<span class="token punctuation">,</span> <span class="token number">5</span><span class="token punctuation">)</span>
+    signal<span class="token punctuation">.</span><span class="token function">Notify</span><span class="token punctuation">(</span>stop<span class="token punctuation">,</span> os<span class="token punctuation">.</span>Interrupt<span class="token punctuation">)</span>
+    <span class="token keyword">for</span> <span class="token punctuation">{</span>
+        <span class="token keyword">select</span> <span class="token punctuation">{</span>
+        <span class="token keyword">case</span> <span class="token operator">&lt;-</span>tick<span class="token punctuation">:</span>
+            <span class="token keyword">var</span> count <span class="token builtin">uint64</span>
+            err <span class="token operator">:=</span> objs<span class="token punctuation">.</span>PktCount<span class="token punctuation">.</span><span class="token function">Lookup</span><span class="token punctuation">(</span><span class="token function">uint32</span><span class="token punctuation">(</span><span class="token number">0</span><span class="token punctuation">)</span><span class="token punctuation">,</span> <span class="token operator">&amp;</span>count<span class="token punctuation">)</span> 
+            <span class="token keyword">if</span> err <span class="token operator">!=</span> <span class="token boolean">nil</span> <span class="token punctuation">{</span>
+                log<span class="token punctuation">.</span><span class="token function">Fatal</span><span class="token punctuation">(</span><span class="token string">"Map lookup:"</span><span class="token punctuation">,</span> err<span class="token punctuation">)</span>
+            <span class="token punctuation">}</span>
+            log<span class="token punctuation">.</span><span class="token function">Printf</span><span class="token punctuation">(</span><span class="token string">"Received %d packets"</span><span class="token punctuation">,</span> count<span class="token punctuation">)</span>
+        <span class="token keyword">case</span> <span class="token operator">&lt;-</span>stop<span class="token punctuation">:</span>
+            log<span class="token punctuation">.</span><span class="token function">Print</span><span class="token punctuation">(</span><span class="token string">"Received signal, exiting.."</span><span class="token punctuation">)</span>
+            <span class="token keyword">return</span>
+        <span class="token punctuation">}</span>
+    <span class="token punctuation">}</span>
+<span class="token punctuation">}</span>
+</code></pre>
+<p>用户态程序会随着你使用的开发框架而有所改变，对于ebpf go而言，需要使用<code>bpf2go</code>工具将C源码进行编译（内部还是用的clang和llvm），但是bpf2go会在编译过程中将对应的数据结构提取出一份go代码（bpf skeleton），用于后续使用。比如如上代码中使用的<code>counterObjects</code>，就是对应了之前的C代码中的内容，此处objs包含了整个C文件的map和program，<code>objs.CountPackets</code>就是<code>count_packets</code>这个ebpf程序，而<code>objs.PktCount</code>对应的是C中的<code>pkt_count</code> map</p>
+<p>在bpf2go生成的go文件中，也可以看到相关的代码</p>
+<pre class=" language-go"><code class="language-go"><span class="token comment" spellcheck="true">// counterObjects contains all objects after they have been loaded into the kernel.</span>
+<span class="token keyword">type</span> counterObjects <span class="token keyword">struct</span> <span class="token punctuation">{</span>
+        counterPrograms
+        counterMaps
+<span class="token punctuation">}</span>
+
+<span class="token operator">...</span>
+
+<span class="token comment" spellcheck="true">// counterMaps contains all maps after they have been loaded into the kernel.</span>
+<span class="token keyword">type</span> counterMaps <span class="token keyword">struct</span> <span class="token punctuation">{</span>
+        PktCount <span class="token operator">*</span>ebpf<span class="token punctuation">.</span>Map <span class="token string">`ebpf:"pkt_count"`</span>
+<span class="token punctuation">}</span>
+
+<span class="token operator">...</span>
+
+<span class="token comment" spellcheck="true">// counterPrograms contains all programs after they have been loaded into the kernel.</span>
+<span class="token keyword">type</span> counterPrograms <span class="token keyword">struct</span> <span class="token punctuation">{</span>
+        CountPackets <span class="token operator">*</span>ebpf<span class="token punctuation">.</span>Program <span class="token string">`ebpf:"count_packets"`</span>
+<span class="token punctuation">}</span>
+</code></pre>
+<p>这个go程序也没啥好说的，对应的程序加载进了内核，然后attach到了XDP上去嗅探流量，最后从map中读取数据。框架的好处就是一个函数直接加载进内核，一个函数直接attach上去，map也不用手动load，全都框架一键配置完成。<br>这些操作都是对bpf相关系统调用的封装，具体的细节交由bpf syscall这一节完成</p>
+<h2 id="bpf-syscall"><a href="#bpf-syscall" class="headerlink" title="bpf() syscall"></a>bpf() syscall</h2><p>之前提到过，bpf内核程序通过helper函数与内核互动（因为内核程序虽然运行在内核，但是还是有一层虚拟机类似的隔离机制，防止把内核打爆，但这个虚拟机的开销应该是远小于系统调用的上下文切换的），而用户态程序还是通过系统调用和bpf内核程序交互，其中最主要的交互方法就是bpf()这个系统调用。<br>其函数签名如下</p>
+<pre class=" language-C"><code class="language-C">int bpf(int cmd, union bpf_attr *attr, unsigned int size);
+</code></pre>
+<p>第一个值cmd指明了进行的操作类型，从书里面抠一张图出来直接展示各种cmd值</p>
+<p><img src="https://image-host-1304136909.cos.ap-shanghai.myqcloud.com/blog/eBPF%E5%85%A5%E9%97%A8/image-20231015114807831.png" alt="image-20231015114807831"></p>
+<p>可以看到，加载bpf program和bpf map是分开的两个命令，如果是手搓系统调用的话，需要手动将program和map分别加载进内核。attach时根据attach的位置可能会调用其他的系统调用。<br>但是如果从头跟起的话，可以看到在进行<code>BPF_PROG_LOAD</code>和<code>BPF_MAP_CREATE</code>命令之前，会先使用<code>BPF_BTF_LOAD</code>将BTF数据结构加载进来。BTF全称BPF Type Format，用于指定bpf程序的数据结构，包括具体的每个数据的大小和偏移等信息，该信息被内核用于解析程序中的结构，后续的map create和program load调用中提供的参数都是依赖于从BTF中读取的信息。</p>
+<p>BTF数据同时使得bpf程序可以在不同的内核上一次编译，四处运行(compile once,run everywhere)，而无视不同内核间数据结构可能的差异，该技术就是通过BTF以及对应的重定向表实现的。</p>
+<p>然而，bpf相关系统调用却没有program unload和map unload相关的指令，这是因为ebpf程序的unload是通过引用计数来完成的，当用户态程序使用<code>BPF_PROG_LOAD</code>指令加载内核程序后，系统调用会返回一个对应的fd，此时对应的引用计数就会加一，当程序退出时，fd被释放，引用计数减一。当引用计数为0时，ebpf程序被释放，对bpf map也是同理。</p>
+<h2 id="ebpf-verifier"><a href="#ebpf-verifier" class="headerlink" title="ebpf verifier"></a>ebpf verifier</h2><p>这一章没仔细看，毕竟写代码的时候遇到bug了再去临时解决。<br>verifier用于评估一个ebpf program是否能够安全运行。其实光看描述就能猜出来，这里的操作很类似于之前学的南大的那个<a href="/%E8%BD%AF%E4%BB%B6%E5%88%86%E6%9E%90%E7%AC%94%E8%AE%B0.html">程序分析</a>课程，只不过之前的课程是对java源码做分析，而这边则是对字节码和寄存器值进行分析。<br>既然是确保程序的安全性，自然做的是一个safe的分析，一个may analysis，即考虑所有的可能性，有一种不安全的情况即认为不安全。就是当一个值可能是1也可能是2时，将结果做并集，认为其为(1,2)，如果做sound的分析则是确保有错误才会输出，即将结果做交集集，直接认为结果不可知</p>
+<p>书上有一个例子，使用<code>bpf_map_lookup_elem</code>不检查返回的p是否为null，verifier就会抛出一个<code>map_value_or_null</code>的错误，即该函数调用结果可能返回空指针或map entry，做并集后值包含空指针，抛出错误，加上一个<code>p != 0</code>的判断后再对p进行解引用，此时显式的排除了p为0的可能性，即可通过verifier的校验。</p>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/ebpf/" rel="tag"># ebpf</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/%E5%A0%86%E5%8A%A0%E5%AF%86%E6%8A%80%E6%9C%AF%E6%8A%84%E5%86%99.html" rel="prev" title="堆加密技术抄写">
+      <i class="fa fa-chevron-left"></i> 堆加密技术抄写
+    </a></div>
+      <div class="post-nav-item"></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+    <div class="comments" id="valine-comments"></div>
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#EBFP%E5%85%A5%E9%97%A8"><span class="nav-number">1.</span> <span class="nav-text">EBFP入门</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%9F%BA%E6%9C%AC%E6%A6%82%E5%BF%B5"><span class="nav-number">1.1.</span> <span class="nav-text">基本概念</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#ebpf%E5%BA%94%E7%94%A8%E7%BB%93%E6%9E%84"><span class="nav-number">1.1.1.</span> <span class="nav-text">ebpf应用结构</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%BC%80%E5%8F%91%E6%A1%86%E6%9E%B6"><span class="nav-number">1.1.2.</span> <span class="nav-text">开发框架</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#ebpf%E7%A8%8B%E5%BA%8F"><span class="nav-number">1.2.</span> <span class="nav-text">ebpf程序</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%86%85%E6%A0%B8%E7%A8%8B%E5%BA%8F"><span class="nav-number">1.2.1.</span> <span class="nav-text">内核程序</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#ebpf-program"><span class="nav-number">1.2.1.1.</span> <span class="nav-text">ebpf program</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#ebpf-map"><span class="nav-number">1.2.1.2.</span> <span class="nav-text">ebpf map</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%94%A8%E6%88%B7%E7%A8%8B%E5%BA%8F"><span class="nav-number">1.2.2.</span> <span class="nav-text">用户程序</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#bpf-syscall"><span class="nav-number">1.3.</span> <span class="nav-text">bpf() syscall</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#ebpf-verifier"><span class="nav-number">1.4.</span> <span class="nav-text">ebpf verifier</span></a></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Z3ratu1" src="https://thirdqq.qlogo.cn/g?b=sdk&k=LSKHut5Wmfic1emlMT4FpuA&kti=ZMCGFwAAAAI&s=640&t=1673848139">
+  <p class="site-author-name" itemprop="name">Z3ratu1</p>
+  <div class="site-description" itemprop="description">与其感慨路难行，不如现在出发</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">187</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">5</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">94</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 2019 – 
+  <span itemprop="copyrightYear">2023</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Z3ratu1</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="external nofollow noopener noreferrer" target="_blank">Hexo</a> & <a href="https://pisces.theme-next.org/" class="theme-link" rel="external nofollow noopener noreferrer" target="_blank">NexT.Pisces</a> 强力驱动
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+
+<script>
+NexT.utils.loadComments(document.querySelector('#valine-comments'), () => {
+  NexT.utils.getScript('https://cdn.jsdelivr.net/npm/valine@1.4.14/dist/Valine.min.js', () => {
+    var GUEST = ['nick', 'mail', 'link'];
+    var guest = 'nick,mail,link';
+    guest = guest.split(',').filter(item => {
+      return GUEST.includes(item);
+    });
+    new Valine({
+      el         : '#valine-comments',
+      verify     : false,
+      notify     : false,
+      appId      : '7H8kg0XdWO8IbhOcu4K1JaAT-gzGzoHsz',
+      appKey     : 'wPKQjkbVtvPaRR7gh2yjfLSi',
+      placeholder: "Just go go",
+      avatar     : 'mm',
+      meta       : guest,
+      pageSize   : '10' || 10,
+      visitor    : true,
+      lang       : '' || 'zh-cn',
+      path       : location.pathname,
+      recordIP   : false,
+      serverURLs : ''
+    });
+  }, window.Valine);
+});
+</script>
+
+</body>
+</html>

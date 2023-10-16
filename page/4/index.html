@@ -196,6 +196,111 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
+    <link itemprop="mainEntityOfPage" href="https://blog.z3ratu1.cn/CS%20DNS%20beacon%E4%BA%8C%E6%AC%A1%E5%BC%80%E5%8F%91%E6%8C%87%E5%8C%97.html">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="https://thirdqq.qlogo.cn/g?b=sdk&k=LSKHut5Wmfic1emlMT4FpuA&kti=ZMCGFwAAAAI&s=640&t=1673848139">
+      <meta itemprop="name" content="Z3ratu1">
+      <meta itemprop="description" content="与其感慨路难行，不如现在出发">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Z3ratu1's blog">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/CS%20DNS%20beacon%E4%BA%8C%E6%AC%A1%E5%BC%80%E5%8F%91%E6%8C%87%E5%8C%97.html" class="post-title-link" itemprop="url">CS DNS beacon二次开发指北</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2023-02-27 16:36:13" itemprop="dateCreated datePublished" datetime="2023-02-27T16:36:13+08:00">2023-02-27</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2023-06-30 10:34:49" itemprop="dateModified" datetime="2023-06-30T10:34:49+08:00">2023-06-30</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E6%B8%97%E9%80%8F/" itemprop="url" rel="index"><span itemprop="name">渗透</span></a>
+                </span>
+            </span>
+
+          
+            <span id="/CS%20DNS%20beacon%E4%BA%8C%E6%AC%A1%E5%BC%80%E5%8F%91%E6%8C%87%E5%8C%97.html" class="post-meta-item leancloud_visitors" data-flag-title="CS DNS beacon二次开发指北" title="阅读次数">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span class="leancloud-visitors-count"></span>
+            </span>
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="far fa-comment"></i>
+      </span>
+      <span class="post-meta-item-text">Valine：</span>
+    
+    <a title="valine" href="/CS%20DNS%20beacon%E4%BA%8C%E6%AC%A1%E5%BC%80%E5%8F%91%E6%8C%87%E5%8C%97.html#valine-comments" itemprop="discussionUrl">
+      <span class="post-comments-count valine-comment-count" data-xid="/CS%20DNS%20beacon%E4%BA%8C%E6%AC%A1%E5%BC%80%E5%8F%91%E6%8C%87%E5%8C%97.html" itemprop="commentCount"></span>
+    </a>
+  </span>
+  
+  
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h1 id="CS-DNS-beacon二次开发指北"><a href="#CS-DNS-beacon二次开发指北" class="headerlink" title="CS DNS beacon二次开发指北"></a>CS DNS beacon二次开发指北</h1><p>接上一篇<a href="/CobaltStrike%20beacon%E4%BA%8C%E5%BC%80%E6%8C%87%E5%8D%97.html">CobaltStrike beacon二开指南</a>，这次把DNS beacon的写法也简要的讲一下。感觉写的东西还是有点玩具，所以依照惯例，还是把指南改成指北吧。。。<br>之前花了大功夫把geacon系列项目整的差不多了，感觉当初这么一个心血来潮的项目能整的这么成功，爽死了捏。当时的TODO上是写了实现DNS beacon的，但是感觉这个功能真的很拉跨加上流量特征极其明显加上不出网环境上马本身就有点玄学，如果有边界机就上代理之后再上马也行，反正就是各种buff叠起来导致感觉鸡肋的很，以及在安全客上看到有人发布了一版实现过的版本，就一直没写，但是最近有点闲的，一起写geacon pro的好兄弟又一直和我提起这个事，就乱写两笔试试算了捏。</p>
+<p><del>写好的代码在<a target="_blank" rel="external nofollow noopener noreferrer" href="https://github.com/H4de5-7/geacon_pro/tree/dns">geacon_pro</a>的dns分支下，由于只是随手写的玩具，还有很多地方没修好，只测试了基本的命令执行，很多功能并未测试，以及很多功能也没实现，只是写出了一个实现的样例demon</del></p>
+<p>pro转私有了，虽然网上可能能找到fork，但是有师傅提到了这个问题，就顺便缝合了一下也缝进plus了，顺便修了点之前的小问题。具体代码整个都在packet&#x2F;dns.go下，外部代码没改啥，通信处有区别的地方加一个if判断改一下就行</p>
+<h2 id="碎碎念"><a href="#碎碎念" class="headerlink" title="碎碎念"></a>碎碎念</h2>
+          <!--noindex-->
+            <div class="post-button">
+              <a class="btn" href="/CS%20DNS%20beacon%E4%BA%8C%E6%AC%A1%E5%BC%80%E5%8F%91%E6%8C%87%E5%8C%97.html#more" rel="contents">
+                阅读全文 &raquo;
+              </a>
+            </div>
+          <!--/noindex-->
+        
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
     <link itemprop="mainEntityOfPage" href="https://blog.z3ratu1.cn/Java%E5%86%85%E5%AD%98%E9%A9%AC%E7%BC%9D%E5%90%88%E7%AC%94%E8%AE%B0.html">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -603,110 +708,6 @@
   
   
 
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
-    <link itemprop="mainEntityOfPage" href="https://blog.z3ratu1.cn/0CTF2022%E5%A4%8D%E7%8E%B0.html">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="https://thirdqq.qlogo.cn/g?b=sdk&k=LSKHut5Wmfic1emlMT4FpuA&kti=ZMCGFwAAAAI&s=640&t=1673848139">
-      <meta itemprop="name" content="Z3ratu1">
-      <meta itemprop="description" content="与其感慨路难行，不如现在出发">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Z3ratu1's blog">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/0CTF2022%E5%A4%8D%E7%8E%B0.html" class="post-title-link" itemprop="url">0CTF2022复现</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2022-09-22 20:22:03" itemprop="dateCreated datePublished" datetime="2022-09-22T20:22:03+08:00">2022-09-22</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="far fa-calendar-check"></i>
-                </span>
-                <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2022-10-06 10:05:22" itemprop="dateModified" datetime="2022-10-06T10:05:22+08:00">2022-10-06</time>
-              </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-folder"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/%E5%88%B7%E9%A2%98%E8%AE%B0%E5%BD%95/" itemprop="url" rel="index"><span itemprop="name">刷题记录</span></a>
-                </span>
-            </span>
-
-          
-            <span id="/0CTF2022%E5%A4%8D%E7%8E%B0.html" class="post-meta-item leancloud_visitors" data-flag-title="0CTF2022复现" title="阅读次数">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-eye"></i>
-              </span>
-              <span class="post-meta-item-text">阅读次数：</span>
-              <span class="leancloud-visitors-count"></span>
-            </span>
-  
-  <span class="post-meta-item">
-    
-      <span class="post-meta-item-icon">
-        <i class="far fa-comment"></i>
-      </span>
-      <span class="post-meta-item-text">Valine：</span>
-    
-    <a title="valine" href="/0CTF2022%E5%A4%8D%E7%8E%B0.html#valine-comments" itemprop="discussionUrl">
-      <span class="post-comments-count valine-comment-count" data-xid="/0CTF2022%E5%A4%8D%E7%8E%B0.html" itemprop="commentCount"></span>
-    </a>
-  </span>
-  
-  
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <h1 id="0CTF2022复现"><a href="#0CTF2022复现" class="headerlink" title="0CTF2022复现"></a>0CTF2022复现</h1><p>嗯，究极挨打，只做了一个被全场秒烂了的go，由于剩下的都是java，然后就摆了。然后看着天哥他们ak 0ctf的web，自闭了捏</p>
-<h2 id="ohf"><a href="#ohf" class="headerlink" title="ohf"></a>ohf</h2><p>被秒烂的go题，抓包看路由可以看到终端那边给了个go的序列化数据，less路由一开始没看懂，一开始以为是linux那个less读文件的，按了半天没反应，然后隔壁的好哥哥和我说这个是写css的东西，可以把他的格式转换成css。然后可以从p神的文章中获知这个less有一个任意文件读取<br><a target="_blank" rel="external nofollow noopener noreferrer" href="https://www.leavesongs.com/PENETRATION/flarum-rce-tour.html">从偶遇Flarum开始的RCE之旅</a></p>
-<p>读到源码之后可以看到一个go的反序列化，然后序列化数据的version字段会进一个第三方库的eval，这个库感觉也不是沙箱，就是个直接的eval，但是阉割了模块<br><a target="_blank" rel="external nofollow noopener noreferrer" href="https://github.com/traefik/yaegi">traefik&#x2F;yaegi</a></p>
-          <!--noindex-->
-            <div class="post-button">
-              <a class="btn" href="/0CTF2022%E5%A4%8D%E7%8E%B0.html#more" rel="contents">
-                阅读全文 &raquo;
-              </a>
-            </div>
-          <!--/noindex-->
-        
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
 
   
   <nav class="pagination">
@@ -777,7 +778,7 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">186</span>
+          <span class="site-state-item-count">187</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
@@ -790,7 +791,7 @@
       <div class="site-state-item site-state-tags">
             <a href="/tags/">
           
-        <span class="site-state-item-count">93</span>
+        <span class="site-state-item-count">94</span>
         <span class="site-state-item-name">标签</span></a>
       </div>
   </nav>

@@ -196,6 +196,110 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
+    <link itemprop="mainEntityOfPage" href="https://blog.z3ratu1.cn/HTTPS%E8%AF%81%E4%B9%A6%E5%90%8A%E9%94%80.html">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="https://thirdqq.qlogo.cn/g?b=sdk&k=LSKHut5Wmfic1emlMT4FpuA&kti=ZMCGFwAAAAI&s=640&t=1673848139">
+      <meta itemprop="name" content="Z3ratu1">
+      <meta itemprop="description" content="与其感慨路难行，不如现在出发">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Z3ratu1's blog">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/HTTPS%E8%AF%81%E4%B9%A6%E5%90%8A%E9%94%80.html" class="post-title-link" itemprop="url">HTTPS证书吊销</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2020-11-20 11:13:56" itemprop="dateCreated datePublished" datetime="2020-11-20T11:13:56+08:00">2020-11-20</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2021-01-06 15:20:19" itemprop="dateModified" datetime="2021-01-06T15:20:19+08:00">2021-01-06</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E7%AC%94%E8%AE%B0/" itemprop="url" rel="index"><span itemprop="name">笔记</span></a>
+                </span>
+            </span>
+
+          
+            <span id="/HTTPS%E8%AF%81%E4%B9%A6%E5%90%8A%E9%94%80.html" class="post-meta-item leancloud_visitors" data-flag-title="HTTPS证书吊销" title="阅读次数">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span class="leancloud-visitors-count"></span>
+            </span>
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="far fa-comment"></i>
+      </span>
+      <span class="post-meta-item-text">Valine：</span>
+    
+    <a title="valine" href="/HTTPS%E8%AF%81%E4%B9%A6%E5%90%8A%E9%94%80.html#valine-comments" itemprop="discussionUrl">
+      <span class="post-comments-count valine-comment-count" data-xid="/HTTPS%E8%AF%81%E4%B9%A6%E5%90%8A%E9%94%80.html" itemprop="commentCount"></span>
+    </a>
+  </span>
+  
+  
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h1 id="HTTPS证书吊销"><a href="#HTTPS证书吊销" class="headerlink" title="HTTPS证书吊销"></a>HTTPS证书吊销</h1><p>事情要说我想申请一个通配符证书说起，从通配符证书到let’s encrypt到OCSP服务器被墙到学习HTTPS证书吊销的奇怪学习链</p>
+<p>先在这推荐一下let’s encrypt，免费发放通配符证书，再也不要一个子域名一个子域名的申请啦<br>证书有效期只有三个月，可以自动更新，但是自动更新需要的OCSP服务器被墙，导致了这篇文章的出现，愚蠢的解决方案是每三个月重新申请新的证书</p>
+<h2 id="HTTPS认证过程"><a href="#HTTPS认证过程" class="headerlink" title="HTTPS认证过程"></a>HTTPS认证过程</h2><p>在这之前，先简单的复习一下HTTPS到底是怎么完成双向认证的<br><img src="/images/HTTPS%E8%AF%81%E4%B9%A6%E5%90%8A%E9%94%80/https.png" alt="https认证"><br>1.服务器向客户端发送证书和公钥，客户端看一下证书的签发单在不在本地安装的证书里面，再看看过期时间，域名对应之类的，用发过来的公钥算一下这个证书和签名对不对得上，有机会还会看看这个证书是不是被吊销了（这就是这篇文章的主题所在）<br>2.验证通过，客户端产生一个<strong>随机数</strong>，用公钥加密还给服务器，服务器解密之后这个随机数就是两方的对称加密密钥了<br>3.开始用对称密钥通信</p>
+          <!--noindex-->
+            <div class="post-button">
+              <a class="btn" href="/HTTPS%E8%AF%81%E4%B9%A6%E5%90%8A%E9%94%80.html#more" rel="contents">
+                阅读全文 &raquo;
+              </a>
+            </div>
+          <!--/noindex-->
+        
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
     <link itemprop="mainEntityOfPage" href="https://blog.z3ratu1.cn/HTTPS%20Mixed%20content.html">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -603,104 +707,6 @@
   
   
 
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
-    <link itemprop="mainEntityOfPage" href="https://blog.z3ratu1.cn/[XNUCA2020]%E7%AC%94%E8%AE%B0.html">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="https://thirdqq.qlogo.cn/g?b=sdk&k=LSKHut5Wmfic1emlMT4FpuA&kti=ZMCGFwAAAAI&s=640&t=1673848139">
-      <meta itemprop="name" content="Z3ratu1">
-      <meta itemprop="description" content="与其感慨路难行，不如现在出发">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Z3ratu1's blog">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/%5BXNUCA2020%5D%E7%AC%94%E8%AE%B0.html" class="post-title-link" itemprop="url">[XNUCA2020]笔记</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-              
-
-              <time title="创建时间：2020-11-02 20:53:10 / 修改时间：20:53:48" itemprop="dateCreated datePublished" datetime="2020-11-02T20:53:10+08:00">2020-11-02</time>
-            </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-folder"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/%E5%88%B7%E9%A2%98%E8%AE%B0%E5%BD%95/" itemprop="url" rel="index"><span itemprop="name">刷题记录</span></a>
-                </span>
-            </span>
-
-          
-            <span id="/%5BXNUCA2020%5D%E7%AC%94%E8%AE%B0.html" class="post-meta-item leancloud_visitors" data-flag-title="[XNUCA2020]笔记" title="阅读次数">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-eye"></i>
-              </span>
-              <span class="post-meta-item-text">阅读次数：</span>
-              <span class="leancloud-visitors-count"></span>
-            </span>
-  
-  <span class="post-meta-item">
-    
-      <span class="post-meta-item-icon">
-        <i class="far fa-comment"></i>
-      </span>
-      <span class="post-meta-item-text">Valine：</span>
-    
-    <a title="valine" href="/%5BXNUCA2020%5D%E7%AC%94%E8%AE%B0.html#valine-comments" itemprop="discussionUrl">
-      <span class="post-comments-count valine-comment-count" data-xid="/%5BXNUCA2020%5D%E7%AC%94%E8%AE%B0.html" itemprop="commentCount"></span>
-    </a>
-  </span>
-  
-  
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <h1 id="XNUCA2020-笔记"><a href="#XNUCA2020-笔记" class="headerlink" title="[XNUCA2020]笔记"></a>[XNUCA2020]笔记</h1><p>周末看了一天多一点点的XNUCA的web，太难了，比ByteCTF的web还离谱，我死了<br>今天看到放了官方wp来做笔记，本来标题想写wp的，但是自己一个题做不出来，就还是叫笔记算了</p>
-<h2 id="easephp-revenge"><a href="#easephp-revenge" class="headerlink" title="easephp_revenge"></a>easephp_revenge</h2><p>这个题是我们看了最久感觉最有可能出的题，结果看了wp之后发现完全不行<br>去年这个题因为没过滤\，而\可以换行导致所有过滤无效被非预期打穿，今年直接上了超级过滤和超级padding，死了<br>我印象里这个题还上了超级disable_function列表，由于没做出来，后面也没注意ban了啥</p>
-<h3 id="源码"><a href="#源码" class="headerlink" title="源码"></a>源码</h3>
-          <!--noindex-->
-            <div class="post-button">
-              <a class="btn" href="/%5BXNUCA2020%5D%E7%AC%94%E8%AE%B0.html#more" rel="contents">
-                阅读全文 &raquo;
-              </a>
-            </div>
-          <!--/noindex-->
-        
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
 
   
   <nav class="pagination">
@@ -771,7 +777,7 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">186</span>
+          <span class="site-state-item-count">187</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
@@ -784,7 +790,7 @@
       <div class="site-state-item site-state-tags">
             <a href="/tags/">
           
-        <span class="site-state-item-count">93</span>
+        <span class="site-state-item-count">94</span>
         <span class="site-state-item-name">标签</span></a>
       </div>
   </nav>

