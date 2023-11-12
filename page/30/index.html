@@ -196,6 +196,147 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
+    <link itemprop="mainEntityOfPage" href="https://blog.z3ratu1.cn/[RCTF%202019]Nextphp.html">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="https://thirdqq.qlogo.cn/g?b=sdk&k=LSKHut5Wmfic1emlMT4FpuA&kti=ZMCGFwAAAAI&s=640&t=1673848139">
+      <meta itemprop="name" content="Z3ratu1">
+      <meta itemprop="description" content="与其感慨路难行，不如现在出发">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Z3ratu1's blog">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/%5BRCTF%202019%5DNextphp.html" class="post-title-link" itemprop="url">[RCTF 2019]Nextphp</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+              
+
+              <time title="创建时间：2020-07-28 15:41:15 / 修改时间：15:42:39" itemprop="dateCreated datePublished" datetime="2020-07-28T15:41:15+08:00">2020-07-28</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E5%88%B7%E9%A2%98%E8%AE%B0%E5%BD%95/" itemprop="url" rel="index"><span itemprop="name">刷题记录</span></a>
+                </span>
+            </span>
+
+          
+            <span id="/%5BRCTF%202019%5DNextphp.html" class="post-meta-item leancloud_visitors" data-flag-title="[RCTF 2019]Nextphp" title="阅读次数">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span class="leancloud-visitors-count"></span>
+            </span>
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="far fa-comment"></i>
+      </span>
+      <span class="post-meta-item-text">Valine：</span>
+    
+    <a title="valine" href="/%5BRCTF%202019%5DNextphp.html#valine-comments" itemprop="discussionUrl">
+      <span class="post-comments-count valine-comment-count" data-xid="/%5BRCTF%202019%5DNextphp.html" itemprop="commentCount"></span>
+    </a>
+  </span>
+  
+  
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h1 id="RCTF-2019-Nextphp"><a href="#RCTF-2019-Nextphp" class="headerlink" title="[RCTF 2019]Nextphp"></a>[RCTF 2019]Nextphp</h1><p>全新的知识，PHP7.4中的全新玩法<br>上来直接给一个shell，直接执行phpinfo看一眼，open_basedir写上了，disable_function超级过滤，把平常用的mail和unsetenv都给禁了，常用的bypass_disable_function via RD_PRELOAD都不能用了，得寻找新的突破口</p>
+<p>可以先var_dump(scandir(‘.’));看一眼有没有其他的可利用文件，发现一个preload.php，里面写了一个类</p>
+<pre class=" language-php"><code class="language-php"><span class="token delimiter">&lt;?php</span>
+<span class="token keyword">final</span> <span class="token keyword">class</span> <span class="token class-name">A</span> <span class="token keyword">implements</span> <span class="token class-name">Serializable</span> <span class="token punctuation">{</span>
+    <span class="token keyword">protected</span> <span class="token variable">$data</span> <span class="token operator">=</span> <span class="token punctuation">[</span>
+        <span class="token string">'ret'</span> <span class="token operator">=</span><span class="token operator">></span> <span class="token keyword">null</span><span class="token punctuation">,</span>
+        <span class="token string">'func'</span> <span class="token operator">=</span><span class="token operator">></span> <span class="token string">'print_r'</span><span class="token punctuation">,</span>
+        <span class="token string">'arg'</span> <span class="token operator">=</span><span class="token operator">></span> <span class="token string">'1'</span>
+    <span class="token punctuation">]</span><span class="token punctuation">;</span>
+
+    <span class="token keyword">private</span> <span class="token keyword">function</span> <span class="token function">run</span> <span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token variable">$this</span><span class="token operator">-</span><span class="token operator">></span><span class="token property">data</span><span class="token punctuation">[</span><span class="token string">'ret'</span><span class="token punctuation">]</span> <span class="token operator">=</span> <span class="token variable">$this</span><span class="token operator">-</span><span class="token operator">></span><span class="token property">data</span><span class="token punctuation">[</span><span class="token string">'func'</span><span class="token punctuation">]</span><span class="token punctuation">(</span><span class="token variable">$this</span><span class="token operator">-</span><span class="token operator">></span><span class="token property">data</span><span class="token punctuation">[</span><span class="token string">'arg'</span><span class="token punctuation">]</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+
+    <span class="token keyword">public</span> <span class="token keyword">function</span> <span class="token function">__serialize</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">:</span> <span class="token keyword">array</span> <span class="token punctuation">{</span>
+        <span class="token keyword">return</span> <span class="token variable">$this</span><span class="token operator">-</span><span class="token operator">></span><span class="token property">data</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+
+    <span class="token keyword">public</span> <span class="token keyword">function</span> <span class="token function">__unserialize</span><span class="token punctuation">(</span><span class="token keyword">array</span> <span class="token variable">$data</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token function">array_merge</span><span class="token punctuation">(</span><span class="token variable">$this</span><span class="token operator">-</span><span class="token operator">></span><span class="token property">data</span><span class="token punctuation">,</span> <span class="token variable">$data</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token variable">$this</span><span class="token operator">-</span><span class="token operator">></span><span class="token function">run</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+
+    <span class="token keyword">public</span> <span class="token keyword">function</span> <span class="token function">serialize</span> <span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">:</span> string <span class="token punctuation">{</span>
+        <span class="token keyword">return</span> <span class="token function">serialize</span><span class="token punctuation">(</span><span class="token variable">$this</span><span class="token operator">-</span><span class="token operator">></span><span class="token property">data</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+
+    <span class="token keyword">public</span> <span class="token keyword">function</span> <span class="token function">unserialize</span><span class="token punctuation">(</span><span class="token variable">$payload</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token variable">$this</span><span class="token operator">-</span><span class="token operator">></span><span class="token property">data</span> <span class="token operator">=</span> <span class="token function">unserialize</span><span class="token punctuation">(</span><span class="token variable">$payload</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token variable">$this</span><span class="token operator">-</span><span class="token operator">></span><span class="token function">run</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+
+    <span class="token keyword">public</span> <span class="token keyword">function</span> <span class="token function">__get</span> <span class="token punctuation">(</span><span class="token variable">$key</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token keyword">return</span> <span class="token variable">$this</span><span class="token operator">-</span><span class="token operator">></span><span class="token property">data</span><span class="token punctuation">[</span><span class="token variable">$key</span><span class="token punctuation">]</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+
+    <span class="token keyword">public</span> <span class="token keyword">function</span> <span class="token function">__set</span> <span class="token punctuation">(</span><span class="token variable">$key</span><span class="token punctuation">,</span> <span class="token variable">$value</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token keyword">throw</span> <span class="token keyword">new</span> <span class="token class-name"><span class="token punctuation">\</span>Exception</span><span class="token punctuation">(</span><span class="token string">'No implemented'</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+
+    <span class="token keyword">public</span> <span class="token keyword">function</span> <span class="token function">__construct</span> <span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token keyword">throw</span> <span class="token keyword">new</span> <span class="token class-name"><span class="token punctuation">\</span>Exception</span><span class="token punctuation">(</span><span class="token string">'No implemented'</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+<span class="token punctuation">}</span>
+</code></pre>
+<p>说实话我是没看懂这个类能怎么利用的，虽然我印象中析构函数会将工作目录切换到根目录，但是这里显然也没有析构函数，而尝试了一下用这个类的反序列化去执行命令，显然还是PHP函数，无法绕过disable_function</p>
+          <!--noindex-->
+            <div class="post-button">
+              <a class="btn" href="/%5BRCTF%202019%5DNextphp.html#more" rel="contents">
+                阅读全文 &raquo;
+              </a>
+            </div>
+          <!--/noindex-->
+        
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
     <link itemprop="mainEntityOfPage" href="https://blog.z3ratu1.cn/[cybrics%202020]%20wp.html">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -608,104 +749,6 @@
   
   
 
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
-    <link itemprop="mainEntityOfPage" href="https://blog.z3ratu1.cn/[NPUCTF2020]ezlogin.html">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="https://thirdqq.qlogo.cn/g?b=sdk&k=LSKHut5Wmfic1emlMT4FpuA&kti=ZMCGFwAAAAI&s=640&t=1673848139">
-      <meta itemprop="name" content="Z3ratu1">
-      <meta itemprop="description" content="与其感慨路难行，不如现在出发">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Z3ratu1's blog">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/%5BNPUCTF2020%5Dezlogin.html" class="post-title-link" itemprop="url">[NPUCTF2020]ezlogin</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-              
-
-              <time title="创建时间：2020-07-19 17:42:19 / 修改时间：17:44:06" itemprop="dateCreated datePublished" datetime="2020-07-19T17:42:19+08:00">2020-07-19</time>
-            </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-folder"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/%E5%88%B7%E9%A2%98%E8%AE%B0%E5%BD%95/" itemprop="url" rel="index"><span itemprop="name">刷题记录</span></a>
-                </span>
-            </span>
-
-          
-            <span id="/%5BNPUCTF2020%5Dezlogin.html" class="post-meta-item leancloud_visitors" data-flag-title="[NPUCTF2020]ezlogin" title="阅读次数">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-eye"></i>
-              </span>
-              <span class="post-meta-item-text">阅读次数：</span>
-              <span class="leancloud-visitors-count"></span>
-            </span>
-  
-  <span class="post-meta-item">
-    
-      <span class="post-meta-item-icon">
-        <i class="far fa-comment"></i>
-      </span>
-      <span class="post-meta-item-text">Valine：</span>
-    
-    <a title="valine" href="/%5BNPUCTF2020%5Dezlogin.html#valine-comments" itemprop="discussionUrl">
-      <span class="post-comments-count valine-comment-count" data-xid="/%5BNPUCTF2020%5Dezlogin.html" itemprop="commentCount"></span>
-    </a>
-  </span>
-  
-  
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <h1 id="NPUCTF2020-ezlogin"><a href="#NPUCTF2020-ezlogin" class="headerlink" title="[NPUCTF2020]ezlogin"></a>[NPUCTF2020]ezlogin</h1><p>xml注入，全新知识点</p>
-<h2 id="题解"><a href="#题解" class="headerlink" title="题解"></a>题解</h2><p>打开题目可以发现username和password是以xml格式提交的，第一反应就是xxe。<br>xxe不会，随便搜了几个payload来打，回显格式不对，估计是没机会了，直接搜wp进行学习</p>
-<p>找到一个xpath注入的文章<a target="_blank" rel="external nofollow noopener noreferrer" href="https://www.tr0y.wang/2019/05/11/XPath%E6%B3%A8%E5%85%A5%E6%8C%87%E5%8C%97/">https://www.tr0y.wang/2019/05/11/XPath%E6%B3%A8%E5%85%A5%E6%8C%87%E5%8C%97/</a><br>注入整体思路和SQL注入类似，不过这里没什么过滤，这个注入也没注释符，手动闭合一下引号<br>再贴一个抄来的脚本</p>
-          <!--noindex-->
-            <div class="post-button">
-              <a class="btn" href="/%5BNPUCTF2020%5Dezlogin.html#more" rel="contents">
-                阅读全文 &raquo;
-              </a>
-            </div>
-          <!--/noindex-->
-        
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
 
   
   <nav class="pagination">
@@ -776,7 +819,7 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">187</span>
+          <span class="site-state-item-count">188</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>

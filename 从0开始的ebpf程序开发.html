@@ -1,0 +1,616 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 6.0.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"blog.z3ratu1.cn","root":"/","scheme":"Pisces","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"always","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":true},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+  </script>
+
+  <meta name="description" content="从0开始的ebpf程序开发上一篇博客中把learning ebpf这本书读完了，获得了足够的基础理论知识，今天开始进行ebpf程序的开发。目前打算是用c写kernel program，然后用ebpf-go做客户端程序，bpf2go套一层进行编译和骨架生成（到时候程序复杂了之后可能得手写Makefile编译.o，然后用bpf2go对.o生成骨架吧） 开发环境Linux ubuntu 5.15.0-8">
+<meta property="og:type" content="article">
+<meta property="og:title" content="从0开始的ebpf程序开发">
+<meta property="og:url" content="https://blog.z3ratu1.cn/%E4%BB%8E0%E5%BC%80%E5%A7%8B%E7%9A%84ebpf%E7%A8%8B%E5%BA%8F%E5%BC%80%E5%8F%91.html">
+<meta property="og:site_name" content="Z3ratu1&#39;s blog">
+<meta property="og:description" content="从0开始的ebpf程序开发上一篇博客中把learning ebpf这本书读完了，获得了足够的基础理论知识，今天开始进行ebpf程序的开发。目前打算是用c写kernel program，然后用ebpf-go做客户端程序，bpf2go套一层进行编译和骨架生成（到时候程序复杂了之后可能得手写Makefile编译.o，然后用bpf2go对.o生成骨架吧） 开发环境Linux ubuntu 5.15.0-8">
+<meta property="og:locale">
+<meta property="article:published_time" content="2023-11-01T06:56:29.000Z">
+<meta property="article:modified_time" content="2023-11-12T11:56:32.542Z">
+<meta property="article:author" content="Z3ratu1">
+<meta property="article:tag" content="ebpf">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="https://blog.z3ratu1.cn/%E4%BB%8E0%E5%BC%80%E5%A7%8B%E7%9A%84ebpf%E7%A8%8B%E5%BA%8F%E5%BC%80%E5%8F%91.html">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-Hans'
+  };
+</script>
+
+  <title>从0开始的ebpf程序开发 | Z3ratu1's blog</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+<link rel="stylesheet" href="/css/prism-tomorrow.css" type="text/css"></head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">Z3ratu1's blog</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">Welcome</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>关于</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+        <li class="menu-item menu-item-links">
+
+    <a href="/links/" rel="section"><i class="fa fa-link fa-fw"></i>友链</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off" placeholder="搜索..." spellcheck="false" type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+  <a href="https://github.com/Z3ratu1" class="github-corner" title="Follow me on GitHub" aria-label="Follow me on GitHub" rel="external nofollow noopener noreferrer" target="_blank"><svg width="80" height="80" viewbox="0 0 250 250" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"/><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"/><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"/></svg></a>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
+    <link itemprop="mainEntityOfPage" href="https://blog.z3ratu1.cn/%E4%BB%8E0%E5%BC%80%E5%A7%8B%E7%9A%84ebpf%E7%A8%8B%E5%BA%8F%E5%BC%80%E5%8F%91.html">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="https://thirdqq.qlogo.cn/g?b=sdk&k=LSKHut5Wmfic1emlMT4FpuA&kti=ZMCGFwAAAAI&s=640&t=1673848139">
+      <meta itemprop="name" content="Z3ratu1">
+      <meta itemprop="description" content="与其感慨路难行，不如现在出发">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Z3ratu1's blog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          从0开始的ebpf程序开发
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2023-11-01 14:56:29" itemprop="dateCreated datePublished" datetime="2023-11-01T14:56:29+08:00">2023-11-01</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2023-11-12 19:56:32" itemprop="dateModified" datetime="2023-11-12T19:56:32+08:00">2023-11-12</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E7%AC%94%E8%AE%B0/" itemprop="url" rel="index"><span itemprop="name">笔记</span></a>
+                </span>
+            </span>
+
+          
+            <span id="/%E4%BB%8E0%E5%BC%80%E5%A7%8B%E7%9A%84ebpf%E7%A8%8B%E5%BA%8F%E5%BC%80%E5%8F%91.html" class="post-meta-item leancloud_visitors" data-flag-title="从0开始的ebpf程序开发" title="阅读次数">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span class="leancloud-visitors-count"></span>
+            </span>
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="far fa-comment"></i>
+      </span>
+      <span class="post-meta-item-text">Valine：</span>
+    
+    <a title="valine" href="/%E4%BB%8E0%E5%BC%80%E5%A7%8B%E7%9A%84ebpf%E7%A8%8B%E5%BA%8F%E5%BC%80%E5%8F%91.html#valine-comments" itemprop="discussionUrl">
+      <span class="post-comments-count valine-comment-count" data-xid="/%E4%BB%8E0%E5%BC%80%E5%A7%8B%E7%9A%84ebpf%E7%A8%8B%E5%BA%8F%E5%BC%80%E5%8F%91.html" itemprop="commentCount"></span>
+    </a>
+  </span>
+  
+  
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h1 id="从0开始的ebpf程序开发"><a href="#从0开始的ebpf程序开发" class="headerlink" title="从0开始的ebpf程序开发"></a>从0开始的ebpf程序开发</h1><p>上一篇博客中把learning ebpf这本书读完了，获得了足够的基础理论知识，今天开始进行ebpf程序的开发。目前打算是用c写kernel program，然后用ebpf-go做客户端程序，bpf2go套一层进行编译和骨架生成（到时候程序复杂了之后可能得手写Makefile编译.o，然后用bpf2go对.o生成骨架吧）</p>
+<h2 id="开发环境"><a href="#开发环境" class="headerlink" title="开发环境"></a>开发环境</h2><pre><code>Linux ubuntu 5.15.0-88-generic #98-Ubuntu SMP Mon Oct 2 15:18:56 UTC 2023 x86_64 x86_64 x86_64 GNU/Linux
+go version go1.21.3 linux/amd64
+</code></pre>
+<p>goland+clion+jetbrain gateway远程开发。主要原因是用不惯vscode</p>
+<p>但是gateway一万个bug，比如run as privileged功能勾了没用，有时候不知道按了什么操作之后IDE的部分按键失效，以及git窗口鼠标实际位置和点击位置有偏移之类的。。。</p>
+<p>所以是直接上root号+编译完了不运行手动去终端运行解决的</p>
+<h2 id="debug命令"><a href="#debug命令" class="headerlink" title="debug命令"></a>debug命令</h2><p>感觉就bpftool一路按？<br><code>bpftool prog list</code>展示所有加载的ebpf程序<br><code>cat /sys/kernel/tracing/trace_pipe</code>看 printk结果，需要注意的是应该使用cat而非less，我感觉这个文件本身就是一个流，cat之后会阻塞住等待输出，但是less会直接卡住Ctrl C都退不掉，虽然我知道应该是用法不对但是我懒得搜了。</p>
+<p>要是能调试内核直接打断点之类的就好了，可惜我不会。。所以，最后全靠print调试法。。。</p>
+<h2 id="header准备"><a href="#header准备" class="headerlink" title="header准备"></a>header准备</h2><p>内核态程序的编写还是要多多仰仗libbpf的封装的，无论你的客户端程序用的是什么，所以libbpf该学还得学，该装还得装。</p>
+<h3 id="vmlinux-h"><a href="#vmlinux-h" class="headerlink" title="vmlinux.h"></a>vmlinux.h</h3><p>必须include的header<br>linux全套内核数据结构，使用<code>bpftool btf dump file /sys/kernel/btf/vmlinux format c &gt; vmlinux.h</code>命令手动导出。该文件会随着linux的版本变化，所以我感觉是自己编译的时候生成一份会比较好，ebpf-go的example中include的common.h就是对该文件的精简版（不知道是不是这部分数据结构是稳定的？）<br>虽说数据结构是版本固定的，但是可以使用libbpf的CORE方法实现重定向，以达到一次编译四处运行的效果</p>
+<p>贴一篇不错的介绍博文<br><a target="_blank" rel="external nofollow noopener noreferrer" href="https://www.grant.pizza/blog/vmlinux-header/">What is vmlinux.h?</a></p>
+<p>以及我之前不知道从哪抄了一个<code>&lt;linux/bpf.h&gt;</code>，和vmlinux.h里面冲突了一万个定义，猛报<code>redefinition of enumerator xxx</code>，但是这个bpf.h又缺一万个定义，所以只include vmlinux.h即可</p>
+<p>也有很多项目就自己把几个关键头文件拉下来自己整一个header目录，编译的时候用<code>-I</code>参数指定头文件</p>
+<h3 id="bpf-xxx-h"><a href="#bpf-xxx-h" class="headerlink" title="bpf_xxx.h"></a>bpf_xxx.h</h3><p>bpf_helpers.h，bpf_tracing.h等，可以从libbpf处直接下一个最新版下来，也可以装了libbpf之后直接<code>&lt;bpf/bpf_helpers.h&gt;</code>来include。暂时不清楚tracing.h里面都有啥，反正先include，如果用不上的话编译器会帮我优化掉的吧。</p>
+<h2 id="主程序"><a href="#主程序" class="headerlink" title="主程序"></a>主程序</h2><p>先把需要查的东西都翻出来（我怎么没找着最简单的bpf_printk？）<br><a target="_blank" rel="external nofollow noopener noreferrer" href="https://man7.org/linux/man-pages/man7/bpf-helpers.7.html">bpf helper man page</a></p>
+<h3 id="少用BCC"><a href="#少用BCC" class="headerlink" title="少用BCC"></a>少用BCC</h3><p>少用BCC！少用BCC！少用BCC！<br>写伪C一时爽，写多了到时候要写C的时候就等死8<br>网上的教程还一堆用BCC的，不认真看有时候抄一下发现完全用不了</p>
+<h3 id="SEC宏"><a href="#SEC宏" class="headerlink" title="SEC宏"></a>SEC宏</h3><p>这个不多说了8，根据给的值定义编译出来的代码section，map，kprobe，tracepoint等都是靠这个宏定义的</p>
+<h3 id="参数"><a href="#参数" class="headerlink" title="参数"></a>参数</h3><p>如果写的是kprobe，可以使用<code>BPF_KPROBE</code>和<code>BPF_KPROBE_SYSCALL</code>两个宏对参数直接进行一个解包，但是如果是uprobe，就只能接收一个<code>struct pt_regs *ctx</code>，然后用<code>PT_REGS_PARM*</code>这个宏去获取第x个参数，使用bpf2go的话默认会生成el和eb大小端两个文件，但是这个宏是只适用于amd和arm的，因为<code>pt_regs</code>是一个放寄存器的结构体，显然其他的奇怪架构寄存器结构不一样。所以需要加一个<code>-target amd64</code>指定架构</p>
+<h3 id="返回值"><a href="#返回值" class="headerlink" title="返回值"></a>返回值</h3><p>使用类似的宏，一开始乱按<code>PT_REGS_RET</code>，还以为是返回值，结果完全不对，看了下定义这个是sp寄存器，栈顶寄存器，应该是函数返回时的返回地址，返回值是<code>PT_REGS_RC</code></p>
+<h3 id="uprobe"><a href="#uprobe" class="headerlink" title="uprobe"></a>uprobe</h3><p>kprobe好像可以直接考SEC宏直接指定内核符号，而uprobe因为是hook用户态的程序，自然不可能直接指定符号。直接网上寻找教程的话是说直接去寻找二进制然后算symbol的偏移去hook，略微的有些手动。而learning-ebpf中提到了对于动态链接库，可以使用<code>SEC(/uprobe/path/to/so/xxx.so)</code>去hook，但是无论是哪种方法，都是需要对特定环境进行特定配置</p>
+<p>又，需要二进制没有被trip过保留符号信息才能找到函数的偏移。对于.so可以使用<code>nm -D xxx.so</code>来获取导出函数</p>
+<h4 id="uprobe实现原理"><a href="#uprobe实现原理" class="headerlink" title="uprobe实现原理"></a>uprobe实现原理</h4><p>类似于调试，将目标位置的指令替换为中断，具体看下面这篇博文<br><a target="_blank" rel="external nofollow noopener noreferrer" href="https://www.edony.ink/deep-in-ebpf-uprobe/">ebpf user-space probes 原理探究</a></p>
+<h4 id="ebpf-go特化"><a href="#ebpf-go特化" class="headerlink" title="ebpf-go特化?"></a>ebpf-go特化?</h4><p>因为想hook经典的SSL_read&#x2F;write，是一个uprobe，理论上来说需要用上述提到的办法，但是ebpf-go里面有一个奇妙的函数，<code>OpenExecutable</code>，从文档上看就直接是指定一个二进制打开，然后反手指定一个symbol名字就可以attach uprobe上去了。<br>但是函数注释里面是提到了如果executable是shared library的话必须提供offset，但是又提到提供的offset会覆盖原有的symbol，不是很懂注释到底想表达什么，反正最后我没加offset也跑起来了。。。。</p>
+<h3 id="core-read"><a href="#core-read" class="headerlink" title="core read"></a>core read</h3><p>显然，如果是读用户态数据的话是不存在CORE问题的，只有读内核态数据的时候考虑使用，用bpf_core_read来代替bpf_probe_read_kernel么？暂时没用上，但是看到一篇看起来很不错的博文，贴一下<br><a target="_blank" rel="external nofollow noopener noreferrer" href="https://nakryiko.com/posts/bpf-core-reference-guide/">bpf core reference guide</a></p>
+<h3 id="map"><a href="#map" class="headerlink" title="map"></a>map</h3><p>不知道之前是在哪看的map定义，反正跑了半天跑不起来，最后找了一个其他的定义方法，如下</p>
+<pre class=" language-C"><code class="language-C">struct bpf_map_def SEC("maps") map_name = {
+    .attr = value;
+    ......
+};
+</code></pre>
+<p>用bpf_map_def这个结构体可以直接定义出一个map来，虽然内部原理暂时未知，type属性用于指定map类型，先搓个perf array出来传递信息试试</p>
+<h4 id="perf-event-array"><a href="#perf-event-array" class="headerlink" title="perf event array"></a>perf event array</h4><p>新版本的ring buff，他的好处是输出时用户态直接接受，就是一个生产者消费者模型，而其他的map就需要用户态轮询去一个个查</p>
+<p>perf array的定义大致需要这几个值</p>
+<pre class=" language-C"><code class="language-C">    .type = BPF_MAP_TYPE_PERF_EVENT_ARRAY,
+    .key_size = sizeof(int),
+    .value_size = sizeof(__u32),
+    .max_entries = 16,
+</code></pre>
+<p>使用<code>bpf_perf_event_output</code>写入，具体参数看bpf helper的man page</p>
+<p>perf array里面一般会塞一个自定义的结构体，这里有一个大坑，bpf2go默认情况下是不会导出这些自定义结构体的，我排查了一个多小时。。。最后是找了个官方的例子一行行看过去才发现的。。。</p>
+<p>在其README下面有这么一段话</p>
+<blockquote>
+<p>bpf2go generates Go types for all map keys and values by default. You can disable this behaviour using -no-global-types. You can add to the set of types by specifying -type foo for each type you’d like to generate.</p>
+</blockquote>
+<p>我在排查的时候看到了这个，但是没有意识到这就是问题所在，bpf2go会自动对map的kv对进行导出，但是perf array的kv对并不能直接塞自定义结构体，就需要用户手动指定<code>-type</code>来导出。。。</p>
+<h4 id="小坑"><a href="#小坑" class="headerlink" title="小坑"></a>小坑</h4><p>需要注意的是，虽然这里面塞的是自定义结构体，但是在定义的时候，value_size一定得是4字节的，也就是<code>sizeof(u32)</code>，不是很懂设计原理，可能是header和tail是两个指针？</p>
+<p>而在对数据进行输出时的bpf_perf_event_output，第三个参数是void*，即为用户自定义的结构体，而第四个参数length需要是sizeof(struct )，而非指针的大小。<br>（这大概也是为什么这个map的大小是由客户端这边指定的），以go-ebpf为例，在定义perf event array时需要填一个buffer大小</p>
+<h3 id="verifier-log"><a href="#verifier-log" class="headerlink" title="verifier log"></a>verifier log</h3><p>之前学的时候懒得看verifier，现在自己写起来了verifier报错看不懂一点。。。<br>ebpf-go提供了一个接口去获取完整的verifier log，如下</p>
+<pre class=" language-go"><code class="language-go">    err <span class="token operator">:=</span> <span class="token function">loadSslObjects</span><span class="token punctuation">(</span><span class="token operator">&amp;</span>sslObj<span class="token punctuation">,</span> <span class="token boolean">nil</span><span class="token punctuation">)</span>
+    <span class="token keyword">if</span> err <span class="token operator">!=</span> <span class="token boolean">nil</span> <span class="token punctuation">{</span>
+        <span class="token keyword">var</span> ve <span class="token operator">*</span>ebpf<span class="token punctuation">.</span>VerifierError
+        <span class="token keyword">if</span> errors<span class="token punctuation">.</span><span class="token function">As</span><span class="token punctuation">(</span>err<span class="token punctuation">,</span> <span class="token operator">&amp;</span>ve<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+            log<span class="token punctuation">.</span><span class="token function">Fatalf</span><span class="token punctuation">(</span><span class="token string">"verify error:\n %+v"</span><span class="token punctuation">,</span> ve<span class="token punctuation">)</span>
+        <span class="token punctuation">}</span>
+        log<span class="token punctuation">.</span><span class="token function">Fatal</span><span class="token punctuation">(</span>err<span class="token punctuation">)</span>
+    <span class="token punctuation">}</span>
+</code></pre>
+<p><code>%+v</code>可以输出完整的日志，否则就只有关键报错一行。至于怎么读log，可以回顾一下learning ebpf的pdf。其实看多了之后一眼就能看出来是哪里出问题了，倒也还算友好</p>
+<h3 id="safety-access"><a href="#safety-access" class="headerlink" title="safety access"></a>safety access</h3><p>我是想hook SSL_read&#x2F;write，里面有三个参数，后面两个是buffer和num，分别对应缓冲区和写入的字节数，本来是想<code>bpf_probe_read_user</code>读num字节数，然后做了num的边界检查，但是无论如何verifier都过不了。。。不知道为什么，一直显示R2可能是负数，虽然我已经套了num&gt;0判断和定义num为unsigned int。。。</p>
+<p>最后找到了一篇博文，给出了解决方案<br><a target="_blank" rel="external nofollow noopener noreferrer" href="https://sysdig.com/blog/the-art-of-writing-ebpf-programs-a-primer/">The art of writing eBPF programs: a primer</a></p>
+<p>如下写法不行</p>
+<pre class=" language-C"><code class="language-C">    res = bpf_probe_read_str(map_value, PATH_MAX, pathname);
+    if (res > 0 && res <= path_max)< span>
+        map_value[res - 1] = 0;
+</=></code></pre>
+<p>需要尽可能的将使用和判断靠近，并且上界的限制用大小于号不行，得用与运算。。。？<br>如下为可以通过verifier的版本</p>
+<pre class=" language-C"><code class="language-C">    res = bpf_probe_read_str(map_value, PATH_MAX, pathname);
+    if (res > 0)
+        map_value[(res - 1) & (PATH_MAX - 1)] = 0;
+</code></pre>
+<p>最后的最后发现<code>bpf_probe_read_user</code>的size只要是第一个参数的size就行了，进来的数据小了不会爆，多了也不会爆。。。</p>
+<p>为了一个本身不存在的问题找了半天。。。</p>
+<h3 id="大内存变量"><a href="#大内存变量" class="headerlink" title="大内存变量"></a>大内存变量</h3><p>由于ssl的buffer最大是4096（好像），所以我需要声明一个长为4096的数组，然后直接爆了，给出超级报错<code>Looks like the BPF stack limit of 512 bytes is exceeded</code>，并且初始化的为0的时候报第二个错<code>A call to built-in function &#39;memset&#39; is not supported</code>，ebpf程序的栈为512，该限制无法逾越，且不能Alloc堆上内存。但是bpf map可以当做ebpf程序的堆来使用（输入还是不能动态分配。。）</p>
+<p>声明一个简单的per cpu array存储数据</p>
+<pre class=" language-C"><code class="language-C">struct bpf_map_def tmp_storage_map = {
+    .type = BPF_MAP_TYPE_PERCPU_ARRAY,
+    .key_size = sizeof(u32),
+    .value_size = PATH_MAX,
+    .max_entries = 1,
+};
+</code></pre>
+<p><del>感觉可以不加<code>SEC(&quot;map&quot;)</code>对外导出，内部存个数据即可</del><br>才怪，不加的话verifier会不认识你传入的map指针，报一个<code>type=map_value expected=map_ptr</code>的错<br><a target="_blank" rel="external nofollow noopener noreferrer" href="https://stackoverflow.com/questions/72606055/bpf-verifier-throws-error-expected-map-ptr">BPF verifier throws error “expected&#x3D;map_ptr”</a><br>如果要写复杂结构体，也可以value size放一个结构体<br><a target="_blank" rel="external nofollow noopener noreferrer" href="https://blog.csdn.net/weixin_43144516/article/details/123213674">关于在eBPF程序中构建长字符串并进行修改</a></p>
+<h3 id="helper函数返回值"><a href="#helper函数返回值" class="headerlink" title="helper函数返回值"></a>helper函数返回值</h3><p>helper函数成功返回0，失败时对应错误返回负数，然而我找了半天也没找着返回值对应的错误在哪。最后在一个奇怪的角落找到了，这个返回值似乎是直接内核的系统错误返回值，使用<code>errno &lt;NUM&gt;</code>命令可以拿到对应的错误类型<br><a target="_blank" rel="external nofollow noopener noreferrer" href="https://github.com/cilium/ebpf/issues/419">bpf_probe_read_str return error(-14) sometimes</a></p>
+<h3 id="可能遇到的奇怪bug以及解决方案"><a href="#可能遇到的奇怪bug以及解决方案" class="headerlink" title="可能遇到的奇怪bug以及解决方案"></a>可能遇到的奇怪bug以及解决方案</h3><h4 id="bpf-probe-read-user-return-14"><a href="#bpf-probe-read-user-return-14" class="headerlink" title="bpf_probe_read_user return -14"></a>bpf_probe_read_user return -14</h4><p>-14刚才已经讲过了，可以用errno命令看报错，该报错的含义为<code>Bad Address</code>，但是问题在于，我输入的指针是从ctx里面用<code>PT_REGS_PARM*</code>拿到的，这个值肯定不会有问题，不然函数本身也跑不起来</p>
+<p>我先在这里放一个函数签名</p>
+<pre><code>long bpf_probe_read_user(void *dst, u32 size, const void *unsafe_ptr)
+</code></pre>
+<p>排查了一个下午，对比了各家代码，最后发现问题出在size上。我一开始的设计将size设置为了<code>sizeof(buff)</code>，用的是dst buff的大小，这样子保证内存不会越界，但是来自用户输入的<code>unsafe_ptr</code>的数据长度不一定有size那么大，然后我size又设置成了4096，是不是大小足够跨页之类的导致稳定报错？</p>
+<p>总之，最后打了个uretprobe的hook，从返回值中拿到<code>unsafe_ptr</code>中数据的长度在read就表现稳定了</p>
+<h4 id="bpf-perf-event-output-return-7"><a href="#bpf-perf-event-output-return-7" class="headerlink" title="bpf_perf_event_output return -7"></a>bpf_perf_event_output return -7</h4><p>我也放一个函数签名在这</p>
+<pre><code>long bpf_perf_event_output(void *ctx, struct bpf_map *map, u64 flags, void *data, u64 size)
+</code></pre>
+<p>这个问题是和上面那个返回-14同时出现的，7的意思是args too big，虽然我的data和size肯定是对应的，但是我估摸着吧肯定是之前读出来的数据有问题导致这里写入会出错，因为我把第一个问题修好之后这个问题也就消失了</p>
+<h4 id="verifier的迷之上界判断"><a href="#verifier的迷之上界判断" class="headerlink" title="verifier的迷之上界判断"></a>verifier的迷之上界判断</h4><p>如果你写过类似如下的代码，你会发现verifier对你使用if else进行的范围判断视而不见，然后和你说这个范围不行</p>
+<pre class=" language-C"><code class="language-C">int len = xxxx;
+if(len > MAX_SIZE){
+    len = MAX_SIZE;
+}
+</code></pre>
+<p>理论上来说，此时的len已经只可能是小于MAX_SIZE的值，但verifier会认为len没有上界（但是如果你用大小于号去限制下界的话，好像verifier又是能认出来的。。。。）。不要问我为什么，反正就是这么判断的，目测verifier支持的上界判断必须是和上界做与运算，即改为如下版本即可通过。</p>
+<pre class=" language-C"><code class="language-C">int len = xxxx;
+if(len > MAX_SIZE){
+    len = MAX_SIZE;
+} else {
+    len = len & (MAX_SIZE - 1);
+}
+</code></pre>
+<h4 id="找一个靠谱的doc"><a href="#找一个靠谱的doc" class="headerlink" title="找一个靠谱的doc"></a>找一个靠谱的doc</h4><p>一开始一直看的是直接谷歌搜<code>SSL_read</code>后出来的第一条，<a target="_blank" rel="external nofollow noopener noreferrer" href="https://www.openssl.org/docs/man1.1.1/man3/SSL_read.html">SSL_read</a>，只能说讲的有点抽象，几个函数堆一起讲，导致我也一直没看懂在说什么，最后是翻到了这个手册才完全理解<br><a target="_blank" rel="external nofollow noopener noreferrer" href="https://linux.die.net/man/3/ssl_read">ssl_read(3) - Linux man page</a><br>也可能是这个的排版看着舒服点。。。</p>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/ebpf/" rel="tag"># ebpf</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/eBPF%E5%85%A5%E9%97%A8.html" rel="prev" title="EBFP入门">
+      <i class="fa fa-chevron-left"></i> EBFP入门
+    </a></div>
+      <div class="post-nav-item"></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+    <div class="comments" id="valine-comments"></div>
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E4%BB%8E0%E5%BC%80%E5%A7%8B%E7%9A%84ebpf%E7%A8%8B%E5%BA%8F%E5%BC%80%E5%8F%91"><span class="nav-number">1.</span> <span class="nav-text">从0开始的ebpf程序开发</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%BC%80%E5%8F%91%E7%8E%AF%E5%A2%83"><span class="nav-number">1.1.</span> <span class="nav-text">开发环境</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#debug%E5%91%BD%E4%BB%A4"><span class="nav-number">1.2.</span> <span class="nav-text">debug命令</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#header%E5%87%86%E5%A4%87"><span class="nav-number">1.3.</span> <span class="nav-text">header准备</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#vmlinux-h"><span class="nav-number">1.3.1.</span> <span class="nav-text">vmlinux.h</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#bpf-xxx-h"><span class="nav-number">1.3.2.</span> <span class="nav-text">bpf_xxx.h</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%BB%E7%A8%8B%E5%BA%8F"><span class="nav-number">1.4.</span> <span class="nav-text">主程序</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%B0%91%E7%94%A8BCC"><span class="nav-number">1.4.1.</span> <span class="nav-text">少用BCC</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#SEC%E5%AE%8F"><span class="nav-number">1.4.2.</span> <span class="nav-text">SEC宏</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%8F%82%E6%95%B0"><span class="nav-number">1.4.3.</span> <span class="nav-text">参数</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%BF%94%E5%9B%9E%E5%80%BC"><span class="nav-number">1.4.4.</span> <span class="nav-text">返回值</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#uprobe"><span class="nav-number">1.4.5.</span> <span class="nav-text">uprobe</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#uprobe%E5%AE%9E%E7%8E%B0%E5%8E%9F%E7%90%86"><span class="nav-number">1.4.5.1.</span> <span class="nav-text">uprobe实现原理</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#ebpf-go%E7%89%B9%E5%8C%96"><span class="nav-number">1.4.5.2.</span> <span class="nav-text">ebpf-go特化?</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#core-read"><span class="nav-number">1.4.6.</span> <span class="nav-text">core read</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#map"><span class="nav-number">1.4.7.</span> <span class="nav-text">map</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#perf-event-array"><span class="nav-number">1.4.7.1.</span> <span class="nav-text">perf event array</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%B0%8F%E5%9D%91"><span class="nav-number">1.4.7.2.</span> <span class="nav-text">小坑</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#verifier-log"><span class="nav-number">1.4.8.</span> <span class="nav-text">verifier log</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#safety-access"><span class="nav-number">1.4.9.</span> <span class="nav-text">safety access</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%A4%A7%E5%86%85%E5%AD%98%E5%8F%98%E9%87%8F"><span class="nav-number">1.4.10.</span> <span class="nav-text">大内存变量</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#helper%E5%87%BD%E6%95%B0%E8%BF%94%E5%9B%9E%E5%80%BC"><span class="nav-number">1.4.11.</span> <span class="nav-text">helper函数返回值</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%8F%AF%E8%83%BD%E9%81%87%E5%88%B0%E7%9A%84%E5%A5%87%E6%80%AAbug%E4%BB%A5%E5%8F%8A%E8%A7%A3%E5%86%B3%E6%96%B9%E6%A1%88"><span class="nav-number">1.4.12.</span> <span class="nav-text">可能遇到的奇怪bug以及解决方案</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#bpf-probe-read-user-return-14"><span class="nav-number">1.4.12.1.</span> <span class="nav-text">bpf_probe_read_user return -14</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#bpf-perf-event-output-return-7"><span class="nav-number">1.4.12.2.</span> <span class="nav-text">bpf_perf_event_output return -7</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#verifier%E7%9A%84%E8%BF%B7%E4%B9%8B%E4%B8%8A%E7%95%8C%E5%88%A4%E6%96%AD"><span class="nav-number">1.4.12.3.</span> <span class="nav-text">verifier的迷之上界判断</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E6%89%BE%E4%B8%80%E4%B8%AA%E9%9D%A0%E8%B0%B1%E7%9A%84doc"><span class="nav-number">1.4.12.4.</span> <span class="nav-text">找一个靠谱的doc</span></a></li></ol></li></ol></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Z3ratu1" src="https://thirdqq.qlogo.cn/g?b=sdk&k=LSKHut5Wmfic1emlMT4FpuA&kti=ZMCGFwAAAAI&s=640&t=1673848139">
+  <p class="site-author-name" itemprop="name">Z3ratu1</p>
+  <div class="site-description" itemprop="description">与其感慨路难行，不如现在出发</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">188</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">5</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">94</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 2019 – 
+  <span itemprop="copyrightYear">2023</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Z3ratu1</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="external nofollow noopener noreferrer" target="_blank">Hexo</a> & <a href="https://pisces.theme-next.org/" class="theme-link" rel="external nofollow noopener noreferrer" target="_blank">NexT.Pisces</a> 强力驱动
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+
+<script>
+NexT.utils.loadComments(document.querySelector('#valine-comments'), () => {
+  NexT.utils.getScript('https://cdn.jsdelivr.net/npm/valine@1.4.14/dist/Valine.min.js', () => {
+    var GUEST = ['nick', 'mail', 'link'];
+    var guest = 'nick,mail,link';
+    guest = guest.split(',').filter(item => {
+      return GUEST.includes(item);
+    });
+    new Valine({
+      el         : '#valine-comments',
+      verify     : false,
+      notify     : false,
+      appId      : '7H8kg0XdWO8IbhOcu4K1JaAT-gzGzoHsz',
+      appKey     : 'wPKQjkbVtvPaRR7gh2yjfLSi',
+      placeholder: "Just go go",
+      avatar     : 'mm',
+      meta       : guest,
+      pageSize   : '10' || 10,
+      visitor    : true,
+      lang       : '' || 'zh-cn',
+      path       : location.pathname,
+      recordIP   : false,
+      serverURLs : ''
+    });
+  }, window.Valine);
+});
+</script>
+
+</body>
+</html>
