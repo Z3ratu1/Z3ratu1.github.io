@@ -31,7 +31,7 @@
 <meta property="og:image" content="https://image-host-1304136909.cos.ap-shanghai.myqcloud.com/blog/ProcessHollowing%E4%B8%8EReflectiveDll/image-20230407120857163.png">
 <meta property="og:image" content="https://image-host-1304136909.cos.ap-shanghai.myqcloud.com/blog/ProcessHollowing%E4%B8%8EReflectiveDll/image-20230407120913253.png">
 <meta property="article:published_time" content="2023-04-06T11:09:34.000Z">
-<meta property="article:modified_time" content="2023-04-24T10:14:13.216Z">
+<meta property="article:modified_time" content="2024-01-22T13:14:25.178Z">
 <meta property="article:author" content="Z3ratu1">
 <meta property="article:tag" content="pentest">
 <meta name="twitter:card" content="summary">
@@ -234,7 +234,7 @@
                   <i class="far fa-calendar-check"></i>
                 </span>
                 <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2023-04-24 18:14:13" itemprop="dateModified" datetime="2023-04-24T18:14:13+08:00">2023-04-24</time>
+                <time title="修改时间：2024-01-22 21:14:25" itemprop="dateModified" datetime="2024-01-22T21:14:25+08:00">2024-01-22</time>
               </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -335,9 +335,14 @@
 <p>再一个是入口点修改，网上的资料大多是说入口为eax（32位，如果64位应该对应rax），而这里改的是rcx，即context中rax后面一个寄存器，C++代码中的注释写的是修改rax，但代码中是rcx，抽象。以及一开始提到的从rdx寄存器中找镜像基址。。。</p>
 <p>综上所述，这个操作暂时只理解了流程，未理解深入原理，并且存在一系列未解之谜。。。</p>
 <p>顺便比较一下三个注入方案，CreateRemoteThread创建远程线程，QueueUserAPC的好处在于劫持已存在线程，没有创建环节，ProcessHollowing可以直接注入一个原始pe进去，没有新的线程启动，调用的方法为SetThreadContext</p>
+<p>今天逛街的时候刷到了另一个用<code>SetThreadContext</code>的注入方法，也和我想象的略微一致了一些。就是简单地注入shellcode，然后把PC寄存器指过去，直接执行，相较于进程镂空省去了给新进程配环境的环节，所以自然而然的能注入的内容也就是本身就能直接执行的shellcode<br><a target="_blank" rel="external nofollow noopener noreferrer" href="https://mp.weixin.qq.com/s/GDPAC_9-Pxfcj_z0_C_ixw">通过进程注入方法绕过杀软测试</a><br>不过这个进程注入关杀软的想法难以苟同，如果杀软不做自我保护允许高权限进程随便关，那感觉就乱杀了，注不注入意义不大。<br>以及显然这里最关键的执行点是改了寄存器，而文末的防御手段居然没提<code>SetThreadContext</code>，难以理解<br>也有可能是我浅薄了？搞不好这个函数本身被调用的很频繁所以不好对这个函数做检测？</p>
 <h2 id="ReflectiveDLL"><a href="#ReflectiveDLL" class="headerlink" title="ReflectiveDLL"></a>ReflectiveDLL</h2><p>考虑一下注入类型的操作，如果注入的只是简单的shellcode的话，啥也不用考虑，注进去直接从头执行就可以了，然而如果注入的是一个拥有众多功能的木马，一般来说就跑不起来，关键点在于注入的木马大多是依赖于外部的动态链接库的，即使你说你是顶级静态编译打包一切，windows的ntdll等操作系统级别的基础库也是打包不进去的。正常的程序在加载时操作系统会通过PE loader为其创建好对应的IAT表，而我们注入进去的代码可就一无所有了。</p>
 <p>如果对比进程镂空与反射dll的话，进程镂空真的比反射Dll方便很多，因为镂空的进程保留了原TEB，可以就着旧进程的IAT表，这样子ntdll等基础模块的函数是天生就能使用的，自己需要的函数也可以用现成的LoadLibrary和GetProcAddress等方法临时加载（胡言乱语中），而当我们CreateRemoteThread的时候，注入进去的新线程可没有人给你填IAT，最基础的ntdll函数都没有，就完全没法运行了。这也就是reflective loader的作用，手动寻找当前进程中ntdll的位置，手动提取LoadLibrary等方法，然后遍历PE的导入表，手动修复IAT<br><a target="_blank" rel="external nofollow noopener noreferrer" href="https://paper.seebug.org/1855">深入理解反射式 dll 注入技术</a><br><a target="_blank" rel="external nofollow noopener noreferrer" href="https://github.com/stephenfewer/ReflectiveDLLInjection/blob/master/dll/src/ReflectiveLoader.c">ReflectiveLoader.c</a></p>
-<p>因此，reflective loader就是一段不依赖任何外部函数的shellcode般的代码，充当PE loader的角色还原一个程序需要运行时的环境<br>reflective loader就做这么几个工作：</p>
+<blockquote>
+<p>In the context of injecting a DLL, there are two paths to go down when it comes to executing code within a foreign process: find some existing code within the foreign process which loads a DLL, or put some new bootstrap code into the foreign process which goes on to load a DLL.</p>
+</blockquote>
+<p>而ReflectiveDLL就是为我们写好了一个现成的bootstrap code which goes on to load a DLL，充当PE loader的角色还原一个程序需要运行时的环境</p>
+<p>reflective loader就做这么几个工作：</p>
 <ol start="0">
 <li><p>通过caller()函数找到当前reflective loader()函数地址，然后向前寻找，直到找到<code>MZ</code>这个DOS头，找到image基址。（注意到我们注入reflective dll的时候都是直接将文件注入进去的，而非进程镂空一样解析PE格式按段写入）</p>
 </li>

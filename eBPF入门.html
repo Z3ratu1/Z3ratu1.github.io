@@ -20,12 +20,12 @@
     var CONFIG = {"hostname":"blog.z3ratu1.cn","root":"/","scheme":"Pisces","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"always","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":true},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
   </script>
 
-  <meta name="description" content="EBFP入门记录一下最近入门eBPF的笔记，用于加强印象（以及偶尔点开博客发现又有一个月没有更新了），国庆肯定是有点小混了，然后就是感觉有很多东西也懒得记了，难得学点东西，并且感觉是一个比较新的技术，稍微写点。 学到目前主要是靠Isovalent家的这本Learning eBPF，写的脉络也可能也就大致和书的脉络一致。 基本概念什么是ebpf，应该不会有人什么都不会就依赖我的博客入门的吧？本文所有">
+  <meta name="description" content="EBPF入门记录一下最近入门eBPF的笔记，用于加强印象（以及偶尔点开博客发现又有一个月没有更新了），国庆肯定是有点小混了，然后就是感觉有很多东西也懒得记了，难得学点东西，并且感觉是一个比较新的技术，稍微写点。 学到目前主要是靠Isovalent家的这本Learning eBPF，写的脉络也可能也就大致和书的脉络一致。 基本概念什么是ebpf，应该不会有人什么都不会就依赖我的博客入门的吧？本文所有">
 <meta property="og:type" content="article">
-<meta property="og:title" content="EBFP入门">
+<meta property="og:title" content="EBPF入门">
 <meta property="og:url" content="https://blog.z3ratu1.cn/eBPF%E5%85%A5%E9%97%A8.html">
 <meta property="og:site_name" content="Z3ratu1&#39;s blog">
-<meta property="og:description" content="EBFP入门记录一下最近入门eBPF的笔记，用于加强印象（以及偶尔点开博客发现又有一个月没有更新了），国庆肯定是有点小混了，然后就是感觉有很多东西也懒得记了，难得学点东西，并且感觉是一个比较新的技术，稍微写点。 学到目前主要是靠Isovalent家的这本Learning eBPF，写的脉络也可能也就大致和书的脉络一致。 基本概念什么是ebpf，应该不会有人什么都不会就依赖我的博客入门的吧？本文所有">
+<meta property="og:description" content="EBPF入门记录一下最近入门eBPF的笔记，用于加强印象（以及偶尔点开博客发现又有一个月没有更新了），国庆肯定是有点小混了，然后就是感觉有很多东西也懒得记了，难得学点东西，并且感觉是一个比较新的技术，稍微写点。 学到目前主要是靠Isovalent家的这本Learning eBPF，写的脉络也可能也就大致和书的脉络一致。 基本概念什么是ebpf，应该不会有人什么都不会就依赖我的博客入门的吧？本文所有">
 <meta property="og:locale">
 <meta property="og:image" content="https://ebpf.io/static/99c69bbff092c35b9c83f00a80fed240/b14d5/hook-overview.png">
 <meta property="og:image" content="https://ebpf.io/static/def942c66b8c7565f0cfeab1c1017a80/b14d5/bcc.png">
@@ -33,7 +33,7 @@
 <meta property="og:image" content="https://image-host-1304136909.cos.ap-shanghai.myqcloud.com/blog/eBPF%E5%85%A5%E9%97%A8/image-20231015114807831.png">
 <meta property="og:image" content="https://image-host-1304136909.cos.ap-shanghai.myqcloud.com/blog/eBPF%E5%85%A5%E9%97%A8/image-20231031114401347.png">
 <meta property="article:published_time" content="2023-10-14T07:47:01.000Z">
-<meta property="article:modified_time" content="2023-11-22T07:41:06.096Z">
+<meta property="article:modified_time" content="2024-01-22T13:14:38.108Z">
 <meta property="article:author" content="Z3ratu1">
 <meta property="article:tag" content="ebpf">
 <meta name="twitter:card" content="summary">
@@ -52,7 +52,7 @@
   };
 </script>
 
-  <title>EBFP入门 | Z3ratu1's blog</title>
+  <title>EBPF入门 | Z3ratu1's blog</title>
   
 
 
@@ -219,7 +219,7 @@
     </span>
       <header class="post-header">
         <h1 class="post-title" itemprop="name headline">
-          EBFP入门
+          EBPF入门
         </h1>
 
         <div class="post-meta">
@@ -236,7 +236,7 @@
                   <i class="far fa-calendar-check"></i>
                 </span>
                 <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2023-11-22 15:41:06" itemprop="dateModified" datetime="2023-11-22T15:41:06+08:00">2023-11-22</time>
+                <time title="修改时间：2024-01-22 21:14:38" itemprop="dateModified" datetime="2024-01-22T21:14:38+08:00">2024-01-22</time>
               </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -249,7 +249,7 @@
             </span>
 
           
-            <span id="/eBPF%E5%85%A5%E9%97%A8.html" class="post-meta-item leancloud_visitors" data-flag-title="EBFP入门" title="阅读次数">
+            <span id="/eBPF%E5%85%A5%E9%97%A8.html" class="post-meta-item leancloud_visitors" data-flag-title="EBPF入门" title="阅读次数">
               <span class="post-meta-item-icon">
                 <i class="fa fa-eye"></i>
               </span>
@@ -280,7 +280,7 @@
     <div class="post-body" itemprop="articleBody">
 
       
-        <h1 id="EBFP入门"><a href="#EBFP入门" class="headerlink" title="EBFP入门"></a>EBFP入门</h1><p>记录一下最近入门eBPF的笔记，用于加强印象（以及偶尔点开博客发现又有一个月没有更新了），国庆肯定是有点小混了，然后就是感觉有很多东西也懒得记了，难得学点东西，并且感觉是一个比较新的技术，稍微写点。</p>
+        <h1 id="EBPF入门"><a href="#EBPF入门" class="headerlink" title="EBPF入门"></a>EBPF入门</h1><p>记录一下最近入门eBPF的笔记，用于加强印象（以及偶尔点开博客发现又有一个月没有更新了），国庆肯定是有点小混了，然后就是感觉有很多东西也懒得记了，难得学点东西，并且感觉是一个比较新的技术，稍微写点。</p>
 <p>学到目前主要是靠Isovalent家的这本<a target="_blank" rel="external nofollow noopener noreferrer" href="https://isovalent.com/books/learning-ebpf/">Learning eBPF</a>，写的脉络也可能也就大致和书的脉络一致。</p>
 <h2 id="基本概念"><a href="#基本概念" class="headerlink" title="基本概念"></a>基本概念</h2><p>什么是ebpf，应该不会有人什么都不会就依赖我的博客入门的吧？本文所有内容均默认读者拥有最基础的基础，不会对太简单的东西进行过分的解释。</p>
 <p>就我个人理解，ebpf是linux内核提供的一个扩展接口，允许用户以较低的开发成本对内核行为进行监控和修改，相较于内核模块的不稳定和对各版本内核需要单独维护，ebpf提供了较为统一的接口，使得一定情况下ebpf甚至能做到一次编译，四处运行（CORE）。</p>
@@ -555,7 +555,7 @@ char __license[] SEC("license") = "Dual MIT/GPL";
 
       <!--noindex-->
       <div class="post-toc-wrap sidebar-panel">
-          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#EBFP%E5%85%A5%E9%97%A8"><span class="nav-number">1.</span> <span class="nav-text">EBFP入门</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%9F%BA%E6%9C%AC%E6%A6%82%E5%BF%B5"><span class="nav-number">1.1.</span> <span class="nav-text">基本概念</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#ebpf%E5%BA%94%E7%94%A8%E7%BB%93%E6%9E%84"><span class="nav-number">1.1.1.</span> <span class="nav-text">ebpf应用结构</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%BC%80%E5%8F%91%E6%A1%86%E6%9E%B6"><span class="nav-number">1.1.2.</span> <span class="nav-text">开发框架</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#ebpf%E7%A8%8B%E5%BA%8F"><span class="nav-number">1.2.</span> <span class="nav-text">ebpf程序</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%86%85%E6%A0%B8%E7%A8%8B%E5%BA%8F"><span class="nav-number">1.2.1.</span> <span class="nav-text">内核程序</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#ebpf-program"><span class="nav-number">1.2.1.1.</span> <span class="nav-text">ebpf program</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#ebpf-map"><span class="nav-number">1.2.1.2.</span> <span class="nav-text">ebpf map</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%94%A8%E6%88%B7%E7%A8%8B%E5%BA%8F"><span class="nav-number">1.2.2.</span> <span class="nav-text">用户程序</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#bpf-syscall"><span class="nav-number">1.3.</span> <span class="nav-text">bpf() syscall</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#BTF"><span class="nav-number">1.3.1.</span> <span class="nav-text">BTF</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#ebpf-verifier"><span class="nav-number">1.4.</span> <span class="nav-text">ebpf verifier</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#ebpf-program-type"><span class="nav-number">1.5.</span> <span class="nav-text">ebpf program type</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#kprobe-x2F-kretprobe"><span class="nav-number">1.5.1.</span> <span class="nav-text">kprobe&#x2F;kretprobe</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#fentry-x2F-fexit"><span class="nav-number">1.5.2.</span> <span class="nav-text">fentry&#x2F;fexit</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#tracepoint"><span class="nav-number">1.5.3.</span> <span class="nav-text">tracepoint</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#BTF-Enabled-tracepoint"><span class="nav-number">1.5.4.</span> <span class="nav-text">BTF-Enabled tracepoint</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%94%A8%E6%88%B7%E6%80%81attachment"><span class="nav-number">1.5.5.</span> <span class="nav-text">用户态attachment</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#sockets"><span class="nav-number">1.5.6.</span> <span class="nav-text">sockets</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#traffic-control"><span class="nav-number">1.5.7.</span> <span class="nav-text">traffic control</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#XDP"><span class="nav-number">1.5.8.</span> <span class="nav-text">XDP</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Cgroup"><span class="nav-number">1.5.9.</span> <span class="nav-text">Cgroup</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#ebpf-for-networking"><span class="nav-number">1.6.</span> <span class="nav-text">ebpf for networking</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#XDP-1"><span class="nav-number">1.6.1.</span> <span class="nav-text">XDP</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#TC"><span class="nav-number">1.6.2.</span> <span class="nav-text">TC</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#ebpf-for-security"><span class="nav-number">1.7.</span> <span class="nav-text">ebpf for security</span></a></li></ol></li></ol></div>
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#EBPF%E5%85%A5%E9%97%A8"><span class="nav-number">1.</span> <span class="nav-text">EBPF入门</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%9F%BA%E6%9C%AC%E6%A6%82%E5%BF%B5"><span class="nav-number">1.1.</span> <span class="nav-text">基本概念</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#ebpf%E5%BA%94%E7%94%A8%E7%BB%93%E6%9E%84"><span class="nav-number">1.1.1.</span> <span class="nav-text">ebpf应用结构</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%BC%80%E5%8F%91%E6%A1%86%E6%9E%B6"><span class="nav-number">1.1.2.</span> <span class="nav-text">开发框架</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#ebpf%E7%A8%8B%E5%BA%8F"><span class="nav-number">1.2.</span> <span class="nav-text">ebpf程序</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%86%85%E6%A0%B8%E7%A8%8B%E5%BA%8F"><span class="nav-number">1.2.1.</span> <span class="nav-text">内核程序</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#ebpf-program"><span class="nav-number">1.2.1.1.</span> <span class="nav-text">ebpf program</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#ebpf-map"><span class="nav-number">1.2.1.2.</span> <span class="nav-text">ebpf map</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%94%A8%E6%88%B7%E7%A8%8B%E5%BA%8F"><span class="nav-number">1.2.2.</span> <span class="nav-text">用户程序</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#bpf-syscall"><span class="nav-number">1.3.</span> <span class="nav-text">bpf() syscall</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#BTF"><span class="nav-number">1.3.1.</span> <span class="nav-text">BTF</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#ebpf-verifier"><span class="nav-number">1.4.</span> <span class="nav-text">ebpf verifier</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#ebpf-program-type"><span class="nav-number">1.5.</span> <span class="nav-text">ebpf program type</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#kprobe-x2F-kretprobe"><span class="nav-number">1.5.1.</span> <span class="nav-text">kprobe&#x2F;kretprobe</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#fentry-x2F-fexit"><span class="nav-number">1.5.2.</span> <span class="nav-text">fentry&#x2F;fexit</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#tracepoint"><span class="nav-number">1.5.3.</span> <span class="nav-text">tracepoint</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#BTF-Enabled-tracepoint"><span class="nav-number">1.5.4.</span> <span class="nav-text">BTF-Enabled tracepoint</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%94%A8%E6%88%B7%E6%80%81attachment"><span class="nav-number">1.5.5.</span> <span class="nav-text">用户态attachment</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#sockets"><span class="nav-number">1.5.6.</span> <span class="nav-text">sockets</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#traffic-control"><span class="nav-number">1.5.7.</span> <span class="nav-text">traffic control</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#XDP"><span class="nav-number">1.5.8.</span> <span class="nav-text">XDP</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Cgroup"><span class="nav-number">1.5.9.</span> <span class="nav-text">Cgroup</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#ebpf-for-networking"><span class="nav-number">1.6.</span> <span class="nav-text">ebpf for networking</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#XDP-1"><span class="nav-number">1.6.1.</span> <span class="nav-text">XDP</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#TC"><span class="nav-number">1.6.2.</span> <span class="nav-text">TC</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#ebpf-for-security"><span class="nav-number">1.7.</span> <span class="nav-text">ebpf for security</span></a></li></ol></li></ol></div>
       </div>
       <!--/noindex-->
 
