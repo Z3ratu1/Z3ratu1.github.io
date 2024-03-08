@@ -196,6 +196,110 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
+    <link itemprop="mainEntityOfPage" href="https://blog.z3ratu1.cn/%E4%BB%BB%E6%84%8F%E6%96%87%E4%BB%B6%E8%AF%BB%E5%88%B0RCE.html">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="https://thirdqq.qlogo.cn/g?b=sdk&k=LSKHut5Wmfic1emlMT4FpuA&kti=ZMCGFwAAAAI&s=640&t=1673848139">
+      <meta itemprop="name" content="Z3ratu1">
+      <meta itemprop="description" content="与其感慨路难行，不如现在出发">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Z3ratu1's blog">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/%E4%BB%BB%E6%84%8F%E6%96%87%E4%BB%B6%E8%AF%BB%E5%88%B0RCE.html" class="post-title-link" itemprop="url">任意文件读到RCE</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2024-03-07 16:14:43" itemprop="dateCreated datePublished" datetime="2024-03-07T16:14:43+08:00">2024-03-07</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2024-03-08 11:29:30" itemprop="dateModified" datetime="2024-03-08T11:29:30+08:00">2024-03-08</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E6%B8%97%E9%80%8F/" itemprop="url" rel="index"><span itemprop="name">渗透</span></a>
+                </span>
+            </span>
+
+          
+            <span id="/%E4%BB%BB%E6%84%8F%E6%96%87%E4%BB%B6%E8%AF%BB%E5%88%B0RCE.html" class="post-meta-item leancloud_visitors" data-flag-title="任意文件读到RCE" title="阅读次数">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span class="leancloud-visitors-count"></span>
+            </span>
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="far fa-comment"></i>
+      </span>
+      <span class="post-meta-item-text">Valine：</span>
+    
+    <a title="valine" href="/%E4%BB%BB%E6%84%8F%E6%96%87%E4%BB%B6%E8%AF%BB%E5%88%B0RCE.html#valine-comments" itemprop="discussionUrl">
+      <span class="post-comments-count valine-comment-count" data-xid="/%E4%BB%BB%E6%84%8F%E6%96%87%E4%BB%B6%E8%AF%BB%E5%88%B0RCE.html" itemprop="commentCount"></span>
+    </a>
+  </span>
+  
+  
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h1 id="任意文件读到RCE"><a href="#任意文件读到RCE" class="headerlink" title="任意文件读到RCE"></a>任意文件读到RCE</h1><p>主要是点开博客一看两个月没更新了，就顺手更新一下，感觉确实越到后面越写不动东西了。。。<br>其实以前就想写一下这个内容的来着，不过因为渗透本身就应该对资产保密，不放截图干巴巴讲没意思，又凑不齐几个案例。但是好巧不巧昨天又打下来一个任意文件读到rce的机器，既然如此，就凑起来写一篇（其实有两台任意文件读，但是有一台是windows，windows想读出有用的东西，感觉基本上就是通灵了）</p>
+<h2 id="利用核心"><a href="#利用核心" class="headerlink" title="利用核心"></a>利用核心</h2><p>因为只能读不能写，在纯读的情况下很难造成实际的危害。实际上从任意文件读打到rce的情况，简单一点的就是读配置文件，读到网站管理员、数据库密码之类的东西，然后再利用这些额外权限去rce。另一种情况是相信对方写的是垃圾网站，读网站源码审计漏洞rce。理论上来说这两种都是遇到过的。</p>
+<p>那么也就引申出了任意文件读的核心问题，怎么确定服务（如web目录，数据库目录）的路径。</p>
+          <!--noindex-->
+            <div class="post-button">
+              <a class="btn" href="/%E4%BB%BB%E6%84%8F%E6%96%87%E4%BB%B6%E8%AF%BB%E5%88%B0RCE.html#more" rel="contents">
+                阅读全文 &raquo;
+              </a>
+            </div>
+          <!--/noindex-->
+        
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
     <link itemprop="mainEntityOfPage" href="https://blog.z3ratu1.cn/%E4%BB%8E0%E5%BC%80%E5%A7%8B%E7%9A%84ebpf%E7%A8%8B%E5%BA%8F%E5%BC%80%E5%8F%91.html">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -227,7 +331,7 @@
                   <i class="far fa-calendar-check"></i>
                 </span>
                 <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2024-01-08 21:00:08" itemprop="dateModified" datetime="2024-01-08T21:00:08+08:00">2024-01-08</time>
+                <time title="修改时间：2024-01-27 23:03:57" itemprop="dateModified" datetime="2024-01-27T23:03:57+08:00">2024-01-27</time>
               </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -611,104 +715,6 @@ go version go1.21.3 linux/amd64
   
   
 
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
-    <link itemprop="mainEntityOfPage" href="https://blog.z3ratu1.cn/zer0ptsCTF2023.html">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="https://thirdqq.qlogo.cn/g?b=sdk&k=LSKHut5Wmfic1emlMT4FpuA&kti=ZMCGFwAAAAI&s=640&t=1673848139">
-      <meta itemprop="name" content="Z3ratu1">
-      <meta itemprop="description" content="与其感慨路难行，不如现在出发">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Z3ratu1's blog">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/zer0ptsCTF2023.html" class="post-title-link" itemprop="url">zer0ptsCTF2023</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-              
-
-              <time title="创建时间：2023-07-17 16:20:41 / 修改时间：22:00:35" itemprop="dateCreated datePublished" datetime="2023-07-17T16:20:41+08:00">2023-07-17</time>
-            </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-folder"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/%E5%88%B7%E9%A2%98%E8%AE%B0%E5%BD%95/" itemprop="url" rel="index"><span itemprop="name">刷题记录</span></a>
-                </span>
-            </span>
-
-          
-            <span id="/zer0ptsCTF2023.html" class="post-meta-item leancloud_visitors" data-flag-title="zer0ptsCTF2023" title="阅读次数">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-eye"></i>
-              </span>
-              <span class="post-meta-item-text">阅读次数：</span>
-              <span class="leancloud-visitors-count"></span>
-            </span>
-  
-  <span class="post-meta-item">
-    
-      <span class="post-meta-item-icon">
-        <i class="far fa-comment"></i>
-      </span>
-      <span class="post-meta-item-text">Valine：</span>
-    
-    <a title="valine" href="/zer0ptsCTF2023.html#valine-comments" itemprop="discussionUrl">
-      <span class="post-comments-count valine-comment-count" data-xid="/zer0ptsCTF2023.html" itemprop="commentCount"></span>
-    </a>
-  </span>
-  
-  
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <h1 id="zer0ptsCTF2023"><a href="#zer0ptsCTF2023" class="headerlink" title="zer0ptsCTF2023"></a>zer0ptsCTF2023</h1><p>只用上班一天，好耶。一堆前端题，又是一场xss大师赛，不会做捏。因为打了点输出就可以记录了<br>题目感觉质量都还行，确实也如他们所说，没有要猜的题。难度，我能做出来，所以应该不算很难。嗯<br>感觉如果打两天的话就能ak了，可惜。不过ak也和我没什么关系</p>
-<h2 id="warmup-profile"><a href="#warmup-profile" class="headerlink" title="warmup profile"></a>warmup profile</h2><p>签到，其实也还是有一定的难度的。目标是登录admin的账户获取flag。</p>
-<p>使用了一个叫<code>sequelize</code>的库连接数据库，顶级防御，无SQL注入，且登录注册时严格校验了输入不为空且类型为字符串，看起来就觉得只有delete那块可能有洞</p>
-          <!--noindex-->
-            <div class="post-button">
-              <a class="btn" href="/zer0ptsCTF2023.html#more" rel="contents">
-                阅读全文 &raquo;
-              </a>
-            </div>
-          <!--/noindex-->
-        
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
 
   
   <nav class="pagination">
@@ -779,7 +785,7 @@ go version go1.21.3 linux/amd64
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">188</span>
+          <span class="site-state-item-count">189</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>

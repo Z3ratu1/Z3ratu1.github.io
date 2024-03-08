@@ -196,6 +196,111 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
+    <link itemprop="mainEntityOfPage" href="https://blog.z3ratu1.cn/rCore_Tutorial_CP4.html">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="https://thirdqq.qlogo.cn/g?b=sdk&k=LSKHut5Wmfic1emlMT4FpuA&kti=ZMCGFwAAAAI&s=640&t=1673848139">
+      <meta itemprop="name" content="Z3ratu1">
+      <meta itemprop="description" content="与其感慨路难行，不如现在出发">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Z3ratu1's blog">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/rCore_Tutorial_CP4.html" class="post-title-link" itemprop="url">rCore_Tutorial_CP4</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2022-08-07 13:51:24" itemprop="dateCreated datePublished" datetime="2022-08-07T13:51:24+08:00">2022-08-07</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2022-09-01 20:02:27" itemprop="dateModified" datetime="2022-09-01T20:02:27+08:00">2022-09-01</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E7%AC%94%E8%AE%B0/" itemprop="url" rel="index"><span itemprop="name">笔记</span></a>
+                </span>
+            </span>
+
+          
+            <span id="/rCore_Tutorial_CP4.html" class="post-meta-item leancloud_visitors" data-flag-title="rCore_Tutorial_CP4" title="阅读次数">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span class="leancloud-visitors-count"></span>
+            </span>
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="far fa-comment"></i>
+      </span>
+      <span class="post-meta-item-text">Valine：</span>
+    
+    <a title="valine" href="/rCore_Tutorial_CP4.html#valine-comments" itemprop="discussionUrl">
+      <span class="post-comments-count valine-comment-count" data-xid="/rCore_Tutorial_CP4.html" itemprop="commentCount"></span>
+    </a>
+  </span>
+  
+  
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h1 id="rCore-Tutorial-CP4"><a href="#rCore-Tutorial-CP4" class="headerlink" title="rCore_Tutorial_CP4"></a>rCore_Tutorial_CP4</h1><p>摸了几天继续看一下，第四章要实现究极虚拟内存，这非常关键，也是操作系统中的一个很核心的部分。之前的批处理和多道处理系统虽然实现了硬件特权的限制和系统调用，但是并没有对应用空间进行隔离，导致用户应用必须以规定的形式分布在内存中，并且还可以读取和修改其他用户程序，甚至是内核数据的内容，并不能认为是一个足够安全的系统。</p>
+<p>本章的目标就是实现虚拟内存的分配，内存分页和页表映射，实现内核与各用户进程间的隔离。通过一层虚拟地址，使得操作系统获得了对实际物理内存访问的完全控制，用户程序只能访问由操作系统提供的虚拟地址，进而实现内存空间的完全隔离</p>
+<p>实现还是经典的页表，段表难维护碎片多。进程对内存的访问一般来说就是通过load等汇编指令进行的，在硬件层面提供一个MMU，并通过内核维护应用程序的页表，MMU访问页表对虚拟地址进行解析，顺便还能对页进行rwx等权限控制，进一步加强保护</p>
+<h2 id="SV39多级页表的硬件机制"><a href="#SV39多级页表的硬件机制" class="headerlink" title="SV39多级页表的硬件机制"></a>SV39多级页表的硬件机制</h2>
+          <!--noindex-->
+            <div class="post-button">
+              <a class="btn" href="/rCore_Tutorial_CP4.html#more" rel="contents">
+                阅读全文 &raquo;
+              </a>
+            </div>
+          <!--/noindex-->
+        
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
     <link itemprop="mainEntityOfPage" href="https://blog.z3ratu1.cn/rCore_Tutorial_CP3.html">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -613,110 +718,6 @@
   
   
 
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
-    <link itemprop="mainEntityOfPage" href="https://blog.z3ratu1.cn/CobaltStrike%20SSL%E8%AF%81%E4%B9%A6%E9%85%8D%E7%BD%AE.html">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="https://thirdqq.qlogo.cn/g?b=sdk&k=LSKHut5Wmfic1emlMT4FpuA&kti=ZMCGFwAAAAI&s=640&t=1673848139">
-      <meta itemprop="name" content="Z3ratu1">
-      <meta itemprop="description" content="与其感慨路难行，不如现在出发">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Z3ratu1's blog">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/CobaltStrike%20SSL%E8%AF%81%E4%B9%A6%E9%85%8D%E7%BD%AE.html" class="post-title-link" itemprop="url">CobaltStrike SSL证书配置</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2022-06-12 17:26:03" itemprop="dateCreated datePublished" datetime="2022-06-12T17:26:03+08:00">2022-06-12</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="far fa-calendar-check"></i>
-                </span>
-                <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2022-06-18 20:04:49" itemprop="dateModified" datetime="2022-06-18T20:04:49+08:00">2022-06-18</time>
-              </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-folder"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/%E7%AC%94%E8%AE%B0/" itemprop="url" rel="index"><span itemprop="name">笔记</span></a>
-                </span>
-            </span>
-
-          
-            <span id="/CobaltStrike%20SSL%E8%AF%81%E4%B9%A6%E9%85%8D%E7%BD%AE.html" class="post-meta-item leancloud_visitors" data-flag-title="CobaltStrike SSL证书配置" title="阅读次数">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-eye"></i>
-              </span>
-              <span class="post-meta-item-text">阅读次数：</span>
-              <span class="leancloud-visitors-count"></span>
-            </span>
-  
-  <span class="post-meta-item">
-    
-      <span class="post-meta-item-icon">
-        <i class="far fa-comment"></i>
-      </span>
-      <span class="post-meta-item-text">Valine：</span>
-    
-    <a title="valine" href="/CobaltStrike%20SSL%E8%AF%81%E4%B9%A6%E9%85%8D%E7%BD%AE.html#valine-comments" itemprop="discussionUrl">
-      <span class="post-comments-count valine-comment-count" data-xid="/CobaltStrike%20SSL%E8%AF%81%E4%B9%A6%E9%85%8D%E7%BD%AE.html" itemprop="commentCount"></span>
-    </a>
-  </span>
-  
-  
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <h1 id="CobaltStrike-SSL证书配置"><a href="#CobaltStrike-SSL证书配置" class="headerlink" title="CobaltStrike SSL证书配置"></a>CobaltStrike SSL证书配置</h1><p>起因是我发现我的机器由于长期挂着CS的服务端，然后导致我被扫描器发现，并且把我的机器标记成威胁服务器了。。。。<br>而为了隐藏CS服务端的信息，就需要从几个方面进行改造，其中之一就是经典的ssl证书配置，而其实CS主要需要配的证书有两个：cobaltstrike.store&amp;https-certificate</p>
-<p>期间踩了一个很大的坑，关于在win7等较老机器上使用https出现的tls版本问题</p>
-<h2 id="cobaltstrike-store"><a href="#cobaltstrike-store" class="headerlink" title="cobaltstrike.store"></a>cobaltstrike.store</h2><p>teamserver脚本中用keytools生成了一个特征及其明显的自签发证书。该证书仅用于客户端与服务端之间的通信，当然，被扫出来就会是及其明显的服务端标记特征。我估摸着也就是扫描器扫到这个证书然后给我标记了。。。</p>
-          <!--noindex-->
-            <div class="post-button">
-              <a class="btn" href="/CobaltStrike%20SSL%E8%AF%81%E4%B9%A6%E9%85%8D%E7%BD%AE.html#more" rel="contents">
-                阅读全文 &raquo;
-              </a>
-            </div>
-          <!--/noindex-->
-        
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
 
   
   <nav class="pagination">
@@ -787,7 +788,7 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">188</span>
+          <span class="site-state-item-count">189</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>

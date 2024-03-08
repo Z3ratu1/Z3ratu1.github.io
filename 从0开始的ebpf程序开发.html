@@ -28,7 +28,7 @@
 <meta property="og:description" content="从0开始的ebpf程序开发上一篇博客中把learning ebpf这本书读完了，获得了足够的基础理论知识，今天开始进行ebpf程序的开发。目前打算是用c写kernel program，然后用ebpf-go做客户端程序，bpf2go套一层进行编译和骨架生成（到时候程序复杂了之后可能得手写Makefile编译.o，然后用bpf2go对.o生成骨架吧） 开发环境Linux ubuntu 5.15.0-8">
 <meta property="og:locale">
 <meta property="article:published_time" content="2023-11-01T06:56:29.000Z">
-<meta property="article:modified_time" content="2024-01-08T13:00:08.000Z">
+<meta property="article:modified_time" content="2024-01-27T15:03:57.196Z">
 <meta property="article:author" content="Z3ratu1">
 <meta property="article:tag" content="ebpf">
 <meta name="twitter:card" content="summary">
@@ -230,7 +230,7 @@
                   <i class="far fa-calendar-check"></i>
                 </span>
                 <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2024-01-08 21:00:08" itemprop="dateModified" datetime="2024-01-08T21:00:08+08:00">2024-01-08</time>
+                <time title="修改时间：2024-01-27 23:03:57" itemprop="dateModified" datetime="2024-01-27T23:03:57+08:00">2024-01-27</time>
               </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -359,6 +359,8 @@ go version go1.21.3 linux/amd64
 </code></pre>
 <p><del>感觉可以不加<code>SEC(&quot;map&quot;)</code>对外导出，内部存个数据即可</del><br>才怪，不加的话verifier会不认识你传入的map指针，报一个<code>type=map_value expected=map_ptr</code>的错<br><a target="_blank" rel="external nofollow noopener noreferrer" href="https://stackoverflow.com/questions/72606055/bpf-verifier-throws-error-expected-map-ptr">BPF verifier throws error “expected&#x3D;map_ptr”</a><br>如果要写复杂结构体，也可以value size放一个结构体<br><a target="_blank" rel="external nofollow noopener noreferrer" href="https://blog.csdn.net/weixin_43144516/article/details/123213674">关于在eBPF程序中构建长字符串并进行修改</a></p>
 <p>看到了别的例子，除了用一个array来存储数据外，还可以直接定义一个全局变量，全局变量位于bss段，也就不在栈上，自然就不会爆栈了。但是这种情况的话全局变量只有一个，如果多个CPU同时访问的话会不会有条件竞争之类的可能性呢？</p>
+<p>所以解决方案是全局变量是一个empty对象，实际的对象使用hashmap之类的方式存储。空对象只被用于初始化map中的项。</p>
+<p>除此之外，如果内核版本高可以直接迁移到ringbuf，如果不需要在多个probe之间传递数据的话，可以直接从ringbuf里面申请空间，总算有点动态的感觉了。不过ringbuf申请的空间需要当场释放掉，所以不能在多个probe直接传递ringbuf的内存（大概，我也没试过，估计是不行的8）</p>
 <h3 id="helper函数返回值"><a href="#helper函数返回值" class="headerlink" title="helper函数返回值"></a>helper函数返回值</h3><p>helper函数成功返回0，失败时对应错误返回负数，然而我找了半天也没找着返回值对应的错误在哪。最后在一个奇怪的角落找到了，这个返回值似乎是直接内核的系统错误返回值，使用<code>errno &lt;NUM&gt;</code>命令可以拿到对应的错误类型<br><a target="_blank" rel="external nofollow noopener noreferrer" href="https://github.com/cilium/ebpf/issues/419">bpf_probe_read_str return error(-14) sometimes</a></p>
 <h3 id="可能遇到的奇怪bug以及解决方案"><a href="#可能遇到的奇怪bug以及解决方案" class="headerlink" title="可能遇到的奇怪bug以及解决方案"></a>可能遇到的奇怪bug以及解决方案</h3><h4 id="bpf-probe-read-user-return-14"><a href="#bpf-probe-read-user-return-14" class="headerlink" title="bpf_probe_read_user return -14"></a>bpf_probe_read_user return -14</h4><p>-14刚才已经讲过了，可以用errno命令看报错，该报错的含义为<code>Bad Address</code>，但是问题在于，我输入的指针是从ctx里面用<code>PT_REGS_PARM*</code>拿到的，这个值肯定不会有问题，不然函数本身也跑不起来</p>
 <p>我先在这里放一个函数签名</p>
@@ -384,6 +386,9 @@ if(len > MAX_SIZE){
     len = len & (MAX_SIZE - 1);
 }
 </code></pre>
+<p>除此之外，verifier也无法识别过于复杂的条件，比如我想有一个超长buff，然后用index存当前数据的offset，将多次的数据读到一个buff里，verifier就是做不到的。就是程序分析中的may analysis，我的data_len和offset均属于[0, 4096)，且data_len+offset也属于[0, 4096)，这两个条件合起来之后，因为只存变量的取值范围，所以得到的还是[0, 4096)捏。</p>
+<p>当时感觉有点无解然后创了个号去Stack Overflow提问，然后发现是真的无解，哈哈。<br><a target="_blank" rel="external nofollow noopener noreferrer" href="https://stackoverflow.com/questions/77762365/ebpf-value-is-outside-of-the-allowed-memory-range-when-reading-data-into-arra">ebpf: “value is outside of the allowed memory range” when reading data into array with offset</a></p>
+<p>刚才点上去一看我这个问题怎么还被点了个踩？我的吧，但是我确实没找着什么相关问题啊</p>
 <h4 id="map创建报错-map-create-invalid-argument-without-BTF-k-x2F-v"><a href="#map创建报错-map-create-invalid-argument-without-BTF-k-x2F-v" class="headerlink" title="map创建报错 map create: invalid argument (without BTF k&#x2F;v)"></a>map创建报错 map create: invalid argument (without BTF k&#x2F;v)</h4><p>这个网上的说法都是说你内核版本太低用了太先进的feature，但是我内核6.6+顶级先进arch和我还说这个就不合理了。我这里遇到的问题是ringbuf创建不成功，我在一通乱按之后发现把max_entries上调到4096以上就可以通过。暂且不知道怎么回事，是页大小刚好是4k然后map至少得有一个页大么？</p>
 <h4 id="找一个靠谱的doc"><a href="#找一个靠谱的doc" class="headerlink" title="找一个靠谱的doc"></a>找一个靠谱的doc</h4><p>一开始一直看的是直接谷歌搜<code>SSL_read</code>后出来的第一条，<a target="_blank" rel="external nofollow noopener noreferrer" href="https://www.openssl.org/docs/man1.1.1/man3/SSL_read.html">SSL_read</a>，只能说讲的有点抽象，几个函数堆一起讲，导致我也一直没看懂在说什么，最后是翻到了这个手册才完全理解<br><a target="_blank" rel="external nofollow noopener noreferrer" href="https://linux.die.net/man/3/ssl_read">ssl_read(3) - Linux man page</a><br>也可能是这个的排版看着舒服点。。。</p>
 <h3 id="LOG"><a href="#LOG" class="headerlink" title="LOG"></a>LOG</h3><p>要写一个大规模的程序的话，日志系统肯定是不能少的，至少得有一个往用户态输出的方法，天天printk不是一件事。然后log的话最好也能支持fmt字符串，这样子写起来也舒服一点。但要是需要支持fmt，那就务必需要支持可变参数，然后我搜了一圈得出的结论是ebpf不支持可变参数。在外面把msg渲染好再传进去也太憨了一点，加上栈大小限制，即使我将log的长度设置成128也最好不要放在栈上，还是另开一个map处理为妙。那这样子每次log要写一大堆，就更憨了，最后找了半天在github上找到了一个用宏展开来代替可变参数的log例子</p>
@@ -415,6 +420,7 @@ if(len > MAX_SIZE){
 <h3 id="map复用"><a href="#map复用" class="headerlink" title="map复用"></a>map复用</h3><p>比如说我有多个ebpf程序，他们共享一个log map，用于对外输出一些日志信息。最好的情况自然是我客户端只用听一个map，所有的ebpf程序都只往这一个map中输出。需求很简单，实现也不复杂。<br>最方便的做法是使用map pinning，将map pin在文件系统上，然后所有程序按照名字约定去加载。在cilium的example里面也写的有用法<br><a target="_blank" rel="external nofollow noopener noreferrer" href="https://github.com/cilium/ebpf/tree/main/examples/kprobepin">kprobepin</a></p>
 <p>具体写法可以看例子，需要使用这种BTF格式的map define，添加一个pinning属性，然后在ebpf程序加载的时添加一个Map选项指定PinPath，在加载程序的时候对于属性为pinning的map就会优先查看PinPath下是否存在，有直接复用，没有则创建。</p>
 <p>这种情况下，可以考虑使用ebpf go去创建这个map，便于对map进行管理，否则会出现程序退出后pinning map没有卸载的问题。但是bpf2go生成的结构体又默认是不导出的，还得自己封装半天，不甚方便</p>
+<p>（最后map也没复用，两个不同的程序用了不同的log map进行输出，如果有多个ebpf程序想共用一个map还有一种方法就是把他们变成一堆.h文件直接编译成一个ebpf程序。。）</p>
 <h3 id="perf-array-read-length"><a href="#perf-array-read-length" class="headerlink" title="perf array read length"></a>perf array read length</h3><p>这个是一开始写log的时候发现的问题，比如我先写入长100的log，再写入长50的log，那么读长50的log的时候会把之前长100的log的数据也读进来。一开始为了解决这个问题，我是给log结构体里面加了个length，然后在用户态手动按长度截断。后来我发现是在<code>bpf_perf_event_output</code>中有一个len选项，我之前都默认用的<code>sizeof(struct)</code>，但是我实际的数据长度却不够struct的长度，导致出现这么个覆写问题。实际上perf array在写的时候也会先写入一个长度，然后客户端再根据长度读。所以也可以在写之前计算数据的长度，然后写入精确长度的数据。不过这样子客户端又会爆炸，因为客户端将数据应用到结构体时需要完整的大小，写入的数据长度不足size会读出eof，然后就要客户端再适配一下，把读出来的数据padding到和结构体长度一致，一个可能的例子如下。</p>
 <pre class=" language-go"><code class="language-go">    <span class="token keyword">var</span> logEvent sslLogEvent
     buff <span class="token operator">:=</span> <span class="token function">make</span><span class="token punctuation">(</span><span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token builtin">byte</span><span class="token punctuation">,</span> p<span class="token punctuation">.</span>eventSize<span class="token punctuation">)</span>
@@ -456,7 +462,10 @@ if(len > MAX_SIZE){
     <a href="/eBPF%E5%85%A5%E9%97%A8.html" rel="prev" title="EBPF入门">
       <i class="fa fa-chevron-left"></i> EBPF入门
     </a></div>
-      <div class="post-nav-item"></div>
+      <div class="post-nav-item">
+    <a href="/%E4%BB%BB%E6%84%8F%E6%96%87%E4%BB%B6%E8%AF%BB%E5%88%B0RCE.html" rel="next" title="任意文件读到RCE">
+      任意文件读到RCE <i class="fa fa-chevron-right"></i>
+    </a></div>
     </div>
       </footer>
     
@@ -531,7 +540,7 @@ if(len > MAX_SIZE){
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">188</span>
+          <span class="site-state-item-count">189</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
