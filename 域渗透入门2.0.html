@@ -33,7 +33,7 @@
 <meta property="og:image" content="https://image-host-1304136909.cos.ap-shanghai.myqcloud.com/blog/%E5%9F%9F%E6%B8%97%E9%80%8F%E5%85%A5%E9%97%A82.0/image-20230610122414603.png">
 <meta property="og:image" content="https://image-host-1304136909.cos.ap-shanghai.myqcloud.com/blog/%E5%9F%9F%E6%B8%97%E9%80%8F%E5%85%A5%E9%97%A82.0/image-20230610142952365.png">
 <meta property="article:published_time" content="2023-05-27T09:07:36.000Z">
-<meta property="article:modified_time" content="2023-08-04T09:30:41.003Z">
+<meta property="article:modified_time" content="2024-04-27T03:40:24.044Z">
 <meta property="article:author" content="Z3ratu1">
 <meta property="article:tag" content="pentest">
 <meta name="twitter:card" content="summary">
@@ -236,7 +236,7 @@
                   <i class="far fa-calendar-check"></i>
                 </span>
                 <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2023-08-04 17:30:41" itemprop="dateModified" datetime="2023-08-04T17:30:41+08:00">2023-08-04</time>
+                <time title="修改时间：2024-04-27 11:40:24" itemprop="dateModified" datetime="2024-04-27T11:40:24+08:00">2024-04-27</time>
               </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -315,10 +315,13 @@
 <p>开关远程桌面，1开0关</p>
 <pre class=" language-cmd"><code class="language-cmd">wmic RDTOGGLE WHERE ServerName='%COMPUTERNAME%' call SetAllowTSConnections 1
 </code></pre>
+<p>注册表设置远程桌面开启</p>
+<pre class=" language-cmd"><code class="language-cmd">reg add "HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\Terminal Server" /t REG_DWORD /v fDenyTSConnections /d 0 /f
+</code></pre>
 <p>设置远程桌面端口</p>
 <pre class=" language-cmd"><code class="language-cmd">reg add "HKLM\System\CurrentControlSet\Control\Terminal Server\WinStations\RDP-Tcp" /t REG_DWORD /v portnumber /d 3389 /f
 </code></pre>
-<p>查看当前机器上的票据（pass the ticket环节可能用的上，或者mmkz也可以抓票据出来）</p>
+<p>mssql可以用<code>xp_regwrite</code>去写注册表<br>查看当前机器上的票据（pass the ticket环节可能用的上，或者mmkz也可以抓票据出来）</p>
 <pre><code>klist
 </code></pre>
 <p>不知道有什么用的查看保存凭据的命令，好像是记录远程桌面时保存的密码之类的东西</p>
@@ -465,7 +468,7 @@ Get-NetUser -Unconstrained -Domain z33.com | select name
 <h3 id="域外信息搜集"><a href="#域外信息搜集" class="headerlink" title="域外信息搜集"></a>域外信息搜集</h3><p>bloodhound也是支持域外使用的，并且信息查询只要一个普通用户权限就可以进行了，所以很是方便</p>
 <p>adfind.exe也支持域外信息搜集，相比之下，powerview好像就没有这个功能？<br>贴一个adfind的链接<br><a target="_blank" rel="external nofollow noopener noreferrer" href="http://www.nooemotion.com/2023/02/20/%E5%9F%9F%E6%B8%97%E9%80%8F%E7%AC%94%E8%AE%B0-%E5%B7%A5%E5%85%B7%E4%BD%BF%E7%94%A8-adfind/">域渗透笔记-工具使用-Adfind</a></p>
 <p>域外域控定位，感觉就是嗯扫，smb扫出来的时候会显示机器的名字，一般来说正常人都会把域控带上dc，或者看端口，域控要提供dns，ldap等服务，会开53,389那几个端口</p>
-<h2 id="一些乱七八糟的杂项内容"><a href="#一些乱七八糟的杂项内容" class="headerlink" title="一些乱七八糟的杂项内容"></a>一些乱七八糟的杂项内容</h2><p>mssql可以走本地认证?如果有一个本地的mssql就算不知道数据库账号密码也可以走本地管理员身份认证进行访问？</p>
+<h2 id="一些乱七八糟的杂项内容"><a href="#一些乱七八糟的杂项内容" class="headerlink" title="一些乱七八糟的杂项内容"></a>一些乱七八糟的杂项内容</h2><p>mssql可以走windows认证。如果有一个本地的mssql就算不知道数据库账号密码也可以走本地管理员身份认证进行访问，navicat中mssql有一个windows验证选项，就是走这个。但是windows下的navicat点windows认证只会把当前机器的凭证发出去。。。我朋友的mac版就可以手动输域名用户名密码。。。干。<br>这把有一个mssql的机器就是他navicat上去，mssql还能改注册表，改注册表开3389上去的。</p>
 <p>远程执行命令的方法：psexec&#x2F;smbexec，这个走445端口，wmi走135端口并且没有回显，还有一个winrm是5895&#x2F;5896端口。winrm的缺点是一般来说不开，并且开了还只接受配置过的trust host的命令，感觉很难用上？</p>
 <p>其中psexec好像是因为走ipc，所以无论是pass the hash还是pass the ticket，只要能建立起连接就能用<br>wmi目前手上的工具支持pass the hash。winrm没用过，不过搜索结果中也有可以pass the hash的。pass the ticket其实没怎么用过，不甚熟练，另一个问题是pass the ticket是kerberos里面和服务交互的方法，一般的攻击感觉都是走的ntlm的认证所以都是pass the hash。</p>
 <p>域内登录指定用户名有两种方式，一个是<code>域名\用户名</code>,另一个是<code>用户名@域名</code>，理论上来说老机器用前者，但实际上都可以用前者</p>
