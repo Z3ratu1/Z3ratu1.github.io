@@ -17,13 +17,13 @@
 
 <script id="hexo-configurations">
     var NexT = window.NexT || {};
-    var CONFIG = {"hostname":"blog.z3ratu1.cn","root":"/","scheme":"Pisces","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"always","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":true},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+    var CONFIG = {"hostname":"blog.z3ratu1.top","root":"/","scheme":"Pisces","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"always","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":true},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
   </script>
 
   <meta name="description" content="Switch联机加速研究接上一篇，研究了switch设置中的代理设置和如何自己实现一个简陋的Switch全局代理 Switch代理情况及解决方案之前和大姐联机的时候wireshark抓到的包和其在switch上连接测试显示的ip是一致的 尝试直接使用clash代理端口转发的时候，发现在STUN第一步的时候就变成了switch直接连接STUN服务器，而不是把流量转发给代理，TCP的流量都全部转发给代">
 <meta property="og:type" content="article">
 <meta property="og:title" content="Switch联机加速研究">
-<meta property="og:url" content="https://blog.z3ratu1.cn/switch%E8%81%94%E6%9C%BA%E6%B7%B1%E7%A9%B6.html">
+<meta property="og:url" content="https://blog.z3ratu1.top/switch%E8%81%94%E6%9C%BA%E6%B7%B1%E7%A9%B6.html">
 <meta property="og:site_name" content="Z3ratu1&#39;s blog">
 <meta property="og:description" content="Switch联机加速研究接上一篇，研究了switch设置中的代理设置和如何自己实现一个简陋的Switch全局代理 Switch代理情况及解决方案之前和大姐联机的时候wireshark抓到的包和其在switch上连接测试显示的ip是一致的 尝试直接使用clash代理端口转发的时候，发现在STUN第一步的时候就变成了switch直接连接STUN服务器，而不是把流量转发给代理，TCP的流量都全部转发给代">
 <meta property="og:locale">
@@ -34,7 +34,7 @@
 <meta property="article:tag" content="Clash TUN">
 <meta name="twitter:card" content="summary">
 
-<link rel="canonical" href="https://blog.z3ratu1.cn/switch%E8%81%94%E6%9C%BA%E6%B7%B1%E7%A9%B6.html">
+<link rel="canonical" href="https://blog.z3ratu1.top/switch%E8%81%94%E6%9C%BA%E6%B7%B1%E7%A9%B6.html">
 
 
 <script id="page-configurations">
@@ -201,7 +201,7 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
-    <link itemprop="mainEntityOfPage" href="https://blog.z3ratu1.cn/switch%E8%81%94%E6%9C%BA%E6%B7%B1%E7%A9%B6.html">
+    <link itemprop="mainEntityOfPage" href="https://blog.z3ratu1.top/switch%E8%81%94%E6%9C%BA%E6%B7%B1%E7%A9%B6.html">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="https://thirdqq.qlogo.cn/g?b=sdk&k=LSKHut5Wmfic1emlMT4FpuA&kti=ZMCGFwAAAAI&s=640&t=1673848139">
@@ -283,7 +283,7 @@
 <p>把手机设为switch网关，让所有流量到达手机之后让手机进行处理，即可强行接管UDP流量。一个简单的旁路由思路（我是网络垃圾呜呜呜）<br>因为发送流量都是看路由表的嘛，然后我把默认路由填到手机地址，那数据包第一跳就稳定到手机上，手机监听网卡，接管全流量，再选择Switch的流量进行转发，的确是个很棒的想法<br>之前也看到clash上说过使用TAP或TUN模式接管全流量，使得不走代理的软件也可以走代理</p>
 <h2 id="游戏联机通信情况"><a href="#游戏联机通信情况" class="headerlink" title="游戏联机通信情况"></a>游戏联机通信情况</h2><p>确实如榜一大哥曾经和我说的，Switch使用STUN服务器使玩家互相发现，若玩家之间NAT类型较好，通信质量佳，即可让其直接通信，如果双方通信质量不佳，比如存在D类NAT，则使用STUN服务器辅助传输数据。<br>没开加速器用D类玩玩了一把，整场通信下来发现我既在和房主UDP通信，时不时也会穿插一些和任天堂STUN服务器通信的TRUN包，wireshark中显示这个包的协议仍是STUN，不过后面的附加内容写的是TURN，是用来数据传输</p>
 <p>TURN协议，用来解决P2P问题的，具体看百科吧。</p>
-<h2 id="clash-TUN全局接管"><a href="#clash-TUN全局接管" class="headerlink" title="clash TUN全局接管"></a>clash TUN全局接管</h2><h3 id="2021-4-19-update"><a href="#2021-4-19-update" class="headerlink" title="2021.4.19 update"></a>2021.4.19 update</h3><p>该方案似乎在实践上有些问题，后来发现了一个电脑开热点的网络共享解决方案，以及优雅arp劫持方案，<strong>弃置这个方案</strong>，用新的<br><a href="https://blog.z3ratu1.cn/Switch%E8%87%AA%E5%BB%BANAT%E4%BC%98%E5%8C%96%E6%8C%87%E5%8C%97.html">Switch自建NAT优化指北</a><br>现在这个方案只是留着记录一下当初研究的思路</p>
+<h2 id="clash-TUN全局接管"><a href="#clash-TUN全局接管" class="headerlink" title="clash TUN全局接管"></a>clash TUN全局接管</h2><h3 id="2021-4-19-update"><a href="#2021-4-19-update" class="headerlink" title="2021.4.19 update"></a>2021.4.19 update</h3><p>该方案似乎在实践上有些问题，后来发现了一个电脑开热点的网络共享解决方案，以及优雅arp劫持方案，<strong>弃置这个方案</strong>，用新的<br><a target="_blank" rel="external nofollow noopener noreferrer" href="https://blog.z3ratu1.cn/Switch%E8%87%AA%E5%BB%BANAT%E4%BC%98%E5%8C%96%E6%8C%87%E5%8C%97.html">Switch自建NAT优化指北</a><br>现在这个方案只是留着记录一下当初研究的思路</p>
 <h3 id="2021-8-6-update"><a href="#2021-8-6-update" class="headerlink" title="2021.8.6 update"></a>2021.8.6 update</h3><p>最近又学了一点网络知识，突然想起来是不是因为windows机器没开路由转发所以连不上网？可以试一下把机器的路由转发开了再试试，不过现在switch不在手边并不能做测试了，文末参考链接中有启动windows10路由转发的教程</p>
 <p>后经测试，好像还是不行。。。<strong>后文内容将更改为对该方案失败原因的研究</strong></p>
 <h3 id="2022-2-12-update"><a href="#2022-2-12-update" class="headerlink" title="2022.2.12 update"></a>2022.2.12 update</h3><p>看到了全新的解决方案，我开始对我当初的记忆产生怀疑，为什么当初我那个很奇怪的方案成功实现了？究竟是哪里发生了玄学的问题？遵循其他大佬的足迹走到了这步，发现了一个实现方案及其优雅，且并不繁琐，<strong>甚至不需要全局接管</strong>，我一直在寻找的其实就是这样子的一个软件。也许这个才是最为正确的思路。整合更新也同步到了上面提到的《Switch自建NAT优化指北》中，<strong>本文后续内容理论上作废</strong>，这个思路的出发点并没有太大的问题，但由于对网络的浅薄认识，并不能指出问题所在的点<br><strong>后续仅可作为clash tun配置教程</strong></p>
@@ -446,7 +446,7 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">190</span>
+          <span class="site-state-item-count">191</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
@@ -459,7 +459,7 @@
       <div class="site-state-item site-state-tags">
             <a href="/tags/">
           
-        <span class="site-state-item-count">94</span>
+        <span class="site-state-item-count">95</span>
         <span class="site-state-item-name">标签</span></a>
       </div>
   </nav>

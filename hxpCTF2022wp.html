@@ -17,13 +17,13 @@
 
 <script id="hexo-configurations">
     var NexT = window.NexT || {};
-    var CONFIG = {"hostname":"blog.z3ratu1.cn","root":"/","scheme":"Pisces","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"always","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":true},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+    var CONFIG = {"hostname":"blog.z3ratu1.top","root":"/","scheme":"Pisces","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"always","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":true},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
   </script>
 
   <meta name="description" content="hxpCTF2022wp又跟着科恩疯狂偷学，天哥一人单刷全部web，我在科恩后面偷看答案复现以及，这是一场在23年办的2022ctf valentine有效的代码部分如下 app.post(&#39;&#x2F;template&#39;, function(req, res) {   let tmpl &#x3D; req.body.tmpl;   let i &#x3D; -1;   while((i &#x3D; tmpl.indexOf(&quot;&amp;l">
 <meta property="og:type" content="article">
 <meta property="og:title" content="hxpCTF2022wp">
-<meta property="og:url" content="https://blog.z3ratu1.cn/hxpCTF2022wp.html">
+<meta property="og:url" content="https://blog.z3ratu1.top/hxpCTF2022wp.html">
 <meta property="og:site_name" content="Z3ratu1&#39;s blog">
 <meta property="og:description" content="hxpCTF2022wp又跟着科恩疯狂偷学，天哥一人单刷全部web，我在科恩后面偷看答案复现以及，这是一场在23年办的2022ctf valentine有效的代码部分如下 app.post(&#39;&#x2F;template&#39;, function(req, res) {   let tmpl &#x3D; req.body.tmpl;   let i &#x3D; -1;   while((i &#x3D; tmpl.indexOf(&quot;&amp;l">
 <meta property="og:locale">
@@ -34,7 +34,7 @@
 <meta property="article:tag" content="JavaScript">
 <meta name="twitter:card" content="summary">
 
-<link rel="canonical" href="https://blog.z3ratu1.cn/hxpCTF2022wp.html">
+<link rel="canonical" href="https://blog.z3ratu1.top/hxpCTF2022wp.html">
 
 
 <script id="page-configurations">
@@ -201,7 +201,7 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
-    <link itemprop="mainEntityOfPage" href="https://blog.z3ratu1.cn/hxpCTF2022wp.html">
+    <link itemprop="mainEntityOfPage" href="https://blog.z3ratu1.top/hxpCTF2022wp.html">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="https://thirdqq.qlogo.cn/g?b=sdk&k=LSKHut5Wmfic1emlMT4FpuA&kti=ZMCGFwAAAAI&s=640&t=1673848139">
@@ -511,7 +511,7 @@ done
 </code></pre>
 <p>返回了一个赋值好<code>__proto__</code>的对象，而后面的这段<code>forEach(([K,V])=&gt;Object.entries(V).forEach(([k,v])=&gt;(o[K]=o[K]||&#123;&#125;,o[K][k]=v)))</code>操作就是在进行原型链污染，把<code>__proto__</code>的各个属性赋值到空对象o上去，最后<code>require i.js</code></p>
 <p>但是实际上找一下会发现，i对应的很多文件是不存在的，这是怎么回事捏</p>
-<p>这就要看这个奇怪的原型链污染操作了，污染了一些奇奇怪怪的东西，如果进行回忆之前balsn的那一个题，就能想起许多<br><a href="https://blog.z3ratu1.cn/BalsnCTF2022web%20wp.html#2linenodejs">balsnCTF2022</a></p>
+<p>这就要看这个奇怪的原型链污染操作了，污染了一些奇奇怪怪的东西，如果进行回忆之前balsn的那一个题，就能想起许多<br><a target="_blank" rel="external nofollow noopener noreferrer" href="https://blog.z3ratu1.cn/BalsnCTF2022web%20wp.html#2linenodejs">balsnCTF2022</a></p>
 <p>再跟着当时的情况调一下，如果没有package.json，原型链污染控制data和path，data需要和require中的字符串一致，就会去加载path下的exports。这样子就完美解释了捏</p>
 <p>比如<code>require(&#39;./555&#39;)(504,897,229)</code>，555.js内容如下</p>
 <pre class=" language-js"><code class="language-js">module<span class="token punctuation">.</span>exports<span class="token operator">=</span><span class="token punctuation">(</span>i<span class="token punctuation">,</span>j<span class="token punctuation">,</span>t<span class="token punctuation">)</span><span class="token operator">=</span><span class="token operator">></span><span class="token punctuation">(</span>i<span class="token operator">+</span><span class="token operator">=</span><span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token punctuation">,</span>j<span class="token operator">+</span><span class="token string">""</span><span class="token punctuation">,</span>t<span class="token operator">=</span><span class="token punctuation">(</span>t<span class="token operator">+</span><span class="token punctuation">{</span><span class="token punctuation">}</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">split</span><span class="token punctuation">(</span><span class="token string">"["</span><span class="token punctuation">)</span><span class="token punctuation">[</span><span class="token number">0</span><span class="token punctuation">]</span><span class="token punctuation">,</span>o<span class="token operator">=</span><span class="token punctuation">{</span><span class="token punctuation">}</span><span class="token punctuation">,</span>Object<span class="token punctuation">.</span><span class="token function">entries</span><span class="token punctuation">(</span><span class="token function">require</span><span class="token punctuation">(</span><span class="token string">'./289'</span><span class="token punctuation">)</span><span class="token punctuation">(</span>j<span class="token punctuation">,</span>t<span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">forEach</span><span class="token punctuation">(</span><span class="token punctuation">(</span><span class="token punctuation">[</span>K<span class="token punctuation">,</span>V<span class="token punctuation">]</span><span class="token punctuation">)</span><span class="token operator">=</span><span class="token operator">></span>Object<span class="token punctuation">.</span><span class="token function">entries</span><span class="token punctuation">(</span>V<span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">forEach</span><span class="token punctuation">(</span><span class="token punctuation">(</span><span class="token punctuation">[</span>k<span class="token punctuation">,</span>v<span class="token punctuation">]</span><span class="token punctuation">)</span><span class="token operator">=</span><span class="token operator">></span><span class="token punctuation">(</span>o<span class="token punctuation">[</span>K<span class="token punctuation">]</span><span class="token operator">=</span>o<span class="token punctuation">[</span>K<span class="token punctuation">]</span><span class="token operator">||</span><span class="token punctuation">{</span><span class="token punctuation">}</span><span class="token punctuation">,</span>o<span class="token punctuation">[</span>K<span class="token punctuation">]</span><span class="token punctuation">[</span>k<span class="token punctuation">]</span><span class="token operator">=</span>v<span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">,</span><span class="token function">require</span><span class="token punctuation">(</span><span class="token template-string"><span class="token string">`./</span><span class="token interpolation"><span class="token interpolation-punctuation punctuation">${</span>j<span class="token interpolation-punctuation punctuation">}</span></span><span class="token string">`</span></span><span class="token punctuation">)</span><span class="token punctuation">)</span>
@@ -684,7 +684,7 @@ includefile <span class="token operator">=</span> <span class="token string">''<
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">190</span>
+          <span class="site-state-item-count">191</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
@@ -697,7 +697,7 @@ includefile <span class="token operator">=</span> <span class="token string">''<
       <div class="site-state-item site-state-tags">
             <a href="/tags/">
           
-        <span class="site-state-item-count">94</span>
+        <span class="site-state-item-count">95</span>
         <span class="site-state-item-name">标签</span></a>
       </div>
   </nav>

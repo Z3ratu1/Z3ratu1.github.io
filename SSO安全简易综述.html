@@ -1,0 +1,577 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 6.0.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"blog.z3ratu1.top","root":"/","scheme":"Pisces","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"always","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":true},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+  </script>
+
+  <meta name="description" content="SSO安全简易综述SSO即Single Sign On，单点登录，只是一个名称，而其下有多种实现方案，比较常见的实现方案为CAS和OAuth，然后基于OAuth又扩展出一个OpenID Connect(OIDC)，最近读论文的时候看了些SSO安全，加上之前学过的一点内容，还是总归记录一下。 整篇文章的安全内容基本围绕OAuth，这个是目前研究比较多资料比较多的方向。 基本概念基本概念只要搞清楚CA">
+<meta property="og:type" content="article">
+<meta property="og:title" content="SSO安全简易综述">
+<meta property="og:url" content="https://blog.z3ratu1.top/SSO%E5%AE%89%E5%85%A8%E7%AE%80%E6%98%93%E7%BB%BC%E8%BF%B0.html">
+<meta property="og:site_name" content="Z3ratu1&#39;s blog">
+<meta property="og:description" content="SSO安全简易综述SSO即Single Sign On，单点登录，只是一个名称，而其下有多种实现方案，比较常见的实现方案为CAS和OAuth，然后基于OAuth又扩展出一个OpenID Connect(OIDC)，最近读论文的时候看了些SSO安全，加上之前学过的一点内容，还是总归记录一下。 整篇文章的安全内容基本围绕OAuth，这个是目前研究比较多资料比较多的方向。 基本概念基本概念只要搞清楚CA">
+<meta property="og:locale">
+<meta property="og:image" content="https://image-host-1304136909.cos.ap-shanghai.myqcloud.com/blog/SSO%E5%AE%89%E5%85%A8%E7%AE%80%E6%98%93%E7%BB%BC%E8%BF%B0/image-20241210162656680.png">
+<meta property="og:image" content="https://image-host-1304136909.cos.ap-shanghai.myqcloud.com/blog/SSO%E5%AE%89%E5%85%A8%E7%AE%80%E6%98%93%E7%BB%BC%E8%BF%B0/image-20241210162736439.png">
+<meta property="article:published_time" content="2024-12-09T11:19:20.000Z">
+<meta property="article:modified_time" content="2024-12-10T08:27:50.738Z">
+<meta property="article:author" content="Z3ratu1">
+<meta property="article:tag" content="SSO">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://image-host-1304136909.cos.ap-shanghai.myqcloud.com/blog/SSO%E5%AE%89%E5%85%A8%E7%AE%80%E6%98%93%E7%BB%BC%E8%BF%B0/image-20241210162656680.png">
+
+<link rel="canonical" href="https://blog.z3ratu1.top/SSO%E5%AE%89%E5%85%A8%E7%AE%80%E6%98%93%E7%BB%BC%E8%BF%B0.html">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-Hans'
+  };
+</script>
+
+  <title>SSO安全简易综述 | Z3ratu1's blog</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+<link rel="stylesheet" href="/css/prism-tomorrow.css" type="text/css"></head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">Z3ratu1's blog</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">Welcome</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>关于</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+        <li class="menu-item menu-item-links">
+
+    <a href="/links/" rel="section"><i class="fa fa-link fa-fw"></i>友链</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off" placeholder="搜索..." spellcheck="false" type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+  <a href="https://github.com/Z3ratu1" class="github-corner" title="Follow me on GitHub" aria-label="Follow me on GitHub" rel="external nofollow noopener noreferrer" target="_blank"><svg width="80" height="80" viewbox="0 0 250 250" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"/><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"/><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"/></svg></a>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
+    <link itemprop="mainEntityOfPage" href="https://blog.z3ratu1.top/SSO%E5%AE%89%E5%85%A8%E7%AE%80%E6%98%93%E7%BB%BC%E8%BF%B0.html">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="https://thirdqq.qlogo.cn/g?b=sdk&k=LSKHut5Wmfic1emlMT4FpuA&kti=ZMCGFwAAAAI&s=640&t=1673848139">
+      <meta itemprop="name" content="Z3ratu1">
+      <meta itemprop="description" content="与其感慨路难行，不如现在出发">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Z3ratu1's blog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          SSO安全简易综述
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2024-12-09 19:19:20" itemprop="dateCreated datePublished" datetime="2024-12-09T19:19:20+08:00">2024-12-09</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2024-12-10 16:27:50" itemprop="dateModified" datetime="2024-12-10T16:27:50+08:00">2024-12-10</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E7%AC%94%E8%AE%B0/" itemprop="url" rel="index"><span itemprop="name">笔记</span></a>
+                </span>
+            </span>
+
+          
+            <span id="/SSO%E5%AE%89%E5%85%A8%E7%AE%80%E6%98%93%E7%BB%BC%E8%BF%B0.html" class="post-meta-item leancloud_visitors" data-flag-title="SSO安全简易综述" title="阅读次数">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span class="leancloud-visitors-count"></span>
+            </span>
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="far fa-comment"></i>
+      </span>
+      <span class="post-meta-item-text">Valine：</span>
+    
+    <a title="valine" href="/SSO%E5%AE%89%E5%85%A8%E7%AE%80%E6%98%93%E7%BB%BC%E8%BF%B0.html#valine-comments" itemprop="discussionUrl">
+      <span class="post-comments-count valine-comment-count" data-xid="/SSO%E5%AE%89%E5%85%A8%E7%AE%80%E6%98%93%E7%BB%BC%E8%BF%B0.html" itemprop="commentCount"></span>
+    </a>
+  </span>
+  
+  
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h1 id="SSO安全简易综述"><a href="#SSO安全简易综述" class="headerlink" title="SSO安全简易综述"></a>SSO安全简易综述</h1><p>SSO即Single Sign On，单点登录，只是一个名称，而其下有多种实现方案，比较常见的实现方案为CAS和OAuth，然后基于OAuth又扩展出一个OpenID Connect(OIDC)，最近读论文的时候看了些SSO安全，加上之前学过的一点内容，还是总归记录一下。</p>
+<p>整篇文章的安全内容基本围绕OAuth，这个是目前研究比较多资料比较多的方向。</p>
+<h2 id="基本概念"><a href="#基本概念" class="headerlink" title="基本概念"></a>基本概念</h2><p>基本概念只要搞清楚CAS，OAuth和OIDC是个啥就行<br>这块应该直接贴链接复制粘贴的。<br>具体过程不详述，多看链接</p>
+<p><a target="_blank" rel="external nofollow noopener noreferrer" href="https://blog.authing.cn/blog/483">CAS 和 OAuth 的区别是什么？</a><br><a target="_blank" rel="external nofollow noopener noreferrer" href="https://docs.authing.cn/v2/concepts/oidc/oidc-overview.html">OIDC 与 OAuth2.0 综述</a><br><a target="_blank" rel="external nofollow noopener noreferrer" href="https://www.ruanyifeng.com/blog/2014/05/oauth_2_0.html">理解OAuth 2.0</a><br><a target="_blank" rel="external nofollow noopener noreferrer" href="https://developer.sjtu.edu.cn/auth/oidc.html#%E5%9F%BA%E4%BA%8E%E9%9A%90%E5%90%AB%E6%8E%88%E6%9D%83-implicit-%E8%BF%87%E7%A8%8B%E7%9A%84-oidc-%E8%AE%A4%E8%AF%81%E6%A8%A1%E5%BC%8F">jAccount认证接入方法</a><br><a target="_blank" rel="external nofollow noopener noreferrer" href="https://docs.authing.cn/v2/reference/sdk-for-node/authentication/StandardProtocol.html">标准协议认证模块</a></p>
+<p>然后再贴几个常见缩写<br>Service Provider（SP）服务提供方，有时也叫Relying Party（RP）依赖方<br>Identity Provider（IdP）身份验证方<br>End User（EU）终端用户</p>
+<p>CAS只进行认证，不进行授权。SP和IdP一般都由一个主体控制，比如学校的办事大厅之类的东西，在门户登录之后其他的子系统也可以一起登录。该过程只有认证，即你在门户完成了认证后，后续对子系统的访问由门户进行认证。</p>
+<p>而OAuth则只负责授权，不进行认证环节。即常见的第三方登录功能，如github登录，微信登录等。OAuth场景下，你登录的SP大多分属于不同的主体，且IdP与SP之间也不会有什么关系。该过程是一个授权过程，通过将你在IdP处已有的账号的（部分）信息授权给SP，使得SP可以通过IdP提供的信息创建一个新的账号登录（或是登录之前已绑定过IdP的已有账号）。（但是放在国内，一般第三方授权创建新号之后还要强制再绑一个手机号，导致第三方登录并不方便。。。）</p>
+<p>OIDC是在OAuth协议下的一种扩展，核心仍然使用OAuth进行授权，但是还多了认证功能，以及一大堆可选的插件。在OAuth的基础上多了ID Token，可以用于用户的认证。可以参看一下上面上交的OIDC手册的描述：</p>
+<blockquote>
+<p>开放式认证系统连接OpenID Connect（OIDC）是基于OAuth2.0的身份认证标准协议，OIDC使用OAuth2的授权服务器来为第三方客户端提供用户的身份认证，并把对应的身份认证信息传递给客户端，且可以适用于各种类型的客户端（比如服务端应用，移动APP，JS应用）。</p>
+</blockquote>
+<p>以及这篇文章，提到了Access token用于授权，而Id token用于认证。<br><a target="_blank" rel="external nofollow noopener noreferrer" href="https://docs.authing.cn/v2/concepts/access-token-vs-id-token.html">Access Token vs Id Token</a></p>
+<p><a target="_blank" rel="external nofollow noopener noreferrer" href="https://docs.authing.cn/v2/concepts/oidc/choose-flow.html">选择 OIDC 授权模式</a><br>以及这里提到了SPA（单页式应用）需要使用隐式模式授权。其实我感觉描述不是很对，感觉更应该像是纯前端应用，或者是APP之类的没有独立后端的应用。因为本身就不能安全的存储access token，所以就摆了，直接忽略code步骤拿access token</p>
+<h2 id="安全"><a href="#安全" class="headerlink" title="安全"></a>安全</h2><p>oauth除了授权码模式和隐式模式(简化模式)外还有密码模式和客户端模式，后两种暴露的安全问题较少，这里只关注前两种的安全问题。</p>
+<h3 id="授权码模式"><a href="#授权码模式" class="headerlink" title="授权码模式"></a>授权码模式</h3><p>一般来说，会比较推荐使用授权码模式进行授权，该模式需要IdP在重定向时返回一次性且短期有效的code，放在url的hash中，然后接收方通过JavaScript读取hash中的code传递到SP，SP需要通过APPID和APPSecret去找IdP兑换access token，并使用access token去获取用户信息。<br>这个步骤中，access token对用户是不可见的。</p>
+<h4 id="开放重定向"><a href="#开放重定向" class="headerlink" title="开放重定向"></a>开放重定向</h4><p>最容易想到的问题是开放重定向，对于IdP的授权请求一般长下面这个样子（直接复制的上交开放文档的内容），以及这个示例请求中缺失了state参数，这会导致csrf攻击。</p>
+<pre><code>GET /oauth2/authorize?response_type=code&amp;scope=openid&amp;client_id=s6BhdRkqt3&amp;redirect_uri=https%3A%2F%2Fclient.example.org%2Fcb HTTP/1.1
+Host: jaccount.sjtu.edu.cn
+</code></pre>
+<p>用户授权后，重定向会长如下这样（但是这里又出现了state参数。。。）</p>
+<pre><code>HTTP/1.1 302 Found
+Location: https://client.example.com/cb?code=SplxlOBeZQQYbYS6WxSbIA&amp;state=xyz
+</code></pre>
+<p>一个很简单的想法就是，攻击者直接修改IdP授权请求的<code>redirect_uri</code>参数，即可将code任意重定向到攻击者可控平台，再自行构造重定向后的页面访问即可接管用户账户。</p>
+<p>该攻击也有显而易见的防御措施，授权请求携带了<code>client_id</code>指明了其属于哪个应用，该应用在注册时设定好允许的重定向url，即可阻止攻击者的开放重定向。</p>
+<h4 id="XSS窃取"><a href="#XSS窃取" class="headerlink" title="XSS窃取"></a>XSS窃取</h4><p>这个的攻击要求会更高一些，需要在SP上有一个xss漏洞，在IdP将code返回时拿到code并外带。并且由于code是一次性的，所以还需要保证重定向回到SP后，阻止前端将code发送到SP后端进行兑换。</p>
+<p>以及常规情况下，SP的callback路径很难有存储型XSS，而IdP返回的重定向内容不太可控（虽然state其实是比较可控的，但是一般来说不太可能反射到页面上）。所以一般的攻击思路是在主站上拿到一个xss后注入iframe，诱骗用户在iframe处进行第三方授权，然后通过拦截重定向结果（比如往页面中注入超长cookie直接塞爆中间件，或者对ajax函数进行hook之类的操作）的方式阻止后端去兑换token并读取iframe url外带。</p>
+<h4 id="CSRF攻击"><a href="#CSRF攻击" class="headerlink" title="CSRF攻击"></a>CSRF攻击</h4><p>CSRF攻击是诱骗用户将自己SP的账号与攻击者的IdP绑定，这里涉及到SP账户和IdP账户两个主体，即使你在SP处使用了第三方登录，SP最终还是会通过IdP的信息给你创建一个SP的号。反过来，如果你先创建一个SP的号，可以再进行第三方登录使得该SP账户与IdP账户绑定。</p>
+<p>具体攻击步骤为，攻击者先进行授权码模式的认证，当验证进行到返回code这一步时，拦截该请求并诱导受害者访问该链接，此时返回的code代表的是攻击者的IdP账户，而受害者在访问该连接后SP会使用code得到攻击者IdP的信息，使得受害者SP绑定上攻击者IdP账户，导致攻击者可以通过IdP登录受害者SP。</p>
+<p>防御方式也就是之前提到的<code>state</code>参数，这个参数可以认为是csrf token，即要求SP在发起授权请求时携带该参数，并在IdP返回code时，将state原封不动的返回。攻击者无法获取用户的state参数，并且用户如果没有发起第三方登录验证的话，也不会存在state参数，即可做到对于csrf攻击的防御。</p>
+<p>不过，就看的一些论文的调查上，似乎许多实现对于state的校验并不严格。有没有一种可能是允许无state，然后用户本身只要不发起授权流程，state就是空就可以直接置空绕过呢。</p>
+<p>可以参看如下链接<br><a target="_blank" rel="external nofollow noopener noreferrer" href="https://www.cnblogs.com/blowing00/p/14872312.html">Oauth2.0 里面的 state 参数是干什么的？</a></p>
+<h4 id="reference信息泄露"><a href="#reference信息泄露" class="headerlink" title="reference信息泄露"></a>reference信息泄露</h4><p>这个的话在实际应用场景中感觉不多，但是论文就喜欢研究这个。<br>如果不设置refer policy，或者用的是某些古早浏览器的话，同一个页面如果加载了其他网站的资源，会携带完整的url作为header中的refer字段，而code如果是通过request parameter形式传播的话，就会被包含在完整url中。</p>
+<p>但是感觉上是不太会有这种问题的，如果code通过parameter传递，那code应该直接抵达后端，后端验证完之后直接应该重定向到登陆完成页面？或者中间有一个中转页面，但是设计上也不应该加载其他外部资源导致code泄露。并且就算需要加载外部资源，也无法被攻击者控制，感觉危害性不是很够。（虽然论文很喜欢说网络嗅探）</p>
+<p>如果code通过hash传递，callback页面也应该只引入js然后让js传递到后端，也不应该会引入其他可能泄露的资源（感觉上，没有写过，云的），所以暂且不太理解这个攻击的实际意义</p>
+<h3 id="简化模式"><a href="#简化模式" class="headerlink" title="简化模式"></a>简化模式</h3><p>简化模式相较于授权码模式会比较直白，省略了从code兑换token的步骤，在重定向返回时直接返回access token。多适用于无独立后端的应用。如单页式应用或者一些纯前端app之类的。<br>给出的理由是纯前端应用无法安全的存储密钥，所以直接摆了。暂且不知道这里提到的密钥是什么，权且认为是app secret。</p>
+<p>这里似乎在实现上存在一定的分歧，通过access token获取用户信息是只需要app id的，但是如果想刷新access token的时间，根据authing的文档，是需要app secret的，这也是authing文档中指出简化模式下不支持刷新token持续时间的原因。但是上交文档中却没有这个限制（以及上交文档中token和code都是通过query传递的，暂且认为不太专业）</p>
+<h4 id="token归属不明"><a href="#token归属不明" class="headerlink" title="token归属不明"></a>token归属不明</h4><p>这个算是一个比较经典的漏洞类型，在使用简化模式进行授权时，token是直接暴露在外的，所以用户是可以手动控制token值的。<br>假设存在一个SP example.com和一个攻击者可控的恶意SP attacker.com，当受害者在attacker.com上完成了第三方认证时，攻击者就可以拿到对应用户IdP身份的access token，再把这个token直接用到example.com上去授权，example用这个token一样可以拿到用户的信息，验证即可通过，也就完成了对用户账户的接管。<br>该攻击需要在简化模式下才能使用，是因为简化模式才允许攻击者直接指定access token，授权码模式下access token是独立存放在后端的。</p>
+<p>修复方案也很明了，上文提到过</p>
+<blockquote>
+<p>通过access token获取用户信息是只需要app id的</p>
+</blockquote>
+<p>所以IdP方需要负责记录发出的access token与app id的对应关系，只有当app id正确的情况下才能验证通过。</p>
+<p>感觉上，其实和授权码模式下的CSRF攻击有点类似。在不考虑state的情况下，似乎也可以用恶意应用去获取用户code然后去SP上尝试登录。不过，code在兑换时本身就需要提供app id和secret，肯定也是做了相关绑定的。</p>
+<h3 id="奇怪的论文研究"><a href="#奇怪的论文研究" class="headerlink" title="奇怪的论文研究"></a>奇怪的论文研究</h3><h4 id="An-Investigation-of-Identity-Account-Inconsistency-in-Single-Sign-On"><a href="#An-Investigation-of-Identity-Account-Inconsistency-in-Single-Sign-On" class="headerlink" title="An Investigation of Identity-Account Inconsistency in Single Sign-On"></a>An Investigation of Identity-Account Inconsistency in Single Sign-On</h4><p><a target="_blank" rel="external nofollow noopener noreferrer" href="https://dl.acm.org/doi/10.1145/3442381.3450085">An Investigation of Identity-Account Inconsistency in Single Sign-On</a></p>
+<p>提出了一个玄学场景，之，当你使用IdP注册了一个号（邮箱），然后你的这个邮箱因为某种原因丢失了&#x2F;注销了&#x2F;改名了，然后被攻击者重新注册，攻击者就可以通过这个邮箱接管你之前通过IdP认证的SP账户。</p>
+<p>乍一看有一种我拿到了你的密保邮箱之后就可以用你的密保邮箱接管你的账号的荒诞感。但是仔细阅读之后还是觉得很有道理的。<br>其实只需要看论文里的一张图就知道讲的是什么。</p>
+<p><img src="https://image-host-1304136909.cos.ap-shanghai.myqcloud.com/blog/SSO%E5%AE%89%E5%85%A8%E7%AE%80%E6%98%93%E7%BB%BC%E8%BF%B0/image-20241210162656680.png" alt="image-20241210162656680"></p>
+<p>这里主要讨论后三种情况，</p>
+<ol>
+<li>bob用<a href="mailto:&#98;&#x6f;&#x62;&#x40;&#x65;&#x78;&#x61;&#109;&#112;&#108;&#x65;&#46;&#x63;&#111;&#109;">&#98;&#x6f;&#x62;&#x40;&#x65;&#x78;&#x61;&#109;&#112;&#108;&#x65;&#46;&#x63;&#111;&#109;</a>通过IdP注册了SP账户，但是把邮箱改成了<a href="mailto:&#97;&#x6c;&#x69;&#99;&#x65;&#64;&#x65;&#120;&#x61;&#x6d;&#112;&#x6c;&#101;&#46;&#x63;&#111;&#x6d;">&#97;&#x6c;&#x69;&#99;&#x65;&#64;&#x65;&#120;&#x61;&#x6d;&#112;&#x6c;&#101;&#46;&#x63;&#111;&#x6d;</a>（号不变，因为sub不变），能否登录原来账户。</li>
+<li>alice使用了<a href="mailto:&#x61;&#x6c;&#105;&#x63;&#x65;&#64;&#x65;&#120;&#97;&#109;&#112;&#x6c;&#101;&#x2e;&#x63;&#111;&#x6d;">&#x61;&#x6c;&#105;&#x63;&#x65;&#64;&#x65;&#120;&#97;&#109;&#112;&#x6c;&#101;&#x2e;&#x63;&#111;&#x6d;</a>这个邮箱注册了账户，但是没有绑定IdP（即sub为空），后来该邮箱被攻击者获取，攻击者能否通过该邮箱接管alice的SP庄户。</li>
+<li>bob注册且绑定IdP后，该邮箱被注销并被攻击者重新注册（分配了新的sub），攻击者能否用该相同邮箱登录bob SP账户。</li>
+</ol>
+<p>感觉根据逻辑来说，情况1应该是允许登录，情况2我个人认为应该也可以登录？看SP本身的考量，而情况3如果登录成功则属于漏洞。</p>
+<p>这个问题牵扯到的核心是，SP应该使用什么来唯一确定IdP的用户，因为邮箱是不允许重复的，所以如果使用邮箱作为索引，就会导致攻击的产生。然而，根据Oauth规范，access token换来的用户信息中应包含sub(subject)项，作为用户ID的唯一标识。当然也会携带email项。</p>
+<p>所以解决思路很明了，只以sub为用户唯一索引即可。<br>这么讨论一下，是不是感觉他说的还挺有道理的。</p>
+<h4 id="DISTINCT-Identity-Theft-using-In-Browser-Communications-in-Dual-Window-Single-Sign-On"><a href="#DISTINCT-Identity-Theft-using-In-Browser-Communications-in-Dual-Window-Single-Sign-On" class="headerlink" title="DISTINCT: Identity Theft using In-Browser Communications in Dual-Window Single Sign-On"></a>DISTINCT: Identity Theft using In-Browser Communications in Dual-Window Single Sign-On</h4><p><a target="_blank" rel="external nofollow noopener noreferrer" href="https://dl.acm.org/doi/10.1145/3548606.3560692">DISTINCT: Identity Theft using In-Browser Communications in Dual-Window Single Sign-On</a><br>CCS传奇文章，写挺好的</p>
+<p>讨论了一个没有标准化的OAuth流程，双窗口OAuth。（不知道现在是不是也有标准了，但是实际上这些漏洞的成因和OAuth流程关系不大，更像是常规web漏洞的利用）<br>传统OAuth流程依赖于重定向，对于SPA单页式应用，重定向是不（那么）可用的，所以也有许多的SP是通过内嵌iframe，或是pop up弹出式窗口与IdP进行授权，完成后通过postMessage之类的浏览器内部通信方式进行传输。</p>
+<p>所以整篇文章讨论的其实是postMessage误配置或是使用window.location传递数据时可能存在的问题。<br>关键内容也就是论文里的一张图</p>
+<p><img src="https://image-host-1304136909.cos.ap-shanghai.myqcloud.com/blog/SSO%E5%AE%89%E5%85%A8%E7%AE%80%E6%98%93%E7%BB%BC%E8%BF%B0/image-20241210162736439.png" alt="image-20241210162736439"></p>
+<p>攻击者通过iframe把SP的认证页面嵌入到自己的页面中，然后进行授权<br>第一种情况是postMessage未设置目标域名，直接获取到数据<br>第二种情况是SP不校验回调url，向攻击者发送数据<br>第三种情况是攻击者可以向location中写入数据造成xss（这个我感觉有点凑数），需要注意的是，跨域情况下，是可以写入跨域iframe的location的，但是不能读取。</p>
+<p>提出了一种全新的漏洞存在方式，还是挺有感觉的。</p>
+<h4 id="O-Single-Sign-Off-Where-Art-Thou-An-Empirical-Analysis-of-Single-Sign-On-Account-Hijacking-and-Session-Management-on-the-Web"><a href="#O-Single-Sign-Off-Where-Art-Thou-An-Empirical-Analysis-of-Single-Sign-On-Account-Hijacking-and-Session-Management-on-the-Web" class="headerlink" title="O Single Sign-Off, Where Art Thou? An Empirical Analysis of Single Sign-On Account Hijacking and Session Management on the Web"></a>O Single Sign-Off, Where Art Thou? An Empirical Analysis of Single Sign-On Account Hijacking and Session Management on the Web</h4><p><a target="_blank" rel="external nofollow noopener noreferrer" href="https://www.usenix.org/conference/usenixsecurity18/presentation/ghasemisharif">O Single Sign-Off, Where Art Thou? An Empirical Analysis of Single Sign-On Account Hijacking and Session Management on the Web</a><br>usenix传奇文章，提出了单点登录的反向情况，单点登出的问题。讨论的是当IdP账户因为某种原因被接管的情况下，用户在重获IdP账户所有权后，如何取消之前的所有授权。</p>
+<p>这个想法也很明确，当SP能够使用token获取到用户信息时，SP就会自己创建对应的账户，并以登录的形式下发cookie给用户，之后并没有其他的理由没事去check一下token是否被吊销。只有当cookie过期之后，攻击者才会失去对用户账户的控制。</p>
+<p>（不过应该也有常见需要一直维护token的有效性的吧，不然refresh token是干什么的呢）</p>
+<p>解决方案的话，好像目前为止标准上都没有特别确定的？（没有专门翻文档，云的）感觉就是强制每隔一段时间去check一下token有效性？不过IdP会不会因为这样有比较大的负载压力？</p>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/SSO/" rel="tag"># SSO</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/JDBC%20attack.html" rel="prev" title="JDBC attack">
+      <i class="fa fa-chevron-left"></i> JDBC attack
+    </a></div>
+      <div class="post-nav-item"></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+    <div class="comments" id="valine-comments"></div>
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#SSO%E5%AE%89%E5%85%A8%E7%AE%80%E6%98%93%E7%BB%BC%E8%BF%B0"><span class="nav-number">1.</span> <span class="nav-text">SSO安全简易综述</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%9F%BA%E6%9C%AC%E6%A6%82%E5%BF%B5"><span class="nav-number">1.1.</span> <span class="nav-text">基本概念</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%AE%89%E5%85%A8"><span class="nav-number">1.2.</span> <span class="nav-text">安全</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%8E%88%E6%9D%83%E7%A0%81%E6%A8%A1%E5%BC%8F"><span class="nav-number">1.2.1.</span> <span class="nav-text">授权码模式</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%BC%80%E6%94%BE%E9%87%8D%E5%AE%9A%E5%90%91"><span class="nav-number">1.2.1.1.</span> <span class="nav-text">开放重定向</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#XSS%E7%AA%83%E5%8F%96"><span class="nav-number">1.2.1.2.</span> <span class="nav-text">XSS窃取</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#CSRF%E6%94%BB%E5%87%BB"><span class="nav-number">1.2.1.3.</span> <span class="nav-text">CSRF攻击</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#reference%E4%BF%A1%E6%81%AF%E6%B3%84%E9%9C%B2"><span class="nav-number">1.2.1.4.</span> <span class="nav-text">reference信息泄露</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%AE%80%E5%8C%96%E6%A8%A1%E5%BC%8F"><span class="nav-number">1.2.2.</span> <span class="nav-text">简化模式</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#token%E5%BD%92%E5%B1%9E%E4%B8%8D%E6%98%8E"><span class="nav-number">1.2.2.1.</span> <span class="nav-text">token归属不明</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%A5%87%E6%80%AA%E7%9A%84%E8%AE%BA%E6%96%87%E7%A0%94%E7%A9%B6"><span class="nav-number">1.2.3.</span> <span class="nav-text">奇怪的论文研究</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#An-Investigation-of-Identity-Account-Inconsistency-in-Single-Sign-On"><span class="nav-number">1.2.3.1.</span> <span class="nav-text">An Investigation of Identity-Account Inconsistency in Single Sign-On</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#DISTINCT-Identity-Theft-using-In-Browser-Communications-in-Dual-Window-Single-Sign-On"><span class="nav-number">1.2.3.2.</span> <span class="nav-text">DISTINCT: Identity Theft using In-Browser Communications in Dual-Window Single Sign-On</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#O-Single-Sign-Off-Where-Art-Thou-An-Empirical-Analysis-of-Single-Sign-On-Account-Hijacking-and-Session-Management-on-the-Web"><span class="nav-number">1.2.3.3.</span> <span class="nav-text">O Single Sign-Off, Where Art Thou? An Empirical Analysis of Single Sign-On Account Hijacking and Session Management on the Web</span></a></li></ol></li></ol></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Z3ratu1" src="https://thirdqq.qlogo.cn/g?b=sdk&k=LSKHut5Wmfic1emlMT4FpuA&kti=ZMCGFwAAAAI&s=640&t=1673848139">
+  <p class="site-author-name" itemprop="name">Z3ratu1</p>
+  <div class="site-description" itemprop="description">与其感慨路难行，不如现在出发</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">191</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">5</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">95</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 2019 – 
+  <span itemprop="copyrightYear">2024</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Z3ratu1</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="external nofollow noopener noreferrer" target="_blank">Hexo</a> & <a href="https://pisces.theme-next.org/" class="theme-link" rel="external nofollow noopener noreferrer" target="_blank">NexT.Pisces</a> 强力驱动
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+
+<script>
+NexT.utils.loadComments(document.querySelector('#valine-comments'), () => {
+  NexT.utils.getScript('https://cdn.jsdelivr.net/npm/valine@1.4.14/dist/Valine.min.js', () => {
+    var GUEST = ['nick', 'mail', 'link'];
+    var guest = 'nick,mail,link';
+    guest = guest.split(',').filter(item => {
+      return GUEST.includes(item);
+    });
+    new Valine({
+      el         : '#valine-comments',
+      verify     : false,
+      notify     : false,
+      appId      : '7H8kg0XdWO8IbhOcu4K1JaAT-gzGzoHsz',
+      appKey     : 'wPKQjkbVtvPaRR7gh2yjfLSi',
+      placeholder: "Just go go",
+      avatar     : 'mm',
+      meta       : guest,
+      pageSize   : '10' || 10,
+      visitor    : true,
+      lang       : '' || 'zh-cn',
+      path       : location.pathname,
+      recordIP   : false,
+      serverURLs : ''
+    });
+  }, window.Valine);
+});
+</script>
+
+</body>
+</html>
