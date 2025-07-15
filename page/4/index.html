@@ -196,6 +196,111 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
+    <link itemprop="mainEntityOfPage" href="https://blog.z3ratu1.top/%E4%BB%8E%E7%83%82%E5%9C%9F%E8%B1%86%E5%BC%80%E5%A7%8B%E7%9A%84%E5%9C%9F%E8%B1%86%E5%AE%B6%E6%97%8F%E5%85%A5%E9%97%A8.html">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="https://thirdqq.qlogo.cn/g?b=sdk&k=LSKHut5Wmfic1emlMT4FpuA&kti=ZMCGFwAAAAI&s=640&t=1673848139">
+      <meta itemprop="name" content="Z3ratu1">
+      <meta itemprop="description" content="与其感慨路难行，不如现在出发">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Z3ratu1's blog">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/%E4%BB%8E%E7%83%82%E5%9C%9F%E8%B1%86%E5%BC%80%E5%A7%8B%E7%9A%84%E5%9C%9F%E8%B1%86%E5%AE%B6%E6%97%8F%E5%85%A5%E9%97%A8.html" class="post-title-link" itemprop="url">从烂土豆开始的土豆家族入门</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2023-04-11 11:54:20" itemprop="dateCreated datePublished" datetime="2023-04-11T11:54:20+08:00">2023-04-11</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2023-04-18 10:07:44" itemprop="dateModified" datetime="2023-04-18T10:07:44+08:00">2023-04-18</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E7%AC%94%E8%AE%B0/" itemprop="url" rel="index"><span itemprop="name">笔记</span></a>
+                </span>
+            </span>
+
+          
+            <span id="/%E4%BB%8E%E7%83%82%E5%9C%9F%E8%B1%86%E5%BC%80%E5%A7%8B%E7%9A%84%E5%9C%9F%E8%B1%86%E5%AE%B6%E6%97%8F%E5%85%A5%E9%97%A8.html" class="post-meta-item leancloud_visitors" data-flag-title="从烂土豆开始的土豆家族入门" title="阅读次数">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span class="leancloud-visitors-count"></span>
+            </span>
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="far fa-comment"></i>
+      </span>
+      <span class="post-meta-item-text">Valine：</span>
+    
+    <a title="valine" href="/%E4%BB%8E%E7%83%82%E5%9C%9F%E8%B1%86%E5%BC%80%E5%A7%8B%E7%9A%84%E5%9C%9F%E8%B1%86%E5%AE%B6%E6%97%8F%E5%85%A5%E9%97%A8.html#valine-comments" itemprop="discussionUrl">
+      <span class="post-comments-count valine-comment-count" data-xid="/%E4%BB%8E%E7%83%82%E5%9C%9F%E8%B1%86%E5%BC%80%E5%A7%8B%E7%9A%84%E5%9C%9F%E8%B1%86%E5%AE%B6%E6%97%8F%E5%85%A5%E9%97%A8.html" itemprop="commentCount"></span>
+    </a>
+  </span>
+  
+  
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h1 id="从烂土豆开始的土豆家族入门"><a href="#从烂土豆开始的土豆家族入门" class="headerlink" title="从烂土豆开始的土豆家族入门"></a>从烂土豆开始的土豆家族入门</h1><p><strong>对.NET和COM一窍不通，代码一行都没写过，全篇内容由读各种文章+自行想象完成，不保证准确性，若发现错误请及时联系我更改</strong></p>
+<p>windows在远古版本前，各种服务都是以最高权限SYSTEM跑起来的，那个时候mssql的一个xp_cmdshell就可以一键打到底，而在某个版本后，添加了local service用户，之后iis或者mssql就被降权为了networkservice之类的账户，权限很低，直接操作几乎啥也干不了，但由于这些账户本身作为服务账户，也需要在特定的情况下拥有高权限，微软是允许这些账户进行提权的，而如果我们能对这些情况进行滥用，同样的也就可以将networkservice账户恢复到system</p>
+<p>土豆系列提权的核心是NTLM中继，通过欺骗运行在高权限（Administrator&#x2F;SYSTEM）的账户进行ntlm认证，同时作为中间人对认证过程进行劫持和重放，最后调用本地认证接口使用高权限账号的ntml认证获取一个高权限token，只要当前进程拥有<code>SeImpersonatePrivilege</code>或<code>SeAssignPrimaryToken</code>权限即可进行令牌模仿，即可取得对应权限（同理，对于直接的令牌窃取利用也需要拥有<code>SeImpersonatePrivilege</code>权限，感觉一般只用于Administrator提到SYSTEM，其他的用户一般来说要么没有这个权限，要么没法直接open高权限账户的token</p>
+<h2 id="hot-potato"><a href="#hot-potato" class="headerlink" title="hot potato"></a>hot potato</h2>
+          <!--noindex-->
+            <div class="post-button">
+              <a class="btn" href="/%E4%BB%8E%E7%83%82%E5%9C%9F%E8%B1%86%E5%BC%80%E5%A7%8B%E7%9A%84%E5%9C%9F%E8%B1%86%E5%AE%B6%E6%97%8F%E5%85%A5%E9%97%A8.html#more" rel="contents">
+                阅读全文 &raquo;
+              </a>
+            </div>
+          <!--/noindex-->
+        
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
     <link itemprop="mainEntityOfPage" href="https://blog.z3ratu1.top/ProcessHollowing%E4%B8%8EReflectiveDll.html">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -649,111 +754,6 @@ app<span class="token punctuation">.</span><span class="token keyword">get</span
   
   
 
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
-    <link itemprop="mainEntityOfPage" href="https://blog.z3ratu1.top/CS%20DNS%20beacon%E4%BA%8C%E6%AC%A1%E5%BC%80%E5%8F%91%E6%8C%87%E5%8C%97.html">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="https://thirdqq.qlogo.cn/g?b=sdk&k=LSKHut5Wmfic1emlMT4FpuA&kti=ZMCGFwAAAAI&s=640&t=1673848139">
-      <meta itemprop="name" content="Z3ratu1">
-      <meta itemprop="description" content="与其感慨路难行，不如现在出发">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Z3ratu1's blog">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/CS%20DNS%20beacon%E4%BA%8C%E6%AC%A1%E5%BC%80%E5%8F%91%E6%8C%87%E5%8C%97.html" class="post-title-link" itemprop="url">CS DNS beacon二次开发指北</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2023-02-27 16:36:13" itemprop="dateCreated datePublished" datetime="2023-02-27T16:36:13+08:00">2023-02-27</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="far fa-calendar-check"></i>
-                </span>
-                <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2023-06-30 10:34:49" itemprop="dateModified" datetime="2023-06-30T10:34:49+08:00">2023-06-30</time>
-              </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-folder"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/%E6%B8%97%E9%80%8F/" itemprop="url" rel="index"><span itemprop="name">渗透</span></a>
-                </span>
-            </span>
-
-          
-            <span id="/CS%20DNS%20beacon%E4%BA%8C%E6%AC%A1%E5%BC%80%E5%8F%91%E6%8C%87%E5%8C%97.html" class="post-meta-item leancloud_visitors" data-flag-title="CS DNS beacon二次开发指北" title="阅读次数">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-eye"></i>
-              </span>
-              <span class="post-meta-item-text">阅读次数：</span>
-              <span class="leancloud-visitors-count"></span>
-            </span>
-  
-  <span class="post-meta-item">
-    
-      <span class="post-meta-item-icon">
-        <i class="far fa-comment"></i>
-      </span>
-      <span class="post-meta-item-text">Valine：</span>
-    
-    <a title="valine" href="/CS%20DNS%20beacon%E4%BA%8C%E6%AC%A1%E5%BC%80%E5%8F%91%E6%8C%87%E5%8C%97.html#valine-comments" itemprop="discussionUrl">
-      <span class="post-comments-count valine-comment-count" data-xid="/CS%20DNS%20beacon%E4%BA%8C%E6%AC%A1%E5%BC%80%E5%8F%91%E6%8C%87%E5%8C%97.html" itemprop="commentCount"></span>
-    </a>
-  </span>
-  
-  
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <h1 id="CS-DNS-beacon二次开发指北"><a href="#CS-DNS-beacon二次开发指北" class="headerlink" title="CS DNS beacon二次开发指北"></a>CS DNS beacon二次开发指北</h1><p>接上一篇<a href="/CobaltStrike%20beacon%E4%BA%8C%E5%BC%80%E6%8C%87%E5%8D%97.html">CobaltStrike beacon二开指南</a>，这次把DNS beacon的写法也简要的讲一下。感觉写的东西还是有点玩具，所以依照惯例，还是把指南改成指北吧。。。<br>之前花了大功夫把geacon系列项目整的差不多了，感觉当初这么一个心血来潮的项目能整的这么成功，爽死了捏。当时的TODO上是写了实现DNS beacon的，但是感觉这个功能真的很拉跨加上流量特征极其明显加上不出网环境上马本身就有点玄学，如果有边界机就上代理之后再上马也行，反正就是各种buff叠起来导致感觉鸡肋的很，以及在安全客上看到有人发布了一版实现过的版本，就一直没写，但是最近有点闲的，一起写geacon pro的好兄弟又一直和我提起这个事，就乱写两笔试试算了捏。</p>
-<p><del>写好的代码在<a target="_blank" rel="external nofollow noopener noreferrer" href="https://github.com/H4de5-7/geacon_pro/tree/dns">geacon_pro</a>的dns分支下，由于只是随手写的玩具，还有很多地方没修好，只测试了基本的命令执行，很多功能并未测试，以及很多功能也没实现，只是写出了一个实现的样例demon</del></p>
-<p>pro转私有了，虽然网上可能能找到fork，但是有师傅提到了这个问题，就顺便缝合了一下也缝进plus了，顺便修了点之前的小问题。具体代码整个都在packet&#x2F;dns.go下，外部代码没改啥，通信处有区别的地方加一个if判断改一下就行</p>
-<h2 id="碎碎念"><a href="#碎碎念" class="headerlink" title="碎碎念"></a>碎碎念</h2>
-          <!--noindex-->
-            <div class="post-button">
-              <a class="btn" href="/CS%20DNS%20beacon%E4%BA%8C%E6%AC%A1%E5%BC%80%E5%8F%91%E6%8C%87%E5%8C%97.html#more" rel="contents">
-                阅读全文 &raquo;
-              </a>
-            </div>
-          <!--/noindex-->
-        
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
 
   
   <nav class="pagination">
@@ -824,7 +824,7 @@ app<span class="token punctuation">.</span><span class="token keyword">get</span
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">191</span>
+          <span class="site-state-item-count">192</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
